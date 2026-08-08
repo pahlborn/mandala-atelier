@@ -1,0 +1,14 @@
+{
+  "name": "mandala-atelier",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mandalas gestalten und kolorieren – offline im Browser. Zur Laufzeit ohne Abhängigkeiten.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node tools/test-app.js",
+    "icons": "node tools/gen-icons.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.0"
+  }
+}
