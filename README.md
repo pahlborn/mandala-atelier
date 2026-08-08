@@ -29,10 +29,12 @@ ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
 - **Alles offline, alles im Browser.** Keine Server, keine KI zur Laufzeit,
   keine Konten, kein Tracking, keine Werbung. Symmetrie und Formen entstehen
   aus klassischer Geometrie.
-- **Einzige externe Ressource:** der Google-Fonts-Link (Fraunces, Work Sans,
-  IBM Plex Mono). Der Service Worker legt die Schriften beim ersten Laden ab.
-  Sie dürfen gern durch lokal eingebettete Dateien ersetzt werden – dann kommt
-  die App ganz ohne externen Abruf aus.
+- **Keine externen Abrufe.** Auch die Schriften (Fraunces, Work Sans,
+  IBM Plex Mono) stecken als Daten-URI in `fonts.css`, Schnitt „latin“.
+  Der Testlauf prüft ausdrücklich, dass die Seite nichts nachlädt. Neu
+  erzeugen lässt sich die Datei mit `node tools/gen-fonts.js` – das ist der
+  einzige Vorgang im Projekt, der überhaupt ins Netz greift, und er läuft
+  nur von Hand.
 - **iPad zuerst.** `pointer`-Events, `touch-action: none`, Safe-Area, Quer- und
   Hochformat.
 - **Sprache der Oberfläche: Deutsch.**
@@ -41,13 +43,15 @@ ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
 
 ## Dateien
 
-    index.html              App-Gerüst, Bedienleiste, Motivwelten-Bereich
+    index.html              App-Gerüst, Schubladen, Galerie
+    fonts.css               Schriften als Daten-URI (erzeugt)
     style.css               Design-Tokens, Hell/Dunkel, Layout
     app.js                  Gesamte Logik, in kommentierte Abschnitte geteilt
     manifest.webmanifest    PWA-Manifest
     sw.js                   Service Worker (Offline-Cache)
     icon-*.png              6 Icons, prozedural erzeugt
     tools/browser.js        Sucht einen vorhandenen Chrome/Chromium
+    tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     package.json            Nur devDependencies (playwright-core) für tools/
@@ -57,20 +61,56 @@ die Testskripte gebraucht und steht in `.gitignore`.
 
 ## Technischer Aufbau
 
-**Vier übereinanderliegende Canvas-Ebenen**, je 900 × 900 logisch, per `dpr`
+**Fünf übereinanderliegende Canvas-Ebenen**, je 900 × 900 logisch, per `dpr`
 hochskaliert (`dpr` auf höchstens 2 begrenzt):
 
 | Ebene         | Zweck                                  | Interaktion        |
 |---------------|----------------------------------------|--------------------|
 | `guideCanvas` | Hilfsraster, dreht sich sehr langsam   | keine              |
 | `fillCanvas`  | Farbflächen                            | keine              |
-| `drawCanvas`  | Linien **und** Zeigerereignisse        | fängt alle Eingaben|
+| `motifCanvas` | Linien der Vorlage                     | keine              |
+| `drawCanvas`  | eigene Striche **und** Zeigerereignisse| fängt alle Eingaben|
 | `labelCanvas` | Punkte und Rechenaufgaben              | keine              |
 
-Die Trennung ist wesentlich: Das Füllwerkzeug liest `drawCanvas` als **Wand**
-(Alpha > 60) und schreibt nach `fillCanvas`. Dadurch liegen Linien immer über
-der Farbe und werden beim Füllen nie zerstört. `labelCanvas` liegt ganz oben,
-damit Zahlen auch auf gefärbtem Grund lesbar bleiben.
+Die Trennung ist wesentlich: Das Füllwerkzeug liest `motifCanvas` und
+`drawCanvas` als **Wand** (Alpha > 60) und schreibt nach `fillCanvas`. Dadurch
+liegen Linien immer über der Farbe und werden beim Füllen nie zerstört.
+`labelCanvas` liegt ganz oben, damit Zahlen auch auf gefärbtem Grund lesbar
+bleiben.
+
+Vorlage und eigene Striche liegen getrennt, damit beim Wechsel zwischen Hell
+und Dunkel die Linienfarbe der Vorlage neu gezeichnet werden kann, ohne
+begonnene Arbeit zu zerstören. Nebeneffekt: Der Radierer nimmt nur die eigenen
+Striche weg, nie die Vorlage.
+
+**Hell und Dunkel** wechseln Papier, Linien und Hilfsraster mit. Die Werte
+stehen doppelt – als CSS-Variablen in `style.css` und als `THEMES` in `app.js`,
+weil die Vorlage auf Canvas entsteht und keine CSS-Variable lesen kann. **Beide
+Stellen zusammen ändern.** Bereits gefärbte Flächen behalten ihr Pigment.
+
+**Layout.** Die Zeichenfläche bekommt allen Platz, den das Fenster hergibt;
+Motive und Werkzeuge liegen in Schubladen, die darüber ein- und ausfahren.
+Die Kantenlänge des Blatts setzt `fitStage()` in JavaScript – in CSS lässt sie
+sich nicht verlässlich ausdrücken, weil `aspect-ratio` nicht mehr greift,
+sobald Breite und Höhe beide feststehen. Dann wird aus dem Mandala eine Ellipse.
+
+**Vollbild.** Der Knopf tut zwei Dinge: die eigene Bedienung tritt zurück
+(`body.is-quiet`, nur noch eine schmale schwebende Leiste), und wo der Browser
+es zulässt, wird echtes Vollbild angefordert. Safari auf dem iPad kennt die
+Vollbild-Schnittstelle nicht überall – dann bleibt es beim ruhigen Modus, und
+der bringt schon fast den ganzen Gewinn.
+
+**Farbwelten.** Vier Sätze zu je 14 gedeckten Pigmenten: Erdpigmente,
+Nordlicht, Färbergarten, Rauchglas. Die Reihenfolge innerhalb eines Satzes ist
+nicht beliebig – die Farblegende der Zählmandalas vergibt die ersten Einträge
+der Reihe nach, deshalb stehen die gut unterscheidbaren vorn.
+
+**Galerie.** Fertige Bilder bleiben auf dem Gerät, in IndexedDB. `localStorage`
+wäre zu klein: ein Werk wiegt ein paar hundert Kilobyte. Ist IndexedDB nicht
+verfügbar (Safari im privaten Modus), hält die App die Werke nur für die
+laufende Sitzung – und sagt das, statt es stillschweigend zu schlucken. Jedes
+Werk hat einen Titel, die Galerie selbst darf einen Namen tragen. Beides bleibt
+auf dem Gerät und wird nirgends hingeschickt.
 
 **Symmetrie.** `segmentLine(p0, p1)` zeichnet jede Linie n-mal um die Mitte
 rotiert; bei aktiver Spiegelung zusätzlich an der Waagerechten gespiegelt.
@@ -149,6 +189,8 @@ Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
 - **Legende** – hat jedes Zähl- und Rechenmandala Einträge?
 - **Layout** – bleibt das Blatt in vier Auflösungen quadratisch, ohne aus der
   Bühne zu ragen?
+- **Galerie** – lässt sich ein Werk ablegen, umbenennen und herausnehmen?
+- **Abgeschlossenheit** – holt die Seite wirklich nichts von außen?
 - **Zeichnen** – erscheint ein mit dem Zeiger gezogener Strich an allen Achsen?
 - **Seed** – liefern zwei Durchläufe dieselben Aufgaben?
 
@@ -174,9 +216,6 @@ dem Finger, Dunkelmodus.
 - **Kein Kinder-Look, obwohl es eine Kids-Corner gibt.** Die Kids-Corner ist
   eine Motivwelt innerhalb der ruhigen Erwachsenen-Oberfläche – Eltern und
   Lehrkräfte sind die Bedienenden.
-- **Das Blatt bleibt im Dunkelmodus hell.** Nur die Umgebung wird dunkel. So
-  sehen gespeicherte Bilder immer gleich aus, und ein Moduswechsel muss die
-  Vorlage nicht neu zeichnen – was begonnene Arbeit zerstören würde.
 - **Der Speicher läuft über eine `Store`-Abstraktion**, nicht direkt über
   `localStorage`: Safari wirft im privaten Modus beim Schreiben, und eine
   spätere Galerie soll denselben Weg nehmen.
@@ -190,10 +229,9 @@ braucht gezeichnete Vorlagen – die kann die App anzeigen, aber nicht erfinden.
 
 ## Sinnvolle nächste Schritte
 
-1. **Galerie** – gespeicherte Werke lokal ablegen, über die `Store`-Abstraktion.
-2. **Druckansicht** für die Kids-Corner: schwarz-weiß, ohne Hilfsraster, DIN A4.
+1. **Druckansicht** für die Kids-Corner: schwarz-weiß, ohne Hilfsraster, DIN A4.
    Wahrscheinlich der größte praktische Gewinn für Lehrkräfte.
+2. **Mehrere Personen** – heute trägt die Galerie einen Namen. Wenn mehrere
+   Leute dasselbe iPad benutzen, wären getrennte Galerien der nächste Schritt.
 3. **Mehr Vorlagen** je Welt; der Katalog ist bewusst erweiterbar angelegt.
-4. **Eigene Farben** mischen.
-5. **Schriften lokal einbetten**, damit die App wirklich ohne jeden externen
-   Abruf auskommt.
+4. **Eigene Farben** mischen und als eigene Farbwelt sichern.

@@ -5,11 +5,12 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-0';
+const CACHE = 'mandala-atelier-v1-1';
 
 const SHELL = [
   './',
   './index.html',
+  './fonts.css',
   './style.css',
   './app.js',
   './manifest.webmanifest',
@@ -41,39 +42,20 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+/* Die App holt nichts von außen – Schriften stecken als Daten-URI in
+   fonts.css. Deshalb genügt hier ein Weg: erst Cache, dann Netz. */
 self.addEventListener('fetch', function (event) {
   const request = event.request;
   if (request.method !== 'GET') return;
+  if (new URL(request.url).origin !== self.location.origin) return;
 
-  const url = new URL(request.url);
-  const isFont = url.hostname === 'fonts.googleapis.com' ||
-                 url.hostname === 'fonts.gstatic.com';
-
-  /* Eigene Dateien: erst Cache, dann Netz. Die App soll offline starten. */
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request).then(function (hit) {
-        return hit || fetch(request).then(function (response) {
-          return store(request, response);
-        });
-      })
-    );
-    return;
-  }
-
-  /* Schriften: die einzige externe Ressource. Beim ersten Laden ablegen,
-     danach aus dem Cache – so kommt die App auch ohne Netz zurecht. */
-  if (isFont) {
-    event.respondWith(
-      caches.match(request).then(function (hit) {
-        return hit || fetch(request).then(function (response) {
-          return store(request, response);
-        }).catch(function () {
-          return hit || Response.error();
-        });
-      })
-    );
-  }
+  event.respondWith(
+    caches.match(request).then(function (hit) {
+      return hit || fetch(request).then(function (response) {
+        return store(request, response);
+      });
+    })
+  );
 });
 
 function store(request, response) {
