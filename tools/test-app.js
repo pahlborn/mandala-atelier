@@ -11,8 +11,8 @@
    für das Füllwerkzeug unbrauchbar.
 
    Zwei Hinweise zur Auswertung:
-     * Meldungen zu Service Worker und ERR_CONNECTION_RESET sind beim Öffnen
-       über file:// normal – es gibt keinen Origin und keine Schriften.
+     * Meldungen zum Service Worker sind beim Öffnen über file:// normal –
+       ohne Origin lässt er sich nicht registrieren.
      * Ein sehr niedriger Füllanteil liegt meist an den Testpunkten, nicht an
        der App: liegt ein Punkt genau auf einer Linie, füllt er nichts.
    ========================================================================== */
@@ -37,6 +37,14 @@ async function run() {
     if (msg.type() === 'error') noise.push(msg.text());
   });
   page.on('pageerror', function (err) { noise.push('pageerror: ' + err.message); });
+
+  /* Die App darf nichts von außen holen. Schriften stecken als Daten-URI
+     in fonts.css – ein Abruf hier wäre ein Rückfall. */
+  const external = [];
+  page.on('request', function (request) {
+    const url = request.url();
+    if (!url.startsWith('file:') && !url.startsWith('data:')) external.push(url);
+  });
 
   await page.goto(FILE_URL);
   await page.waitForFunction('window.MandalaAtelier && window.MandalaAtelier.MOTIFS.length > 0');
@@ -223,6 +231,8 @@ async function run() {
 
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    /* Die Kantenlänge setzt ein ResizeObserver – der braucht einen Bildaufbau. */
+    await page.waitForTimeout(150);
     const box = await page.evaluate(function () {
       const stack = document.getElementById('stack').getBoundingClientRect();
       const stage = document.querySelector('.stage').getBoundingClientRect();
@@ -244,6 +254,7 @@ async function run() {
     );
   }
   await page.setViewportSize({ width: 1400, height: 1000 });
+  await page.waitForTimeout(150);
 
   /* Zeichnen über echte Zeigerereignisse – prüft nebenbei die Umrechnung
      von Bildschirm- in Blattkoordinaten. */
@@ -303,6 +314,53 @@ async function run() {
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
 
+  /* Galerie: ablegen, wiederfinden, umbenennen, herausnehmen. */
+  const gallery = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.loadMotif('bluete');
+    const p = app.pol(200, -Math.PI / 2);
+    app.floodFill(p[0], p[1], '#b5654a');
+
+    return app.Gallery.open()
+      .then(function () { return app.keepWork(); })
+      .then(function () { return app.Gallery.all(); })
+      .then(function (works) {
+        const work = works[works.length - 1];
+        work.title = 'Probe';
+        return app.Gallery.put(work)
+          .then(function () { return app.Gallery.all(); })
+          .then(function (after) {
+            const found = after.filter(function (w) { return w.id === work.id; })[0];
+            return app.Gallery.remove(work.id).then(function () {
+              return app.Gallery.all().then(function (rest) {
+                return {
+                  dauerhaft: app.Gallery.persistent,
+                  abgelegt: !!found,
+                  titel: found ? found.title : '',
+                  bild: found ? found.full.slice(0, 14) : '',
+                  entfernt: rest.every(function (w) { return w.id !== work.id; })
+                };
+              });
+            });
+          });
+      });
+  });
+
+  const galleryOk = gallery.abgelegt && gallery.titel === 'Probe' &&
+    gallery.bild === 'data:image/png' && gallery.entfernt;
+  console.log('\nGalerie');
+  console.log('  Speicher: ' + (gallery.dauerhaft ? 'IndexedDB' : 'nur diese Sitzung'));
+  console.log('  Ablegen, umbenennen, herausnehmen: ' + (galleryOk ? 'wie erwartet' : '← FEHLER'));
+
+  /* Schriften: eingebettet, nicht nachgeladen. */
+  const typeOk = await page.evaluate(async function () {
+    await document.fonts.load('500 20px "IBM Plex Mono"');
+    return ['600 21px Fraunces', '500 15px "Work Sans"', '500 20px "IBM Plex Mono"']
+      .every(function (spec) { return document.fonts.check(spec); });
+  });
+  console.log('\nSchriften geladen: ' + (typeOk ? 'alle drei' : 'NICHT vollständig'));
+  console.log('Abrufe nach außen: ' + (external.length ? external.length + ' ← ' + external[0] : 'keine'));
+
   /* Gleicher Seed, gleiche Aufgaben – auf jedem Gerät. */
   const stable = await page.evaluate(function () {
     const app = window.MandalaAtelier;
@@ -316,6 +374,9 @@ async function run() {
   const broken = results.filter(function (r) {
     return r.leaked || (r.motif.kind !== 'plain' && r.legend === 0);
   }).map(function (r) { return r.motif.name; }).concat(tapProblems, layoutProblems);
+  if (!galleryOk) broken.push('Galerie');
+  if (!typeOk) broken.push('Schriften');
+  if (external.length) broken.push('externe Abrufe');
 
   if (noise.length) {
     console.log('\nMeldungen des Browsers (bei file:// erwartbar):');

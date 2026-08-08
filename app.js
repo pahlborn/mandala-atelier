@@ -15,8 +15,9 @@
      9.  Füllen (Scanline-Flood-Fill)
      10. Hilfsraster
      11. Verlauf (Rückgängig)
-     12. Oberfläche
-     13. Start
+     12. Galerie
+     13. Oberfläche
+     14. Start
 
    Zur Laufzeit gibt es keine Abhängigkeiten. Alles läuft im Browser,
    nichts verlässt das Gerät.
@@ -35,27 +36,107 @@ const R_IN  = 46;               // Innenring (Nabe)
 const UP    = -Math.PI / 2;     // Bezugsrichtung aller Motive: nach oben
 const TAU   = Math.PI * 2;
 
-const INK   = '#242424';        // Linienfarbe der Vorlagen
-const PAPER = '#f6f1e7';        // Papierton für gespeicherte Bilder
+/* Papier, Linien und Hilfsraster wechseln mit dem Modus. Dieselben Werte
+   stehen als CSS-Variablen in style.css – die Vorlage entsteht auf Canvas
+   und kann keine Variable lesen. Beide Stellen zusammen ändern. */
+const THEMES = {
+  hell:   { paper: '#f6f1e7', ink: '#242424', guide: 'rgba(60, 52, 40, 0.16)' },
+  dunkel: { paper: '#1c1d20', ink: '#d8d2c6', guide: 'rgba(216, 210, 198, 0.13)' }
+};
 
-/* Gedeckte Pigmente statt Buntstift-Knallfarben – sie tragen die
-   erwachsene Anmutung der App wesentlich. */
-const PIGMENTS = [
-  { name: 'Terrakotta', hex: '#b5654a' },
-  { name: 'Rost',       hex: '#8c4a2f' },
-  { name: 'Mohn',       hex: '#a8342f' },
-  { name: 'Ocker',      hex: '#c89b3c' },
-  { name: 'Sand',       hex: '#d9c4a3' },
-  { name: 'Olive',      hex: '#6e7233' },
-  { name: 'Salbei',     hex: '#7c8c6b' },
-  { name: 'Moos',       hex: '#3f5b3a' },
-  { name: 'Petrol',     hex: '#2e6b6b' },
-  { name: 'Nebelblau',  hex: '#7c93a8' },
-  { name: 'Indigo',     hex: '#3b4b7c' },
-  { name: 'Pflaume',    hex: '#6b3c5b' },
-  { name: 'Anthrazit',  hex: '#333a3f' },
-  { name: 'Elfenbein',  hex: '#efe7d8' }
+function palette() {
+  return THEMES[state.theme] || THEMES.hell;
+}
+
+/* Vier Farbwelten zu je 14 Pigmenten. Alle gedeckt – keine Buntstift-
+   Knallfarben; das trägt die erwachsene Anmutung wesentlich. Die Reihenfolge
+   ist nicht beliebig: die ersten zehn Einträge jeder Welt sind bewusst gut
+   unterscheidbar, weil die Farblegende der Zählmandalas sie der Reihe nach
+   vergibt. */
+const PALETTES = [
+  {
+    id: 'erde', name: 'Erdpigmente',
+    colors: [
+      { name: 'Terrakotta', hex: '#b5654a' },
+      { name: 'Ocker',      hex: '#c89b3c' },
+      { name: 'Petrol',     hex: '#2e6b6b' },
+      { name: 'Indigo',     hex: '#3b4b7c' },
+      { name: 'Moos',       hex: '#3f5b3a' },
+      { name: 'Mohn',       hex: '#a8342f' },
+      { name: 'Nebelblau',  hex: '#7c93a8' },
+      { name: 'Pflaume',    hex: '#6b3c5b' },
+      { name: 'Olive',      hex: '#6e7233' },
+      { name: 'Sand',       hex: '#d9c4a3' },
+      { name: 'Rost',       hex: '#8c4a2f' },
+      { name: 'Salbei',     hex: '#7c8c6b' },
+      { name: 'Anthrazit',  hex: '#333a3f' },
+      { name: 'Elfenbein',  hex: '#efe7d8' }
+    ]
+  },
+  {
+    id: 'nord', name: 'Nordlicht',
+    colors: [
+      { name: 'Eisblau',     hex: '#6f9fb5' },
+      { name: 'Tanne',       hex: '#2f4a3c' },
+      { name: 'Amethyst',    hex: '#5b5580' },
+      { name: 'Tiefsee',     hex: '#1f4a5c' },
+      { name: 'Flechte',     hex: '#8aa38c' },
+      { name: 'Beere',       hex: '#7a3f52' },
+      { name: 'Gletscher',   hex: '#a9c6cd' },
+      { name: 'Fjord',       hex: '#4a7a78' },
+      { name: 'Heidekraut',  hex: '#8d7fa0' },
+      { name: 'Stahl',       hex: '#5d6a72' },
+      { name: 'Polarnacht',  hex: '#23304a' },
+      { name: 'Schiefer',    hex: '#3a4249' },
+      { name: 'Raureif',     hex: '#d3e0e2' },
+      { name: 'Möwe',        hex: '#eef1f2' }
+    ]
+  },
+  {
+    id: 'faerber', name: 'Färbergarten',
+    colors: [
+      { name: 'Krapp',          hex: '#a4423a' },
+      { name: 'Safran',         hex: '#d59b3a' },
+      { name: 'Waid',           hex: '#34527a' },
+      { name: 'Färberginster',  hex: '#9a9d4a' },
+      { name: 'Cochenille',     hex: '#8e3550' },
+      { name: 'Walnuss',        hex: '#6b4a33' },
+      { name: 'Reseda',         hex: '#b9a94a' },
+      { name: 'Malve',          hex: '#7d5570' },
+      { name: 'Indigo tief',    hex: '#26365e' },
+      { name: 'Birke',          hex: '#cfc48a' },
+      { name: 'Katechu',        hex: '#8a6a4a' },
+      { name: 'Rinde',          hex: '#4a3527' },
+      { name: 'Ruß',            hex: '#2e2c2a' },
+      { name: 'Leinen',         hex: '#e6ddc9' }
+    ]
+  },
+  {
+    id: 'rauch', name: 'Rauchglas',
+    colors: [
+      { name: 'Taubenblau', hex: '#78838c' },
+      { name: 'Altrosa',    hex: '#a3807c' },
+      { name: 'Farn',       hex: '#61694f' },
+      { name: 'Kastanie',   hex: '#55403a' },
+      { name: 'Mauve',      hex: '#8b7480' },
+      { name: 'Schilf',     hex: '#8b8f7c' },
+      { name: 'Zinn',       hex: '#575c60' },
+      { name: 'Trüffel',    hex: '#6a5b52' },
+      { name: 'Nebel',      hex: '#b6b2ab' },
+      { name: 'Basalt',     hex: '#3b3b3d' },
+      { name: 'Rauch',      hex: '#6e6a66' },
+      { name: 'Asche',      hex: '#8f8b85' },
+      { name: 'Perle',      hex: '#d7d3cb' },
+      { name: 'Kalk',       hex: '#ece8e0' }
+    ]
+  }
 ];
+
+/* Die Pigmente der gerade gewählten Farbwelt. */
+function pigments() {
+  const set = PALETTES.filter(function (p) { return p.id === state.palette; })[0];
+  return (set || PALETTES[0]).colors;
+}
 
 const AXES_CHOICES = [6, 8, 10, 12, 16, 24];
 
@@ -140,17 +221,24 @@ function shuffledFill(values, count, rng) {
 /* ---------------------------------------------------------------------------
    4. Ebenen und Skalierung
 
-   Vier übereinanderliegende Ebenen. Die Trennung ist wesentlich: das
-   Füllwerkzeug liest drawCanvas als Wand und schreibt nach fillCanvas.
-   Dadurch liegen Linien immer über der Farbe und werden beim Füllen nie
-   zerstört. labelCanvas liegt ganz oben, damit Zahlen lesbar bleiben.
+   Fünf übereinanderliegende Ebenen. Die Trennung ist wesentlich: das
+   Füllwerkzeug liest motifCanvas und drawCanvas als Wand und schreibt nach
+   fillCanvas. Dadurch liegen Linien immer über der Farbe und werden beim
+   Füllen nie zerstört. labelCanvas liegt ganz oben, damit Zahlen lesbar
+   bleiben.
+
+   Vorlage und eigene Striche liegen getrennt, damit beim Wechsel zwischen
+   Hell und Dunkel die Linienfarbe der Vorlage neu gezeichnet werden kann,
+   ohne begonnene Arbeit zu zerstören. Nebeneffekt: der Radierer nimmt nur
+   die eigenen Striche weg, nie die Vorlage.
    ------------------------------------------------------------------------- */
 
-const LAYER_IDS = ['guide', 'fill', 'draw', 'label'];
+const LAYER_IDS = ['guide', 'fill', 'motif', 'draw', 'label'];
 const layers = {};
 
 const state = {
   dpr:        1,
+  theme:      'hell',
   motif:      null,
   fields:     null,   // Zähl-/Rechenfelder des aktuellen Motivs
   legend:     [],     // [{ value, hex, text }]
@@ -158,8 +246,12 @@ const state = {
   mirror:     false,
   guides:     true,
   tool:       'pen',
-  color:      PIGMENTS[0].hex,
+  palette:    'erde',
+  color:      PALETTES[0].colors[0].hex,
   width:      4,
+  owner:      '',
+  works:      [],
+  viewing:    null,
   drawing:    false,
   last:       null,
   guideAngle: 0
@@ -171,7 +263,8 @@ function setupLayers() {
     const canvas = document.getElementById(id + 'Canvas');
     canvas.width  = Math.round(SIZE * state.dpr);
     canvas.height = Math.round(SIZE * state.dpr);
-    const readOften = (id === 'draw' || id === 'fill');   // beide liest das Füllwerkzeug
+    /* Diese drei liest das Füllwerkzeug bei jedem Tipp. */
+    const readOften = (id === 'motif' || id === 'draw' || id === 'fill');
     const ctx = canvas.getContext('2d', { willReadFrequently: readOften });
     ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
     layers[id] = { canvas: canvas, ctx: ctx };
@@ -672,7 +765,7 @@ function makeLegend(motif, fields) {
   return values.map(function (value, index) {
     return {
       value: value,
-      hex: PIGMENTS[index % PIGMENTS.length].hex,
+      hex: pigments()[index % pigments().length].hex,
       text: motif.kind === 'math'
         ? 'Ergebnis ' + value
         : value + (value === 1 ? ' Punkt' : ' Punkte')
@@ -686,7 +779,7 @@ function renderLabels() {
   if (!state.fields) return;
 
   ctx.save();
-  ctx.fillStyle = INK;
+  ctx.fillStyle = palette().ink;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -829,7 +922,9 @@ function floodFill(x, y, hex) {
   const w = layers.fill.canvas.width;
   const h = layers.fill.canvas.height;
 
-  const wall  = layers.draw.ctx.getImageData(0, 0, w, h).data;
+  /* Wand ist alles, was auf der Vorlage oder unter eigenen Strichen liegt. */
+  const wall = blockedMask(w, h);
+
   const image = layers.fill.ctx.getImageData(0, 0, w, h);
   const buf   = new Uint32Array(image.data.buffer);
   const target = packColor(hex);
@@ -846,7 +941,7 @@ function floodFill(x, y, hex) {
     if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
 
     const index = sy * w + sx;
-    if (wall[index * 4 + 3] > WALL_ALPHA) return;   // direkt auf einer Linie
+    if (wall[index]) return;                        // direkt auf einer Linie
     const start = buf[index];
     if (start === target) return;                   // Feld hat die Farbe schon
 
@@ -858,11 +953,23 @@ function floodFill(x, y, hex) {
   return painted;
 }
 
+/* Beide Linienebenen zu einer Maske verrechnen: ein Byte je Bildpunkt
+   statt zweier Alphawerte, das hält die Suche danach knapp. */
+function blockedMask(w, h) {
+  const a = layers.motif.ctx.getImageData(0, 0, w, h).data;
+  const b = layers.draw.ctx.getImageData(0, 0, w, h).data;
+  const mask = new Uint8Array(w * h);
+  for (let i = 0, p = 3; i < mask.length; i++, p += 4) {
+    if (a[p] > WALL_ALPHA || b[p] > WALL_ALPHA) mask[i] = 1;
+  }
+  return mask;
+}
+
 function scanFill(buf, wall, w, h, x, y, start, target) {
   const stack = [x, y];
 
   function open(index) {
-    return buf[index] === start && wall[index * 4 + 3] <= WALL_ALPHA;
+    return buf[index] === start && !wall[index];
   }
 
   while (stack.length) {
@@ -891,7 +998,7 @@ function pushRow(stack, buf, wall, start, rowStart, left, right, row) {
   let inside = false;
   for (let i = left; i <= right; i++) {
     const index = rowStart + i;
-    const open = buf[index] === start && wall[index * 4 + 3] <= WALL_ALPHA;
+    const open = buf[index] === start && !wall[index];
     if (open && !inside) {
       stack.push(i, row);
       inside = true;
@@ -918,7 +1025,7 @@ function renderGuides() {
   ctx.translate(CX, CY);
   ctx.rotate(state.guideAngle);
   ctx.translate(-CX, -CY);
-  ctx.strokeStyle = 'rgba(60, 52, 40, 0.16)';
+  ctx.strokeStyle = palette().guide;
   ctx.lineWidth = 1;
 
   [90, 170, 250, 330, 405].forEach(function (r) {
@@ -995,17 +1102,242 @@ function undo() {
 }
 
 
+
 /* ---------------------------------------------------------------------------
-   12. Oberfläche
+   12. Galerie
+
+   Fertige Bilder bleiben auf dem Gerät. localStorage wäre zu klein – ein Werk
+   wiegt ein paar hundert Kilobyte –, deshalb IndexedDB. Ist sie nicht
+   verfügbar (Safari im privaten Modus), hält die App die Werke nur für die
+   laufende Sitzung; das wird dann auch gesagt statt stillschweigend zu
+   schlucken.
+   ------------------------------------------------------------------------- */
+
+const Gallery = {
+  db: null,
+  volatile: [],          // Notlager, wenn IndexedDB nicht mitspielt
+  persistent: false,
+
+  open: function () {
+    const self = this;
+    return new Promise(function (resolve) {
+      if (!window.indexedDB) return resolve();
+      let request;
+      try {
+        request = indexedDB.open('mandala-atelier', 1);
+      } catch (err) {
+        return resolve();
+      }
+      request.onupgradeneeded = function () {
+        request.result.createObjectStore('werke', { keyPath: 'id' });
+      };
+      request.onsuccess = function () {
+        self.db = request.result;
+        self.persistent = true;
+        resolve();
+      };
+      request.onerror = function () { resolve(); };
+      request.onblocked = function () { resolve(); };
+    });
+  },
+
+  store: function (mode) {
+    return this.db.transaction('werke', mode).objectStore('werke');
+  },
+
+  put: function (work) {
+    if (!this.db) {
+      this.volatile = this.volatile.filter(function (w) { return w.id !== work.id; });
+      this.volatile.push(work);
+      return Promise.resolve();
+    }
+    return wrap(this.store('readwrite').put(work));
+  },
+
+  all: function () {
+    if (!this.db) return Promise.resolve(this.volatile.slice());
+    return wrap(this.store('readonly').getAll());
+  },
+
+  remove: function (id) {
+    if (!this.db) {
+      this.volatile = this.volatile.filter(function (w) { return w.id !== id; });
+      return Promise.resolve();
+    }
+    return wrap(this.store('readwrite').delete(id));
+  }
+};
+
+function wrap(request) {
+  return new Promise(function (resolve, reject) {
+    request.onsuccess = function () { resolve(request.result); };
+    request.onerror = function () { reject(request.error); };
+  });
+}
+
+/* Alle bemalbaren Ebenen auf Papier zusammenlegen. Dieselbe Funktion für
+   Download, Kachel und vergrößerte Ansicht – so sehen alle drei gleich aus. */
+function composeImage(size) {
+  const out = document.createElement('canvas');
+  out.width = size;
+  out.height = size;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = palette().paper;
+  ctx.fillRect(0, 0, size, size);
+  ['fill', 'motif', 'draw', 'label'].forEach(function (name) {
+    ctx.drawImage(layers[name].canvas, 0, 0, size, size);
+  });
+  return out;
+}
+
+function newId() {
+  return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function formatDate(stamp) {
+  const date = new Date(stamp);
+  return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function keepWork() {
+  const work = {
+    id: newId(),
+    title: state.motif ? state.motif.name : 'Freies Blatt',
+    motif: state.motif ? state.motif.name : 'Leeres Blatt',
+    created: Date.now(),
+    thumb: composeImage(280).toDataURL('image/png'),
+    full: composeImage(1200).toDataURL('image/png')
+  };
+
+  Gallery.put(work).then(function () {
+    say(Gallery.persistent
+      ? 'In die Galerie gelegt.'
+      : 'In die Galerie gelegt – bleibt aber nur, solange die Seite offen ist.');
+    refreshGallery();
+  }).catch(function () {
+    say('Das Werk ließ sich nicht ablegen – der Speicher des Geräts ist voll.');
+  });
+}
+
+function refreshGallery() {
+  return Gallery.all().then(function (works) {
+    works.sort(function (a, b) { return b.created - a.created; });
+    state.works = works;
+    renderWorks();
+  });
+}
+
+function renderWorks() {
+  const works = state.works || [];
+  ui.works.textContent = '';
+  ui.galleryEmpty.hidden = works.length > 0;
+  ui.galleryCount.textContent = works.length
+    ? works.length + (works.length === 1 ? ' Werk' : ' Werke')
+    : '';
+
+  works.forEach(function (work) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'work';
+    button.dataset.work = work.id;
+    button.innerHTML = '<img alt=""><span class="work-title"></span><span class="work-meta"></span>';
+    button.querySelector('img').src = work.thumb;
+    button.querySelector('img').alt = work.title;
+    button.querySelector('.work-title').textContent = work.title;
+    button.querySelector('.work-meta').textContent = formatDate(work.created);
+    ui.works.appendChild(button);
+  });
+}
+
+function openViewer(id) {
+  const work = (state.works || []).filter(function (w) { return w.id === id; })[0];
+  if (!work) return;
+  state.viewing = work;
+  ui.viewerImage.src = work.full;
+  ui.viewerImage.alt = work.title;
+  ui.viewerTitle.value = work.title;
+  ui.viewerMeta.textContent = work.motif + ' · ' + formatDate(work.created);
+  ui.viewer.hidden = false;
+  ui.viewerTitle.focus();
+}
+
+function closeViewer() {
+  ui.viewer.hidden = true;
+  state.viewing = null;
+}
+
+function renameWork() {
+  const work = state.viewing;
+  if (!work) return;
+  const title = ui.viewerTitle.value.trim() || work.motif;
+  if (title === work.title) return;
+  work.title = title;
+  Gallery.put(work).then(renderWorks);
+}
+
+function deleteWork() {
+  const work = state.viewing;
+  if (!work) return;
+  Gallery.remove(work.id).then(function () {
+    closeViewer();
+    refreshGallery();
+  });
+}
+
+function downloadWork() {
+  const work = state.viewing;
+  if (!work) return;
+  const link = document.createElement('a');
+  link.download = fileName(work.title, work.created);
+  link.href = work.full;
+  link.click();
+}
+
+function fileName(title, stamp) {
+  const slug = ((state.owner ? state.owner + ' ' : '') + title).toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mandala';
+  return 'mandala-' + slug + '-' + new Date(stamp).toISOString().slice(0, 10) + '.png';
+}
+
+/* Personalisierung: Die Galerie darf einen Namen tragen. Er bleibt auf dem
+   Gerät, wird nirgends hingeschickt und taucht in gespeicherten Dateinamen
+   wieder auf – mehr Personalisierung braucht es hier nicht. */
+function setOwner(name) {
+  state.owner = (name || '').trim().slice(0, 28);
+  Store.set('owner', state.owner);
+  ui.galleryHead.textContent = state.owner ? 'Galerie von ' + state.owner : 'Galerie';
+  if (ui.owner.value !== state.owner) ui.owner.value = state.owner;
+}
+
+function setGallery(open) {
+  ui.gallery.hidden = !open;
+  ui.galleryButton.classList.toggle('is-active', open);
+  if (open) {
+    setDrawer('library', false);
+    setDrawer('controls', false);
+    refreshGallery();
+  } else {
+    closeViewer();
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   13. Oberfläche
    ------------------------------------------------------------------------- */
 
 const ui = {};
 
 function cacheUi() {
+  ui.stage      = document.querySelector('.stage');
+  ui.stack      = document.getElementById('stack');
   ui.worlds     = document.getElementById('worlds');
   ui.library    = document.getElementById('library');
-  ui.libToggle  = document.getElementById('btn-library-toggle');
+  ui.controls   = document.getElementById('controls');
+  ui.floatbar   = document.getElementById('floatbar');
   ui.palette    = document.getElementById('palette');
+  ui.psets      = document.getElementById('palette-sets');
   ui.axes       = document.getElementById('axes');
   ui.legend     = document.getElementById('legend');
   ui.legendBox  = document.getElementById('legend-panel');
@@ -1017,6 +1349,21 @@ function cacheUi() {
   ui.clear      = document.getElementById('btn-clear');
   ui.save       = document.getElementById('btn-save');
   ui.theme      = document.getElementById('btn-theme');
+  ui.full       = document.getElementById('btn-fullscreen');
+  ui.keep       = document.getElementById('btn-keep');
+  ui.gallery      = document.getElementById('gallery');
+  ui.galleryButton= document.getElementById('btn-gallery');
+  ui.galleryClose = document.getElementById('btn-gallery-close');
+  ui.galleryEmpty = document.getElementById('gallery-empty');
+  ui.galleryCount = document.getElementById('gallery-count');
+  ui.works        = document.getElementById('works');
+  ui.galleryHead  = document.getElementById('gallery-title');
+  ui.owner        = document.getElementById('gallery-owner');
+  ui.viewer       = document.getElementById('viewer');
+  ui.viewerImage  = document.getElementById('viewer-image');
+  ui.viewerTitle  = document.getElementById('viewer-title');
+  ui.viewerMeta   = document.getElementById('viewer-meta');
+  ui.fullExit   = document.getElementById('btn-fullscreen-exit');
   ui.hint       = document.getElementById('stage-hint');
   ui.tools      = Array.prototype.slice.call(document.querySelectorAll('.tool'));
 }
@@ -1025,7 +1372,7 @@ function buildLibrary() {
   WORLDS.forEach(function (world) {
     const section = document.createElement('section');
     section.className = 'world';
-    const heading = document.createElement('h2');
+    const heading = document.createElement('h3');
     heading.textContent = world.title;
     section.appendChild(heading);
 
@@ -1045,8 +1392,20 @@ function buildLibrary() {
   });
 }
 
+function buildPaletteSets() {
+  PALETTES.forEach(function (set) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pset';
+    button.dataset.palette = set.id;
+    button.textContent = set.name;
+    ui.psets.appendChild(button);
+  });
+}
+
 function buildPalette() {
-  PIGMENTS.forEach(function (pigment) {
+  ui.palette.textContent = '';
+  pigments().forEach(function (pigment) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'pigment';
@@ -1056,6 +1415,25 @@ function buildPalette() {
     button.setAttribute('aria-label', pigment.name);
     ui.palette.appendChild(button);
   });
+}
+
+/* Farbwelt wechseln. Bereits gefärbte Flächen behalten ihre Farbe – der
+   Wechsel betrifft nur, womit ab jetzt gemalt wird. Die Farblegende der
+   Zählmandalas wird neu vergeben. */
+function setPalette(id) {
+  const before = pigments();
+  const index = before.reduce(function (found, p, i) {
+    return p.hex === state.color ? i : found;
+  }, 0);
+
+  state.palette = id;
+  Store.set('palette', id);
+  state.color = pigments()[index].hex;
+
+  buildPalette();
+  if (state.fields) state.legend = makeLegend(state.motif, state.fields);
+  renderLegend();
+  syncUI();
 }
 
 function buildAxes() {
@@ -1100,21 +1478,9 @@ function loadMotif(id) {
   history.length = 0;
   clearLayer('fill');
   clearLayer('draw');
-  clearLayer('label');
 
   if (motif) {
     state.axes = motif.axes;
-    const ctx = layers.draw.ctx;
-    const pen = makePen(ctx, motif.axes);
-    ctx.save();
-    ctx.strokeStyle = INK;
-    ctx.fillStyle = INK;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    drawWedgeFrame(pen);
-    motif.build(pen);
-    ctx.restore();
-
     state.fields = motif.values ? makeFields(motif) : null;
     state.legend = state.fields ? makeLegend(motif, state.fields) : [];
   } else {
@@ -1122,11 +1488,34 @@ function loadMotif(id) {
     state.legend = [];
   }
 
+  renderMotif();
   Store.set('motif', motif ? motif.id : '');
-  renderLabels();
   renderLegend();
-  renderGuides();
   syncUI();
+}
+
+/* Vorlage und Beschriftung neu zeichnen – beim Motivwechsel und bei jedem
+   Wechsel zwischen Hell und Dunkel. Farbflächen und eigene Striche liegen
+   auf anderen Ebenen und bleiben dabei unberührt. */
+function renderMotif() {
+  clearLayer('motif');
+  const motif = state.motif;
+
+  if (motif) {
+    const ctx = layers.motif.ctx;
+    const pen = makePen(ctx, motif.axes);
+    ctx.save();
+    ctx.strokeStyle = palette().ink;
+    ctx.fillStyle = palette().ink;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    drawWedgeFrame(pen);
+    motif.build(pen);
+    ctx.restore();
+  }
+
+  renderLabels();
+  renderGuides();
 }
 
 function clearSheet() {
@@ -1136,29 +1525,14 @@ function clearSheet() {
     history.length = 0;
     clearLayer('fill');
     clearLayer('draw');
-    clearLayer('label');
     syncUI();
   }
 }
 
 function exportImage() {
-  const scale = 2;
-  const out = document.createElement('canvas');
-  out.width = SIZE * scale;
-  out.height = SIZE * scale;
-  const ctx = out.getContext('2d');
-  ctx.scale(scale, scale);
-  ctx.fillStyle = PAPER;
-  ctx.fillRect(0, 0, SIZE, SIZE);
-  ['fill', 'draw', 'label'].forEach(function (name) {
-    ctx.drawImage(layers[name].canvas, 0, 0, SIZE, SIZE);
-  });
-
-  const stamp = new Date().toISOString().slice(0, 10);
-  const name = state.motif ? state.motif.id : 'freies-blatt';
   const link = document.createElement('a');
-  link.download = 'mandala-' + name + '-' + stamp + '.png';
-  link.href = out.toDataURL('image/png');
+  link.download = fileName(state.motif ? state.motif.name : 'freies Blatt', Date.now());
+  link.href = composeImage(SIZE * 2).toDataURL('image/png');
   link.click();
 }
 
@@ -1174,9 +1548,27 @@ function preferredTheme() {
 }
 
 function setTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  ui.theme.textContent = theme === 'dunkel' ? 'Hell' : 'Dunkel';
-  Store.set('theme', theme);
+  state.theme = THEMES[theme] ? theme : 'hell';
+  document.documentElement.dataset.theme = state.theme;
+  /* Die Farbe der Systemleiste mitziehen, wo es die Angabe gibt. */
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', palette().paper);
+  ui.theme.textContent = state.theme === 'dunkel' ? 'Hell' : 'Dunkel';
+  Store.set('theme', state.theme);
+
+  /* Papier und Linien der Vorlage wechseln mit. Eigene Striche behalten ihr
+     Pigment – sie sollen beim Umschalten nicht die Farbe wechseln. */
+  renderMotif();
+}
+
+/* Kurze Rückmeldung in der Fußzeile der Werkzeuge. Kein Pokal, kein Konfetti –
+   ein Satz, der nach ein paar Sekunden wieder dem Motivhinweis weicht. */
+let sayTimer = 0;
+
+function say(text) {
+  ui.hint.textContent = text;
+  clearTimeout(sayTimer);
+  sayTimer = setTimeout(syncUI, 4000);
 }
 
 function syncUI() {
@@ -1185,6 +1577,9 @@ function syncUI() {
   });
   Array.prototype.forEach.call(ui.palette.children, function (button) {
     button.classList.toggle('is-active', button.dataset.hex === state.color);
+  });
+  Array.prototype.forEach.call(ui.psets.children, function (button) {
+    button.classList.toggle('is-active', button.dataset.palette === state.palette);
   });
   Array.prototype.forEach.call(ui.axes.children, function (button) {
     button.classList.toggle('is-active', Number(button.dataset.axes) === state.axes);
@@ -1209,6 +1604,88 @@ function syncUI() {
         : ' · ein Tipp färbt nur das angetippte Feld');
   }
 }
+
+/* ---- Größe der Zeichenfläche -------------------------------------------
+   Das größte Quadrat, das in die Bühne passt. In CSS lässt sich das nicht
+   verlässlich ausdrücken: sobald Breite und Höhe beide feststehen, greift
+   aspect-ratio nicht mehr und aus dem Mandala wird eine Ellipse.
+   --------------------------------------------------------------------- */
+
+function fitStage() {
+  const stage = ui.stage;
+  const style = getComputedStyle(stage);
+  const width  = stage.clientWidth -
+    parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  const height = stage.clientHeight -
+    parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+  const size = Math.max(120, Math.floor(Math.min(width, height)));
+  ui.stack.style.width = size + 'px';
+  ui.stack.style.height = size + 'px';
+}
+
+
+/* ---- Schubladen -------------------------------------------------------- */
+
+function drawerOf(name) {
+  return name === 'library' ? ui.library : ui.controls;
+}
+
+function setDrawer(name, open) {
+  const drawer = drawerOf(name);
+  drawer.classList.toggle('is-open', open);
+  drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+  Array.prototype.forEach.call(
+    document.querySelectorAll('[data-drawer="' + name + '"]'),
+    function (button) {
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      button.classList.toggle('is-active', open);
+    }
+  );
+}
+
+function toggleDrawer(name) {
+  const open = !drawerOf(name).classList.contains('is-open');
+  /* Beide zugleich verdecken zu viel – die andere geht zu. */
+  if (open) setDrawer(name === 'library' ? 'controls' : 'library', false);
+  setDrawer(name, open);
+}
+
+
+/* ---- Vollbild ----------------------------------------------------------
+   Zwei Dinge zugleich: die eigene Bedienung tritt zurück, und wo der
+   Browser es zulässt, wird echtes Vollbild angefordert. Auf dem iPad kennt
+   Safari die Vollbild-Schnittstelle nicht überall – dann bleibt es beim
+   ruhigen Modus, und der bringt schon fast den ganzen Gewinn.
+   --------------------------------------------------------------------- */
+
+function setQuiet(on) {
+  document.body.classList.toggle('is-quiet', on);
+  ui.floatbar.hidden = !on;
+  if (on) { setDrawer('library', false); setDrawer('controls', false); }
+  ui.full.classList.toggle('is-active', on);
+}
+
+function enterFullscreen() {
+  setQuiet(true);
+  const root = document.documentElement;
+  const request = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (request) {
+    const result = request.call(root);
+    if (result && result.catch) result.catch(function () { /* bleibt ruhiger Modus */ });
+  }
+}
+
+function leaveFullscreen() {
+  setQuiet(false);
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+    const result = exit.call(document);
+    if (result && result.catch) result.catch(function () {});
+  }
+}
+
+
+/* ---- Ereignisse --------------------------------------------------------- */
 
 function toLocal(event) {
   const rect = layers.draw.canvas.getBoundingClientRect();
@@ -1252,18 +1729,28 @@ function bindEvents() {
   });
 
   document.addEventListener('click', function (event) {
-    const motifButton = event.target.closest('.motif');
+    const target = event.target;
+
+    const drawerButton = target.closest('[data-drawer]');
+    if (drawerButton) { toggleDrawer(drawerButton.dataset.drawer); return; }
+
+    const closeButton = target.closest('[data-close]');
+    if (closeButton) { setDrawer(closeButton.dataset.close, false); return; }
+
+    const motifButton = target.closest('.motif');
     if (motifButton) {
       loadMotif(motifButton.dataset.motif);
-      ui.library.classList.remove('is-open');
-      ui.libToggle.setAttribute('aria-expanded', 'false');
+      setDrawer('library', false);
       return;
     }
 
-    const tool = event.target.closest('.tool');
+    const tool = target.closest('.tool');
     if (tool) { state.tool = tool.dataset.tool; syncUI(); return; }
 
-    const pigment = event.target.closest('.pigment, .legend button');
+    const set = target.closest('.pset');
+    if (set) { setPalette(set.dataset.palette); return; }
+
+    const pigment = target.closest('.pigment, .legend button');
     if (pigment) {
       state.color = pigment.dataset.hex;
       Store.set('color', state.color);
@@ -1271,13 +1758,8 @@ function bindEvents() {
       return;
     }
 
-    const axis = event.target.closest('.axis');
+    const axis = target.closest('.axis');
     if (axis) { state.axes = Number(axis.dataset.axes); renderGuides(); syncUI(); }
-  });
-
-  ui.libToggle.addEventListener('click', function () {
-    const open = ui.library.classList.toggle('is-open');
-    ui.libToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 
   ui.mirror.addEventListener('change', function () {
@@ -1296,41 +1778,104 @@ function bindEvents() {
     Store.set('width', state.width);
   });
 
+  if (window.ResizeObserver) {
+    new ResizeObserver(fitStage).observe(ui.stage);
+  } else {
+    window.addEventListener('resize', fitStage);
+    window.addEventListener('orientationchange', fitStage);
+  }
+
   ui.undo.addEventListener('click', undo);
   ui.clear.addEventListener('click', clearSheet);
   ui.save.addEventListener('click', exportImage);
+  ui.keep.addEventListener('click', keepWork);
+  ui.galleryButton.addEventListener('click', function () {
+    setGallery(ui.gallery.hidden);
+  });
+  ui.galleryClose.addEventListener('click', function () { setGallery(false); });
+  ui.owner.addEventListener('input', function () { setOwner(ui.owner.value); });
+
+  ui.works.addEventListener('click', function (event) {
+    const tile = event.target.closest('.work');
+    if (tile) openViewer(tile.dataset.work);
+  });
+
+  document.getElementById('viewer-close').addEventListener('click', closeViewer);
+  document.getElementById('viewer-delete').addEventListener('click', deleteWork);
+  document.getElementById('viewer-download').addEventListener('click', downloadWork);
+  ui.viewerTitle.addEventListener('change', renameWork);
+  ui.viewerTitle.addEventListener('blur', renameWork);
+  ui.viewer.addEventListener('click', function (event) {
+    if (event.target === ui.viewer) closeViewer();
+  });
+  ui.full.addEventListener('click', function () {
+    document.body.classList.contains('is-quiet') ? leaveFullscreen() : enterFullscreen();
+  });
+  ui.fullExit.addEventListener('click', leaveFullscreen);
   ui.theme.addEventListener('click', function () {
-    setTheme(document.documentElement.dataset.theme === 'dunkel' ? 'hell' : 'dunkel');
+    setTheme(state.theme === 'dunkel' ? 'hell' : 'dunkel');
+  });
+
+  /* Verlässt der Browser das Vollbild von sich aus (Escape, Wischgeste),
+     soll die Bedienung wieder auftauchen. */
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (type) {
+    document.addEventListener(type, function () {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!active && document.body.classList.contains('is-quiet')) setQuiet(false);
+    });
   });
 
   document.addEventListener('keydown', function (event) {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault();
       undo();
+      return;
     }
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+
+    const keys = { '1': 'pen', '2': 'fill', '3': 'eraser' };
+    if (keys[event.key]) { state.tool = keys[event.key]; syncUI(); return; }
+    if (event.key === 'm') toggleDrawer('library');
+    if (event.key === 'w') toggleDrawer('controls');
+    if (event.key === 'f') {
+      document.body.classList.contains('is-quiet') ? leaveFullscreen() : enterFullscreen();
+    }
+    if (event.key === 'Escape') {
+      if (!ui.viewer.hidden) { closeViewer(); return; }
+      if (!ui.gallery.hidden) { setGallery(false); return; }
+      setDrawer('library', false);
+      setDrawer('controls', false);
+    }
+    if (event.key === 'g') setGallery(ui.gallery.hidden);
   });
 }
 
 
 /* ---------------------------------------------------------------------------
-   13. Start
+   14. Start
    ------------------------------------------------------------------------- */
 
 function start() {
   cacheUi();
   setupLayers();
   buildLibrary();
-  buildPalette();
+  buildPaletteSets();
   buildAxes();
   bindEvents();
 
-  state.color  = Store.get('color', state.color);
+  state.palette = Store.get('palette', state.palette);
+  buildPalette();
+  state.color  = Store.get('color', pigments()[0].hex);
   state.width  = Store.get('width', state.width);
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
   setTheme(Store.get('theme', preferredTheme()));
+  setOwner(Store.get('owner', ''));
 
+  fitStage();
   loadMotif(Store.get('motif', 'sternkranz'));
+  Gallery.open().then(refreshGallery);
   requestAnimationFrame(guideTick);
 
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
@@ -1344,10 +1889,14 @@ function start() {
 window.MandalaAtelier = {
   MOTIFS: MOTIFS,
   WORLDS: WORLDS,
-  PIGMENTS: PIGMENTS,
+  PALETTES: PALETTES,
+  pigments: pigments,
   state: state,
   layers: layers,
   loadMotif: loadMotif,
+  Gallery: Gallery,
+  keepWork: keepWork,
+  composeImage: composeImage,
   floodFill: floodFill,
   makeFields: makeFields,
   makeLegend: makeLegend,

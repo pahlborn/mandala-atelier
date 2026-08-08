@@ -1,12 +1,19 @@
 /* ============================================================
    Mandala Atelier – Gestaltung
    Ruhig, erwachsen, gedeckt. Keine Spielsymbolik, keine Signalfarben.
+
+   Grundgedanke des Layouts: Die Zeichenfläche bekommt allen Platz,
+   den das Fenster hergibt. Alles zur Steuerung liegt in zwei
+   Schubladen, die darüber ein- und ausfahren.
    ============================================================ */
 
 /* ---- Design-Tokens: Hell ---------------------------------- */
 :root {
-  --paper:        #f6f1e7;   /* Zeichenfläche – bleibt in beiden Modi hell */
-  --ink:          #242424;   /* Linienfarbe der Vorlagen                  */
+  /* Papier und Linien wechseln mit dem Modus mit. Dieselben Werte stehen
+     in app.js (THEMES) – die Vorlage wird auf Canvas gezeichnet und kann
+     keine CSS-Variable lesen. Beide Stellen zusammen ändern. */
+  --paper:        #f6f1e7;
+  --ink:          #242424;
 
   --bg:           #f3ece1;
   --surface:      #fbf7ef;
@@ -17,23 +24,26 @@
   --accent:       #2e6b6b;
   --accent-ink:   #ffffff;
   --focus:        #b5654a;
+  --veil:         rgba(40, 33, 22, .28);
 
   --radius:       14px;
   --radius-sm:    9px;
-  --shadow:       0 1px 2px rgba(40, 33, 22, .06), 0 8px 24px rgba(40, 33, 22, .07);
+  --shadow:       0 1px 2px rgba(40, 33, 22, .06), 0 8px 24px rgba(40, 33, 22, .10);
+  --shadow-lift:  0 2px 6px rgba(40, 33, 22, .10), 0 18px 48px rgba(40, 33, 22, .20);
 
   --font-display: "Fraunces", Georgia, serif;
   --font-text:    "Work Sans", system-ui, -apple-system, sans-serif;
   --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
 
   --gap:          14px;
+  --drawer:       288px;
 }
 
-/* ---- Design-Tokens: Dunkel --------------------------------
-   Nur die Umgebung wird dunkel. Das Blatt bleibt Papier –
-   so sehen gespeicherte Bilder immer gleich aus und ein
-   Moduswechsel muss die Vorlage nicht neu zeichnen.        */
+/* ---- Design-Tokens: Dunkel -------------------------------- */
 :root[data-theme="dunkel"] {
+  --paper:        #1c1d20;
+  --ink:          #d8d2c6;
+
   --bg:           #17181a;
   --surface:      #202225;
   --surface-2:    #2a2d31;
@@ -43,15 +53,18 @@
   --accent:       #7fb0ab;
   --accent-ink:   #17181a;
   --focus:        #d08a6c;
+  --veil:         rgba(0, 0, 0, .48);
   --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow-lift:  0 2px 6px rgba(0, 0, 0, .5), 0 18px 48px rgba(0, 0, 0, .55);
 }
 
 * { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-  margin: 0;
-}
+/* Ein eigenes display: beat sonst das hidden-Attribut – die schwebende
+   Leiste blieb unsichtbar sichtbar und fing Klicks ab. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
 
 body {
   background: var(--bg);
@@ -81,28 +94,21 @@ button, input { font: inherit; color: inherit; }
 
 /* ---- Kopfzeile -------------------------------------------- */
 .topbar {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--gap);
-  padding: 10px 18px;
+  padding: 9px 16px;
   border-bottom: 1px solid var(--edge);
   background: var(--surface);
 }
 
-.brand h1 {
-  margin: 0;
-  font-size: 21px;
-  letter-spacing: .01em;
-}
+.brand h1 { margin: 0; font-size: 20px; letter-spacing: .01em; }
 
-.claim {
-  margin: 1px 0 0;
-  font-size: 12.5px;
-  color: var(--text-soft);
-}
+.claim { margin: 1px 0 0; font-size: 12.5px; color: var(--text-soft); }
 
-.topbar-actions { display: flex; gap: 8px; }
+.topbar-actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
 
 .chip {
   border: 1px solid var(--edge);
@@ -111,33 +117,156 @@ button, input { font: inherit; color: inherit; }
   border-radius: 999px;
   padding: 7px 15px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .chip:hover { border-color: var(--accent); }
 
-/* ---- Dreispaltiges Atelier -------------------------------- */
+.chip.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Ersatzleiste im Vollbild – schwebt über der Zeichenfläche. */
+.floatbar {
+  position: fixed;
+  z-index: 40;
+  top: calc(10px + env(safe-area-inset-top));
+  right: calc(10px + env(safe-area-inset-right));
+  display: flex;
+  gap: 7px;
+  opacity: .45;
+  transition: opacity .2s ease;
+}
+
+.floatbar:hover, .floatbar:focus-within { opacity: 1; }
+
+.floatbar .chip { box-shadow: var(--shadow); background: var(--surface); }
+
+body.is-quiet .topbar { display: none; }
+
+/* ---- Bühne ------------------------------------------------ */
 .atelier {
+  position: relative;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr) 232px;
-  gap: var(--gap);
+  place-items: center;
   padding: var(--gap);
 }
 
-/* ---- Motivwelten ------------------------------------------ */
-.library {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background: var(--surface);
+body.is-quiet .stage { padding: 6px; }
+
+/* Größtes Quadrat, das in die Bühne passt. Die genaue Kantenlänge setzt
+   fitStage() in app.js: aspect-ratio verliert hier gegen die Prozentangaben
+   und das Mandala würde zur Ellipse. Die Angaben hier gelten nur, bis das
+   Skript einmal gelaufen ist. */
+.canvas-stack {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
+  background: var(--paper);
   border: 1px solid var(--edge);
   border-radius: var(--radius);
-  padding: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-.world { margin-bottom: 14px; }
+.canvas-stack canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
-.world > h2 {
+/* Nur die Zeichenebene nimmt Zeigerereignisse entgegen. */
+#guideCanvas, #fillCanvas, #motifCanvas, #labelCanvas { pointer-events: none; }
+
+#drawCanvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: crosshair;
+}
+
+/* ---- Schubladen ------------------------------------------- */
+.drawer {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  bottom: 0;
+  width: min(var(--drawer), 88vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
+  transition: transform .22s ease;
+  visibility: hidden;
+}
+
+.drawer-left  { left: 0;  border-right: 1px solid var(--edge); transform: translateX(-101%); }
+.drawer-right { right: 0; border-left: 1px solid var(--edge);  transform: translateX(101%); }
+
+.drawer.is-open { transform: none; visibility: visible; }
+
+.drawer-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--edge);
+}
+
+.drawer-head h2 { margin: 0; font-size: 17px; }
+
+.drawer-close {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-soft);
+}
+
+.drawer-close:hover { border-color: var(--accent); color: var(--text); }
+
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drawer-foot {
+  font-size: 12px;
+  color: var(--text-soft);
+  border-top: 1px solid var(--edge);
+  padding-top: 10px;
+  margin: 0;
+}
+
+/* ---- Motivwelten ------------------------------------------ */
+.world { margin-bottom: 12px; }
+
+.world > h3, .panel > h3 {
   margin: 0 0 7px;
   font-size: 12px;
   letter-spacing: .09em;
@@ -161,107 +290,20 @@ button, input { font: inherit; color: inherit; }
 
 .motif:hover { background: var(--surface-2); }
 
-.motif.is-active {
-  background: var(--surface-2);
-  border-color: var(--accent);
-}
+.motif.is-active { background: var(--surface-2); border-color: var(--accent); }
 
 .motif-name { display: block; font-weight: 500; }
 
-.motif-note {
-  display: block;
-  font-size: 12px;
-  color: var(--text-soft);
-}
+.motif-note { display: block; font-size: 12px; color: var(--text-soft); }
 
-.motif.blank {
-  border: 1px dashed var(--edge);
-  margin-bottom: 14px;
-}
+.motif.blank { border: 1px dashed var(--edge); margin-bottom: 14px; }
 
-.library-foot {
-  font-size: 12px;
-  color: var(--text-soft);
-  border-top: 1px solid var(--edge);
-  padding-top: 10px;
-  margin: 6px 0 0;
-}
-
-/* ---- Bühne ------------------------------------------------ */
-.stage {
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.canvas-stack {
-  position: relative;
-  width: min(100%, 78vh);
-  aspect-ratio: 1 / 1;
-  /* Ohne flex: none staucht der Flex-Container die Höhe und aus dem
-     Mandala wird eine Ellipse – im Hochformat sofort sichtbar. */
-  flex: none;
-  background: var(--paper);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.canvas-stack canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* Nur die Zeichenebene nimmt Zeigerereignisse entgegen. */
-#guideCanvas, #fillCanvas, #labelCanvas { pointer-events: none; }
-
-#drawCanvas {
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: crosshair;
-}
-
-.stage-hint {
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--text-soft);
-  text-align: center;
-  min-height: 1.4em;
-}
-
-/* ---- Bedienleiste ----------------------------------------- */
-.controls {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+/* ---- Werkzeug-Tafeln -------------------------------------- */
 .panel {
-  background: var(--surface);
   border: 1px solid var(--edge);
   border-radius: var(--radius);
   padding: 12px;
-}
-
-.panel h2 {
-  margin: 0 0 9px;
-  font-size: 12px;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--text-soft);
-  font-family: var(--font-text);
-  font-weight: 600;
+  background: var(--surface);
 }
 
 .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
@@ -275,21 +317,31 @@ button, input { font: inherit; color: inherit; }
   font-size: 13.5px;
 }
 
-.tool.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-}
+.tool.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 .field { display: block; margin-top: 11px; font-size: 12.5px; color: var(--text-soft); }
 .field input[type="range"] { width: 100%; margin-top: 4px; accent-color: var(--accent); }
 
-/* ---- Palette ---------------------------------------------- */
-.palette {
+/* ---- Farbwelten und Pigmente ------------------------------ */
+.palette-sets {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 10px;
 }
+
+.pset {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 7px 4px;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+
+.pset.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.palette { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 
 .pigment {
   aspect-ratio: 1 / 1;
@@ -300,10 +352,7 @@ button, input { font: inherit; color: inherit; }
   padding: 0;
 }
 
-.pigment.is-active {
-  border-color: var(--text);
-  transform: scale(1.08);
-}
+.pigment.is-active { border-color: var(--text); transform: scale(1.08); }
 
 /* ---- Farblegende ------------------------------------------ */
 .legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
@@ -325,16 +374,14 @@ button, input { font: inherit; color: inherit; }
 .legend button:hover { background: var(--surface-2); }
 
 .legend .dot {
-  width: 17px;
-  height: 17px;
-  flex: none;
+  width: 17px; height: 17px; flex: none;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
 }
 
 .legend .val { font-family: var(--font-mono); }
 
-/* ---- Achsen ----------------------------------------------- */
+/* ---- Achsen und Schalter ---------------------------------- */
 .axes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
 
 .axis {
@@ -347,11 +394,7 @@ button, input { font: inherit; color: inherit; }
   font-size: 13px;
 }
 
-.axis.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-}
+.axis.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 .switch {
   display: flex;
@@ -379,59 +422,183 @@ button, input { font: inherit; color: inherit; }
 
 .action + .action { margin-top: 5px; }
 .row .action + .action { margin-top: 0; }
-
 .action:hover { border-color: var(--accent); }
-
 .action:disabled { opacity: .45; cursor: default; }
+.action.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
-.action.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
+/* ---- Galerie ----------------------------------------------- */
+.overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
-/* ---- Schmale Geräte / Hochformat --------------------------- */
-@media (max-width: 900px) {
-  .atelier {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    grid-template-areas: "stage" "controls";
-    align-content: start;
-    overflow-y: auto;          /* Bedienleiste rutscht unter das Blatt */
-    -webkit-overflow-scrolling: touch;
-  }
+.overlay-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--surface);
+}
 
-  /* min-height: auto ist hier wesentlich: sonst schrumpft die Rasterzeile,
-     sobald die Bedienleiste wächst (etwa durch die Farblegende), und das
-     Blatt schiebt sich unter die Bedienleiste. */
-  .stage    { grid-area: stage; min-height: auto; }
-  .controls { grid-area: controls; overflow: visible; }
+.overlay-head h2 { margin: 0; font-size: 20px; }
 
-  /* Die Motivliste klappt über die Bühne, statt Platz zu nehmen. */
-  .library {
-    position: fixed;
-    z-index: 20;
-    top: 0; right: 0; bottom: 0;
-    width: min(320px, 86vw);
-    border-radius: 0;
-    box-shadow: var(--shadow);
-    transform: translateX(101%);
-    transition: transform .22s ease;
-    padding-top: calc(12px + env(safe-area-inset-top));
-  }
+.overlay-note { margin: 1px 0 0; font-size: 12.5px; color: var(--text-soft); }
 
-  .library.is-open { transform: none; }
+.overlay-ident { min-width: 0; }
 
-  .canvas-stack { width: min(100%, 52vh); }
+.owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
 
-  .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.owner input {
+  width: 11em;
+  padding: 7px 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }
 
 @media (max-width: 560px) {
-  .controls { grid-template-columns: minmax(0, 1fr); }
+  .overlay-head { flex-wrap: wrap; }
+  .owner { width: 100%; margin-left: 0; }
+  .owner input { flex: 1; width: auto; }
+}
+
+.overlay-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px;
+}
+
+.empty {
+  max-width: 34em;
+  margin: 12vh auto;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.works {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 16px;
+}
+
+.work {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--edge);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 9px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.work:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+
+.work img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.work-title {
+  display: block;
+  margin-top: 8px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-meta { display: block; font-size: 12px; color: var(--text-soft); }
+
+/* ---- Vergrößerte Ansicht ----------------------------------- */
+.viewer {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: var(--veil);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.viewer-card {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  max-width: min(1000px, 100%);
+  max-height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  padding: 16px;
+  overflow: auto;
+}
+
+.viewer-card img {
+  display: block;
+  width: min(62vh, 100%);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.viewer-side {
+  flex: 1;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewer-side .field input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.viewer-meta { margin: 0 0 4px; font-size: 12.5px; color: var(--text-soft); }
+
+@media (max-width: 720px) {
+  .viewer-card { flex-direction: column; }
+  .viewer-card img { width: 100%; }
+}
+
+/* ---- Schmale Geräte --------------------------------------- */
+@media (max-width: 560px) {
   .claim { display: none; }
+  .brand h1 { font-size: 17px; }
+  .chip { padding: 6px 11px; font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .library { transition: none; }
+  .drawer, .floatbar { transition: none; }
 }
