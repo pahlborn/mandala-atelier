@@ -1162,6 +1162,17 @@ function exportImage() {
   link.click();
 }
 
+/* Beim allerersten Start: einer bereits gesetzten Vorgabe folgen, sonst der
+   Einstellung des Geräts. Danach zählt nur noch die eigene Wahl. */
+function preferredTheme() {
+  const preset = document.documentElement.dataset.theme;
+  if (preset === 'dunkel' || preset === 'dark') return 'dunkel';
+  if (preset === 'hell' || preset === 'light') return 'hell';
+  const dark = window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return dark ? 'dunkel' : 'hell';
+}
+
 function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
   ui.theme.textContent = theme === 'dunkel' ? 'Hell' : 'Dunkel';
@@ -1317,7 +1328,7 @@ function start() {
   state.width  = Store.get('width', state.width);
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
-  setTheme(Store.get('theme', 'hell'));
+  setTheme(Store.get('theme', preferredTheme()));
 
   loadMotif(Store.get('motif', 'sternkranz'));
   requestAnimationFrame(guideTick);
