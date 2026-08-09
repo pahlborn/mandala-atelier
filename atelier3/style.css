@@ -242,6 +242,165 @@ body.is-turning #sheet { opacity: 0; }
 }
 
 /* ---------------------------------------------------------------------------
+   Die Blattlade
+
+   Eine Schublade mit Papier, kein Einstellungsfenster: oben die Pigmente,
+   die auf dem Tisch liegen sollen, darunter die Blätter zur Auswahl.
+   ------------------------------------------------------------------------- */
+
+.lade {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: calc(env(safe-area-inset-top) + 24px) 24px
+           calc(env(safe-area-inset-bottom) + 24px);
+  background: var(--room);
+}
+
+.lade-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  max-width: 860px;
+  width: 100%;
+}
+
+/* Die Stimmung zuerst, und die trägt einen Namen. Über ein Wort
+   entscheidet man in einem Atemzug; sechs Bilder zu vergleichen ist eine
+   Aufgabe. */
+.lade-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lade-kind {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--quiet);
+  font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  font-size: clamp(17px, 2.6vmin, 22px);
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 220ms ease, background-color 220ms ease;
+}
+
+.lade-kind:hover { background: rgba(128, 128, 128, 0.08); }
+
+.lade-kind[aria-pressed='true'] {
+  color: var(--plain);
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.lade-kind:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+/* Danach die Farbwelten als das, was sie sind: Pigmente. Ohne Namen –
+   über eine Beschriftung müsste man erst nachdenken, über Farbe nicht. */
+.lade-worlds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lade-world {
+  display: flex;
+  gap: 3px;
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.lade-world span {
+  width: 13px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.lade-world:hover { background: rgba(128, 128, 128, 0.08); }
+
+.lade-world[aria-pressed='true'] {
+  border-color: var(--quiet);
+  background: rgba(128, 128, 128, 0.10);
+}
+
+.lade-world:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+/* Die Blätter selbst. */
+.lade-sheets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 620px;
+}
+
+@media (min-width: 640px) {
+  .lade-sheets { grid-template-columns: repeat(3, 1fr); }
+}
+
+.lade-sheet {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  box-shadow: 0 1px 2px var(--edge), 0 8px 22px -12px var(--edge);
+  transition: transform 240ms cubic-bezier(.2,.7,.3,1), box-shadow 240ms ease;
+}
+
+.lade-sheet canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+
+.lade-sheet:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 4px var(--edge), 0 14px 30px -12px var(--edge);
+}
+
+.lade-sheet:focus-visible { outline: 2px solid var(--plain); outline-offset: 4px; }
+
+.lade-bar {
+  display: flex;
+  gap: 6px;
+}
+
+.lade-bar button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--plain);
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.lade-bar button:hover { background: rgba(128, 128, 128, 0.12); }
+.lade-bar button:focus-visible { outline: 2px solid var(--plain); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lade-sheet, .lade-world, .lade-kind { transition-duration: 1ms !important; }
+}
+
+/* ---------------------------------------------------------------------------
    Der Stapel
    ------------------------------------------------------------------------- */
 

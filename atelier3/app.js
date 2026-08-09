@@ -25,8 +25,8 @@
      11. Speicher
      12. Oberfläche
      13. Der Stapel
-     14. Die Stille
-     15. Start
+     15. Die Stille
+     16. Start
    ========================================================================== */
 
 
@@ -321,13 +321,56 @@ function cloudLayer(shift, salt) {
 const WIDE   = ['petals', 'lattice', 'scallops', 'petals', 'waves', 'petals'];
 const NARROW = ['beads', 'rays', 'waves', 'plain', 'beads', 'plain'];
 
-function buildPlan(seed) {
+/* Vier Charaktere. Sie sind keine festen Motive, sondern **biegen den
+   Generator**: andere Zähligkeit, andere Bandzahl, anderes Ornament. Es
+   bleibt also dabei, dass jedes Blatt neu entsteht – man sagt nur, in
+   welche Richtung.
+
+   Der Grund, warum es sie überhaupt gibt: Menschen greifen zuerst zu einem
+   Wort für ihre Stimmung und schauen erst danach auf Bilder. „Mir ist heute
+   nach Ruhe“ ist eine Entscheidung, die man in einem Atemzug trifft; sechs
+   Bilder zu vergleichen ist eine Aufgabe. Das Wort steht deshalb vor dem
+   Bild und nicht daneben.
+
+   Die Namen sind Stimmungen, keine Formenkunde – niemand soll erst lernen
+   müssen, was ein Gitterband ist. */
+const KINDS = [
+  { id: 'ruhe', name: 'Ruhe',
+    axes: [6, 8, 8, 10, 10, 12], bands: [3, 4], lw: [0.0050, 0.0068],
+    wide:   ['plain', 'waves', 'petals', 'scallops', 'plain'],
+    narrow: ['plain', 'waves', 'beads', 'plain'] },
+
+  { id: 'bluete', name: 'Blüte',
+    axes: [8, 10, 12, 12, 14], bands: [4, 5], lw: [0.0055, 0.0080],
+    wide:   ['petals', 'scallops', 'petals', 'waves'],
+    narrow: ['beads', 'waves', 'plain', 'beads'] },
+
+  { id: 'klarheit', name: 'Klarheit',
+    axes: [12, 12, 16, 16, 18], bands: [4, 5], lw: [0.0052, 0.0070],
+    wide:   ['lattice', 'rays', 'lattice', 'waves'],
+    narrow: ['rays', 'beads', 'plain'] },
+
+  { id: 'fuelle', name: 'Fülle',
+    axes: [14, 16, 16, 18, 18], bands: [5, 6], lw: [0.0058, 0.0082],
+    wide:   ['petals', 'lattice', 'scallops', 'petals'],
+    narrow: ['beads', 'rays', 'waves', 'beads'] }
+];
+
+function kindById(id) {
+  return KINDS.filter(function (k) { return k.id === id; })[0] || null;
+}
+
+/* Ohne Charakter verhält sich der Generator genau wie bisher. Das ist
+   Absicht: Blätter, die vor den Kategorien entstanden sind, tragen keinen
+   – und müssen beim Wiederaufnehmen dasselbe Relief bekommen wie damals. */
+function buildPlan(seed, kindId) {
   const rng = mulberry32(seed);
   const pick = function (list) { return list[(rng() * list.length) | 0]; };
   const span = function (a, b) { return a + rng() * (b - a); };
 
-  const n  = pick([8, 10, 12, 12, 12, 14, 16, 6, 18]);
-  const lw = span(0.0052, 0.0082);
+  const art = kindById(kindId);
+  const n  = pick(art ? art.axes : [8, 10, 12, 12, 12, 14, 16, 6, 18]);
+  const lw = art ? span(art.lw[0], art.lw[1]) : span(0.0052, 0.0082);
 
   const bands = [];
 
@@ -348,7 +391,9 @@ function buildPlan(seed) {
 
   /* Die Ringbänder nach außen. */
   let r = rose;
-  const count = 4 + ((rng() * 3) | 0);
+  const count = art
+    ? art.bands[0] + ((rng() * (art.bands[1] - art.bands[0] + 1)) | 0)
+    : 4 + ((rng() * 3) | 0);
   const weights = [];
   let total = 0;
   for (let i = 0; i < count; i++) {
@@ -360,9 +405,10 @@ function buildPlan(seed) {
   let last = '';
   for (let i = 0; i < count; i++) {
     const width = (1 - rose) * (weights[i] / total);
+    const breit = width > 0.115;
     let kind = '';
     for (let guard = 0; guard < 10; guard++) {
-      kind = pick(width > 0.115 ? WIDE : NARROW);
+      kind = pick(art ? (breit ? art.wide : art.narrow) : (breit ? WIDE : NARROW));
       if (kind !== last) break;
     }
     last = kind;
@@ -772,6 +818,7 @@ function clamp255(v) {
 const sheet = {
   plan: null,
   world: null,
+  kind: null,
   pigments: null,
   relief: null,
   dens: null,
@@ -1230,6 +1277,13 @@ function bindHand() {
     try { canvas.setPointerCapture(event.pointerId); } catch (err) {}
     awaken();
 
+    /* Einmal je Berührung nachmessen. Das kostet einen Blick ins Layout und
+       macht das Zeichnen unabhängig davon, ob zwischendurch etwas die Seite
+       verschoben hat – eine gedrehte Tastatur, eine Adressleiste, ein
+       verpasstes resize. Während eines Striches ändert sich die Ansicht
+       nicht, also genügt dieser eine Blick. */
+    if (touching.size === 1) refreshGeometry();
+
     /* Der Stift hat immer Vorrang. Liegt er auf, ist jede Berührung der
        Handballen – und niemals die zweite Hand. */
     if (event.pointerType === 'pen') {
@@ -1525,6 +1579,7 @@ async function saveCurrent() {
     if (!blob) return;
     await Speicher.put('kv', {
       blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
+      kind: sheet.kind && sheet.kind.id,
       pigment: pigmentIndex, zeit: Date.now()
     }, 'blatt');
     savedAt = performance.now();
@@ -1542,7 +1597,7 @@ async function shelveCurrent() {
   await Speicher.put('blaetter', {
     id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
     blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
-    zeit: Date.now()
+    kind: sheet.kind && sheet.kind.id, zeit: Date.now()
   });
   return true;
 }
@@ -1550,7 +1605,7 @@ async function shelveCurrent() {
 /* Ein gesichertes Blatt wird wieder das laufende – beim Start und beim
    Aufnehmen vom Stapel derselbe Weg. */
 async function adoptSheet(rec) {
-  makeSheet(rec.seed, rec.mode, rec.world);
+  makeSheet(rec.seed, rec.mode, rec.world, rec.kind);
   buildPigments();
   setPigment(rec.pigment || 0);
 
@@ -1653,7 +1708,243 @@ function setTray(open) {
 
 
 /* ---------------------------------------------------------------------------
-   13. Der Stapel
+   13. Die Blattlade
+
+   Die Wahl gehört an die Tür, nicht in die Tätigkeit.
+
+   Der erste Entwurf strich jede Auswahl – auch die der Farbwelt – mit der
+   Begründung, jede Wahl sei eine Entscheidung vor dem ersten Strich. Das
+   warf zwei sehr verschiedene Dinge zusammen. Über Pinselgröße, Werkzeug
+   oder Deckkraft zu entscheiden ist Last: Es steht zwischen Mensch und
+   Tätigkeit und kommt während der Arbeit immer wieder. Zu entscheiden, ob
+   einem heute nach kühlen oder warmen Farben ist, ist keine Last – das ist
+   das Ankommen, und es passiert genau einmal.
+
+   Wer die zweite Art mit wegräumt, nimmt keine Arbeit ab, sondern
+   Selbstbestimmung. Und Selbstbestimmung ist einer der sechs Kerne, um die
+   es hier geht. Wer kühle Farben will, soll sie nehmen können und nicht so
+   lange Blätter durchwürfeln müssen, bis eine kühle Welt erscheint.
+
+   Deshalb: Beim Griff nach einem neuen Blatt sieht man, was auf dem Tisch
+   liegt. Zwei Berührungen, dann nie wieder eine Frage. Beim allerersten
+   Start erscheint die Lade nicht – vor dem allerersten Strich wird nichts
+   gefragt.
+
+   Von jedem Blatt zeigt die Vorschau nur einen **Ausschnitt**. Der Reiz
+   dieser App ist, dass das Muster erst unter der Hand hervorkommt; eine
+   vollständige Vorschau nähme genau das weg. Ein Segment verrät den
+   Charakter – dicht oder luftig, streng oder blumig – und lässt das Bild
+   offen.
+   ------------------------------------------------------------------------- */
+
+const PREVIEW_PX  = 300;    // Kantenlänge einer Vorschau
+const LADE_COUNT  = 6;      // so viele Blätter liegen zur Auswahl
+const WEDGE_HALF  = Math.PI * 0.40;   // halbe Öffnung des Ausschnitts
+const WEDGE_DIR   = -Math.PI * 0.5 + 0.30;
+
+const lade = { world: null, kind: null, seeds: [], mode: 'tag', pending: 0 };
+
+/* Ein Blatt, wie es nach ein paar leichten Strichen aussähe – aber nur in
+   einem Segment. Gerechnet wird direkt über die Feldfunktion: Bei 260 × 260
+   Punkten lohnt keine Nachschlagetabelle. */
+function drawPreview(cv, seed, world, mode, kindId) {
+  const px = cv.width;
+  const plan = buildPlan(seed, kindId);
+  const look = SHEETS[mode];
+  const pigs = pigmentsOf(world, mode);
+  const paper = look.paper;
+  const chalk = look.chalk;
+
+  const img = cv.getContext('2d').createImageData(px, px);
+  const d = img.data;
+  const C = px / 2, R = C * 0.92;
+
+  for (let y = 0; y < px; y++) {
+    for (let x = 0; x < px; x++) {
+      const o = (y * px + x) * 4;
+      const dx = x + 0.5 - C, dy = y + 0.5 - C;
+      const rr = Math.sqrt(dx * dx + dy * dy) / R;
+
+      const n = (hash2(x, y) - 0.5) * 5;
+      let r = paper[0] + n, g = paper[1] + n, b = paper[2] + n;
+
+      if (rr <= 1.02) {
+        /* Wie weit liegt dieser Punkt im Ausschnitt? Die Ränder laufen
+           weich aus, damit es nach einem angehobenen Stück Papier aussieht
+           und nicht nach einem Tortenstück. */
+        let th = Math.atan2(dy, dx);
+        let a = th - WEDGE_DIR;
+        while (a >  Math.PI) a -= TAU;
+        while (a < -Math.PI) a += TAU;
+
+        let vis = 1 - (Math.abs(a) - WEDGE_HALF * 0.66) / (WEDGE_HALF * 0.34);
+        if (vis > 1) vis = 1;
+        const fade = 1 - (rr - 0.88) / 0.14;
+        if (fade < vis) vis = fade;
+
+        if (vis > 0.004) {
+          if (vis > 1) vis = 1;
+          vis = vis * vis * (3 - 2 * vis);
+
+          /* Flacher als beim echten Reiben und kräftiger: Bei Daumennagel-
+              größe sind die Ornamentlinien dünner als ein Bildpunkt und
+              verschwänden sonst. Der Charakter – dicht oder luftig, streng
+              oder blumig – soll über die Tonwerte lesbar sein, nicht über
+              Haarlinien. */
+          const rel = fieldAt(plan, rr, th < 0 ? th + TAU : th);
+          const bite = Math.pow(rel, 1.55);
+          let dens = bite * 1.45 * vis * (0.62 + 0.60 * tooth(x, y));
+          if (dens > 0.94) dens = 0.94;
+
+          if (dens > 0.004) {
+            const band = rr < 0.4 ? 0 : (rr < 0.75 ? 3 : 6);
+            const pig = pigs[band].rgb;
+            if (chalk) {
+              r += (pig[0] - r) * dens;
+              g += (pig[1] - g) * dens;
+              b += (pig[2] - b) * dens;
+            } else {
+              r += (pig[0] + (r * pig[0] / 255 - pig[0]) * MIX_SUB - r) * dens;
+              g += (pig[1] + (g * pig[1] / 255 - pig[1]) * MIX_SUB - g) * dens;
+              b += (pig[2] + (b * pig[2] / 255 - pig[2]) * MIX_SUB - b) * dens;
+            }
+          }
+        }
+      }
+
+      d[o] = clamp255(r); d[o + 1] = clamp255(g); d[o + 2] = clamp255(b); d[o + 3] = 255;
+    }
+  }
+  cv.getContext('2d').putImageData(img, 0, 0);
+}
+
+function freshSeeds() {
+  lade.seeds = [];
+  for (let i = 0; i < LADE_COUNT; i++) {
+    lade.seeds.push((Math.random() * 4294967296) >>> 0);
+  }
+}
+
+/* Das Wort steht vor dem Bild: erst die Stimmung, dann die Pigmente,
+   dann die Blätter. */
+function buildLadeKinds() {
+  ui.ladeKinds.innerHTML = '';
+  KINDS.forEach(function (k) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'lade-kind';
+    button.dataset.kind = k.id;
+    button.textContent = k.name;
+    button.setAttribute('aria-pressed', k.id === lade.kind.id ? 'true' : 'false');
+    ui.ladeKinds.appendChild(button);
+  });
+}
+
+function setLadeKind(id) {
+  const found = kindById(id);
+  if (!found || found === lade.kind) return;
+  lade.kind = found;
+  freshSeeds();
+  buildLadeKinds();
+  buildLadeSheets();
+}
+
+function buildLadeWorlds() {
+  ui.ladeWorlds.innerHTML = '';
+  WORLDS.forEach(function (w) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'lade-world';
+    button.dataset.world = w.id;
+    button.setAttribute('aria-label', w.name);
+    button.setAttribute('aria-pressed', w.id === lade.world.id ? 'true' : 'false');
+    pigmentsOf(w, lade.mode).forEach(function (pig) {
+      const dot = document.createElement('span');
+      dot.style.background = 'rgb(' + pig.rgb.join(',') + ')';
+      button.appendChild(dot);
+    });
+    ui.ladeWorlds.appendChild(button);
+  });
+}
+
+/* Die Vorschauen entstehen eine je Bild. So steht die Lade sofort da,
+   statt erst nach dem Rechnen aufzugehen. */
+function buildLadeSheets() {
+  ui.ladeSheets.innerHTML = '';
+  const jobs = [];
+  lade.seeds.forEach(function (seed) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'lade-sheet';
+    button.dataset.seed = String(seed);
+    button.setAttribute('aria-label', 'Dieses Blatt nehmen');
+    const cv = document.createElement('canvas');
+    cv.width = PREVIEW_PX;
+    cv.height = PREVIEW_PX;
+    button.appendChild(cv);
+    ui.ladeSheets.appendChild(button);
+    jobs.push({ cv: cv, seed: seed });
+  });
+
+  const token = ++lade.pending;
+  let i = 0;
+  const step = function () {
+    if (token !== lade.pending || i >= jobs.length) return;
+    drawPreview(jobs[i].cv, jobs[i].seed, lade.world, lade.mode, lade.kind.id);
+    i++;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function openLade() {
+  setTray(false);
+  lade.mode = preferredMode();
+  lade.world = sheet.world || worldFor(sheet.seed);
+  lade.kind = sheet.kind || KINDS[0];
+  freshSeeds();
+  buildLadeKinds();
+  ui.lade.hidden = false;
+  buildLadeWorlds();
+  buildLadeSheets();
+  awaken();
+}
+
+function closeLade() {
+  lade.pending++;
+  ui.lade.hidden = true;
+  awaken();
+}
+
+function setLadeWorld(id) {
+  const found = WORLDS.filter(function (w) { return w.id === id; })[0];
+  if (!found || found === lade.world) return;
+  lade.world = found;
+  /* Dieselben Blätter, andere Pigmente – so lässt sich „dieser Charakter,
+     aber kühler“ unmittelbar vergleichen. */
+  buildLadeWorlds();
+  buildLadeSheets();
+}
+
+async function takeFreshSheet(seed) {
+  closeLade();
+  clearTimeout(saveTimer);
+  await shelveCurrent();
+  await Speicher.del('kv', 'blatt');
+
+  document.body.classList.add('is-turning');
+  await new Promise(function (r) { setTimeout(r, 260); });
+  makeSheet(seed, lade.mode, lade.world.id, lade.kind.id);
+  buildPigments();
+  setPigment(0);
+  paint();
+  document.body.classList.remove('is-turning');
+  awaken();
+}
+
+
+/* ---------------------------------------------------------------------------
+   14. Der Stapel
 
    Ein Stapel, kein Kachelraster. Ein Raster stellt Bilder nebeneinander und
    lädt damit zum Vergleichen ein, und Vergleichen ist der Anfang von
@@ -1763,26 +2054,10 @@ async function removeStackItem() {
   showStackItem();
 }
 
-/* Das laufende Blatt weglegen und ein frisches nehmen. */
-async function newSheet() {
-  setTray(false);
-  clearTimeout(saveTimer);
-  await shelveCurrent();
-  await Speicher.del('kv', 'blatt');
-
-  document.body.classList.add('is-turning');
-  await new Promise(function (r) { setTimeout(r, 260); });
-  makeSheet((Math.random() * 4294967296) >>> 0, preferredMode());
-  buildPigments();
-  setPigment(0);
-  paint();
-  document.body.classList.remove('is-turning');
-  awaken();
-}
 
 
 /* ---------------------------------------------------------------------------
-   14. Die Stille
+   15. Die Stille
 
    Nach vierzig Sekunden ohne Berührung tritt die Bedienung ab: Die Pigmente
    verblassen, das Zeichen verschwindet, das Blatt steht allein.
@@ -1807,7 +2082,7 @@ function awaken() {
 
 function tickStillness(now) {
   if (still || hand.down || !sheet.touched) return;
-  if (!ui.tray.hidden || !ui.stack.hidden) { lastTouch = now; return; }
+  if (!ui.tray.hidden || !ui.stack.hidden || !ui.lade.hidden) { lastTouch = now; return; }
   if (now - lastTouch < STILL_MS) return;
   still = true;
   document.body.classList.add('is-still');
@@ -1817,7 +2092,7 @@ function tickStillness(now) {
 
 
 /* ---------------------------------------------------------------------------
-   15. Start
+   16. Start
    ------------------------------------------------------------------------- */
 
 function preferredMode() {
@@ -1832,7 +2107,7 @@ function hintStrength() {
 }
 
 /* Baut Relief, Papier und Puffer für ein Blatt. */
-function makeSheet(seed, mode, worldId) {
+function makeSheet(seed, mode, worldId, kindId) {
   sheet.seed   = seed >>> 0;
   sheet.mode   = SHEETS[mode] ? mode : 'tag';
   sheet.look   = SHEETS[sheet.mode];
@@ -1844,7 +2119,12 @@ function makeSheet(seed, mode, worldId) {
               || worldFor(sheet.seed);
   sheet.pigments = pigmentsOf(sheet.world, sheet.mode);
 
-  sheet.plan   = buildPlan(sheet.seed);
+  /* Der Charakter gehört ebenso zum Blatt und muss mitgesichert werden:
+     Er biegt den Generator, ein wieder aufgenommenes Blatt bekäme sonst
+     ein anderes Relief als das, auf dem schon Farbe liegt. */
+  sheet.kind = kindById(kindId);
+
+  sheet.plan   = buildPlan(sheet.seed, sheet.kind && sheet.kind.id);
   sheet.relief = rasterRelief(sheet.plan);
 
   if (!sheet.pix) {
@@ -1883,16 +2163,31 @@ function fitSheet() {
   canvas.style.width  = side + 'px';
   canvas.style.height = side + 'px';
 
-  /* Grundgröße und Mitte merken, damit die zweite Hand ohne einen einzigen
-     Blick ins Layout rechnen kann. Die Mitte steht fest: Eine Verschiebung
-     des Blattes ändert nur seine Darstellung, nicht seinen Platz im Raster. */
   view.base = side;
-  const box = ui.wrap.getBoundingClientRect();
-  view.cx = box.left + box.width * 0.5 - view.tx;
-  view.cy = box.top + box.height * 0.5 - view.ty;
+  refreshGeometry();
 
   const fit = clampedView();
   setView(fit.scale, fit.tx, fit.ty);
+}
+
+/* Wo liegt das Blatt im Fenster, wenn man es nicht verschöbe?
+
+   Gemessen wird .sheet-wrap, nicht der Canvas: Die Verschiebung sitzt als
+   Transformation auf dem Canvas und ginge sonst doppelt ein. Der Umriss der
+   Hülle bleibt davon unberührt, weil Transformationen das Layout nicht
+   anfassen – er ist also genau die gesuchte, unverschobene Mitte.
+
+   Hier stand einmal ein „minus view.tx“, in der falschen Annahme, der
+   gemessene Umriss enthalte die Verschiebung bereits. Die Folge war
+   bösartig: Beim Zeichnen landete die Farbe um genau den
+   Verschiebungsbetrag neben dem Finger – aber erst, nachdem irgendwann ein
+   resize gelaufen war. Auf dem Schreibtisch passiert das nie, auf einem
+   iPad beim Drehen sofort. */
+function refreshGeometry() {
+  const box = ui.wrap.getBoundingClientRect();
+  view.cx = box.left + box.width * 0.5;
+  view.cy = box.top + box.height * 0.5;
+  applyView();
 }
 
 function cacheUi() {
@@ -1911,6 +2206,12 @@ function cacheUi() {
   ui.stackEmpty  = document.getElementById('stack-empty');
   ui.stackPrev   = document.getElementById('stack-prev');
   ui.stackNext   = document.getElementById('stack-next');
+  ui.lade        = document.getElementById('lade');
+  ui.ladeKinds   = document.getElementById('lade-kinds');
+  ui.ladeWorlds  = document.getElementById('lade-worlds');
+  ui.ladeSheets  = document.getElementById('lade-sheets');
+  ui.ladeMore    = document.getElementById('lade-more');
+  ui.ladeClose   = document.getElementById('lade-close');
   ui.stackTake   = document.getElementById('stack-take');
   ui.stackRemove = document.getElementById('stack-remove');
   ui.stackClose  = document.getElementById('stack-close');
@@ -1931,7 +2232,26 @@ function bindUi() {
     setTray(false);
   });
 
-  ui.trayNew.addEventListener('click', newSheet);
+  ui.trayNew.addEventListener('click', openLade);
+
+  ui.ladeMore.addEventListener('click', function () {
+    freshSeeds();
+    buildLadeSheets();
+    awaken();
+  });
+  ui.ladeClose.addEventListener('click', closeLade);
+  ui.ladeKinds.addEventListener('click', function (event) {
+    const button = event.target.closest('.lade-kind');
+    if (button) { setLadeKind(button.dataset.kind); awaken(); }
+  });
+  ui.ladeWorlds.addEventListener('click', function (event) {
+    const button = event.target.closest('.lade-world');
+    if (button) { setLadeWorld(button.dataset.world); awaken(); }
+  });
+  ui.ladeSheets.addEventListener('click', function (event) {
+    const button = event.target.closest('.lade-sheet');
+    if (button) takeFreshSheet(Number(button.dataset.seed) >>> 0);
+  });
   ui.trayStack.addEventListener('click', openStack);
   ui.traySound.addEventListener('click', function () {
     Klang.wake();
@@ -1948,7 +2268,8 @@ function bindUi() {
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
-      if (!ui.stack.hidden) closeStack();
+      if (!ui.lade.hidden) closeLade();
+      else if (!ui.stack.hidden) closeStack();
       else if (!ui.tray.hidden) setTray(false);
     }
     if (!ui.stack.hidden) {
@@ -2035,10 +2356,16 @@ window.Blatt = {
   contactRadius: contactRadius,
   setViewForTest: function (scale, tx, ty) { stopViewAnim(); setView(scale, tx || 0, ty || 0); },
   viewHome: viewHome,
+  openLade: openLade,
+  lade: lade,
+  KINDS: KINDS,
   buildPlan: buildPlan, fieldAt: fieldAt,
   WORLDS: WORLDS,
   makeSheet: function (seed, mode, world) {
     makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();
+  },
+  makeSheetFull: function (seed, mode, world, kind) {
+    makeSheet(seed, mode, world, kind); buildPigments(); setPigment(0); paint();
   },
   setPigment: setPigment,
   rubPath: function (points, dwell, press) {
