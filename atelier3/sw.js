@@ -9,7 +9,7 @@
    WICHTIG: Bei jedem Release die Version erhöhen.
    ========================================================================== */
 
-const CACHE = 'atelier3-v1-0';
+const CACHE = 'atelier3-v1-1';
 
 const SHELL = [
   './',
@@ -49,7 +49,24 @@ self.addEventListener('activate', function (event) {
 });
 
 /* Diese App holt nichts von außen – keine Schriften, keine Klänge, keine
-   Bilder. Deshalb genügt ein Weg: erst Cache, dann Netz. */
+   Bilder. Es geht hier also nur um die eigenen Dateien.
+
+   Ausgeliefert wird sofort aus dem Vorrat, damit die App auch ohne Netz und
+   ohne Warten startet. Im Hintergrund wird trotzdem nachgesehen, ob es etwas
+   Neueres gibt, und der Vorrat aufgefrischt: Beim nächsten Öffnen liegt dann
+   die neue Fassung da.
+
+   Das ist ausdrücklich eine Absicherung gegen den eigenen Leichtsinn. Vorher
+   galt „erst Vorrat, sonst Netz“, und der Vorrat wurde nur beim Wechsel der
+   Cache-Version erneuert. Wird der Wechsel einmal vergessen – und genau das
+   ist zweimal hintereinander passiert –, bleibt ein Gerät für immer auf der
+   alten Fassung stehen: Der Worker selbst hat sich ja nicht geändert, also
+   installiert der Browser auch nichts nach. Ein stiller Fehler, den man auf
+   dem Schreibtisch nie sieht, weil dort kein Worker läuft.
+
+   Die Cache-Version bei jedem Release trotzdem erhöhen – sie räumt auf und
+   sorgt dafür, dass die neue Fassung sofort und nicht erst beim übernächsten
+   Start ankommt. */
 self.addEventListener('fetch', function (event) {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -57,9 +74,14 @@ self.addEventListener('fetch', function (event) {
 
   event.respondWith(
     caches.match(request).then(function (hit) {
-      return hit || fetch(request).then(function (response) {
-        return store(request, response);
-      });
+      const fresh = fetch(request)
+        .then(function (response) { return store(request, response); })
+        .catch(function () { return hit; });
+
+      /* Das Nachladen muss den Worker am Leben halten, sonst bricht es ab,
+         sobald die Antwort aus dem Vorrat draußen ist. */
+      if (hit) { event.waitUntil(fresh.catch(function () {})); return hit; }
+      return fresh;
     })
   );
 });

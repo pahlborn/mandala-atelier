@@ -331,7 +331,17 @@ dem Finger **und** mit der aufliegenden Hand, Klang, Dunkelmodus.
 
 ## Fallen, die schon zugeschnappt sind
 
-1. **`display: flex` schlägt `hidden`.** Fach und Stapel bekommen im CSS ein
+1. **Die Cache-Version vergessen.** Zweimal hintereinander passiert, und die
+   Folge ist bösartig: Das iPad bleibt **für immer** auf der alten Fassung
+   stehen. Der Worker selbst hat sich ja nicht geändert, also installiert der
+   Browser nichts nach, also wird der Vorrat nie erneuert – während auf dem
+   Server längst die neue Fassung liegt und alles korrekt aussieht. Auf dem
+   Schreibtisch sieht man davon nichts, weil dort über `file://` gar kein
+   Worker läuft. Der `fetch`-Handler frischt den Vorrat deshalb jetzt im
+   Hintergrund auf; die Version trotzdem bei jedem Release erhöhen, damit die
+   neue Fassung sofort ankommt und nicht erst beim übernächsten Start.
+
+2. **`display: flex` schlägt `hidden`.** Fach und Stapel bekommen im CSS ein
    `display: flex`; das überstimmt das `display: none`, das der Browser dem
    `hidden`-Attribut mitgibt. Der Stapel lag dadurch unsichtbar über dem
    ganzen Blatt und fing jede Berührung ab — die App war vollständig tot,
@@ -339,35 +349,35 @@ dem Finger **und** mit der aufliegenden Hand, Klang, Dunkelmodus.
    die Überdeckung nicht kennt. Deshalb steht ganz oben in `style.css`
    `[hidden] { display: none !important; }`. **Nicht entfernen.**
 
-2. **Die Prägung mit Byte-Werten rechnen.** Siehe oben — Faktor 255.
+3. **Die Prägung mit Byte-Werten rechnen.** Siehe oben — Faktor 255.
 
-3. **Zwei Finger nach Reihenfolge aus der Liste greifen.** Die Zwei-Finger-Geste
+4. **Zwei Finger nach Reihenfolge aus der Liste greifen.** Die Zwei-Finger-Geste
    nimmt ausdrücklich den *reibenden* und den *neu hinzugekommenen* Zeiger.
    Nahm sie stattdessen die ersten beiden aus der Liste der aufliegenden
    Kontakte, hing sie an einem Zeiger, dessen Loslassen der Browser
    verschluckt hatte – die Geste zog dann an einem Punkt, an dem längst kein
    Finger mehr war.
 
-4. **`setPointerCapture` ohne Absicherung.** Es wirft gelegentlich, und eine
+5. **`setPointerCapture` ohne Absicherung.** Es wirft gelegentlich, und eine
    Ausnahme an dieser Stelle heißt: Der Strich beginnt gar nicht erst. Immer
    in `try` einpacken.
 
-5. **„Weglegen“ an zwei Stellen für Gegensätzliches.** Im Fach legt „Neues
+6. **„Weglegen“ an zwei Stellen für Gegensätzliches.** Im Fach legt „Neues
    Blatt“ das laufende Blatt weg – auf den Stapel. Im Stapel hieß der Knopf
    zum endgültigen Löschen ebenfalls „Weglegen“. Heißt jetzt „Verwerfen“ und
    fragt einmal nach; es ist die einzige Stelle in dieser App, an der etwas
    wirklich verloren geht.
 
-6. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
+7. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
    Wolkigkeit ergibt ein sichtbares Schachbrett. Papier hat keine Kacheln,
    also zwischen den Gitterpunkten weich überblenden.
 
-7. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
+8. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
    0,11 gegen Linien bei 1,0. Ergebnis: Man bekam ausschließlich Linien, die
    Flächen nahmen praktisch nie Farbe an. Die Stufen und die Gamma-Werte
    müssen zusammen gedacht werden.
 
-8. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
+9. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
    der Fenstergröße wandern, wäre bei jeder Drehung des iPads die Arbeit weg.
 
 ## Grenzen
