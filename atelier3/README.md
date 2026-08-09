@@ -75,6 +75,48 @@ n-zählig drehsymmetrisch, aus konzentrischen Bändern: Rosette, Blütenkränze,
 Gitter, Perlen, Wellen, Strahlen, Bögen, dazwischen Randlinien. Erhebungen
 sind die Ornamentlinien, dazwischen liegen Flächen tiefer.
 
+**Die zweite Hand.** Ein Finger reibt, **zwei Finger bewegen das Blatt** –
+heranholen, verschieben. Beim Ausmalen auf Papier malt eine Hand und die
+andere schiebt das Blatt zurecht; genau das ist gemeint. Kein Bedienelement,
+keine Einstellung, kein Modus.
+
+Der Unterschied zum Zoom des Browsers ist wesentlich: Der vergrößert die
+ganze Stube samt Pigmenten, die dabei aus dem Bild wandern. Hier bewegt sich
+nur das Blatt, die Stifte bleiben auf dem Tisch liegen.
+
+Der Weg zurück ist kein Knopf: Nach vierzig Sekunden Ruhe **sinkt das Blatt
+mit in die Vollansicht zurück**, zusammen mit dem Abtreten der Pigmente. Der
+Abschluss zeigt so immer das ganze Mandala und nie einen Ausschnitt – und man
+kann sich nicht aussperren.
+
+Grenzen: nie kleiner als bildfüllend, nach oben Anschlag bei 2,2. Über die
+Grenzen lässt es sich weich hinausziehen und federt beim Loslassen zurück.
+Der obere Anschlag ist nicht willkürlich – jenseits davon sieht man nicht
+mehr Mandala, sondern das Raster der 1280 Punkte. Bis dahin liest es sich
+als Papierstruktur, so wie man beim Naherangehen an echtes Papier Fasern
+sieht und keine feineren Blüten.
+
+**Der Kontakt klebt am Glas, nicht am Bild.** Eine Fingerkuppe ist rund zwölf
+Millimeter breit, und daran ändert sich nichts, wenn man näher herangeht.
+Deshalb steht der Kontaktradius in Bildschirmpunkten (`R_FINGER_CSS`,
+`R_PEN_CSS`) und wird erst zur Laufzeit in Blatt-Einheiten umgerechnet. Holt
+man das Blatt heran, deckt dieselbe Fingerkuppe **weniger** Bildfläche ab –
+so wird feine Arbeit möglich, ohne dass es dafür einen Regler gäbe. Stünde
+der Radius wie früher fest in Blatt-Koordinaten, wüchse der Finger beim
+Heranholen mit und das Näherkommen wäre nutzlos.
+
+**Werkzeug wird nicht gewählt, sondern erkannt.** Finger und Stift kommen als
+verschiedene Zeigerarten herein und bekommen ihre eigene Kontaktbreite und
+ihren eigenen Umgang mit Druck. Man kann mitten in einem Blatt wechseln, ohne
+irgendwo etwas umzustellen. Solange ein Stift aufliegt, werden Berührungen
+vollständig verworfen – das ist der Handballen. Mit dem Finger entscheidet
+die Zeit: ein zweiter Kontakt innerhalb von 260 ms ist die zweite Hand, ein
+späterer ist der Ballen.
+
+In derselben Frist trägt ein **ruhender** Finger noch kein Pigment auf. Ein
+Reiben beginnt mit einer Bewegung, ein Heranholen mit zwei ruhenden Fingern –
+ohne diese Frist bliebe von jedem Heranholen ein dunkler Punkt zurück.
+
 **Was die Hand tut, bestimmt, wie tief der Kontakt greift.**
 
 | Hand | Blatt |
@@ -243,16 +285,33 @@ dem Finger **und** mit der aufliegenden Hand, Klang, Dunkelmodus.
 
 2. **Die Prägung mit Byte-Werten rechnen.** Siehe oben — Faktor 255.
 
-3. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
+3. **Zwei Finger nach Reihenfolge aus der Liste greifen.** Die Zwei-Finger-Geste
+   nimmt ausdrücklich den *reibenden* und den *neu hinzugekommenen* Zeiger.
+   Nahm sie stattdessen die ersten beiden aus der Liste der aufliegenden
+   Kontakte, hing sie an einem Zeiger, dessen Loslassen der Browser
+   verschluckt hatte – die Geste zog dann an einem Punkt, an dem längst kein
+   Finger mehr war.
+
+4. **`setPointerCapture` ohne Absicherung.** Es wirft gelegentlich, und eine
+   Ausnahme an dieser Stelle heißt: Der Strich beginnt gar nicht erst. Immer
+   in `try` einpacken.
+
+5. **„Weglegen“ an zwei Stellen für Gegensätzliches.** Im Fach legt „Neues
+   Blatt“ das laufende Blatt weg – auf den Stapel. Im Stapel hieß der Knopf
+   zum endgültigen Löschen ebenfalls „Weglegen“. Heißt jetzt „Verwerfen“ und
+   fragt einmal nach; es ist die einzige Stelle in dieser App, an der etwas
+   wirklich verloren geht.
+
+6. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
    Wolkigkeit ergibt ein sichtbares Schachbrett. Papier hat keine Kacheln,
    also zwischen den Gitterpunkten weich überblenden.
 
-4. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
+7. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
    0,11 gegen Linien bei 1,0. Ergebnis: Man bekam ausschließlich Linien, die
    Flächen nahmen praktisch nie Farbe an. Die Stufen und die Gamma-Werte
    müssen zusammen gedacht werden.
 
-5. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
+8. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
    der Fenstergröße wandern, wäre bei jeder Drehung des iPads die Arbeit weg.
 
 ## Grenzen

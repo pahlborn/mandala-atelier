@@ -49,8 +49,16 @@ const TAU    = Math.PI * 2;
 /* Stellschrauben des Auftrags. */
 const RATE        = 0.20;   // Pigment je Millisekunde Verweildauer je Pixel
 const DWELL_CAP   = 3.0;    // ms/px – deckelt das Stehenbleiben an einer Stelle
-const R_FINGER    = 52;     // Kontaktradius Finger, innere Pixel
-const R_PEN       = 30;     // Kontaktradius Stift
+/* Der Kontakt wird in Bildschirmpunkten gemessen, nicht in Blatt-Koordinaten.
+   Eine Fingerkuppe klebt am Glas, nicht am Bild: Sie ist rund zwölf Millimeter
+   breit, und daran ändert sich nichts, wenn man näher herangeht. Erst dadurch
+   hilft das Heranholen überhaupt beim Ausmalen kleiner Flächen – sonst wüchse
+   der Finger mit dem Papier mit.
+
+   Bei bildfüllender Ansicht ergeben diese Werte genau das, was vorher fest in
+   Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
+const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
+const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
 const GAMMA_LIGHT = 3.6;    // leichter/schneller Kontakt: fast nur die Höhen
 const GAMMA_FIRM  = 0.7;    // fester/langsamer Kontakt: greift bis in die Tiefen
 const MIX_SUB     = 0.5;    // wie subtraktiv Pigment über Pigment mischt
@@ -73,6 +81,23 @@ const HINT_BASE = 0.030;
 const STILL_MS  = 40000;    // nach so langer Ruhe tritt die Bedienung ab
 const SAVE_MS   = 1500;     // Verzögerung, bis das Blatt still gesichert wird
 const GRAIN_DEADBAND = 0.05;   // Totgang beim Zurückrechnen der Dichte
+
+/* Das Blatt bewegen. Der Anschlag oben ist nicht willkürlich: Das Blatt hat
+   1280 Punkte Kantenlänge, und jenseits von etwa dem Doppelten sieht man
+   nicht mehr Mandala, sondern das Raster. Bis dahin liest es sich als
+   Papierstruktur – so, wie man beim Naherangehen an echtes Papier Fasern
+   sieht und keine feineren Blüten. */
+const VIEW_MAX      = 2.2;
+const VIEW_RUBBER   = 0.35;   // wie weich es sich über die Grenzen ziehen lässt
+const VIEW_SNAP_MS  = 380;    // Zurückfedern nach dem Loslassen
+const VIEW_HOME_MS  = 1800;   // Zurücksinken in die Vollansicht bei Ruhe
+
+/* In den ersten Augenblicken gilt ein ruhender Finger als möglicher Beginn
+   einer Zwei-Finger-Geste und trägt noch kein Pigment auf. Man beginnt ein
+   Reiben mit einer Bewegung, nicht mit Warten – und ohne diese Frist bliebe
+   bei jedem Heranholen ein dunkler Punkt zurück. */
+const GESTURE_GRACE = 260;
+const MOVE_WAKE     = 3;      // ab so vielen Blatt-Einheiten reibt die Hand wirklich
 
 
 /* ---------------------------------------------------------------------------
@@ -857,15 +882,172 @@ const Klang = {
 
 
 /* ---------------------------------------------------------------------------
-   10. Die Hand
+   10. Die zweite Hand – das Blatt bewegen
+
+   Beim Ausmalen auf Papier malt eine Hand und die andere schiebt das Blatt
+   zurecht. Genau so hier: Ein Finger reibt, zwei Finger bewegen das Papier.
+   Das ist kein Bedienelement, keine Einstellung und kein Modus – es ist die
+   zweite Hand, und sie muss niemandem erklärt werden.
+
+   Der Unterschied zum Zoom des Browsers ist wesentlich: Der vergrößert die
+   ganze Stube, samt Pigmenten, die dann aus dem Bild wandern. Hier bewegt
+   sich nur das Blatt. Die Stifte bleiben auf dem Tisch liegen.
+
+   Verrechnet wird ohne einen einzigen Blick ins Layout: Die Lage des Blattes
+   folgt allein aus Grundgröße, Maßstab und Verschiebung. Das hält toLocal()
+   frei von getBoundingClientRect, das sonst bei jedem Zeigerereignis ein
+   Neuberechnen der Seite erzwingen würde.
+   ------------------------------------------------------------------------- */
+
+const view = {
+  scale: 1, tx: 0, ty: 0,
+  base: 0,                    // Kantenlänge bei bildfüllender Ansicht
+  cx: 0, cy: 0,               // Mitte des Blattes im Fenster, ohne Verschiebung
+  left: 0, top: 0, size: 0,   // daraus abgeleitet: wo das Blatt gerade liegt
+  perCss: 1,                  // Blatt-Einheiten je Bildschirmpunkt
+  anim: null
+};
+
+function viewLimit(scale) {
+  /* Das Blatt darf nie so weit wandern, dass daneben Leere entsteht. */
+  return Math.max(0, (scale - 1) * view.base * 0.5);
+}
+
+function applyView() {
+  view.size = view.base * view.scale;
+  view.left = view.cx + view.tx - view.size * 0.5;
+  view.top  = view.cy + view.ty - view.size * 0.5;
+  view.perCss = view.size > 0 ? SIZE / view.size : 1;
+  canvas.style.transform =
+    'translate(' + view.tx + 'px,' + view.ty + 'px) scale(' + view.scale + ')';
+}
+
+function setView(scale, tx, ty) {
+  view.scale = scale;
+  view.tx = tx;
+  view.ty = ty;
+  applyView();
+}
+
+/* Weich über die Grenze hinaus, damit nichts hart anschlägt. */
+function rubber(value, min, max) {
+  if (value < min) return min - (min - value) * VIEW_RUBBER;
+  if (value > max) return max + (value - max) * VIEW_RUBBER;
+  return value;
+}
+
+function clampedView() {
+  const scale = Math.max(1, Math.min(VIEW_MAX, view.scale));
+  const lim = viewLimit(scale);
+  return {
+    scale: scale,
+    tx: Math.max(-lim, Math.min(lim, view.tx)),
+    ty: Math.max(-lim, Math.min(lim, view.ty))
+  };
+}
+
+function stopViewAnim() {
+  if (view.anim) { cancelAnimationFrame(view.anim.id); view.anim = null; }
+}
+
+function animateView(target, duration) {
+  stopViewAnim();
+  const from = { scale: view.scale, tx: view.tx, ty: view.ty };
+  if (Math.abs(from.scale - target.scale) < 0.0005 &&
+      Math.abs(from.tx - target.tx) < 0.5 &&
+      Math.abs(from.ty - target.ty) < 0.5) return;
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setView(target.scale, target.tx, target.ty);
+    return;
+  }
+
+  const start = performance.now();
+  const step = function (now) {
+    const t = Math.min(1, (now - start) / duration);
+    const e = 1 - Math.pow(1 - t, 3);
+    setView(
+      from.scale + (target.scale - from.scale) * e,
+      from.tx + (target.tx - from.tx) * e,
+      from.ty + (target.ty - from.ty) * e
+    );
+    if (t < 1) view.anim.id = requestAnimationFrame(step);
+    else view.anim = null;
+  };
+  view.anim = { id: requestAnimationFrame(step) };
+}
+
+function settleView() { animateView(clampedView(), VIEW_SNAP_MS); }
+
+/* Der Weg zurück ist kein Knopf, sondern dieselbe Ruhe, die auch die
+   Pigmente abtreten lässt: Wer die Hand hebt und einen Augenblick nichts
+   tut, bekommt sein ganzes Mandala zu sehen. */
+function viewHome() { animateView({ scale: 1, tx: 0, ty: 0 }, VIEW_HOME_MS); }
+
+/* Die laufende Zwei-Finger-Geste. */
+const grip = {
+  active: false,
+  a: 0, b: 0,                 // die beiden beteiligten Zeiger
+  dist: 0, mx: 0, my: 0,      // Ausgangsabstand und -mitte
+  scale: 1, tx: 0, ty: 0      // Ansicht beim Beginn der Geste
+};
+
+function gripBegin(p1, p2) {
+  stopViewAnim();
+  grip.active = true;
+  grip.a = p1.id; grip.b = p2.id;
+  grip.dist = Math.max(1, Math.hypot(p1.x - p2.x, p1.y - p2.y));
+  grip.mx = (p1.x + p2.x) * 0.5;
+  grip.my = (p1.y + p2.y) * 0.5;
+  grip.scale = view.scale;
+  grip.tx = view.tx;
+  grip.ty = view.ty;
+}
+
+function gripMove(p1, p2) {
+  const dist = Math.max(1, Math.hypot(p1.x - p2.x, p1.y - p2.y));
+  const mx = (p1.x + p2.x) * 0.5;
+  const my = (p1.y + p2.y) * 0.5;
+
+  const wanted = grip.scale * (dist / grip.dist);
+  const scale = rubber(wanted, 1, VIEW_MAX);
+
+  /* Der Punkt unter der Mitte der beiden Finger soll dort bleiben, wo er ist. */
+  const ox = grip.mx - view.cx, oy = grip.my - view.cy;
+  const ux = (ox - grip.tx) / grip.scale;
+  const uy = (oy - grip.ty) / grip.scale;
+
+  const lim = viewLimit(scale);
+  setView(
+    scale,
+    rubber((mx - view.cx) - scale * ux, -lim, lim),
+    rubber((my - view.cy) - scale * uy, -lim, lim)
+  );
+}
+
+function gripEnd() {
+  grip.active = false;
+  settleView();
+}
+
+
+/* ---------------------------------------------------------------------------
+   11. Die Hand
 
    Zeigerereignisse werden nur eingesammelt; aufgetragen wird einmal je Bild.
    Das entkoppelt die Eingaberate von der Darstellung, ergibt genau eine
    Übertragung ans Bild je Bild und macht die Verweildauer sauber messbar.
 
-   Handballen: Es malt ausschließlich der erste Kontakt. Wer minutenlang über
-   ein Blatt reibt, legt die Hand auf – ohne diese Regel wäre jede Sitzung
-   nach zwei Minuten ruiniert.
+   Werkzeug wird nicht gewählt, sondern erkannt: Finger und Stift kommen als
+   verschiedene Zeigerarten herein und bekommen ihre eigene Kontaktbreite und
+   ihren eigenen Umgang mit Druck. Man kann mitten in einem Blatt wechseln,
+   ohne irgendwo etwas umzustellen.
+
+   Handballen: Es malt immer nur ein Kontakt. Wer minutenlang über ein Blatt
+   reibt, legt die Hand auf – ohne diese Regel wäre jede Sitzung nach zwei
+   Minuten ruiniert. Solange ein Stift arbeitet, werden Berührungen deshalb
+   vollständig verworfen; mit dem Finger entscheidet die Zeit darüber, ob ein
+   zweiter Kontakt die zweite Hand ist oder der Ballen.
    ------------------------------------------------------------------------- */
 
 const hand = {
@@ -873,20 +1055,32 @@ const hand = {
   down: false,
   x: 0, y: 0,
   press: 0.5,
-  radius: R_FINGER,
+  radius: 0,
+  pen: false,
   queue: [],
+  moved: false,
+  downAt: 0,
   lastFrame: 0,
   lastMove: 0
 };
 
+/* Alle aufliegenden Zeiger, damit die zweite Hand erkannt werden kann. */
+const touching = new Map();
+
 let canvas, ctx, imageData;
 
 function toLocal(event) {
-  const rect = canvas.getBoundingClientRect();
   return [
-    ((event.clientX - rect.left) / rect.width) * SIZE,
-    ((event.clientY - rect.top) / rect.height) * SIZE
+    ((event.clientX - view.left) / view.size) * SIZE,
+    ((event.clientY - view.top) / view.size) * SIZE
   ];
+}
+
+/* Kontaktbreite: physisch gedacht, in Blatt-Einheiten umgerechnet. Holt man
+   das Blatt näher, deckt dieselbe Fingerkuppe weniger Bildfläche ab – genau
+   wie in Wirklichkeit. */
+function contactRadius(pen) {
+  return (pen ? R_PEN_CSS : R_FINGER_CSS) * view.perCss;
 }
 
 function pressureOf(event) {
@@ -899,48 +1093,125 @@ function pressureOf(event) {
   return 0.5;
 }
 
+function startStroke(event) {
+  hand.id = event.pointerId;
+  hand.down = true;
+  hand.pen = event.pointerType === 'pen';
+  hand.radius = contactRadius(hand.pen);
+  hand.press = pressureOf(event);
+  const p = toLocal(event);
+  hand.x = p[0]; hand.y = p[1];
+  hand.queue.length = 0;
+  hand.moved = false;
+  hand.downAt = performance.now();
+  hand.lastFrame = hand.downAt;
+  hand.lastMove = hand.downAt;
+  Klang.wake();
+}
+
+function endStroke() {
+  if (!hand.down) return;
+  hand.id = null;
+  hand.down = false;
+  hand.queue.length = 0;
+  Klang.rest();
+  scheduleSave();
+}
+
 function bindHand() {
   canvas.addEventListener('pointerdown', function (event) {
-    if (hand.id !== null || !event.isPrimary) return;
     event.preventDefault();
-
-    hand.id = event.pointerId;
-    hand.down = true;
-    hand.radius = event.pointerType === 'pen' ? R_PEN : R_FINGER;
-    hand.press = pressureOf(event);
-    const p = toLocal(event);
-    hand.x = p[0]; hand.y = p[1];
-    hand.queue.length = 0;
-    hand.lastFrame = performance.now();
-    hand.lastMove = hand.lastFrame;
-
-    canvas.setPointerCapture(event.pointerId);
-    Klang.wake();
+    touching.set(event.pointerId, {
+      id: event.pointerId, x: event.clientX, y: event.clientY, pen: event.pointerType === 'pen'
+    });
+    /* Das Einfangen des Zeigers darf nie den Rest dieses Handlers
+       verhindern. Safari wirft hier gelegentlich, und eine Ausnahme an
+       dieser Stelle hieße: Der Strich beginnt gar nicht erst. */
+    try { canvas.setPointerCapture(event.pointerId); } catch (err) {}
     awaken();
+
+    /* Der Stift hat immer Vorrang. Liegt er auf, ist jede Berührung der
+       Handballen – und niemals die zweite Hand. */
+    if (event.pointerType === 'pen') {
+      if (hand.down && !hand.pen) endStroke();
+      if (!hand.down) startStroke(event);
+      return;
+    }
+    if (hand.down && hand.pen) return;
+
+    if (!hand.down) { startStroke(event); return; }
+
+    /* Ein zweiter Finger kurz nach dem ersten: die zweite Hand. Kommt er
+       später, hat die erste Hand längst zu reiben begonnen – dann ist es
+       der Ballen und wird verworfen. */
+    if (!grip.active && performance.now() - hand.downAt < GESTURE_GRACE) {
+      /* Ausdrücklich der reibende und der neu hinzugekommene Zeiger – nicht
+         irgendwelche zwei aus der Liste. Ein Kontakt, dessen Loslassen der
+         Browser verschluckt hat, bliebe sonst darin liegen und würde die
+         Geste an einem Punkt aufhängen, an dem längst kein Finger mehr ist. */
+      const erste = touching.get(hand.id);
+      const zweite = touching.get(event.pointerId);
+      if (erste && zweite && erste !== zweite) {
+        endStroke();
+        gripBegin(erste, zweite);
+      }
+    }
   });
 
   canvas.addEventListener('pointermove', function (event) {
-    if (event.pointerId !== hand.id) return;
     event.preventDefault();
+    const known = touching.get(event.pointerId);
+    if (known) { known.x = event.clientX; known.y = event.clientY; }
+
+    if (grip.active) {
+      const a = touching.get(grip.a), b = touching.get(grip.b);
+      if (a && b) gripMove(a, b);
+      return;
+    }
+
+    if (event.pointerId !== hand.id) return;
 
     const list = event.getCoalescedEvents ? event.getCoalescedEvents() : [event];
     for (let i = 0; i < list.length; i++) {
       const p = toLocal(list[i]);
+      if (!hand.moved &&
+          (Math.abs(p[0] - hand.x) > MOVE_WAKE || Math.abs(p[1] - hand.y) > MOVE_WAKE)) {
+        hand.moved = true;
+      }
       hand.queue.push(p[0], p[1]);
     }
     hand.press = pressureOf(event);
   });
 
   const lift = function (event) {
-    if (event.pointerId !== hand.id) return;
-    hand.id = null;
-    hand.down = false;
-    hand.queue.length = 0;
-    Klang.rest();
-    scheduleSave();
+    touching.delete(event.pointerId);
+    if (grip.active) {
+      if (event.pointerId === grip.a || event.pointerId === grip.b) gripEnd();
+      return;
+    }
+    if (event.pointerId === hand.id) endStroke();
   };
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
+
+  /* Auf dem Schreibtisch gibt es keine zweite Hand – dort tut das Rad
+     dasselbe. Für das iPad ist das ohne Bedeutung. */
+  canvas.addEventListener('wheel', function (event) {
+    event.preventDefault();
+    stopViewAnim();
+    awaken();
+    const factor = Math.exp(-event.deltaY * 0.0016);
+    const scale = Math.max(1, Math.min(VIEW_MAX, view.scale * factor));
+    const ox = event.clientX - view.cx, oy = event.clientY - view.cy;
+    const ux = (ox - view.tx) / view.scale;
+    const uy = (oy - view.ty) / view.scale;
+    const lim = viewLimit(scale);
+    setView(
+      scale,
+      Math.max(-lim, Math.min(lim, ox - scale * ux)),
+      Math.max(-lim, Math.min(lim, oy - scale * uy))
+    );
+  }, { passive: false });
 
   /* Safari fängt sonst Wischgesten ab. */
   canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
@@ -994,8 +1265,15 @@ function applyHand(dt) {
 
   if (len < 0.4) {
     /* Die Hand steht. Auch das trägt auf – wer den Stift hält und wartet,
-       bekommt einen dunklen Fleck. Gedeckelt, damit es nicht ausufert. */
+       bekommt einen dunklen Fleck. Gedeckelt, damit es nicht ausufert.
+
+       Nur ganz am Anfang nicht: Solange sich noch nichts bewegt hat und die
+       Frist für die zweite Hand läuft, bleibt das Blatt unberührt. Ein
+       Reiben beginnt mit einer Bewegung, ein Heranholen mit zwei ruhenden
+       Fingern – und ohne diese Frist bliebe von jedem Heranholen ein
+       dunkler Punkt zurück. */
     q.length = 0;
+    if (!hand.moved && performance.now() - hand.downAt < GESTURE_GRACE) return;
     rub(hand.x, hand.y, hand.x, hand.y,
         Math.min(DWELL_CAP, dt * 0.35), hand.radius, rgb);
     return;
@@ -1246,6 +1524,7 @@ function closeStack() {
 }
 
 function showStackItem() {
+  if (typeof resetDiscard === 'function') resetDiscard();
   const empty = stack.items.length === 0;
   ui.stackEmpty.hidden = !empty;
   ui.stackFigure.hidden = empty;
@@ -1266,12 +1545,37 @@ function stepStack(delta) {
   showStackItem();
 }
 
+/* Das Verwerfen ist das einzige Endgültige in dieser App – überall sonst
+   geht nichts verloren. Deshalb als einzige Stelle eine Rückfrage, und zwar
+   ohne Dialog: Der Knopf selbst fragt, und wer danebentippt oder wartet,
+   hat nichts getan.
+
+   Es hieß hier einmal „Weglegen“. Genau das tut aber „Neues Blatt“ – ein
+   Blatt weglegen heißt, es auf den Stapel zu legen. Dasselbe Wort für das
+   Gegenteil zu verwenden, hat Arbeit gekostet. */
+let discardArmed = 0;
+
+function resetDiscard() {
+  discardArmed = 0;
+  ui.stackRemove.textContent = 'Verwerfen';
+  ui.stackRemove.classList.remove('is-armed');
+}
+
 async function removeStackItem() {
   if (!stack.items.length) return;
+
+  if (!discardArmed || Date.now() - discardArmed > 5000) {
+    discardArmed = Date.now();
+    ui.stackRemove.textContent = 'Wirklich verwerfen';
+    ui.stackRemove.classList.add('is-armed');
+    return;
+  }
+
   const item = stack.items[stack.at];
   await Speicher.del('blaetter', item.id);
   stack.items.splice(stack.at, 1);
   if (stack.at >= stack.items.length) stack.at = Math.max(0, stack.items.length - 1);
+  resetDiscard();
   showStackItem();
 }
 
@@ -1318,6 +1622,9 @@ function awaken() {
   if (still) {
     still = false;
     document.body.classList.remove('is-still');
+    /* Sinkt das Blatt gerade in die Vollansicht zurück und jemand legt die
+       Hand wieder auf, bleibt es stehen, wo es ist. Die Hand hat Vorrang. */
+    stopViewAnim();
   }
 }
 
@@ -1327,6 +1634,8 @@ function tickStillness(now) {
   if (now - lastTouch < STILL_MS) return;
   still = true;
   document.body.classList.add('is-still');
+  /* Der Abschluss zeigt das ganze Mandala, nicht einen Ausschnitt. */
+  viewHome();
 }
 
 
@@ -1388,10 +1697,22 @@ function fitSheet() {
   const side = Math.max(160, Math.floor(Math.min(w, h)));
   canvas.style.width  = side + 'px';
   canvas.style.height = side + 'px';
+
+  /* Grundgröße und Mitte merken, damit die zweite Hand ohne einen einzigen
+     Blick ins Layout rechnen kann. Die Mitte steht fest: Eine Verschiebung
+     des Blattes ändert nur seine Darstellung, nicht seinen Platz im Raster. */
+  view.base = side;
+  const box = ui.wrap.getBoundingClientRect();
+  view.cx = box.left + box.width * 0.5 - view.tx;
+  view.cy = box.top + box.height * 0.5 - view.ty;
+
+  const fit = clampedView();
+  setView(fit.scale, fit.tx, fit.ty);
 }
 
 function cacheUi() {
   ui.room        = document.querySelector('.room');
+  ui.wrap        = document.querySelector('.sheet-wrap');
   ui.pigments    = document.getElementById('pigments');
   ui.mark        = document.getElementById('mark');
   ui.tray        = document.getElementById('tray');
@@ -1533,8 +1854,11 @@ async function start() {
 /* Für den Testlauf in tools/test-atelier3.js. Die App selbst benutzt nichts
    davon – es ist ein Fenster, kein Bedienelement. */
 window.Blatt = {
-  SIZE: SIZE, R_DISC: R_DISC,
-  sheet: sheet, hand: hand,
+  SIZE: SIZE, R_DISC: R_DISC, VIEW_MAX: VIEW_MAX,
+  sheet: sheet, hand: hand, view: view,
+  contactRadius: contactRadius,
+  setViewForTest: function (scale, tx, ty) { stopViewAnim(); setView(scale, tx || 0, ty || 0); },
+  viewHome: viewHome,
   buildPlan: buildPlan, fieldAt: fieldAt,
   makeSheet: function (seed, mode) { makeSheet(seed, mode); buildPigments(); setPigment(0); paint(); },
   setPigment: setPigment,
@@ -1543,7 +1867,7 @@ window.Blatt = {
     setBite(press === undefined ? 0.5 : press);
     for (let i = 0; i + 3 < points.length; i += 2) {
       rub(points[i], points[i + 1], points[i + 2], points[i + 3],
-          dwell, R_FINGER, rgb);
+          dwell, contactRadius(false), rgb);
     }
     paint();
   },

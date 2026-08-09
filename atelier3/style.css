@@ -85,6 +85,12 @@ body[data-sheet='nacht'] {
     0 1px 2px var(--edge),
     0 12px 36px -12px var(--edge);
   transition: opacity 260ms ease;
+
+  /* Die zweite Hand verschiebt und vergrößert allein diese Ebene. Das Layout
+     bleibt davon unberührt – deshalb bleiben Pigmente und Zeichen dort, wo
+     sie liegen, während das Blatt darunter wandert. */
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 body.is-turning #sheet { opacity: 0; }
@@ -115,6 +121,7 @@ body.is-turning #sheet { opacity: 0; }
 
 .strip {
   position: fixed;
+  z-index: 2;
   left: 0;
   right: 0;
   bottom: calc(env(safe-area-inset-bottom) + 16px);
@@ -166,6 +173,7 @@ body.is-turning #sheet { opacity: 0; }
 
 .mark {
   position: fixed;
+  z-index: 2;
   right: calc(env(safe-area-inset-right) + 14px);
   bottom: calc(env(safe-area-inset-bottom) + 32px);
   width: 34px;

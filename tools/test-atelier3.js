@@ -265,8 +265,15 @@ async function run() {
       }));
     };
 
-    /* Nur der zweite Kontakt – der Handballen – bewegt sich. */
+    /* Nur der zweite Kontakt – der Handballen – bewegt sich. Er kommt
+       bewusst spät: Ein zweiter Finger kurz nach dem ersten wäre die zweite
+       Hand und damit ein anderer Fall. */
     mach('pointerdown', 1, true, box.left + box.width * 0.5, box.top + box.height * 0.5);
+    for (let i = 0; i < 6; i++) {
+      mach('pointermove', 1, true,
+           box.left + box.width * (0.5 + i * 0.004), box.top + box.height * 0.5);
+    }
+    await new Promise(function (r) { setTimeout(r, 420); });
     mach('pointerdown', 2, false, box.left + box.width * 0.2, box.top + box.height * 0.8);
     for (let i = 0; i < 30; i++) {
       mach('pointermove', 2, false,
@@ -281,9 +288,76 @@ async function run() {
       for (let x = (S * 0.12) | 0; x < (S * 0.5) | 0; x += 2) { sum += B.sheet.dens[y * S + x]; n++; }
     }
     mach('pointerup', 1, true, box.left + box.width * 0.5, box.top + box.height * 0.5);
+    mach('pointerup', 2, false, box.left + box.width * 0.5, box.top + box.height * 0.8);
     return sum / n;
   });
   prüfe('zweiter Kontakt malt nicht', ballen < 1e-6, 'Dichte ' + ballen.toExponential(1));
+
+  /* ---- Die zweite Hand -------------------------------------------------- */
+  console.log('\nDie zweite Hand');
+
+  const naeher = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1, 0, 0);
+    const weit = B.contactRadius(false);
+    B.setViewForTest(2, 0, 0);
+    const nah = B.contactRadius(false);
+    const stift = B.contactRadius(true);
+    B.setViewForTest(1, 0, 0);
+    return { weit: weit, nah: nah, stift: stift };
+  });
+  prüfe('Kontakt bleibt am Glas, nicht am Bild',
+        Math.abs(naeher.nah - naeher.weit / 2) < 0.01,
+        naeher.weit.toFixed(1) + ' Einheiten → ' + naeher.nah.toFixed(1) + ' bei doppelter Ansicht');
+  prüfe('Stift ist feiner als der Finger', naeher.stift < naeher.weit);
+
+  /* Zwei Finger holen das Blatt heran – mit echten Zeigerereignissen. */
+  const geste = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1, 0, 0);
+    const c = document.getElementById('sheet');
+    const box = c.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    const mach = function (typ, id, primär, x, y) {
+      c.dispatchEvent(new PointerEvent(typ, {
+        pointerId: id, isPrimary: primär, pointerType: 'touch',
+        clientX: x, clientY: y, bubbles: true, cancelable: true, pressure: 0.5
+      }));
+    };
+
+    const vorher = B.sheet.touched;
+    mach('pointerdown', 11, true,  cx - 40, cy);
+    mach('pointerdown', 12, false, cx + 40, cy);
+    for (let i = 1; i <= 10; i++) {
+      const d = 40 + i * 12;
+      mach('pointermove', 11, true,  cx - d, cy);
+      mach('pointermove', 12, false, cx + d, cy);
+    }
+    const gezoomt = B.view.scale;
+    const schmutz = B.sheet.touched !== vorher;
+    mach('pointerup', 11, true,  cx - 160, cy);
+    mach('pointerup', 12, false, cx + 160, cy);
+    await new Promise(function (r) { setTimeout(r, 600); });
+    return { gezoomt: gezoomt, nachher: B.view.scale, schmutz: schmutz, max: B.VIEW_MAX };
+  });
+  prüfe('zwei Finger holen das Blatt heran', geste.gezoomt > 1.3,
+        'Maßstab ' + geste.gezoomt.toFixed(2));
+  prüfe('kein Pigment beim Heranholen', !geste.schmutz);
+  prüfe('Anschlag hält', geste.nachher <= geste.max + 0.001,
+        'nach dem Loslassen ' + geste.nachher.toFixed(2) + ' von höchstens ' + geste.max);
+
+  /* Kleiner als bildfüllend darf es nicht bleiben. */
+  const zurueck = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1.8, 120, -60);
+    B.viewHome();
+    await new Promise(function (r) { setTimeout(r, 2400); });
+    return { scale: B.view.scale, tx: B.view.tx, ty: B.view.ty };
+  });
+  prüfe('das Blatt sinkt in die Vollansicht zurück',
+        Math.abs(zurueck.scale - 1) < 0.01 &&
+        Math.abs(zurueck.tx) < 1 && Math.abs(zurueck.ty) < 1,
+        'Maßstab ' + zurueck.scale.toFixed(2));
 
   /* ---- Was es nicht gibt ------------------------------------------------ */
   console.log('\nWas es nicht gibt');
@@ -293,6 +367,7 @@ async function run() {
       knöpfe: document.querySelectorAll('button').length,
       pigmente: document.querySelectorAll('.pigment').length,
       zurück: /rückgängig|undo|radier|löschen/.test(text),
+      verwerfen: (document.getElementById('stack-remove') || {}).textContent,
       zahl: /\d+\s*%/.test(text),
       speichern: /speichern|sichern/.test(text)
     };
@@ -301,6 +376,8 @@ async function run() {
   prüfe('kein Rückgängig, kein Radierer', !bedienung.zurück);
   prüfe('keine Prozentanzeige', !bedienung.zahl);
   prüfe('kein Speichern-Knopf', !bedienung.speichern);
+  prüfe('Verwerfen heißt nicht Weglegen', bedienung.verwerfen === 'Verwerfen',
+        'im Stapel steht: ' + bedienung.verwerfen);
 
   /* ---- Layout ----------------------------------------------------------- */
   console.log('\nLayout');
