@@ -241,7 +241,8 @@ async function run() {
   ];
 
   /* Mit der längsten Farblegende – genau dieser Fall hat die Bühne
-     zusammengedrückt, bis das Blatt unter der Bedienleiste lag. */
+     zusammengedrückt, bis das Blatt unter der Bedienleiste lag. Gezählt
+     werden dabei die Legendenknöpfe; bei den Ziermotiven die Pigmente. */
   await page.evaluate(function () { window.MandalaAtelier.loadMotif('zaehlen10'); });
 
   for (const viewport of VIEWPORTS) {
@@ -256,7 +257,7 @@ async function run() {
          eine seitlich scrollbare Reihe findet niemand. */
       const row = document.getElementById('quick-palette').getBoundingClientRect();
       const swatches = Array.prototype.slice.call(
-        document.querySelectorAll('#quick-palette .pigment'));
+        document.querySelectorAll('#quick-palette .pigment, #quick-palette .quick-legend'));
       const shown = swatches.filter(function (el) {
         const b = el.getBoundingClientRect();
         return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
@@ -286,6 +287,28 @@ async function run() {
       (box.overflow ? ', ← Seite läuft seitlich über' : '')
     );
   }
+  /* Und dasselbe noch einmal mit der vollen Palette eines Ziermotivs. */
+  await page.evaluate(function () { window.MandalaAtelier.loadMotif('sternkranz'); });
+  for (const viewport of VIEWPORTS) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.waitForTimeout(120);
+    const box = await page.evaluate(function () {
+      const row = document.getElementById('quick-palette').getBoundingClientRect();
+      const swatches = Array.prototype.slice.call(
+        document.querySelectorAll('#quick-palette .pigment'));
+      const shown = swatches.filter(function (el) {
+        const b = el.getBoundingClientRect();
+        return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
+      }).length;
+      return { pigments: swatches.length, shown: shown };
+    });
+    if (box.shown !== box.pigments || box.pigments !== 14) {
+      layoutProblems.push(viewport.name + ' (Palette)');
+    }
+  }
+  console.log('  volle Palette in allen Auflösungen: ' +
+    (layoutProblems.length ? '← Befund' : '14 von 14'));
+
   await page.setViewportSize({ width: 1400, height: 1000 });
   await page.waitForTimeout(150);
 
@@ -346,6 +369,142 @@ async function run() {
   if (!strokeOk) tapProblems.push('Zeichnen');
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
+
+  /* Grundformen: Freihand wird ein Kreis nie rund – das Form-Werkzeug muss
+     es sein. Geprüft wird die Rundheit, dass die Vorschau nichts hinterlässt
+     und dass Rückgängig eine Form wieder wegnimmt. */
+  console.log('\nGrundformen');
+  const shapes = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.loadMotif('');
+    app.state.axes = 12;
+    app.state.tool = 'shape';
+    app.state.width = 3;
+    app.state.guides = false;      // damit das Raster die Messung nicht stört
+    app.resetZoom();
+
+    const canvas = app.layers.draw.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = canvas.width / app.SIZE;
+
+    function screen(point) {
+      return [
+        rect.left + (point[0] / app.SIZE) * rect.width,
+        rect.top + (point[1] / app.SIZE) * rect.height
+      ];
+    }
+    function touch(type, x, y) {
+      return new PointerEvent(type, {
+        clientX: x, clientY: y, pointerId: 1,
+        pointerType: 'touch', bubbles: true, isPrimary: true
+      });
+    }
+    function drag(from, to) {
+      const a = screen(from), b = screen(to);
+      canvas.dispatchEvent(touch('pointerdown', a[0], a[1]));
+      canvas.dispatchEvent(touch('pointermove', (a[0] + b[0]) / 2, (a[1] + b[1]) / 2));
+      canvas.dispatchEvent(touch('pointermove', b[0], b[1]));
+      canvas.dispatchEvent(touch('pointerup', b[0], b[1]));
+    }
+
+    const UP = -Math.PI / 2;
+    app.state.shape = 'ring';
+    drag(app.pol(380, UP), app.pol(380, UP));
+
+    /* Rundheit: an 72 Winkeln muss die Linie im Radius 380 ± 4 liegen. */
+    const data = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let round = 0;
+    for (let i = 0; i < 72; i++) {
+      const angle = (i / 72) * Math.PI * 2;
+      for (let d = -4; d <= 4; d++) {
+        const q = app.pol(380 + d, angle);
+        const x = Math.round(q[0] * dpr), y = Math.round(q[1] * dpr);
+        if (data[(y * canvas.width + x) * 4 + 3] > 60) { round++; break; }
+      }
+    }
+
+    /* Vorschau: das Raster ist aus, es darf nichts übrig bleiben. */
+    const guide = app.layers.guide.canvas;
+    const gdata = guide.getContext('2d')
+      .getImageData(0, 0, guide.width, guide.height).data;
+    let leftover = 0;
+    for (let i = 3; i < gdata.length; i += 4 * 128) if (gdata[i] > 0) leftover++;
+
+    /* Rückgängig muss die Form wieder wegnehmen. */
+    const before = ink(canvas);
+    app.state.shape = 'petal';
+    drag(app.pol(150, UP), app.pol(260, UP + 0.1));
+    const withPetal = ink(canvas);
+    document.getElementById('btn-undo').click();
+    const afterUndo = ink(canvas);
+
+    function ink(c) {
+      const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let i = 3; i < d.length; i += 4 * 32) if (d[i] > 60) n++;
+      return n;
+    }
+
+    app.state.guides = true;
+    app.state.tool = 'pen';
+    return {
+      round: round,
+      leftover: leftover,
+      grew: withPetal > before,
+      undone: afterUndo === before,
+      shapes: Object.keys(app.SHAPE_NAMES).length
+    };
+  });
+
+  const shapeOk = shapes.round === 72 && shapes.leftover === 0 &&
+    shapes.grew && shapes.undone && shapes.shapes === 5;
+  console.log('  Ring rund an ' + shapes.round + ' von 72 Winkeln' +
+    (shapes.round === 72 ? '' : '   ← krumm'));
+  console.log('  Vorschau hinterlässt nichts: ' + (shapes.leftover === 0 ? 'ja' : '← NEIN'));
+  console.log('  Rückgängig nimmt eine Form wieder weg: ' +
+    (shapes.grew && shapes.undone ? 'ja' : '← NEIN'));
+  console.log('  ' + shapes.shapes + ' Grundformen: Ring, Speiche, Blatt, Raute, Band');
+
+  /* Aufgabenstellung: Bei Zähl- und Rechenmandalas muss sie sichtbar sein,
+     sonst erschließt sich die Aufgabe nicht. Und die Legende, auf die sie
+     verweist, muss ohne Schublade erreichbar sein. */
+  console.log('\nAufgabenstellung');
+  const tasks = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    return app.MOTIFS.map(function (motif) {
+      app.loadMotif(motif.id);
+      const banner = document.getElementById('task');
+      const chips = document.querySelectorAll('#quick-palette .quick-legend');
+      const exercise = motif.kind === 'count' || motif.kind === 'math';
+      return {
+        name: motif.name,
+        exercise: exercise,
+        shown: !banner.hidden,
+        text: banner.hidden ? '' : banner.textContent.trim(),
+        chips: chips.length,
+        legend: app.state.legend.length
+      };
+    });
+  });
+
+  const taskProblems = [];
+  tasks.forEach(function (row) {
+    if (row.exercise) {
+      if (!row.shown || row.text.length < 40) taskProblems.push(row.name + ' (Aufgabe)');
+      if (row.chips !== row.legend || !row.chips) taskProblems.push(row.name + ' (Legende)');
+    } else if (row.shown) {
+      taskProblems.push(row.name + ' (Aufgabe, obwohl keine)');
+    }
+  });
+  tasks.filter(function (r) { return r.exercise; }).forEach(function (row) {
+    console.log(pad('  ' + row.name, 26) +
+      pad(row.shown ? 'Aufgabe sichtbar' : '← FEHLT', 20) +
+      row.chips + ' Legendenknöpfe in der Leiste');
+  });
+  console.log('  bei den übrigen ' +
+    tasks.filter(function (r) { return !r.exercise && !r.shown; }).length +
+    ' Motiven keine Aufgabenzeile');
 
   /* Vergrößern: Knöpfe, richtige Koordinaten trotz Maßstab, und – der
      eigentliche Anlass – zwei Finger dürfen nie einen Strich hinterlassen. */
@@ -638,6 +797,8 @@ async function run() {
   if (!galleryOk) broken.push('Galerie');
   if (!atelierOk) broken.push('Atelier');
   if (!zoomOk) broken.push('Vergrößern');
+  broken.push.apply(broken, taskProblems);
+  if (!shapeOk) broken.push('Grundformen');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 
