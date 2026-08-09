@@ -150,10 +150,15 @@ Symmetrie-Position ein eigener Startpunkt** gesetzt – ein Tipp färbt alle
 gleichwertigen Felder zugleich. Das ist der Komfortgewinn gegenüber einem
 Papier-Ausmalbuch und sollte erhalten bleiben.
 
-Eine Ausnahme: Bei Zähl- und Rechenmandalas trägt jedes Feld einen eigenen
-Wert. Dort färbt ein Tipp nur das angetippte Feld (`fillsSymmetrically()`) –
-sonst bekämen Felder mit verschiedenen Ergebnissen dieselbe Farbe und die
-Aufgabe wäre hinfällig.
+Ob das geschieht, entscheidet der Schalter **„Füllen wirkt auf alle Achsen“**
+unter Symmetrie. An ist das Voreingestellte – der Komfortgewinn gegenüber
+Papier. Aus, wer jedes Feld einzeln setzen und dabei eigene Muster legen will.
+
+Davon unberührt: Bei Zähl- und Rechenmandalas trägt jedes Feld einen eigenen
+Wert, dort wird **immer** einzeln gefüllt. Das ist keine Einstellung, sondern
+eine Bedingung – sonst bekämen Felder mit verschiedenen Ergebnissen dieselbe
+Farbe und die Aufgabe wäre hinfällig. Der Schalter ist dann gesperrt und sagt
+warum (`isExercise()` / `fillsSymmetrically()`).
 
 **Rückgängig.** Schnappschüsse der Ebenen, die der jeweilige Zug verändert –
 beim Zeichnen also nur `drawCanvas`, beim Füllen nur `fillCanvas`. Bis zu 20

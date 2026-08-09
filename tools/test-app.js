@@ -193,7 +193,7 @@ async function run() {
       return { id: id, expected: motif.axes, hit: hit, of: motif.axes, kind: 'Positionen' };
     }
 
-    return [
+    const rows = [
       tap('sternkranz', 340, 0),
       tap('mustertanz', 300, 0.2),
       tap('zaehlen6', 330, 0),
@@ -201,6 +201,20 @@ async function run() {
       tap('rechnen10', 330, 0),
       tap('rechnen20', 330, 0)
     ];
+
+    /* Schalter aus: dann färbt auch bei den Ziermotiven ein Tipp nur ein
+       Feld. Bei den Aufgabenmandalas ändert der Schalter nichts – dort ist
+       das Einzelfüllen Bedingung, nicht Einstellung. */
+    app.state.fillAll = false;
+    const single = tap('sternkranz', 340, 0);
+    const exercise = tap('zaehlen6', 330, 0);
+    app.state.fillAll = true;
+
+    rows.push({ id: 'sternkranz, Schalter aus', expected: 1, hit: single.hit,
+                of: single.of, kind: 'Positionen' });
+    rows.push({ id: 'zaehlen6, Schalter aus', expected: 1, hit: exercise.hit,
+                of: exercise.of, kind: 'Feldern' });
+    return rows;
   });
 
   const tapProblems = [];
