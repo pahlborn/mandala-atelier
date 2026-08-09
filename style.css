@@ -163,6 +163,9 @@ body.is-quiet .topbar { display: none; }
   display: grid;
   place-items: center;
   padding: var(--gap);
+  /* Zwingend: beim Vergrößern ragt das Blatt über die Bühne hinaus und
+     würde sonst über die Schnellzugriffsleiste gemalt. */
+  overflow: hidden;
 }
 
 /* ---- Schnellzugriff ---------------------------------------
@@ -172,7 +175,8 @@ body.is-quiet .topbar { display: none; }
   flex: none;
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px 12px;
   padding: 8px 12px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--edge);
@@ -191,13 +195,16 @@ body.is-quiet .topbar { display: none; }
 
 .quick-tools .glyph { font-size: 16px; line-height: 1; }
 
+/* Alle Pigmente der Farbwelt müssen sichtbar sein. Eine seitlich
+   scrollbare Reihe findet niemand – auf schmalen Geräten waren zwei von
+   vierzehn zu sehen. Deshalb umbrechen statt schieben. */
 .quick-colors {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 7px;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 3px 1px;
 }
 
@@ -209,6 +216,23 @@ body.is-quiet .topbar { display: none; }
 }
 
 .quick-actions { display: flex; gap: 5px; flex: none; }
+
+.quick-zoom { display: flex; align-items: center; gap: 5px; flex: none; }
+
+.zoom-level {
+  min-width: 62px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.zoom-level:hover { border-color: var(--accent); color: var(--text); }
 
 .icon-button {
   width: 40px;
@@ -228,14 +252,26 @@ body.is-quiet .topbar { display: none; }
 body.quick-collapsed .quick-tools,
 body.quick-collapsed .quick-colors,
 body.quick-collapsed #btn-undo,
-body.quick-collapsed #btn-redo { display: none; }
+body.quick-collapsed #btn-redo,
+body.quick-collapsed .quick-zoom { display: none; }
 
 body.quick-collapsed .quickbar { justify-content: flex-end; padding-top: 4px; padding-bottom: 4px; }
 body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
 
+/* Unterhalb dieser Breite reicht eine Zeile nicht mehr für alles:
+   Werkzeuge und Schritte teilen sich die erste, die Farben bekommen
+   die zweite in voller Breite. */
+@media (max-width: 900px) {
+  .quick-tools { flex: none; }
+  .quick-zoom { margin-left: auto; }
+  .quick-actions { margin-left: auto; }
+  .quick-colors { order: 3; flex-basis: 100%; }
+}
+
 @media (max-width: 700px) {
   .quick-tools .tool-name { display: none; }
   .quick-tools .tool { padding: 8px 11px; }
+  .quick-colors .pigment { width: 30px; height: 30px; }
 }
 
 body.is-quiet .stage { padding: 6px; }
@@ -246,6 +282,7 @@ body.is-quiet .stage { padding: 6px; }
    Skript einmal gelaufen ist. */
 .canvas-stack {
   position: relative;
+  transform-origin: center center;
   aspect-ratio: 1 / 1;
   max-width: 100%;
   max-height: 100%;
