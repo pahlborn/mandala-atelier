@@ -30,16 +30,34 @@ keine Pokale, keine Streaks. Wer hier malt, will abschalten.
 Es gibt nichts zu bauen. `index.html` im Browser öffnen genügt.
 
 Für die Fassung auf dem iPad braucht es eine Adresse über `https`, sonst
-arbeitet der Service Worker nicht:
+arbeitet der Service Worker nicht. GitHub Pages ist dafür eingerichtet
+(Branch `main`, Ordner `/`) und liefert beide Apps ohne weiteres Zutun:
 
-    Einstellungen → Pages → Branch `main`, Ordner `/`
+| Adresse | |
+|---|---|
+| `…/mandala-atelier/` | Mandala Atelier |
+| `…/mandala-atelier/atelier3/` | Blatt (Atelier 3.0) |
+| `…/mandala-atelier/beide.html` | Einstiegsseite zum Ablegen beider |
 
-Danach die Seite in Safari öffnen und über „Teilen → Zum Home-Bildschirm“
-ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
+Am einfachsten geht man über **`beide.html`**: dort stehen beide Apps
+nebeneinander, und man legt sie nacheinander über „Teilen → Zum
+Home-Bildschirm“ ab. Danach liegen zwei unterscheidbare Symbole auf dem
+Gerät, „Mandala“ und „Blatt“. Beide starten im Vollbild und laufen ohne Netz.
 
-Für den Vergleich zusätzlich `/atelier3/` ablegen. Die beiden Apps haben
-eigene Icons, eigene Namen, eigene Service-Worker-Bereiche und eigene
-Speicher – sie gehen einander vollständig aus dem Weg.
+Die Seite gehört zu keiner der beiden Apps und ist bewusst nüchtern: keine
+Beschreibung einer Wirkung, keine Empfehlung, keine Reihenfolge – wer dort
+landet, könnte eine Testperson sein.
+
+**Die beiden Apps gehen einander vollständig aus dem Weg:** eigene Icons und
+Namen, getrennte Service-Worker-Bereiche und Cache-Namen, getrennte
+Speicher (`mandala-atelier.*` gegen `atelier3-*`, eigene Datenbanken).
+
+Zwei Stellen mussten dafür ausdrücklich geregelt werden, beide in `sw.js`:
+Der Worker hier räumt beim Aktivieren **nur die eigenen** alten Caches weg
+(vorher alle – das hätte Blatt bei jedem Release den Offline-Vorrat
+gelöscht), und er fasst Abrufe unter `/atelier3/` nicht an, obwohl sein
+Geltungsbereich sie mit einschließt. `.nojekyll` liegt bei, damit Pages die
+Dateien unverändert ausliefert.
 
 ## Randbedingungen
 
@@ -62,6 +80,8 @@ Speicher – sie gehen einander vollständig aus dem Weg.
 
     docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
     atelier3/               Zweite App „Blatt“ – eigenes README dort
+    beide.html              Einstiegsseite: beide Apps auf den Homescreen
+    .nojekyll               Pages liefert unverändert aus
 
     index.html              App-Gerüst, Schubladen, Galerie
     fonts.css               Schriften als Daten-URI (erzeugt)
@@ -76,6 +96,7 @@ Speicher – sie gehen einander vollständig aus dem Weg.
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     tools/gen-atelier3-icons.js  Icons für „Blatt“
     tools/test-atelier3.js  Testlauf für „Blatt“
+    tools/test-nebeneinander.js  Prüft, dass sich beide Apps nicht stören
     package.json            Nur devDependencies (playwright-core) für tools/
 
 Zur Laufzeit hat die App **keine Abhängigkeiten**. `node_modules` wird nur für
@@ -202,7 +223,14 @@ kommen dort dazu. Bausteine: `petalPoints`, `wedgeBandPoints`, `diamondPoints`,
 
     npm install          # nur playwright-core, kein Browser-Download nötig
     npm test             # diese App
-    npm run test:alle    # beide Apps
+    npm run test:alle    # beide Apps und ihr Nebeneinander
+
+`test:nebeneinander` ist der Wächter über die Koexistenz: Er startet kurz
+einen Dateiserver, lässt beide Service Worker laufen, erzwingt eine
+Neufassung des Workers hier und prüft dann dreierlei – dass Blatt am Ende
+von seinem eigenen Worker bedient wird, dass keine `/atelier3/`-Datei im
+Vorrat dieser App landet, und dass ein fremder Vorrat das Aufräumen
+übersteht.
 
 Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
 

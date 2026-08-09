@@ -386,8 +386,11 @@ function startServer(root) {
   return new Promise(function (resolve) {
     const server = http.createServer(function (req, res) {
       const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '');
-      const file = path.join(root, rel);
-      if (file.indexOf(root) !== 0 || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      let file = path.join(root, rel);
+      if (fs.existsSync(file) && fs.statSync(file).isDirectory()) {
+        file = path.join(file, 'index.html');
+      }
+      if (file.indexOf(root) !== 0 || !fs.existsSync(file)) {
         res.writeHead(404); res.end('nicht da'); return;
       }
       res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });

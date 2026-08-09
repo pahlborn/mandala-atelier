@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-1';
+const CACHE = 'mandala-atelier-v1-2';
 
 const SHELL = [
   './',
@@ -35,7 +35,12 @@ self.addEventListener('activate', function (event) {
     caches.keys()
       .then(function (keys) {
         return Promise.all(keys.map(function (key) {
-          return key === CACHE ? null : caches.delete(key);
+          /* Nur die eigenen alten Fassungen wegräumen. Unter derselben
+             Adresse liegt in /atelier3/ die Schwester-App „Blatt“; ein
+             pauschales Aufräumen würde ihr bei jedem Release hier den
+             Offline-Vorrat löschen. */
+          if (key === CACHE) return null;
+          return key.indexOf('mandala-atelier-') === 0 ? caches.delete(key) : null;
         }));
       })
       .then(function () { return self.clients.claim(); })
@@ -47,7 +52,15 @@ self.addEventListener('activate', function (event) {
 self.addEventListener('fetch', function (event) {
   const request = event.request;
   if (request.method !== 'GET') return;
-  if (new URL(request.url).origin !== self.location.origin) return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  /* Der Geltungsbereich dieses Workers schließt /atelier3/ mit ein, weil er
+     eine Ebene darüber liegt. Die Schwester-App hat aber ihren eigenen
+     Worker und ihren eigenen Vorrat – hier nichts anfassen, sonst lägen
+     ihre Dateien doppelt und veralteten unbemerkt. */
+  if (url.pathname.indexOf('/atelier3/') !== -1) return;
 
   event.respondWith(
     caches.match(request).then(function (hit) {

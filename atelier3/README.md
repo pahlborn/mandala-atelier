@@ -29,9 +29,16 @@ Auf dem iPad braucht es `https`, sonst arbeitet der Service Worker nicht.
 Die GitHub-Pages-Adresse ist dieselbe wie beim Mandala Atelier, nur mit
 `/atelier3/` am Ende. Danach in Safari „Teilen → Zum Home-Bildschirm“.
 
-**Für den Vergleich beide Apps ablegen.** Sie haben eigene Icons, eigene
-Namen und eigene Speicher; auf dem Homescreen sind sie auf einen Blick
-unterscheidbar.
+**Für den Vergleich beide Apps ablegen** – am einfachsten über
+[`../beide.html`](../beide.html), wo sie nebeneinander stehen. Sie haben
+eigene Icons, eigene Namen und eigene Speicher; auf dem Homescreen sind sie
+auf einen Blick unterscheidbar.
+
+Der Service Worker des Mandala Ateliers liegt eine Ebene höher, sein
+Geltungsbereich schließt `/atelier3/` also mit ein. Damit die beiden Apps
+sich nicht ins Gehege kommen, räumt er nur noch seine **eigenen** alten
+Caches weg und fasst Abrufe unter `/atelier3/` gar nicht erst an. Wer dort
+etwas ändert, muss das mitdenken.
 
 ## Randbedingungen
 
@@ -203,6 +210,12 @@ größtes Risiko benennt.
 
     npm install
     npm run test:atelier3        # oder: npm run test:alle
+
+Dazu gehört `npm run test:nebeneinander`: Beide Apps liegen auf GitHub Pages
+unter einem Origin, und der Worker des Mandala Ateliers hat sie beide in
+seinem Geltungsbereich. Der Lauf prüft, dass Blatt am Ende von seinem
+eigenen Worker bedient wird, dass keine `/atelier3/`-Datei im fremden Vorrat
+landet und dass ein fremder Vorrat das Aufräumen übersteht.
 
 Geprüft wird nicht, ob es hübsch aussieht — das muss man ansehen. Geprüft
 wird, ob die Zusagen des Entwurfs gelten: nichts von außen; die Hand

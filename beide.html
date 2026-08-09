@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Zwei Ateliers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Beide Ateliers auf den Homescreen legen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon-192.png">
+
+<!--
+  Diese Seite gehört zu keiner der beiden Apps. Sie hilft nur beim Ablegen
+  auf dem Homescreen.
+
+  Sie ist bewusst nüchtern gehalten: keine Beschreibung dessen, was die eine
+  oder die andere App „bewirkt“, keine Empfehlung, keine Reihenfolge. Wer
+  hier landet, könnte eine Testperson sein, und dann darf diese Seite ihr
+  nichts einreden.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --room:  #efe9dd;
+    --card:  #f8f4ea;
+    --ink:   #2f2a22;
+    --quiet: #6d6355;
+    --edge:  rgba(60, 48, 32, 0.16);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --room:  #16151a;
+      --card:  #201f25;
+      --ink:   #e8e2d6;
+      --quiet: #9a9287;
+      --edge:  rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: clamp(24px, 6vw, 64px) clamp(20px, 5vw, 40px)
+             calc(clamp(24px, 6vw, 64px) + env(safe-area-inset-bottom));
+    background: var(--room);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 44rem; margin: 0 auto; }
+
+  h1 {
+    margin: 0 0 0.15em;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(28px, 6vw, 40px);
+    letter-spacing: -0.01em;
+  }
+
+  .lede { margin: 0 0 2.4rem; color: var(--quiet); }
+
+  .apps {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    margin-bottom: 2.6rem;
+  }
+
+  .app {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: 0 1px 2px var(--edge), 0 10px 28px -14px var(--edge);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .app img {
+    width: 60px;
+    height: 60px;
+    flex: 0 0 auto;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px var(--edge);
+  }
+
+  .app strong { display: block; font-size: 17px; font-weight: 600; }
+  .app span   { display: block; font-size: 14px; color: var(--quiet); }
+
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+
+  ol { margin: 0 0 2.4rem; padding-left: 1.3em; }
+  li { margin-bottom: 0.5em; }
+
+  .note {
+    margin: 0;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--edge);
+    font-size: 14.5px;
+    color: var(--quiet);
+  }
+
+  .note strong { color: var(--ink); }
+
+  footer {
+    margin-top: 2.6rem;
+    font-size: 13.5px;
+    color: var(--quiet);
+  }
+
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Zwei Ateliers</h1>
+  <p class="lede">Beide gehören auf den Homescreen. Sie laufen getrennt
+     voneinander und ohne Netz.</p>
+
+  <div class="apps">
+    <a class="app" href="./index.html">
+      <img src="icon-192.png" alt="">
+      <span>
+        <strong>Mandala Atelier</strong>
+        <span>Zeichnen und ausmalen mit Symmetrie</span>
+      </span>
+    </a>
+
+    <a class="app" href="./atelier3/index.html">
+      <img src="atelier3/icon-192.png" alt="">
+      <span>
+        <strong>Blatt</strong>
+        <span>Ein Blatt, über das man streicht</span>
+      </span>
+    </a>
+  </div>
+
+  <h2>Auf dem iPad ablegen</h2>
+  <ol>
+    <li>Die erste App oben antippen, damit sie sich öffnet.</li>
+    <li>In Safari auf <b>Teilen → Zum Home-Bildschirm</b>.</li>
+    <li>Zurück auf diese Seite und dasselbe mit der zweiten App.</li>
+  </ol>
+  <p style="margin-top:-2rem; margin-bottom:2.4rem; font-size:14.5px; color:var(--quiet)">
+     Danach liegen zwei Symbole nebeneinander, „Mandala“ und „Blatt“. Beide
+     starten im Vollbild und arbeiten auch ohne Verbindung. Was man in der
+     einen macht, sieht die andere nie.</p>
+
+  <p class="note">
+    <strong>Wenn hier verglichen wird:</strong> Diese Seite sagt absichtlich
+    nicht, was die eine oder die andere App bewirken soll, und empfiehlt
+    keine Reihenfolge. Beides würde das Ergebnis verfärben. Wer den Vergleich
+    durchführt, findet das Vorgehen im Konzeptpapier des Projekts – und sollte
+    es Testpersonen vorher nicht zu lesen geben.
+  </p>
+
+  <footer>
+    Beide Ateliers arbeiten ausschließlich auf dem Gerät: keine Konten, keine
+    Werbung, kein Tracking. Nichts, was hier entsteht, verlässt das iPad.
+  </footer>
+
+</main>
+</body>
+</html>
