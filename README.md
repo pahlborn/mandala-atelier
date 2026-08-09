@@ -107,10 +107,21 @@ Motivkatalog. Die Reihenfolge innerhalb eines Satzes ist
 nicht beliebig – die Farblegende der Zählmandalas vergibt die ersten Einträge
 der Reihe nach, deshalb stehen die gut unterscheidbaren vorn.
 
-**Schnellzugriff.** Farben, Werkzeuge, Rückgängig und Wiederherstellen liegen
-in einer Leiste unter der Zeichenfläche, nicht in einer Schublade – beim Malen
-werden sie ständig gebraucht. Die Leiste lässt sich einklappen und bleibt auch
-im Vollbild stehen.
+**Schnellzugriff.** Farben, Werkzeuge, Vergrößern, Rückgängig und
+Wiederherstellen liegen in einer Leiste unter der Zeichenfläche, nicht in einer
+Schublade – beim Malen werden sie ständig gebraucht. **Alle** Pigmente der
+Farbwelt müssen dort sichtbar sein; eine seitlich scrollbare Reihe findet
+niemand, auf dem Telefon waren zwei von vierzehn zu sehen. Deshalb bricht die
+Reihe um, statt zu schieben. Der Testlauf zählt sie in fünf Auflösungen.
+
+**Vergrößern.** Knöpfe für Plus, Minus und Zurücksetzen, dazu Zwei-Finger-Gesten
+zum Zoomen und Schieben. Der Anlass war, dass der Versuch zu zoomen sonst im
+Zeichnen landete: Sobald ein zweiter Finger aufsetzt, wird der eben begonnene
+Strich zurückgenommen und stattdessen geschoben. `.stage` muss dabei
+`overflow: hidden` behalten, sonst malt das vergrößerte Blatt über die
+Schnellzugriffsleiste. Die Zeigerkoordinaten stimmen automatisch, weil
+`toLocal()` über `getBoundingClientRect()` rechnet und die Vergrößerung darin
+schon steckt.
 
 **Personen.** Eine dünne Ebene über der Galerie: ein Name, eigene Werke. Kein
 Konto, kein Bild, keine Punkte – nur damit sich mehrere Leute auf einem iPad
@@ -221,6 +232,8 @@ Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
   eine offene Linie, auch wenn die Geometrie geschlossen ist.
 - **Atelier** – mischt die eigene Farbwelt, trennt sie die Galerien der
   Personen, liest sie eine Sicherung ohne Dopplung ein?
+- **Vergrößern** – stimmen die Koordinaten beim Zeichnen im Maßstab, und
+  hinterlässt eine Zwei-Finger-Geste wirklich keinen Strich?
 - **Abgeschlossenheit** – holt die Seite wirklich nichts von außen?
 - **Zeichnen** – erscheint ein mit dem Zeiger gezogener Strich an allen Achsen?
 - **Seed** – liefern zwei Durchläufe dieselben Aufgaben?

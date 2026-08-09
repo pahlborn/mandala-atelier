@@ -222,6 +222,7 @@ async function run() {
     { name: 'iPad quer',  width: 1180, height: 820 },
     { name: 'iPad hoch',  width: 820,  height: 1180 },
     { name: 'Telefon',    width: 390,  height: 844 },
+    { name: 'Telefon groß', width: 430, height: 932 },
     { name: 'Schreibtisch', width: 1600, height: 900 }
   ];
 
@@ -236,20 +237,38 @@ async function run() {
     const box = await page.evaluate(function () {
       const stack = document.getElementById('stack').getBoundingClientRect();
       const stage = document.querySelector('.stage').getBoundingClientRect();
+
+      /* Alle Pigmente der Farbwelt müssen im Schnellzugriff sichtbar sein –
+         eine seitlich scrollbare Reihe findet niemand. */
+      const row = document.getElementById('quick-palette').getBoundingClientRect();
+      const swatches = Array.prototype.slice.call(
+        document.querySelectorAll('#quick-palette .pigment'));
+      const shown = swatches.filter(function (el) {
+        const b = el.getBoundingClientRect();
+        return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
+      }).length;
+
       return {
         width: stack.width,
         height: stack.height,
         contained: stack.top >= stage.top - 1 && stack.bottom <= stage.bottom + 1,
-        overflow: document.documentElement.scrollWidth > window.innerWidth + 1
+        overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+        pigments: swatches.length,
+        shown: shown
       };
     });
     const square = Math.abs(box.width - box.height) <= 1;
-    if (!square || box.overflow || !box.contained) layoutProblems.push(viewport.name);
+    const allShown = box.shown === box.pigments;
+    if (!square || box.overflow || !box.contained || !allShown) {
+      layoutProblems.push(viewport.name);
+    }
     console.log(
       pad('  ' + viewport.name, 26) +
       pad(Math.round(box.width) + ' × ' + Math.round(box.height), 16) +
+      pad(box.shown + '/' + box.pigments + ' Farben', 14) +
       (square ? 'quadratisch' : '← gestaucht') +
       (box.contained ? '' : ', ← ragt aus der Bühne') +
+      (allShown ? '' : ', ← Farben abgeschnitten') +
       (box.overflow ? ', ← Seite läuft seitlich über' : '')
     );
   }
@@ -313,6 +332,84 @@ async function run() {
   if (!strokeOk) tapProblems.push('Zeichnen');
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
+
+  /* Vergrößern: Knöpfe, richtige Koordinaten trotz Maßstab, und – der
+     eigentliche Anlass – zwei Finger dürfen nie einen Strich hinterlassen. */
+  console.log('\nVergrößern');
+  const zoom = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.resetZoom();
+    app.loadMotif('sternkranz');
+
+    app.zoomBy(1.25);
+    app.zoomBy(1.25);
+    const scaled = app.state.zoom;
+
+    /* Ein Tipp muss trotz Maßstab an der gemeinten Stelle landen. */
+    const canvas = app.layers.draw.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const sx = rect.left + (450 / 900) * rect.width;
+    const sy = rect.top + (180 / 900) * rect.height;
+    const touch = function (type, id, x, y) {
+      return new PointerEvent(type, {
+        clientX: x, clientY: y, pointerId: id,
+        pointerType: 'touch', bubbles: true, isPrimary: id === 1
+      });
+    };
+    canvas.dispatchEvent(touch('pointerdown', 1, sx, sy));
+    canvas.dispatchEvent(touch('pointerup', 1, sx, sy));
+
+    const dpr = canvas.width / app.SIZE;
+    const data = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let hit = false;
+    const x = Math.round(450 * dpr), y = Math.round(180 * dpr);
+    for (let oy = -8; oy <= 8 && !hit; oy++) {
+      for (let ox = -8; ox <= 8 && !hit; ox++) {
+        if (data[((y + oy) * canvas.width + (x + ox)) * 4 + 3] > 60) hit = true;
+      }
+    }
+
+    /* Zwei Finger: schieben und zoomen, aber nicht malen. */
+    app.resetZoom();
+    app.loadMotif('sternkranz');
+    const before = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data.slice();
+    const box = canvas.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    canvas.dispatchEvent(touch('pointerdown', 1, cx - 60, cy));
+    canvas.dispatchEvent(touch('pointerdown', 2, cx + 60, cy));
+    for (let i = 1; i <= 8; i++) {
+      canvas.dispatchEvent(touch('pointermove', 1, cx - 60 - i * 8, cy));
+      canvas.dispatchEvent(touch('pointermove', 2, cx + 60 + i * 8, cy));
+    }
+    canvas.dispatchEvent(touch('pointerup', 1, cx - 120, cy));
+    canvas.dispatchEvent(touch('pointerup', 2, cx + 120, cy));
+    const after = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let changed = 0;
+    for (let i = 3; i < after.length; i += 4 * 64) {
+      if (after[i] !== before[i]) changed++;
+    }
+    const gestureZoom = app.state.zoom;
+    app.resetZoom();
+
+    return {
+      scaled: scaled,
+      reset: app.state.zoom,
+      hit: hit,
+      clean: changed === 0,
+      gestureZoom: gestureZoom
+    };
+  });
+
+  const zoomOk = Math.abs(zoom.scaled - 1.5625) < 0.01 && zoom.reset === 1 &&
+    zoom.hit && zoom.clean && zoom.gestureZoom > 1.5;
+  console.log('  Knöpfe: ' + Math.round(zoom.scaled * 100) + ' %, zurück auf ' +
+    Math.round(zoom.reset * 100) + ' %');
+  console.log('  Zeichnen trifft trotz Maßstab: ' + (zoom.hit ? 'ja' : '← NEIN'));
+  console.log('  Zwei Finger zoomen auf ' + Math.round(zoom.gestureZoom * 100) +
+    ' % und hinterlassen keinen Strich: ' + (zoom.clean ? 'ja' : '← NEIN'));
 
   /* Größe der einzelnen Felder. Nicht nur „läuft Farbe bis in die Ecken“,
      sondern: Wie viel färbt ein Tipp wirklich? Zu große Felder wirken wie
@@ -526,6 +623,7 @@ async function run() {
   broken.push.apply(broken, cellProblems);
   if (!galleryOk) broken.push('Galerie');
   if (!atelierOk) broken.push('Atelier');
+  if (!zoomOk) broken.push('Vergrößern');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 

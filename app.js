@@ -262,6 +262,9 @@ const state = {
   person:     'p1',
   works:      [],
   viewing:    null,
+  zoom:       1,
+  panX:       0,
+  panY:       0,
   drawing:    false,
   last:       null,
   guideAngle: 0
@@ -1634,6 +1637,9 @@ function cacheUi() {
   ui.mirror     = document.getElementById('mirror');
   ui.guides     = document.getElementById('guides');
   ui.width      = document.getElementById('width');
+  ui.zoomIn     = document.getElementById('btn-zoom-in');
+  ui.zoomOut    = document.getElementById('btn-zoom-out');
+  ui.zoomLevel  = document.getElementById('zoom-level');
   ui.undo       = document.getElementById('btn-undo');
   ui.redo       = document.getElementById('btn-redo');
   ui.quickCollapse = document.getElementById('btn-quick-collapse');
@@ -2025,6 +2031,66 @@ function fitStage() {
   const size = Math.max(120, Math.floor(Math.min(width, height)));
   ui.stack.style.width = size + 'px';
   ui.stack.style.height = size + 'px';
+  if (ui.zoomLevel) applyZoom();
+}
+
+
+/* ---- Vergrößern --------------------------------------------------------
+   Auf dem iPad landet der Versuch, mit zwei Fingern zu zoomen, sonst im
+   Zeichnen. Deshalb zwei Dinge: ausdrückliche Knöpfe, und Gesten mit zwei
+   Fingern zeichnen grundsätzlich nicht – sie schieben und zoomen.
+   --------------------------------------------------------------------- */
+
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 4;
+
+function applyZoom() {
+  clampPan();
+  ui.stack.style.transform =
+    'translate(' + state.panX.toFixed(1) + 'px, ' + state.panY.toFixed(1) + 'px) ' +
+    'scale(' + state.zoom.toFixed(3) + ')';
+  ui.zoomLevel.textContent = Math.round(state.zoom * 100) + ' %';
+  ui.zoomOut.disabled = state.zoom <= ZOOM_MIN + 0.001;
+  ui.zoomIn.disabled = state.zoom >= ZOOM_MAX - 0.001;
+}
+
+/* Das Blatt darf nicht aus der Bühne geschoben werden. */
+function clampPan() {
+  if (state.zoom <= 1) { state.panX = 0; state.panY = 0; return; }
+  const size = ui.stack.offsetWidth || 1;
+  const room = (size * state.zoom - size) / 2;
+  state.panX = Math.max(-room, Math.min(room, state.panX));
+  state.panY = Math.max(-room, Math.min(room, state.panY));
+}
+
+function setZoom(value, focus) {
+  const before = state.zoom;
+  const next = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, value));
+  if (Math.abs(next - before) < 0.0005) return;
+
+  /* Um den Punkt zwischen den Fingern vergrößern, nicht um die Mitte. */
+  if (focus) {
+    const rect = ui.stack.getBoundingClientRect();
+    const dx = focus[0] - (rect.left + rect.width / 2);
+    const dy = focus[1] - (rect.top + rect.height / 2);
+    const ratio = next / before;
+    state.panX -= dx * (ratio - 1);
+    state.panY -= dy * (ratio - 1);
+  }
+
+  state.zoom = next;
+  applyZoom();
+}
+
+function zoomBy(factor) {
+  setZoom(state.zoom * factor, null);
+}
+
+function resetZoom() {
+  state.zoom = 1;
+  state.panX = 0;
+  state.panY = 0;
+  applyZoom();
 }
 
 
@@ -2102,8 +2168,44 @@ function toLocal(event) {
 function bindEvents() {
   const canvas = layers.draw.canvas;
 
+  /* Alle liegenden Finger. Sobald zwei darauf sind, wird nicht gezeichnet,
+     sondern geschoben und gezoomt. */
+  const touches = new Map();
+  let gesture = null;
+
+  function gestureState() {
+    const points = Array.from(touches.values());
+    const dx = points[0].x - points[1].x;
+    const dy = points[0].y - points[1].y;
+    return {
+      distance: Math.hypot(dx, dy),
+      center: [(points[0].x + points[1].x) / 2, (points[0].y + points[1].y) / 2]
+    };
+  }
+
+  /* Beginnt eine Geste, wird der eben angefangene Strich zurückgenommen –
+     sonst bliebe von jedem Zoomversuch ein Kringel stehen. */
+  function abandonStroke() {
+    if (!state.drawing) return;
+    state.drawing = false;
+    const entry = history.pop();
+    if (entry) applyEntry(entry);
+    syncUI();
+  }
+
   canvas.addEventListener('pointerdown', function (event) {
     event.preventDefault();
+    touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (touches.size >= 2) {
+      abandonStroke();
+      gesture = gestureState();
+      gesture.zoom = state.zoom;
+      gesture.panX = state.panX;
+      gesture.panY = state.panY;
+      return;
+    }
+
     const point = toLocal(event);
 
     if (state.tool === 'fill') {
@@ -2121,6 +2223,21 @@ function bindEvents() {
   });
 
   canvas.addEventListener('pointermove', function (event) {
+    if (touches.has(event.pointerId)) {
+      touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    }
+
+    if (gesture && touches.size >= 2) {
+      event.preventDefault();
+      const now = gestureState();
+      state.panX = gesture.panX + (now.center[0] - gesture.center[0]);
+      state.panY = gesture.panY + (now.center[1] - gesture.center[1]);
+      state.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX,
+        gesture.zoom * (now.distance / (gesture.distance || 1))));
+      applyZoom();
+      return;
+    }
+
     if (!state.drawing) return;
     event.preventDefault();
     const point = toLocal(event);
@@ -2129,7 +2246,13 @@ function bindEvents() {
   });
 
   ['pointerup', 'pointercancel'].forEach(function (type) {
-    canvas.addEventListener(type, function () { state.drawing = false; });
+    canvas.addEventListener(type, function (event) {
+      touches.delete(event.pointerId);
+      if (touches.size < 2) gesture = null;
+      /* Nach einer Geste nicht mit dem verbliebenen Finger weiterzeichnen. */
+      if (touches.size === 0) state.drawing = false;
+      else if (touches.size === 1) state.drawing = false;
+    });
   });
 
   document.addEventListener('click', function (event) {
@@ -2189,6 +2312,9 @@ function bindEvents() {
     window.addEventListener('orientationchange', fitStage);
   }
 
+  ui.zoomIn.addEventListener('click', function () { zoomBy(1.25); });
+  ui.zoomOut.addEventListener('click', function () { zoomBy(1 / 1.25); });
+  ui.zoomLevel.addEventListener('click', resetZoom);
   ui.undo.addEventListener('click', undo);
   ui.redo.addEventListener('click', redo);
   ui.quickCollapse.addEventListener('click', function () {
@@ -2254,6 +2380,10 @@ function bindEvents() {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
 
+    if (event.key === '+') { zoomBy(1.25); return; }
+    if (event.key === '-') { zoomBy(1 / 1.25); return; }
+    if (event.key === '0') { resetZoom(); return; }
+
     const keys = { '1': 'pen', '2': 'fill', '3': 'eraser' };
     if (keys[event.key]) { state.tool = keys[event.key]; syncUI(); return; }
     if (event.key === 'm') toggleDrawer('library');
@@ -2301,6 +2431,7 @@ function start() {
     ui.quickCollapse.title = 'Leiste ausklappen';
   }
 
+  applyZoom();
   fitStage();
   loadMotif(Store.get('motif', 'sternkranz'));
   Gallery.open().then(refreshGallery);
@@ -2323,6 +2454,9 @@ window.MandalaAtelier = {
   state: state,
   layers: layers,
   loadMotif: loadMotif,
+  setZoom: setZoom,
+  zoomBy: zoomBy,
+  resetZoom: resetZoom,
   Gallery: Gallery,
   keepWork: keepWork,
   setPalette: setPalette,
