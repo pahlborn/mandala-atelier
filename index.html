@@ -132,6 +132,10 @@
         <h3>Farbwelt</h3>
         <div class="palette-sets" id="palette-sets" role="group" aria-label="Farbwelt wählen"></div>
         <div class="palette" id="palette" role="group" aria-label="Pigment wählen"></div>
+        <label class="field mixer" id="mixer" hidden>
+          <span>Gewähltes Pigment mischen</span>
+          <input type="color" id="mix-color">
+        </label>
       </section>
 
       <section class="panel" id="legend-panel" hidden>
@@ -157,6 +161,7 @@
         <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
         <button type="button" id="btn-keep" class="action primary">In die Galerie legen</button>
         <button type="button" id="btn-save" class="action">Als Bild speichern</button>
+        <button type="button" id="btn-print" class="action">Druckbogen (A4)</button>
       </section>
 
       <p class="drawer-foot" id="stage-hint">Wähle ein Motiv oder beginne auf dem leeren Blatt.</p>
@@ -174,10 +179,13 @@
       <h2 id="gallery-title">Galerie</h2>
       <p class="overlay-note" id="gallery-count"></p>
     </div>
-    <label class="owner">
-      <span>Galerie von</span>
-      <input type="text" id="gallery-owner" maxlength="28" placeholder="Name eintragen">
-    </label>
+    <div class="owner">
+      <label>
+        <span>Galerie von</span>
+        <select id="person-select" aria-label="Person wählen"></select>
+      </label>
+      <input type="text" id="gallery-owner" maxlength="28" placeholder="Name" aria-label="Person umbenennen">
+    </div>
     <button type="button" class="drawer-close" id="btn-gallery-close" aria-label="Galerie schließen">✕</button>
   </header>
   <div class="overlay-body">
@@ -186,6 +194,18 @@
       „In die Galerie legen“ hierher.
     </p>
     <div class="works" id="works"></div>
+    <footer class="overlay-foot">
+      <p>
+        Werke liegen nur auf diesem Gerät. Eine Sicherung ist zugleich der Weg
+        auf ein zweites Gerät – sie enthält alle Personen, deren Werke und die
+        eigene Farbwelt.
+      </p>
+      <div class="overlay-actions">
+        <button type="button" class="action" id="btn-backup-save">Sicherung speichern</button>
+        <button type="button" class="action" id="btn-backup-load">Sicherung einlesen</button>
+        <input type="file" id="backup-file" accept="application/json,.json" hidden>
+      </div>
+    </footer>
   </div>
 </section>
 

@@ -6,7 +6,7 @@ eigene Zielgruppe, eigene Gestaltung.
 
 Der Kern ist nicht das Ausmalbuch, sondern das **Symmetrie-Werkzeug**: Man
 zeichnet ein Segment, die App spiegelt den Rest. Dieses Gefühl ist das
-eigentliche Produkt. Die 19 fertigen Vorlagen sind die Ergänzung für alle, die
+eigentliche Produkt. Die 26 fertigen Vorlagen sind die Ergänzung für alle, die
 sofort losfärben wollen.
 
 Leitsatz: ruhig, erwachsen, entspannend. **Keine Gamification** – keine Sterne,
@@ -100,17 +100,35 @@ es zulässt, wird echtes Vollbild angefordert. Safari auf dem iPad kennt die
 Vollbild-Schnittstelle nicht überall – dann bleibt es beim ruhigen Modus, und
 der bringt schon fast den ganzen Gewinn.
 
-**Farbwelten.** Vier Sätze zu je 14 gedeckten Pigmenten: Erdpigmente,
-Nordlicht, Färbergarten, Rauchglas. Die Reihenfolge innerhalb eines Satzes ist
+**Farbwelten.** Fünf Sätze zu je 14 gedeckten Pigmenten: Erdpigmente,
+Nordlicht, Färbergarten, Rauchglas und eine selbst gemischte. Die eigene
+Farbwelt gehört dem Haushalt, nicht einer Person – sie ist Material wie der
+Motivkatalog. Die Reihenfolge innerhalb eines Satzes ist
 nicht beliebig – die Farblegende der Zählmandalas vergibt die ersten Einträge
 der Reihe nach, deshalb stehen die gut unterscheidbaren vorn.
+
+**Schnellzugriff.** Farben, Werkzeuge, Rückgängig und Wiederherstellen liegen
+in einer Leiste unter der Zeichenfläche, nicht in einer Schublade – beim Malen
+werden sie ständig gebraucht. Die Leiste lässt sich einklappen und bleibt auch
+im Vollbild stehen.
+
+**Personen.** Eine dünne Ebene über der Galerie: ein Name, eigene Werke. Kein
+Konto, kein Bild, keine Punkte – nur damit sich mehrere Leute auf einem iPad
+nicht in die Bilder malen. Werke aus der Zeit davor gehören der ersten Person.
+
+**Sicherung.** Eine Datei mit allen Personen, deren Werken und der eigenen
+Farbwelt. Zugleich der Weg auf ein zweites Gerät. Einlesen führt zusammen,
+statt zu ersetzen – vorhandene Werke bleiben, Dopplungen entstehen nicht.
+
+**Druckbogen.** A4, ohne Hilfsraster, wahlweise nur die Linien (zum Ausmalen
+mit echten Stiften) oder das fertige Werk. Gedruckt wird immer auf hellem
+Grund; im Dunkelmodus werden die Linien dafür umgefärbt.
 
 **Galerie.** Fertige Bilder bleiben auf dem Gerät, in IndexedDB. `localStorage`
 wäre zu klein: ein Werk wiegt ein paar hundert Kilobyte. Ist IndexedDB nicht
 verfügbar (Safari im privaten Modus), hält die App die Werke nur für die
 laufende Sitzung – und sagt das, statt es stillschweigend zu schlucken. Jedes
-Werk hat einen Titel, die Galerie selbst darf einen Namen tragen. Beides bleibt
-auf dem Gerät und wird nirgends hingeschickt.
+Werk hat einen Titel. Alles bleibt auf dem Gerät und wird nirgends hingeschickt.
 
 **Symmetrie.** `segmentLine(p0, p1)` zeichnet jede Linie n-mal um die Mitte
 rotiert; bei aktiver Spiegelung zusätzlich an der Waagerechten gespiegelt.
@@ -138,14 +156,23 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (19 Vorlagen, 5 Welten)
+## Motivkatalog (26 Vorlagen, 5 Welten)
 
-- **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein
-- **Natur:** Blüte, Blätterkranz, Muschelspirale
-- **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld
+- **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
+  Achteckstern, Gitterrose
+- **Natur:** Blüte, Blätterkranz, Muschelspirale, Farnkreis, Samenkranz
+- **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
+  Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
-- **Kids-Corner:** Erste Formen (Kindergarten), Mustertanz (Grundschule),
-  Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10, Rechenmandala ZR 20
+- **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
+  Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
+  Rechenmandala ZR 20
+
+**Regel für neue Motive:** Genug Ringe, damit der Hintergrund in Felder
+zerfällt. Ein Feld, das von der Nabe bis zum Rand reicht, wirkt beim
+symmetrischen Füllen wie eine offene Linie – auch wenn die Geometrie
+geschlossen ist. Offene Linien müssen bis an Nabe **und** Außenring laufen.
+Der Testlauf misst beides.
 
 Bei Zähl- und Rechenmandalas erscheint automatisch eine **Farblegende** in der
 Bedienleiste („Ergebnis 7“, „4 Punkte“). Sie wird aus den tatsächlich
@@ -190,6 +217,10 @@ Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
 - **Layout** – bleibt das Blatt in vier Auflösungen quadratisch, ohne aus der
   Bühne zu ragen?
 - **Galerie** – lässt sich ein Werk ablegen, umbenennen und herausnehmen?
+- **Feldgröße** – wie viel färbt ein Tipp wirklich? Zu große Felder wirken wie
+  eine offene Linie, auch wenn die Geometrie geschlossen ist.
+- **Atelier** – mischt die eigene Farbwelt, trennt sie die Galerien der
+  Personen, liest sie eine Sicherung ohne Dopplung ein?
 - **Abgeschlossenheit** – holt die Seite wirklich nichts von außen?
 - **Zeichnen** – erscheint ein mit dem Zeiger gezogener Strich an allen Achsen?
 - **Seed** – liefern zwei Durchläufe dieselben Aufgaben?
@@ -229,9 +260,11 @@ braucht gezeichnete Vorlagen – die kann die App anzeigen, aber nicht erfinden.
 
 ## Sinnvolle nächste Schritte
 
-1. **Druckansicht** für die Kids-Corner: schwarz-weiß, ohne Hilfsraster, DIN A4.
-   Wahrscheinlich der größte praktische Gewinn für Lehrkräfte.
-2. **Mehrere Personen** – heute trägt die Galerie einen Namen. Wenn mehrere
-   Leute dasselbe iPad benutzen, wären getrennte Galerien der nächste Schritt.
-3. **Mehr Vorlagen** je Welt; der Katalog ist bewusst erweiterbar angelegt.
-4. **Eigene Farben** mischen und als eigene Farbwelt sichern.
+1. **Person löschen** – heute lassen sich Personen anlegen und umbenennen,
+   aber nicht entfernen. Das Löschen nimmt Werke mit und braucht deshalb eine
+   saubere Rückfrage.
+2. **Mehr Vorlagen** je Welt; der Katalog ist bewusst erweiterbar angelegt.
+3. **Eigene Farbwelt benennen** und mehrere davon halten.
+4. **Test am echten iPad** – bisher läuft der Testlauf nur in einem
+   kopflosen Chromium. Zeichnen mit dem Finger, Safaris Vollbild und die
+   Geschwindigkeit bei 24 Achsen sind ungeprüft.

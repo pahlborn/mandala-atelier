@@ -431,6 +431,76 @@ async function run() {
   console.log('  Speicher: ' + (gallery.dauerhaft ? 'IndexedDB' : 'nur diese Sitzung'));
   console.log('  Ablegen, umbenennen, herausnehmen: ' + (galleryOk ? 'wie erwartet' : '← FEHLER'));
 
+  /* Personen, eigene Farbwelt und Sicherung. */
+  const atelier = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const out = {};
+
+    /* Eigene Farbwelt mischen */
+    app.setPalette('eigen');
+    app.state.color = app.pigments()[0].hex;
+    app.mixPigment('#123456');
+    out.mischen = app.pigments()[0].hex === '#123456' && app.state.color === '#123456';
+    app.setPalette('erde');
+
+    /* Getrennte Galerien */
+    return app.Gallery.open().then(function () {
+      app.addPerson();
+      app.renamePerson('Prüfung A');
+      const a = app.state.person;
+      app.loadMotif('bluete');
+      const p = app.pol(200, -Math.PI / 2);
+      app.floodFill(p[0], p[1], '#b5654a');
+      return app.keepWork()
+        .then(function () { return app.refreshGallery(); })
+        .then(function () {
+          out.werkeA = app.state.works.length;
+          app.addPerson();
+          app.renamePerson('Prüfung B');
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.werkeB = app.state.works.length;
+          app.selectPerson(a);
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.zurueckA = app.state.works.length;
+          return app.Gallery.all();
+        })
+        .then(function (works) {
+          out.alleHabenPerson = works.every(function (w) { return !!w.person; });
+          /* Sicherung: einlesen darf nichts verlieren und nichts doppeln. */
+          const backup = {
+            app: 'mandala-atelier', version: 1,
+            people: app.state.people,
+            ownPalette: app.PALETTES.filter(function (p) { return p.custom; })[0].colors,
+            works: works
+          };
+          const file = new File([JSON.stringify(backup)], 'sicherung.json',
+            { type: 'application/json' });
+          app.loadBackup(file);
+          return new Promise(function (resolve) { setTimeout(resolve, 500); });
+        })
+        .then(function () { return app.Gallery.all(); })
+        .then(function (after) {
+          out.nachEinlesen = after.length;
+          return out;
+        });
+    });
+  });
+
+  const atelierOk = atelier.mischen && atelier.werkeA === 1 && atelier.werkeB === 0 &&
+    atelier.zurueckA === 1 && atelier.alleHabenPerson &&
+    atelier.nachEinlesen === atelier.werkeA;
+
+  console.log('\nAtelier');
+  console.log('  Eigene Farbwelt mischen: ' + (atelier.mischen ? 'wie erwartet' : '← FEHLER'));
+  console.log('  Galerien getrennt: ' + atelier.werkeA + ' / ' + atelier.werkeB +
+    ' / zurück ' + atelier.zurueckA + (atelier.zurueckA === atelier.werkeA ? '   wie erwartet' : '   ← FEHLER'));
+  console.log('  Sicherung einlesen ohne Dopplung: ' +
+    (atelier.nachEinlesen === atelier.werkeA ? 'wie erwartet' : '← ' + atelier.nachEinlesen + ' statt ' + atelier.werkeA));
+
   /* Schriften: eingebettet, nicht nachgeladen. */
   const typeOk = await page.evaluate(async function () {
     await document.fonts.load('500 20px "IBM Plex Mono"');
@@ -455,6 +525,7 @@ async function run() {
   }).map(function (r) { return r.motif.name; }).concat(tapProblems, layoutProblems);
   broken.push.apply(broken, cellProblems);
   if (!galleryOk) broken.push('Galerie');
+  if (!atelierOk) broken.push('Atelier');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 

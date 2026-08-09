@@ -132,6 +132,15 @@ const PALETTES = [
   }
 ];
 
+/* Die fünfte Farbwelt gehört dem Haushalt und wird selbst gemischt.
+   Sie ist Material wie der Motivkatalog – deshalb gilt sie für alle
+   Personen, nicht nur für eine. */
+const OWN_DEFAULT = PALETTES[0].colors.map(function (c) {
+  return { name: c.name, hex: c.hex };
+});
+
+PALETTES.push({ id: 'eigen', name: 'Eigene', custom: true, colors: OWN_DEFAULT.slice() });
+
 /* Die Pigmente der gerade gewählten Farbwelt. */
 function pigments() {
   const set = PALETTES.filter(function (p) { return p.id === state.palette; })[0];
@@ -249,7 +258,8 @@ const state = {
   palette:    'erde',
   color:      PALETTES[0].colors[0].hex,
   width:      4,
-  owner:      '',
+  people:     [],
+  person:     'p1',
   works:      [],
   viewing:    null,
   drawing:    false,
@@ -509,6 +519,38 @@ const MOTIFS = [
     }
   },
 
+  {
+    id: 'achteckstern', world: 'geo', axes: 8,
+    name: 'Achteckstern', note: 'Acht Achsen, klare Kanten',
+    build: function (p) {
+      drawRing(p, 366, 1.6);
+      drawRing(p, 296, 1.8);
+      drawRing(p, 226, 1.6);
+      drawRing(p, 148, 1.8);
+      drawClosedLoop(p, diamondPoints(298, 404, p.step * 0.30), 2.2);
+      drawClosedLoop(p, rotatePoints(diamondPoints(298, 364, p.step * 0.18), p.step / 2), 1.6);
+      drawClosedLoop(p, wedgeBandPoints(228, 294, p.step * 0.36, 16), 1.8);
+      drawClosedLoop(p, diamondPoints(150, 224, p.step * 0.34), 1.8);
+      drawClosedLoop(p, petalPoints(48, 146, p.step * 0.40), 2);
+      drawDotAccent(p, 340, 6, 1.4);
+    }
+  },
+  {
+    id: 'gitterrose', world: 'geo', axes: 12,
+    name: 'Gitterrose', note: 'Verschränkte Rauten, dichtes Netz',
+    build: function (p) {
+      drawRing(p, 372, 1.4);
+      drawRing(p, 308, 1.6);
+      drawRing(p, 244, 1.6);
+      drawRing(p, 180, 1.6);
+      drawRing(p, 112, 1.6);
+      drawClosedLoop(p, diamondPoints(310, 402, p.step * 0.42), 1.8);
+      drawClosedLoop(p, rotatePoints(diamondPoints(246, 306, p.step * 0.46), p.step / 2), 1.8);
+      drawClosedLoop(p, diamondPoints(182, 242, p.step * 0.46), 1.8);
+      drawClosedLoop(p, rotatePoints(petalPoints(114, 178, p.step * 0.44), p.step / 2), 1.8);
+      drawClosedLoop(p, petalPoints(48, 110, p.step * 0.42), 1.8);
+    }
+  },
   /* --- Natur ------------------------------------------------------------ */
   {
     id: 'bluete', world: 'natur', axes: 8,
@@ -555,6 +597,42 @@ const MOTIFS = [
     }
   },
 
+  {
+    id: 'farnkreis', world: 'natur', axes: 10,
+    name: 'Farnkreis', note: 'Wedel mit feinen Fiedern',
+    build: function (p) {
+      drawRing(p, 360, 1.4);
+      drawRing(p, 292, 1.6);
+      drawRing(p, 220, 1.6);
+      drawRing(p, 146, 1.6);
+      drawRing(p, 92, 1.6);
+      drawClosedLoop(p, petalPoints(294, 400, p.step * 0.30, 26, 0.85), 2.2);
+      drawPolyline(p, [pol(298, UP), pol(396, UP)], 1.1);
+      [316, 344, 372].forEach(function (r) {
+        drawPolyline(p, [pol(r, UP), branchTip(r, 24, 1)], 1.1);
+        drawPolyline(p, [pol(r, UP), branchTip(r, 24, -1)], 1.1);
+      });
+      drawClosedLoop(p, rotatePoints(petalPoints(222, 290, p.step * 0.34, 24), p.step / 2), 1.8);
+      drawClosedLoop(p, petalPoints(148, 218, p.step * 0.36, 24), 1.8);
+      drawClosedLoop(p, petalPoints(48, 90, p.step * 0.42), 1.8);
+    }
+  },
+  {
+    id: 'samenkranz', world: 'natur', axes: 16,
+    name: 'Samenkranz', note: 'Sechzehn Samen, feine Teilung',
+    build: function (p) {
+      drawRing(p, 374, 1.3);
+      drawRing(p, 312, 1.4);
+      drawRing(p, 252, 1.4);
+      drawRing(p, 192, 1.4);
+      drawRing(p, 130, 1.4);
+      drawClosedLoop(p, petalPoints(314, 402, p.step * 0.38, 24, 0.62), 1.6);
+      drawClosedLoop(p, rotatePoints(petalPoints(254, 310, p.step * 0.40, 22, 0.62), p.step / 2), 1.5);
+      drawClosedLoop(p, petalPoints(194, 250, p.step * 0.40, 22, 0.62), 1.5);
+      drawClosedLoop(p, diamondPoints(132, 190, p.step * 0.36), 1.4);
+      drawClosedLoop(p, petalPoints(48, 128, p.step * 0.44), 1.6);
+    }
+  },
   /* --- Zen & Achtsamkeit ------------------------------------------------ */
   {
     id: 'wellenkreis', world: 'zen', axes: 24,
@@ -596,6 +674,29 @@ const MOTIFS = [
     }
   },
 
+  {
+    id: 'atemringe', world: 'zen', axes: 16,
+    name: 'Atemringe', note: 'Ruhiger Takt, gleichmäßige Weite',
+    build: function (p) {
+      [388, 340, 292, 244, 196, 148, 100].forEach(function (r) {
+        drawRing(p, r, 1.5);
+      });
+      drawDotAccent(p, 364, 5, 1.3);
+      drawDotAccent(p, 124, 5, 1.3);
+    }
+  },
+  {
+    id: 'steingarten', world: 'zen', axes: 10,
+    name: 'Steingarten', note: 'Wenige Formen, geharkte Bahnen',
+    build: function (p) {
+      [386, 348, 310, 272, 234, 196, 158, 120, 84].forEach(function (r) {
+        drawRing(p, r, 1.3);
+      });
+      drawClosedLoop(p, petalPoints(200, 306, p.step * 0.34, 26, 0.7), 2.4);
+      drawDotAccent(p, 356, 12, 2);
+      drawDotAccent(p, 140, 9, 2);
+    }
+  },
   /* --- Jahreszeiten ----------------------------------------------------- */
   {
     id: 'winter', world: 'jahr', axes: 6,
@@ -682,6 +783,19 @@ const MOTIFS = [
       drawClosedLoop(p, wedgeBandPoints(334, 400, p.step * 0.40, 14), 2.4);
       drawClosedLoop(p, rotatePoints(wedgeBandPoints(196, 326, p.step * 0.40, 14), p.step / 2), 2.4);
       drawClosedLoop(p, petalPoints(48, 186, p.step * 0.44), 2.2);
+    }
+  },
+  {
+    id: 'formenreigen', world: 'kids', axes: 8,
+    name: 'Formenreigen', note: 'Kindergarten – runde und eckige Felder',
+    build: function (p) {
+      drawRing(p, 320, 2.6);
+      drawRing(p, 220, 2.6);
+      drawRing(p, 130, 2.6);
+      drawClosedLoop(p, petalPoints(322, 400, p.step * 0.42, 24), 3);
+      drawClosedLoop(p, rotatePoints(diamondPoints(224, 316, p.step * 0.44), p.step / 2), 3);
+      drawClosedLoop(p, wedgeBandPoints(134, 216, p.step * 0.34, 14), 3);
+      drawDotAccent(p, 88, 18, 3);
     }
   },
   {
@@ -1249,11 +1363,12 @@ function keepWork() {
     title: state.motif ? state.motif.name : 'Freies Blatt',
     motif: state.motif ? state.motif.name : 'Leeres Blatt',
     created: Date.now(),
+    person: currentPerson().id,
     thumb: composeImage(280).toDataURL('image/png'),
     full: composeImage(1200).toDataURL('image/png')
   };
 
-  Gallery.put(work).then(function () {
+  return Gallery.put(work).then(function () {
     say(Gallery.persistent
       ? 'In die Galerie gelegt.'
       : 'In die Galerie gelegt – bleibt aber nur, solange die Seite offen ist.');
@@ -1265,8 +1380,12 @@ function keepWork() {
 
 function refreshGallery() {
   return Gallery.all().then(function (works) {
-    works.sort(function (a, b) { return b.created - a.created; });
-    state.works = works;
+    /* Werke aus der Zeit vor den Personen gehören der ersten Person. */
+    const own = works.filter(function (w) {
+      return (w.person || people()[0].id) === currentPerson().id;
+    });
+    own.sort(function (a, b) { return b.created - a.created; });
+    state.works = own;
     renderWorks();
   });
 }
@@ -1338,20 +1457,145 @@ function downloadWork() {
 }
 
 function fileName(title, stamp) {
-  const slug = ((state.owner ? state.owner + ' ' : '') + title).toLowerCase()
+  const name = currentPerson().name;
+  const slug = ((name ? name + ' ' : '') + title).toLowerCase()
     .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mandala';
   return 'mandala-' + slug + '-' + new Date(stamp).toISOString().slice(0, 10) + '.png';
 }
 
-/* Personalisierung: Die Galerie darf einen Namen tragen. Er bleibt auf dem
-   Gerät, wird nirgends hingeschickt und taucht in gespeicherten Dateinamen
-   wieder auf – mehr Personalisierung braucht es hier nicht. */
-function setOwner(name) {
-  state.owner = (name || '').trim().slice(0, 28);
-  Store.set('owner', state.owner);
-  ui.galleryHead.textContent = state.owner ? 'Galerie von ' + state.owner : 'Galerie';
-  if (ui.owner.value !== state.owner) ui.owner.value = state.owner;
+/* Personen: eine dünne Ebene über der Galerie. Kein Konto, kein Bild, keine
+   Punkte – nur ein Name, damit sich mehrere Leute auf einem iPad nicht in die
+   Bilder malen. Alles bleibt auf dem Gerät. */
+function people() {
+  if (!state.people.length) state.people = [{ id: 'p1', name: '' }];
+  return state.people;
+}
+
+function currentPerson() {
+  return people().filter(function (p) { return p.id === state.person; })[0] || people()[0];
+}
+
+function savePeople() {
+  Store.set('people', state.people);
+  Store.set('person', currentPerson().id);
+}
+
+function addPerson() {
+  const person = { id: 'p' + Date.now().toString(36), name: '' };
+  state.people.push(person);
+  state.person = person.id;
+  savePeople();
+  renderPeople();
+  refreshGallery();
+  ui.owner.focus();
+}
+
+function renamePerson(name) {
+  currentPerson().name = (name || '').trim().slice(0, 28);
+  savePeople();
+  renderPeople();
+}
+
+function selectPerson(id) {
+  if (id === '+') { addPerson(); return; }
+  state.person = id;
+  savePeople();
+  renderPeople();
+  refreshGallery();
+}
+
+function renderPeople() {
+  const person = currentPerson();
+  state.person = person.id;
+  ui.galleryHead.textContent = person.name ? 'Galerie von ' + person.name : 'Galerie';
+  if (ui.owner.value !== person.name) ui.owner.value = person.name;
+
+  ui.personSelect.textContent = '';
+  people().forEach(function (p, i) {
+    const option = document.createElement('option');
+    option.value = p.id;
+    option.textContent = p.name || 'Ohne Namen ' + (i + 1);
+    if (p.id === person.id) option.selected = true;
+    ui.personSelect.appendChild(option);
+  });
+  const add = document.createElement('option');
+  add.value = '+';
+  add.textContent = '＋ Neue Person';
+  ui.personSelect.appendChild(add);
+}
+
+/* Sicherung: eine Datei, die das Atelier enthält. Zugleich der Weg auf ein
+   zweites Gerät – ohne sie ist alles weg, sobald jemand die Browserdaten
+   löscht. */
+function saveBackup() {
+  Gallery.all().then(function (works) {
+    const backup = {
+      app: 'mandala-atelier',
+      version: 1,
+      exported: new Date().toISOString(),
+      people: state.people,
+      ownPalette: ownPalette().colors,
+      works: works
+    };
+    const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'mandala-atelier-sicherung-' +
+      new Date().toISOString().slice(0, 10) + '.json';
+    link.href = url;
+    link.click();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    say(works.length + (works.length === 1 ? ' Werk gesichert.' : ' Werke gesichert.'));
+  });
+}
+
+function loadBackup(file) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    let backup;
+    try {
+      backup = JSON.parse(reader.result);
+    } catch (err) {
+      say('Die Datei ließ sich nicht lesen.');
+      return;
+    }
+    if (!backup || backup.app !== 'mandala-atelier' || !Array.isArray(backup.works)) {
+      say('Das ist keine Sicherung des Mandala Ateliers.');
+      return;
+    }
+
+    /* Zusammenführen statt ersetzen – vorhandene Werke bleiben. */
+    (backup.people || []).forEach(function (person) {
+      if (!state.people.some(function (p) { return p.id === person.id; })) {
+        state.people.push(person);
+      }
+    });
+    savePeople();
+
+    if (Array.isArray(backup.ownPalette) && backup.ownPalette.length === OWN_DEFAULT.length) {
+      ownPalette().colors = backup.ownPalette;
+      Store.set('ownPalette', backup.ownPalette);
+      buildPalette();
+    }
+
+    Gallery.all().then(function (existing) {
+      const known = {};
+      existing.forEach(function (w) { known[w.id] = true; });
+      const fresh = backup.works.filter(function (w) { return !known[w.id]; });
+      return fresh.reduce(function (chain, work) {
+        return chain.then(function () { return Gallery.put(work); });
+      }, Promise.resolve()).then(function () {
+        renderPeople();
+        return refreshGallery().then(function () {
+          say(fresh.length
+            ? fresh.length + (fresh.length === 1 ? ' Werk eingelesen.' : ' Werke eingelesen.')
+            : 'Alles aus der Sicherung war schon vorhanden.');
+        });
+      });
+    });
+  };
+  reader.readAsText(file);
 }
 
 function setGallery(open) {
@@ -1406,6 +1650,13 @@ function cacheUi() {
   ui.works        = document.getElementById('works');
   ui.galleryHead  = document.getElementById('gallery-title');
   ui.owner        = document.getElementById('gallery-owner');
+  ui.personSelect = document.getElementById('person-select');
+  ui.mixer        = document.getElementById('mixer');
+  ui.mixColor     = document.getElementById('mix-color');
+  ui.print        = document.getElementById('btn-print');
+  ui.backupSave   = document.getElementById('btn-backup-save');
+  ui.backupLoad   = document.getElementById('btn-backup-load');
+  ui.backupFile   = document.getElementById('backup-file');
   ui.viewer       = document.getElementById('viewer');
   ui.viewerImage  = document.getElementById('viewer-image');
   ui.viewerTitle  = document.getElementById('viewer-title');
@@ -1470,6 +1721,35 @@ function buildPalette() {
 /* Farbwelt wechseln. Bereits gefärbte Flächen behalten ihre Farbe – der
    Wechsel betrifft nur, womit ab jetzt gemalt wird. Die Farblegende der
    Zählmandalas wird neu vergeben. */
+function ownPalette() {
+  return PALETTES.filter(function (p) { return p.custom; })[0];
+}
+
+function loadOwnPalette() {
+  const stored = Store.get('ownPalette', null);
+  if (Array.isArray(stored) && stored.length === OWN_DEFAULT.length) {
+    ownPalette().colors = stored.map(function (c, i) {
+      return { name: c.name || OWN_DEFAULT[i].name, hex: c.hex || OWN_DEFAULT[i].hex };
+    });
+  }
+}
+
+/* Ein Pigment der eigenen Farbwelt umfärben. */
+function mixPigment(hex) {
+  const own = ownPalette();
+  const index = own.colors.reduce(function (found, c, i) {
+    return c.hex === state.color ? i : found;
+  }, -1);
+  if (index < 0) return;
+  own.colors[index] = { name: 'Eigen ' + (index + 1), hex: hex };
+  Store.set('ownPalette', own.colors);
+  state.color = hex;
+  buildPalette();
+  if (state.fields) state.legend = makeLegend(state.motif, state.fields);
+  renderLegend();
+  syncUI();
+}
+
 function setPalette(id) {
   const before = pigments();
   const index = before.reduce(function (found, p, i) {
@@ -1599,6 +1879,73 @@ function preferredTheme() {
   return dark ? 'dunkel' : 'hell';
 }
 
+/* Druckbogen: die App gibt Arbeit an Papier zurück. Ohne Hilfsraster, auf
+   A4, wahlweise nur die Linien (zum Ausmalen mit echten Stiften) oder das
+   fertige Werk. Gedruckt wird immer auf hellem Grund, auch im Dunkelmodus. */
+function printSheet() {
+  const withColour = window.confirm(
+    'Druckbogen erstellen.\n\n' +
+    'OK: mit den gesetzten Farben\n' +
+    'Abbrechen: nur die Linien zum Ausmalen'
+  );
+
+  const size = 1600;
+  const out = document.createElement('canvas');
+  out.width = size;
+  out.height = size;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = THEMES.hell.paper;
+  ctx.fillRect(0, 0, size, size);
+  if (withColour) ctx.drawImage(layers.fill.canvas, 0, 0, size, size);
+
+  /* Im Dunkelmodus sind die Linien hell – fürs Papier umgefärbt. */
+  const lines = document.createElement('canvas');
+  lines.width = size;
+  lines.height = size;
+  const lineCtx = lines.getContext('2d');
+  ['motif', 'draw', 'label'].forEach(function (name) {
+    lineCtx.drawImage(layers[name].canvas, 0, 0, size, size);
+  });
+  if (state.theme === 'dunkel') {
+    lineCtx.globalCompositeOperation = 'source-in';
+    lineCtx.fillStyle = THEMES.hell.ink;
+    lineCtx.fillRect(0, 0, size, size);
+  }
+  ctx.drawImage(lines, 0, 0);
+
+  const person = currentPerson().name;
+  const title = state.motif ? state.motif.name : 'Freies Blatt';
+  const frame = window.open('', '_blank');
+  if (!frame) {
+    say('Der Browser hat das Druckfenster blockiert.');
+    return;
+  }
+  frame.document.write(
+    '<!doctype html><html lang="de"><head><meta charset="utf-8">' +
+    '<title>' + title + '</title><style>' +
+    '@page { size: A4 portrait; margin: 14mm; }' +
+    'body { margin:0; font-family: system-ui, sans-serif; color:#242424;' +
+    ' display:flex; flex-direction:column; align-items:center; }' +
+    'h1 { font-size: 13pt; font-weight: 600; margin: 0 0 4mm; }' +
+    'p { font-size: 9pt; color:#6d6559; margin: 3mm 0 0; }' +
+    'img { width: 100%; max-width: 170mm; height: auto; }' +
+    '</style></head><body>' +
+    '<h1>' + escapeText(title) + (person ? ' – ' + escapeText(person) : '') + '</h1>' +
+    '<img src="' + out.toDataURL('image/png') + '" alt="">' +
+    '<p>Mandala Atelier</p>' +
+    '</body></html>'
+  );
+  frame.document.close();
+  frame.focus();
+  setTimeout(function () { frame.print(); }, 400);
+}
+
+function escapeText(text) {
+  return String(text).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+
 function setTheme(theme) {
   state.theme = THEMES[theme] ? theme : 'hell';
   document.documentElement.dataset.theme = state.theme;
@@ -1645,6 +1992,10 @@ function syncUI() {
   ui.mirror.checked = state.mirror;
   ui.guides.checked = state.guides;
   ui.width.value = state.width;
+  const own = ownPalette();
+  ui.mixer.hidden = state.palette !== own.id;
+  if (!ui.mixer.hidden) ui.mixColor.value = state.color;
+
   ui.undo.disabled = history.length === 0;
   ui.redo.disabled = future.length === 0;
 
@@ -1853,7 +2204,16 @@ function bindEvents() {
     setGallery(ui.gallery.hidden);
   });
   ui.galleryClose.addEventListener('click', function () { setGallery(false); });
-  ui.owner.addEventListener('input', function () { setOwner(ui.owner.value); });
+  ui.owner.addEventListener('input', function () { renamePerson(ui.owner.value); });
+  ui.personSelect.addEventListener('change', function () { selectPerson(ui.personSelect.value); });
+  ui.backupSave.addEventListener('click', saveBackup);
+  ui.backupLoad.addEventListener('click', function () { ui.backupFile.click(); });
+  ui.backupFile.addEventListener('change', function () {
+    if (ui.backupFile.files[0]) loadBackup(ui.backupFile.files[0]);
+    ui.backupFile.value = '';
+  });
+  ui.print.addEventListener('click', printSheet);
+  ui.mixColor.addEventListener('input', function () { mixPigment(ui.mixColor.value); });
 
   ui.works.addEventListener('click', function (event) {
     const tile = event.target.closest('.work');
@@ -1931,7 +2291,11 @@ function start() {
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
   setTheme(Store.get('theme', preferredTheme()));
-  setOwner(Store.get('owner', ''));
+  state.people = Store.get('people', [{ id: 'p1', name: Store.get('owner', '') }]);
+  state.person = Store.get('person', state.people[0].id);
+  loadOwnPalette();
+  buildPalette();
+  renderPeople();
   if (Store.get('quickCollapsed', false)) {
     document.body.classList.add('quick-collapsed');
     ui.quickCollapse.title = 'Leiste ausklappen';
@@ -1954,12 +2318,21 @@ window.MandalaAtelier = {
   MOTIFS: MOTIFS,
   WORLDS: WORLDS,
   PALETTES: PALETTES,
+  ownPalette: ownPalette,
   pigments: pigments,
   state: state,
   layers: layers,
   loadMotif: loadMotif,
   Gallery: Gallery,
   keepWork: keepWork,
+  setPalette: setPalette,
+  mixPigment: mixPigment,
+  addPerson: addPerson,
+  renamePerson: renamePerson,
+  selectPerson: selectPerson,
+  refreshGallery: refreshGallery,
+  saveBackup: saveBackup,
+  loadBackup: loadBackup,
   composeImage: composeImage,
   floodFill: floodFill,
   makeFields: makeFields,

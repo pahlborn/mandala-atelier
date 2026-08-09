@@ -544,6 +544,17 @@ body.is-quiet .stage { padding: 6px; }
   white-space: nowrap;
 }
 
+.owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
 .owner input {
   width: 11em;
   padding: 7px 10px;
@@ -555,7 +566,18 @@ body.is-quiet .stage { padding: 6px; }
 @media (max-width: 560px) {
   .overlay-head { flex-wrap: wrap; }
   .owner { width: 100%; margin-left: 0; }
-  .owner input { flex: 1; width: auto; }
+  .owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
+.owner input { flex: 1; width: auto; }
 }
 
 .overlay-body {
@@ -571,6 +593,32 @@ body.is-quiet .stage { padding: 6px; }
   margin: 12vh auto;
   text-align: center;
   color: var(--text-soft);
+}
+
+.overlay-foot {
+  margin-top: 26px;
+  border-top: 1px solid var(--edge);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  flex-wrap: wrap;
+}
+
+.overlay-foot p { margin: 0; max-width: 46em; font-size: 12.5px; color: var(--text-soft); }
+
+.overlay-actions { display: flex; gap: 8px; }
+.overlay-actions .action { width: auto; margin: 0; white-space: nowrap; }
+
+.mixer input[type="color"] {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  padding: 2px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }
 
 .works {
