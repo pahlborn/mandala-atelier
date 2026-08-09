@@ -307,6 +307,14 @@ body.is-turning #sheet { opacity: 0; }
 
 #stack-prev, #stack-next { font-size: 22px; line-height: 1; padding: 8px 14px; }
 
+/* Aufnehmen ist der gewöhnliche Weg, Verwerfen der seltene. Das darf man
+   sehen, ohne dass es laut wird. */
+#stack-take { font-weight: 600; }
+
+#stack-remove { color: var(--quiet); }
+#stack-remove.is-armed { color: #a4423a; font-weight: 600; }
+body[data-sheet='nacht'] #stack-remove.is-armed { color: #e08b7a; }
+
 /* ---------------------------------------------------------------------------
    Die Stille
 

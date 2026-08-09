@@ -79,7 +79,8 @@ const SAT_LIMIT   = 0.985;  // Dichte läuft asymptotisch, kippt nie
 const HINT_BASE = 0.030;
 
 const STILL_MS  = 40000;    // nach so langer Ruhe tritt die Bedienung ab
-const SAVE_MS   = 1500;     // Verzögerung, bis das Blatt still gesichert wird
+const SAVE_MS      = 700;   // Verzögerung, bis das Blatt still gesichert wird
+const LONG_SAVE_MS = 25000; // Sicherung auch mitten in einem langen Zug
 const GRAIN_DEADBAND = 0.05;   // Totgang beim Zurückrechnen der Dichte
 
 /* Das Blatt bewegen. Der Anschlag oben ist nicht willkürlich: Das Blatt hat
@@ -113,39 +114,136 @@ const MOVE_WAKE     = 3;      // ab so vielen Blatt-Einheiten reibt die Hand wir
    ------------------------------------------------------------------------- */
 
 const SHEETS = {
-  tag: {
-    paper: [246, 241, 231],
-    grain: 5.5,
-    blend: 'multiply',
-    pigments: [
-      { name: 'Terrakotta', rgb: [150,  74,  50] },
-      { name: 'Ocker',      rgb: [176, 128,  38] },
-      { name: 'Moos',       rgb: [ 62,  92,  56] },
-      { name: 'Petrol',     rgb: [ 38,  96,  98] },
-      { name: 'Indigo',     rgb: [ 52,  68, 118] },
-      { name: 'Pflaume',    rgb: [ 96,  54,  84] },
-      { name: 'Krapp',      rgb: [154,  56,  48] },
-      { name: 'Walnuss',    rgb: [ 98,  70,  48] },
-      { name: 'Ruß',        rgb: [ 46,  44,  42] }
+  tag:   { paper: [246, 241, 231], grain: 5.5, blend: 'multiply', chalk: false },
+  nacht: { paper: [ 39,  36,  32], grain: 4.5, blend: 'screen',   chalk: true  }
+};
+
+/* Die vier Farbwelten des Mandala Ateliers, unverändert übernommen – ihre
+   Stimmung ist das eigentliche Kapital. Neun je Welt statt vierzehn: Der
+   Griff soll aus dem Handgelenk kommen, nicht aus einer Abwägung.
+
+   Gewählt wird die Welt nicht. Sie gehört zum Blatt, so wie das Relief:
+   Man setzt sich an einen Tisch, auf dem heute die Erdpigmente liegen, und
+   morgen liegt Nordlicht da. Eine Auswahl wäre eine Entscheidung vor dem
+   ersten Strich; ein gedeckter Tisch ist keine. Wer eine andere Stimmung
+   will, nimmt ein neues Blatt. */
+const WORLDS = [
+  {
+    id: 'erde', name: 'Erdpigmente',
+    colors: [
+      { name: 'Terrakotta', hex: '#b5654a' },
+      { name: 'Ocker',      hex: '#c89b3c' },
+      { name: 'Olive',      hex: '#6e7233' },
+      { name: 'Moos',       hex: '#3f5b3a' },
+      { name: 'Petrol',     hex: '#2e6b6b' },
+      { name: 'Indigo',     hex: '#3b4b7c' },
+      { name: 'Pflaume',    hex: '#6b3c5b' },
+      { name: 'Rost',       hex: '#8c4a2f' },
+      { name: 'Anthrazit',  hex: '#333a3f' }
     ]
   },
-  nacht: {
-    paper: [39, 36, 32],
-    grain: 4.5,
-    blend: 'screen',
-    pigments: [
-      { name: 'Rosé',       rgb: [226, 158, 132] },
-      { name: 'Stroh',      rgb: [232, 198, 122] },
-      { name: 'Flechte',    rgb: [162, 196, 152] },
-      { name: 'Gletscher',  rgb: [156, 204, 206] },
-      { name: 'Eisblau',    rgb: [150, 172, 222] },
-      { name: 'Malve',      rgb: [196, 156, 200] },
-      { name: 'Koralle',    rgb: [230, 140, 128] },
-      { name: 'Sand',       rgb: [216, 196, 168] },
-      { name: 'Kreide',     rgb: [240, 236, 226] }
+  {
+    id: 'nord', name: 'Nordlicht',
+    colors: [
+      { name: 'Eisblau',    hex: '#6f9fb5' },
+      { name: 'Fjord',      hex: '#4a7a78' },
+      { name: 'Tanne',      hex: '#2f4a3c' },
+      { name: 'Flechte',    hex: '#8aa38c' },
+      { name: 'Amethyst',   hex: '#5b5580' },
+      { name: 'Heidekraut', hex: '#8d7fa0' },
+      { name: 'Beere',      hex: '#7a3f52' },
+      { name: 'Tiefsee',    hex: '#1f4a5c' },
+      { name: 'Polarnacht', hex: '#23304a' }
+    ]
+  },
+  {
+    id: 'faerber', name: 'Färbergarten',
+    colors: [
+      { name: 'Krapp',         hex: '#a4423a' },
+      { name: 'Safran',        hex: '#d59b3a' },
+      { name: 'Färberginster', hex: '#9a9d4a' },
+      { name: 'Waid',          hex: '#34527a' },
+      { name: 'Indigo tief',   hex: '#26365e' },
+      { name: 'Cochenille',    hex: '#8e3550' },
+      { name: 'Malve',         hex: '#7d5570' },
+      { name: 'Walnuss',       hex: '#6b4a33' },
+      { name: 'Rinde',         hex: '#4a3527' }
+    ]
+  },
+  {
+    id: 'rauch', name: 'Rauchglas',
+    colors: [
+      { name: 'Altrosa',    hex: '#a3807c' },
+      { name: 'Schilf',     hex: '#8b8f7c' },
+      { name: 'Farn',       hex: '#61694f' },
+      { name: 'Taubenblau', hex: '#78838c' },
+      { name: 'Mauve',      hex: '#8b7480' },
+      { name: 'Trüffel',    hex: '#6a5b52' },
+      { name: 'Kastanie',   hex: '#55403a' },
+      { name: 'Zinn',       hex: '#575c60' },
+      { name: 'Basalt',     hex: '#3b3b3d' }
     ]
   }
-};
+];
+
+function hexRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/* Dieselbe Welt als Kreide auf getöntem Papier. Nicht von Hand ein zweites
+   Mal ausgesucht, sondern abgeleitet: Farbton bleibt, Helligkeit steigt,
+   Buntheit wird leicht zurückgenommen. So bleibt die Stimmung einer Welt
+   bei Tag und bei Nacht dieselbe, und der dunkelste Pigmentstift wird
+   ganz von selbst zum hellsten – die Kreide. */
+function asChalk(rgb) {
+  const r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+
+  let h = 0, sat = 0;
+  if (d > 0) {
+    sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r)      h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else                h = ((r - g) / d + 4) / 6;
+  }
+
+  const L = 0.74;
+  const S = Math.min(0.46, sat * 0.92);
+  if (S === 0) return [Math.round(L * 255), Math.round(L * 255), Math.round(L * 255)];
+
+  const q = L < 0.5 ? L * (1 + S) : L + S - L * S;
+  const pp = 2 * L - q;
+  const chan = function (t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return pp + (q - pp) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return pp + (q - pp) * (2 / 3 - t) * 6;
+    return pp;
+  };
+  return [
+    Math.round(chan(h + 1 / 3) * 255),
+    Math.round(chan(h) * 255),
+    Math.round(chan(h - 1 / 3) * 255)
+  ];
+}
+
+/* Welche Welt auf einem Blatt liegt, steckt im Seed – aber in einem eigenen
+   Zweig davon, damit sie nicht mit der Zähligkeit des Reliefs mitwandert. */
+function worldFor(seed) {
+  return WORLDS[Math.floor(mulberry32((seed ^ 0x9e3779b9) >>> 0)() * WORLDS.length)];
+}
+
+function pigmentsOf(world, mode) {
+  const chalk = SHEETS[mode].chalk;
+  return world.colors.map(function (c) {
+    const rgb = hexRgb(c.hex);
+    return { name: c.name, rgb: chalk ? asChalk(rgb) : rgb };
+  });
+}
 
 
 /* ---------------------------------------------------------------------------
@@ -673,6 +771,8 @@ function clamp255(v) {
 
 const sheet = {
   plan: null,
+  world: null,
+  pigments: null,
   relief: null,
   dens: null,
   pix: null,
@@ -1238,6 +1338,7 @@ function frame(now) {
   }
 
   tickStillness(now);
+  tickSave(now);
 }
 
 function applyHand(dt) {
@@ -1387,10 +1488,22 @@ const Speicher = {
 };
 
 let saveTimer = 0;
+let saving = false;
+let savedAt = 0;
 
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveCurrent, SAVE_MS);
+}
+
+/* Gesichert wird sonst nur, wenn die Hand kurz innehält. Wer eine Viertel-
+   stunde am Stück kreist, ohne abzusetzen, hätte bis dahin nichts auf der
+   Platte. Deshalb zusätzlich eine Langstreckensicherung – selten genug, dass
+   sie nicht stört, und ausdrücklich nur zwischen zwei Bildern. */
+function tickSave(now) {
+  if (saving || !sheet.touched || !Speicher.ok) return;
+  if (now - savedAt < LONG_SAVE_MS) return;
+  saveCurrent();
 }
 
 function snapshot() {
@@ -1404,13 +1517,53 @@ function snapshot() {
 }
 
 async function saveCurrent() {
-  if (!Speicher.ok || !sheet.touched) return;
+  if (!Speicher.ok || !sheet.touched || saving) return;
+  saving = true;
+  savedAt = performance.now();
+  try {
+    const blob = await snapshot();
+    if (!blob) return;
+    await Speicher.put('kv', {
+      blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
+      pigment: pigmentIndex, zeit: Date.now()
+    }, 'blatt');
+    savedAt = performance.now();
+  } finally {
+    saving = false;
+  }
+}
+
+/* Ein Blatt weglegen: als Ganzes auf den Stapel, mit allem, was es
+   wiederherstellbar macht. */
+async function shelveCurrent() {
+  if (!sheet.touched || !Speicher.ok) return false;
   const blob = await snapshot();
-  if (!blob) return;
-  await Speicher.put('kv', {
-    blob: blob, seed: sheet.seed, mode: sheet.mode,
-    pigment: pigmentIndex, zeit: Date.now()
-  }, 'blatt');
+  if (!blob) return false;
+  await Speicher.put('blaetter', {
+    id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
+    blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
+    zeit: Date.now()
+  });
+  return true;
+}
+
+/* Ein gesichertes Blatt wird wieder das laufende – beim Start und beim
+   Aufnehmen vom Stapel derselbe Weg. */
+async function adoptSheet(rec) {
+  makeSheet(rec.seed, rec.mode, rec.world);
+  buildPigments();
+  setPigment(rec.pigment || 0);
+
+  const img = await loadBitmap(rec.blob);
+  if (img) {
+    ctx.drawImage(img, 0, 0, SIZE, SIZE);
+    imageData = ctx.getImageData(0, 0, SIZE, SIZE);
+    sheet.pix = imageData.data;
+    densityFromPixels();
+    sheet.touched = true;
+  }
+  paint();
+  return !!img;
 }
 
 /* Dichte aus der Helligkeit zurückrechnen. */
@@ -1462,13 +1615,13 @@ let pigmentIndex = 0;
 const ui = {};
 
 function current() {
-  return sheet.look.pigments[pigmentIndex];
+  return sheet.pigments[pigmentIndex];
 }
 
 function buildPigments() {
   const strip = ui.pigments;
   strip.innerHTML = '';
-  sheet.look.pigments.forEach(function (pig, i) {
+  sheet.pigments.forEach(function (pig, i) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'pigment';
@@ -1481,7 +1634,7 @@ function buildPigments() {
 }
 
 function setPigment(i) {
-  pigmentIndex = Math.max(0, Math.min(sheet.look.pigments.length - 1, i));
+  pigmentIndex = Math.max(0, Math.min(sheet.pigments.length - 1, i));
   const all = ui.pigments.querySelectorAll('.pigment');
   for (let k = 0; k < all.length; k++) {
     all[k].setAttribute('aria-pressed', k === pigmentIndex ? 'true' : 'false');
@@ -1531,6 +1684,7 @@ function showStackItem() {
   ui.stackPrev.disabled = empty || stack.at <= 0;
   ui.stackNext.disabled = empty || stack.at >= stack.items.length - 1;
   ui.stackRemove.hidden = empty;
+  ui.stackTake.hidden = empty;
   if (empty) return;
 
   if (stack.url) URL.revokeObjectURL(stack.url);
@@ -1543,6 +1697,36 @@ function stepStack(delta) {
   if (next < 0 || next >= stack.items.length) return;
   stack.at = next;
   showStackItem();
+}
+
+/* Ein Blatt vom Stapel wieder aufnehmen. Es wird das laufende Blatt, und
+   das bisherige wandert dafür auf den Stapel – zwei Blätter tauschen die
+   Plätze. Kein Speichern, kein Laden, kein Dialog; auf dem Tisch tut man
+   genau das, wenn man ein liegengebliebenes Blatt wieder hervorholt.
+
+   Die Reihenfolge ist Absicht: erst das laufende Blatt in Sicherheit
+   bringen, dann das andere holen, und erst wenn das geglückt ist, den
+   alten Eintrag entfernen. Bricht etwas dazwischen ab, liegt schlimmsten-
+   falls ein Blatt doppelt – aber keines fehlt. */
+async function takeStackItem() {
+  if (!stack.items.length) return;
+  const item = stack.items[stack.at];
+
+  clearTimeout(saveTimer);
+  await shelveCurrent();
+
+  document.body.classList.add('is-turning');
+  await new Promise(function (r) { setTimeout(r, 260); });
+
+  const ok = await adoptSheet(item);
+  document.body.classList.remove('is-turning');
+
+  if (ok) {
+    await Speicher.del('blaetter', item.id);
+    await saveCurrent();
+  }
+  closeStack();
+  awaken();
 }
 
 /* Das Verwerfen ist das einzige Endgültige in dieser App – überall sonst
@@ -1582,15 +1766,8 @@ async function removeStackItem() {
 /* Das laufende Blatt weglegen und ein frisches nehmen. */
 async function newSheet() {
   setTray(false);
-  if (sheet.touched && Speicher.ok) {
-    const blob = await snapshot();
-    if (blob) {
-      await Speicher.put('blaetter', {
-        id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
-        blob: blob, seed: sheet.seed, mode: sheet.mode, zeit: Date.now()
-      });
-    }
-  }
+  clearTimeout(saveTimer);
+  await shelveCurrent();
   await Speicher.del('kv', 'blatt');
 
   document.body.classList.add('is-turning');
@@ -1655,10 +1832,18 @@ function hintStrength() {
 }
 
 /* Baut Relief, Papier und Puffer für ein Blatt. */
-function makeSheet(seed, mode) {
+function makeSheet(seed, mode, worldId) {
   sheet.seed   = seed >>> 0;
   sheet.mode   = SHEETS[mode] ? mode : 'tag';
   sheet.look   = SHEETS[sheet.mode];
+
+  /* Die Welt steckt im Seed. Gesicherte Blätter tragen sie zusätzlich bei
+     sich: Käme später eine Welt dazu, verschöbe sich sonst die Farbe eines
+     Blattes, das längst gemalt ist. */
+  sheet.world = (worldId && WORLDS.filter(function (w) { return w.id === worldId; })[0])
+              || worldFor(sheet.seed);
+  sheet.pigments = pigmentsOf(sheet.world, sheet.mode);
+
   sheet.plan   = buildPlan(sheet.seed);
   sheet.relief = rasterRelief(sheet.plan);
 
@@ -1726,6 +1911,7 @@ function cacheUi() {
   ui.stackEmpty  = document.getElementById('stack-empty');
   ui.stackPrev   = document.getElementById('stack-prev');
   ui.stackNext   = document.getElementById('stack-next');
+  ui.stackTake   = document.getElementById('stack-take');
   ui.stackRemove = document.getElementById('stack-remove');
   ui.stackClose  = document.getElementById('stack-close');
   ui.hint        = document.getElementById('hint');
@@ -1756,6 +1942,7 @@ function bindUi() {
 
   ui.stackPrev.addEventListener('click', function () { stepStack(-1); });
   ui.stackNext.addEventListener('click', function () { stepStack(1); });
+  ui.stackTake.addEventListener('click', takeStackItem);
   ui.stackRemove.addEventListener('click', removeStackItem);
   ui.stackClose.addEventListener('click', closeStack);
 
@@ -1802,26 +1989,15 @@ async function start() {
   let resumed = null;
   if (stored) resumed = await Speicher.get('kv', 'blatt');
 
-  makeSheet(
-    resumed ? resumed.seed : (Math.random() * 4294967296) >>> 0,
-    resumed ? resumed.mode : preferredMode()
-  );
-
-  buildPigments();
-  setPigment(resumed ? (resumed.pigment || 0) : 0);
-
   if (resumed) {
-    const img = await loadBitmap(resumed.blob);
-    if (img) {
-      ctx.drawImage(img, 0, 0, SIZE, SIZE);
-      imageData = ctx.getImageData(0, 0, SIZE, SIZE);
-      sheet.pix = imageData.data;
-      densityFromPixels();
-      sheet.touched = true;
-    }
+    await adoptSheet(resumed);
+  } else {
+    makeSheet((Math.random() * 4294967296) >>> 0, preferredMode());
+    buildPigments();
+    setPigment(0);
+    paint();
   }
 
-  paint();
   fitSheet();
   bindUi();
   bindHand();
@@ -1860,7 +2036,10 @@ window.Blatt = {
   setViewForTest: function (scale, tx, ty) { stopViewAnim(); setView(scale, tx || 0, ty || 0); },
   viewHome: viewHome,
   buildPlan: buildPlan, fieldAt: fieldAt,
-  makeSheet: function (seed, mode) { makeSheet(seed, mode); buildPigments(); setPigment(0); paint(); },
+  WORLDS: WORLDS,
+  makeSheet: function (seed, mode, world) {
+    makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();
+  },
   setPigment: setPigment,
   rubPath: function (points, dwell, press) {
     const rgb = current().rgb;

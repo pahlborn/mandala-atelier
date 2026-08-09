@@ -293,6 +293,54 @@ async function run() {
   });
   prüfe('zweiter Kontakt malt nicht', ballen < 1e-6, 'Dichte ' + ballen.toExponential(1));
 
+  /* ---- Farbwelten ------------------------------------------------------- */
+  console.log('\nFarbwelten');
+  const welten = await page.evaluate(function () {
+    const B = window.Blatt;
+    const gesehen = {};
+    for (let i = 0; i < 400; i++) {
+      B.makeSheet(1000 + i * 7919, 'tag');
+      gesehen[B.sheet.world.id] = (gesehen[B.sheet.world.id] || 0) + 1;
+    }
+
+    /* Dieselbe Welt bei Tag und bei Nacht: gleicher Farbton, hellere Kreide. */
+    B.makeSheet(4242, 'tag');
+    const tag = B.sheet.pigments.map(function (p) { return p.name; }).join(',');
+    const tagHell = B.sheet.pigments.map(function (p) {
+      return (p.rgb[0] + p.rgb[1] + p.rgb[2]) / 3;
+    });
+    const welt = B.sheet.world.id;
+    B.makeSheet(4242, 'nacht');
+    const nacht = B.sheet.pigments.map(function (p) { return p.name; }).join(',');
+    const nachtHell = B.sheet.pigments.map(function (p) {
+      return (p.rgb[0] + p.rgb[1] + p.rgb[2]) / 3;
+    });
+
+    /* Stabil: derselbe Seed muss dieselbe Welt ergeben. */
+    B.makeSheet(4242, 'tag');
+    const nochmal = B.sheet.world.id;
+
+    let heller = 0;
+    for (let i = 0; i < tagHell.length; i++) if (nachtHell[i] > tagHell[i]) heller++;
+
+    return {
+      anzahl: Object.keys(gesehen).length,
+      verteilung: gesehen,
+      gleich: tag === nacht,
+      heller: heller,
+      welt: welt,
+      stabil: welt === nochmal,
+      alle: B.WORLDS.length
+    };
+  });
+  prüfe('alle Farbwelten kommen vor', welten.anzahl === welten.alle,
+        Object.keys(welten.verteilung).join(', '));
+  prüfe('die Welt hängt am Blatt, nicht am Zufall', welten.stabil,
+        'Seed 4242 → ' + welten.welt);
+  prüfe('Tag und Nacht sind dieselbe Welt', welten.gleich);
+  prüfe('bei Nacht wird daraus Kreide', welten.heller === 9,
+        welten.heller + ' von 9 Pigmenten heller');
+
   /* ---- Die zweite Hand -------------------------------------------------- */
   console.log('\nDie zweite Hand');
 
@@ -431,6 +479,62 @@ async function run() {
       ? 'ok' : 'FEHLT';
     prüfe('Blatt überlebt den Neustart', fortsetzen === 'ok',
           'Dichte ' + vorher.dichte.toExponential(1) + ' → ' + nachher.dichte.toExponential(1));
+
+    /* Der ganze Kreislauf: weglegen, wiederfinden, aufnehmen, weitermalen. */
+    console.log('\nWeglegen und wiederaufnehmen');
+    const altSeed = nachher.seed;
+    const altDichte = nachher.dichte;
+
+    await p2.click('#mark');
+    await p2.click('#tray-new');
+    await p2.waitForFunction(function (alt) {
+      return window.Blatt.sheet.seed !== alt;
+    }, altSeed, { timeout: 10000 });
+    const frisch = await p2.evaluate(function () {
+      return { seed: window.Blatt.sheet.seed, dichte: window.Blatt.meanDensity() };
+    });
+    prüfe('„Neues Blatt“ bringt ein leeres', frisch.seed !== altSeed && frisch.dichte < 1e-6);
+
+    await p2.click('#mark');
+    await p2.click('#tray-stack');
+    await p2.waitForTimeout(500);
+    const imStapel = await p2.evaluate(function () {
+      return {
+        sichtbar: !document.getElementById('stack').hidden,
+        aufnehmen: !document.getElementById('stack-take').hidden,
+        leer: !document.getElementById('stack-empty').hidden
+      };
+    });
+    prüfe('das weggelegte Blatt liegt im Stapel',
+          imStapel.sichtbar && imStapel.aufnehmen && !imStapel.leer);
+
+    await p2.click('#stack-take');
+    await p2.waitForTimeout(1400);
+    const wieder = await p2.evaluate(function () {
+      return {
+        seed: window.Blatt.sheet.seed,
+        dichte: window.Blatt.meanDensity(),
+        welt: window.Blatt.sheet.world.id,
+        zu: document.getElementById('stack').hidden
+      };
+    });
+    prüfe('Aufnehmen holt genau dieses Blatt zurück',
+          wieder.seed === altSeed && wieder.dichte > altDichte * 0.4 && wieder.zu,
+          'Dichte ' + wieder.dichte.toExponential(1));
+
+    /* Und es lässt sich darauf weitermalen. */
+    const box2 = await p2.locator('#sheet').boundingBox();
+    await p2.mouse.move(box2.x + box2.width * 0.35, box2.y + box2.height * 0.62);
+    await p2.mouse.down();
+    for (let i = 0; i < 40; i++) {
+      await p2.mouse.move(box2.x + box2.width * (0.35 + i * 0.007), box2.y + box2.height * 0.62);
+    }
+    await p2.mouse.up();
+    await p2.waitForTimeout(200);
+    const weiter = await p2.evaluate(function () { return window.Blatt.meanDensity(); });
+    prüfe('auf dem aufgenommenen Blatt lässt sich weitermalen', weiter > wieder.dichte,
+          wieder.dichte.toExponential(1) + ' → ' + weiter.toExponential(1));
+
     await p2.close();
   } finally {
     server.close();

@@ -147,6 +147,38 @@ verschwindet, und nichts lässt sich zumatschen** — deshalb braucht es kein
 Rückgängig und keinen Radierer. Nicht als Strenge, sondern weil es keinen
 Zustand gibt, aus dem man gerettet werden müsste.
 
+## Die Farbwelten
+
+Die vier Farbwelten des Mandala Ateliers, unverändert übernommen –
+**Erdpigmente, Nordlicht, Färbergarten, Rauchglas**. Ihre Stimmung ist das
+eigentliche Kapital. Neun je Welt statt vierzehn: Der Griff soll aus dem
+Handgelenk kommen, nicht aus einer Abwägung.
+
+**Gewählt wird die Welt nicht.** Sie gehört zum Blatt, so wie das Relief, und
+steckt im Seed. Man setzt sich an einen Tisch, auf dem heute die Erdpigmente
+liegen; morgen liegt Nordlicht da. Eine Auswahl wäre eine Entscheidung vor
+dem ersten Strich, ein gedeckter Tisch ist keine – und Stifte sucht man sich
+auf einem fremden Tisch auch nicht aus. Wer eine andere Stimmung will, nimmt
+ein neues Blatt.
+
+Der Zweig des Seeds für die Welt ist ein anderer als der fürs Relief, sonst
+wanderte die Farbe mit der Zähligkeit mit. Gesicherte Blätter tragen ihre
+Welt zusätzlich bei sich: Käme später eine fünfte dazu, verschöbe sich sonst
+die Farbe eines längst gemalten Blattes.
+
+**Die Kreide wird abgeleitet, nicht ein zweites Mal ausgesucht.** `asChalk()`
+behält den Farbton, hebt die Helligkeit und nimmt die Buntheit leicht zurück.
+So ist eine Welt bei Tag und bei Nacht dieselbe Welt – und der dunkelste
+Pigmentstift wird ganz von selbst zum hellsten, der Kreide.
+
+**Kein Weiß bei Tag.** Pigment liegt dort subtraktiv; ein weißer Stift hätte
+den Wert 255 und würde jede dunklere Stelle aufhellen. Er wäre ein Radierer
+mit anderem Namen, und es gibt auch kein harmloses Elfenbein – jedes Pigment,
+das heller ist als das, was daliegt, hellt auf. Gebraucht wird es ohnehin
+nicht: **In dieser App ist Weiß schon da. Es heißt „nicht reiben“.** Beim
+Nachtblatt dagegen ist Weiß ein vollwertiges Pigment, weil es dort auf
+getöntem Grund hinzufügt statt wegzunehmen.
+
 **Tag und Nacht sind kein Thema, sondern zwei Papiere.** Bei Tag helles
 Papier mit subtraktivem Pigment, bei Nacht getöntes Papier mit heller Kreide
 (dieselbe Rechnung, nur `screen` statt `multiply`). Welches ein Blatt ist,
@@ -191,8 +223,32 @@ Zügen gearbeitet wird.
 Atelier darf die bis zu 128 MB belegen. Hier gibt es sie nicht — eine
 philosophische Entscheidung mit angenehmem Nebeneffekt.
 
-**Speicher.** Das laufende Blatt wird entprellt in IndexedDB gesichert, als
-zusammengesetztes Bild plus Seed des Reliefs. Beim Fortsetzen wird die Dichte
+## Blätter weglegen und wieder aufnehmen
+
+Es gibt genau **ein laufendes Blatt**. Daneben liegt der **Stapel**.
+
+- **„Neues Blatt“** legt das laufende auf den Stapel und holt ein frisches.
+- **„Aufnehmen“** im Stapel macht ein früheres Blatt wieder zum laufenden –
+  das bisherige wandert dafür auf den Stapel. Zwei Blätter tauschen die
+  Plätze, so wie auf dem Tisch. Kein Speichern, kein Laden, kein Dialog.
+- **„Verwerfen“** ist die einzige Stelle in dieser App, an der wirklich
+  etwas verloren geht, und deshalb die einzige mit einer Rückfrage – ohne
+  Dialog: Der Knopf selbst fragt, wer danebentippt oder wartet, hat nichts
+  getan.
+
+Beim Aufnehmen ist die Reihenfolge Absicht: erst das laufende Blatt in
+Sicherheit bringen, dann das andere holen, und erst wenn das geglückt ist,
+den alten Eintrag entfernen. Bricht etwas dazwischen ab, liegt schlimmsten-
+falls ein Blatt doppelt – aber keines fehlt.
+
+Wiederhergestellt wird über **einen** Weg, `adoptSheet()`, den sich Start und
+Aufnehmen teilen.
+
+**Speicher.** Das laufende Blatt wird 700 ms nach jedem Strich in IndexedDB
+gesichert, als zusammengesetztes Bild plus Seed, Papierzustand und Welt.
+Dazu eine **Langstreckensicherung**: Wer eine Viertelstunde am Stück kreist,
+ohne abzusetzen, hätte sonst bis dahin nichts auf der Platte – deshalb
+zusätzlich alle 25 Sekunden, ausdrücklich nur zwischen zwei Bildern. Beim Fortsetzen wird die Dichte
 aus der Helligkeit zurückgerechnet — eine Näherung, aber eine ehrliche: Das
 Blatt erinnert sich an das, was man sieht. Ein Totgang (`GRAIN_DEADBAND`)
 sorgt dafür, dass Papierkorn und Randabschattung nicht als Pigment gelesen
