@@ -341,6 +341,96 @@ async function run() {
   prüfe('bei Nacht wird daraus Kreide', welten.heller === 9,
         welten.heller + ' von 9 Pigmenten heller');
 
+  /* ---- Die Blattlade ---------------------------------------------------- */
+  console.log('\nDie Blattlade');
+
+  const charaktere = await page.evaluate(function () {
+    const B = window.Blatt;
+
+    /* Ohne Charakter muss der Bauplan genau der alte bleiben – sonst bekäme
+       ein Blatt von früher beim Wiederaufnehmen ein anderes Relief. */
+    const ohneA = B.buildPlan(4242);
+    const ohneB = B.buildPlan(4242);
+    const stabil = ohneA.n === ohneB.n && ohneA.bands.length === ohneB.bands.length;
+
+    /* Und die Charaktere müssen sich messbar unterscheiden. */
+    const profil = {};
+    B.KINDS.forEach(function (k) {
+      let achsen = 0, baender = 0;
+      for (let i = 0; i < 60; i++) {
+        const plan = B.buildPlan(9000 + i * 137, k.id);
+        achsen += plan.n;
+        baender += plan.bands.length;
+      }
+      profil[k.id] = { n: achsen / 60, b: baender / 60 };
+    });
+    return { stabil: stabil, profil: profil, namen: B.KINDS.map(function (k) { return k.name; }) };
+  });
+  prüfe('vier Charaktere', charaktere.namen.length === 4, charaktere.namen.join(' · '));
+  prüfe('ohne Charakter bleibt der Bauplan der alte', charaktere.stabil);
+  prüfe('Ruhe ist ruhiger als Fülle',
+        charaktere.profil.ruhe.n < charaktere.profil.fuelle.n &&
+        charaktere.profil.ruhe.b < charaktere.profil.fuelle.b,
+        'Achsen ' + charaktere.profil.ruhe.n.toFixed(1) + ' gegen ' +
+        charaktere.profil.fuelle.n.toFixed(1) + ', Bänder ' +
+        charaktere.profil.ruhe.b.toFixed(1) + ' gegen ' + charaktere.profil.fuelle.b.toFixed(1));
+
+  const ladeAuf = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.openLade();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    return {
+      offen: !document.getElementById('lade').hidden,
+      kategorien: document.querySelectorAll('.lade-kind').length,
+      welten: document.querySelectorAll('.lade-world').length,
+      blaetter: document.querySelectorAll('.lade-sheet canvas').length,
+      gemalt: Array.prototype.every.call(
+        document.querySelectorAll('.lade-sheet canvas'),
+        function (cv) {
+          const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+          let min = 255, max = 0;
+          for (let k = 0; k < d.length; k += 4 * 37) {
+            const l = (d[k] + d[k + 1] + d[k + 2]) / 3;
+            if (l < min) min = l;
+            if (l > max) max = l;
+          }
+          return max - min > 25;
+        })
+    };
+  });
+  prüfe('die Lade zeigt Stimmung, Pigmente und Blätter',
+        ladeAuf.offen && ladeAuf.kategorien === 4 && ladeAuf.welten === 4 && ladeAuf.blaetter === 6,
+        ladeAuf.kategorien + ' Stimmungen, ' + ladeAuf.welten + ' Welten, ' + ladeAuf.blaetter + ' Blätter');
+  prüfe('die Ausschnitte zeigen wirklich etwas', ladeAuf.gemalt);
+
+  const gewechselt = await page.evaluate(async function () {
+    const B = window.Blatt;
+    const vorher = B.lade.world.id;
+    const andere = B.WORLDS.filter(function (w) { return w.id !== vorher; })[0];
+    document.querySelector('.lade-world[data-world="' + andere.id + '"]').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    const nachher = B.lade.world.id;
+
+    document.querySelector('.lade-kind[data-kind="fuelle"]').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    const stimmung = B.lade.kind.id;
+
+    const seed = Number(document.querySelector('.lade-sheet').dataset.seed) >>> 0;
+    document.querySelector('.lade-sheet').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    return {
+      welt: nachher === andere.id,
+      stimmung: stimmung === 'fuelle',
+      genommen: B.sheet.seed === seed &&
+                B.sheet.world.id === nachher &&
+                B.sheet.kind && B.sheet.kind.id === 'fuelle',
+      zu: document.getElementById('lade').hidden
+    };
+  });
+  prüfe('die Farbwelt lässt sich wählen', gewechselt.welt);
+  prüfe('die Stimmung lässt sich wählen', gewechselt.stimmung);
+  prüfe('das gewählte Blatt kommt genau so', gewechselt.genommen && gewechselt.zu);
+
   /* ---- Die zweite Hand -------------------------------------------------- */
   console.log('\nDie zweite Hand');
 
@@ -406,6 +496,67 @@ async function run() {
         Math.abs(zurueck.scale - 1) < 0.01 &&
         Math.abs(zurueck.tx) < 1 && Math.abs(zurueck.ty) < 1,
         'Maßstab ' + zurueck.scale.toFixed(2));
+
+  /* ---- Landet die Farbe unter dem Finger? ------------------------------- */
+  console.log('\nDie Farbe unter dem Finger');
+  const treffer = await page.evaluate(async function () {
+    const B = window.Blatt;
+    const faelle = [
+      { scale: 1,   tx: 0,   ty: 0,  resize: false },
+      { scale: 2,   tx: 0,   ty: 0,  resize: false },
+      { scale: 2,   tx: 120, ty: 60, resize: false },
+      { scale: 2,   tx: 120, ty: 60, resize: true  },
+      { scale: 1.6, tx: -90, ty: 40, resize: true  }
+    ];
+    const out = [];
+
+    for (const f of faelle) {
+      B.makeSheet(4242, 'tag');
+      B.setViewForTest(f.scale, f.tx, f.ty);
+      if (f.resize) window.dispatchEvent(new Event('resize'));
+      await new Promise(function (r) { requestAnimationFrame(r); });
+
+      const cv = document.getElementById('sheet');
+      const box = cv.getBoundingClientRect();
+      const px = box.left + box.width * 0.62;
+      const py = box.top + box.height * 0.38;
+      const sollX = ((px - box.left) / box.width) * B.SIZE;
+      const sollY = ((py - box.top) / box.height) * B.SIZE;
+
+      const mach = function (t, x, y) {
+        cv.dispatchEvent(new PointerEvent(t, {
+          pointerId: 9, isPrimary: true, pointerType: 'touch',
+          clientX: x, clientY: y, bubbles: true, cancelable: true, pressure: 0.7
+        }));
+      };
+      mach('pointerdown', px, py);
+      for (let i = 1; i <= 22; i++) {
+        mach('pointermove', px + i * 1.4, py + i * 0.9);
+        await new Promise(function (r) { setTimeout(r, 12); });
+      }
+      await new Promise(function (r) { setTimeout(r, 120); });
+      mach('pointerup', px + 31, py + 20);
+
+      let sx = 0, sy = 0, n = 0;
+      const d = B.sheet.dens, S = B.SIZE;
+      for (let y = 0; y < S; y += 2) {
+        for (let x = 0; x < S; x += 2) {
+          const v = d[y * S + x];
+          if (v > 0.004) { sx += x * v; sy += y * v; n += v; }
+        }
+      }
+      out.push({
+        wie: 'Maßstab ' + f.scale + (f.tx ? ', verschoben' : '') + (f.resize ? ', nach resize' : ''),
+        versatz: n ? Math.hypot(sx / n - sollX, sy / n - sollY) : Infinity
+      });
+    }
+    B.setViewForTest(1, 0, 0);
+    return out;
+  });
+  treffer.forEach(function (t) {
+    prüfe('Farbe unter dem Finger', t.versatz < 12,
+          t.wie + ': ' + (isFinite(t.versatz) ? t.versatz.toFixed(0) + ' Einheiten daneben' : 'nichts gemalt'));
+  });
 
   /* ---- Was es nicht gibt ------------------------------------------------ */
   console.log('\nWas es nicht gibt');
@@ -487,13 +638,16 @@ async function run() {
 
     await p2.click('#mark');
     await p2.click('#tray-new');
+    await p2.waitForSelector('.lade-sheet canvas', { timeout: 10000 });
+    await p2.waitForTimeout(600);
+    await p2.click('.lade-sheet');
     await p2.waitForFunction(function (alt) {
       return window.Blatt.sheet.seed !== alt;
     }, altSeed, { timeout: 10000 });
     const frisch = await p2.evaluate(function () {
       return { seed: window.Blatt.sheet.seed, dichte: window.Blatt.meanDensity() };
     });
-    prüfe('„Neues Blatt“ bringt ein leeres', frisch.seed !== altSeed && frisch.dichte < 1e-6);
+    prüfe('aus der Lade kommt ein leeres Blatt', frisch.seed !== altSeed && frisch.dichte < 1e-6);
 
     await p2.click('#mark');
     await p2.click('#tray-stack');

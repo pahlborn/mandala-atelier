@@ -46,6 +46,26 @@
 </div>
 
 <!-- ---------------------------------------------------------------
+     Die Blattlade. Sie erscheint nur, wenn man ein neues Blatt nimmt –
+     nie während der Arbeit. Man wählt mit den Augen: welche Pigmente
+     heute auf dem Tisch liegen sollen, und welches Blatt.
+
+     Von jedem Blatt ist nur ein Ausschnitt zu sehen. Genug, um den
+     Charakter zu erkennen, zu wenig, um das Mandala schon zu kennen.
+     --------------------------------------------------------------- -->
+<section class="lade" id="lade" aria-label="Ein neues Blatt nehmen" hidden>
+  <div class="lade-inner">
+    <div class="lade-kinds" id="lade-kinds" role="group" aria-label="Wonach ist dir heute"></div>
+    <div class="lade-worlds" id="lade-worlds" role="group" aria-label="Welche Pigmente"></div>
+    <div class="lade-sheets" id="lade-sheets" role="group" aria-label="Welches Blatt"></div>
+    <div class="lade-bar">
+      <button type="button" id="lade-more">Andere zeigen</button>
+      <button type="button" id="lade-close">Zurück</button>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------
      Der Stapel: ein Blatt nach dem anderen, nie nebeneinander.
      --------------------------------------------------------------- -->
 <section class="stack" id="stack" aria-label="Blätter" hidden>
