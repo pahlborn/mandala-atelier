@@ -49,8 +49,16 @@ const TAU    = Math.PI * 2;
 /* Stellschrauben des Auftrags. */
 const RATE        = 0.20;   // Pigment je Millisekunde Verweildauer je Pixel
 const DWELL_CAP   = 3.0;    // ms/px – deckelt das Stehenbleiben an einer Stelle
-const R_FINGER    = 52;     // Kontaktradius Finger, innere Pixel
-const R_PEN       = 30;     // Kontaktradius Stift
+/* Der Kontakt wird in Bildschirmpunkten gemessen, nicht in Blatt-Koordinaten.
+   Eine Fingerkuppe klebt am Glas, nicht am Bild: Sie ist rund zwölf Millimeter
+   breit, und daran ändert sich nichts, wenn man näher herangeht. Erst dadurch
+   hilft das Heranholen überhaupt beim Ausmalen kleiner Flächen – sonst wüchse
+   der Finger mit dem Papier mit.
+
+   Bei bildfüllender Ansicht ergeben diese Werte genau das, was vorher fest in
+   Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
+const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
+const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
 const GAMMA_LIGHT = 3.6;    // leichter/schneller Kontakt: fast nur die Höhen
 const GAMMA_FIRM  = 0.7;    // fester/langsamer Kontakt: greift bis in die Tiefen
 const MIX_SUB     = 0.5;    // wie subtraktiv Pigment über Pigment mischt
@@ -71,8 +79,26 @@ const SAT_LIMIT   = 0.985;  // Dichte läuft asymptotisch, kippt nie
 const HINT_BASE = 0.030;
 
 const STILL_MS  = 40000;    // nach so langer Ruhe tritt die Bedienung ab
-const SAVE_MS   = 1500;     // Verzögerung, bis das Blatt still gesichert wird
+const SAVE_MS      = 700;   // Verzögerung, bis das Blatt still gesichert wird
+const LONG_SAVE_MS = 25000; // Sicherung auch mitten in einem langen Zug
 const GRAIN_DEADBAND = 0.05;   // Totgang beim Zurückrechnen der Dichte
+
+/* Das Blatt bewegen. Der Anschlag oben ist nicht willkürlich: Das Blatt hat
+   1280 Punkte Kantenlänge, und jenseits von etwa dem Doppelten sieht man
+   nicht mehr Mandala, sondern das Raster. Bis dahin liest es sich als
+   Papierstruktur – so, wie man beim Naherangehen an echtes Papier Fasern
+   sieht und keine feineren Blüten. */
+const VIEW_MAX      = 2.2;
+const VIEW_RUBBER   = 0.35;   // wie weich es sich über die Grenzen ziehen lässt
+const VIEW_SNAP_MS  = 380;    // Zurückfedern nach dem Loslassen
+const VIEW_HOME_MS  = 1800;   // Zurücksinken in die Vollansicht bei Ruhe
+
+/* In den ersten Augenblicken gilt ein ruhender Finger als möglicher Beginn
+   einer Zwei-Finger-Geste und trägt noch kein Pigment auf. Man beginnt ein
+   Reiben mit einer Bewegung, nicht mit Warten – und ohne diese Frist bliebe
+   bei jedem Heranholen ein dunkler Punkt zurück. */
+const GESTURE_GRACE = 260;
+const MOVE_WAKE     = 3;      // ab so vielen Blatt-Einheiten reibt die Hand wirklich
 
 
 /* ---------------------------------------------------------------------------
@@ -88,39 +114,136 @@ const GRAIN_DEADBAND = 0.05;   // Totgang beim Zurückrechnen der Dichte
    ------------------------------------------------------------------------- */
 
 const SHEETS = {
-  tag: {
-    paper: [246, 241, 231],
-    grain: 5.5,
-    blend: 'multiply',
-    pigments: [
-      { name: 'Terrakotta', rgb: [150,  74,  50] },
-      { name: 'Ocker',      rgb: [176, 128,  38] },
-      { name: 'Moos',       rgb: [ 62,  92,  56] },
-      { name: 'Petrol',     rgb: [ 38,  96,  98] },
-      { name: 'Indigo',     rgb: [ 52,  68, 118] },
-      { name: 'Pflaume',    rgb: [ 96,  54,  84] },
-      { name: 'Krapp',      rgb: [154,  56,  48] },
-      { name: 'Walnuss',    rgb: [ 98,  70,  48] },
-      { name: 'Ruß',        rgb: [ 46,  44,  42] }
+  tag:   { paper: [246, 241, 231], grain: 5.5, blend: 'multiply', chalk: false },
+  nacht: { paper: [ 39,  36,  32], grain: 4.5, blend: 'screen',   chalk: true  }
+};
+
+/* Die vier Farbwelten des Mandala Ateliers, unverändert übernommen – ihre
+   Stimmung ist das eigentliche Kapital. Neun je Welt statt vierzehn: Der
+   Griff soll aus dem Handgelenk kommen, nicht aus einer Abwägung.
+
+   Gewählt wird die Welt nicht. Sie gehört zum Blatt, so wie das Relief:
+   Man setzt sich an einen Tisch, auf dem heute die Erdpigmente liegen, und
+   morgen liegt Nordlicht da. Eine Auswahl wäre eine Entscheidung vor dem
+   ersten Strich; ein gedeckter Tisch ist keine. Wer eine andere Stimmung
+   will, nimmt ein neues Blatt. */
+const WORLDS = [
+  {
+    id: 'erde', name: 'Erdpigmente',
+    colors: [
+      { name: 'Terrakotta', hex: '#b5654a' },
+      { name: 'Ocker',      hex: '#c89b3c' },
+      { name: 'Olive',      hex: '#6e7233' },
+      { name: 'Moos',       hex: '#3f5b3a' },
+      { name: 'Petrol',     hex: '#2e6b6b' },
+      { name: 'Indigo',     hex: '#3b4b7c' },
+      { name: 'Pflaume',    hex: '#6b3c5b' },
+      { name: 'Rost',       hex: '#8c4a2f' },
+      { name: 'Anthrazit',  hex: '#333a3f' }
     ]
   },
-  nacht: {
-    paper: [39, 36, 32],
-    grain: 4.5,
-    blend: 'screen',
-    pigments: [
-      { name: 'Rosé',       rgb: [226, 158, 132] },
-      { name: 'Stroh',      rgb: [232, 198, 122] },
-      { name: 'Flechte',    rgb: [162, 196, 152] },
-      { name: 'Gletscher',  rgb: [156, 204, 206] },
-      { name: 'Eisblau',    rgb: [150, 172, 222] },
-      { name: 'Malve',      rgb: [196, 156, 200] },
-      { name: 'Koralle',    rgb: [230, 140, 128] },
-      { name: 'Sand',       rgb: [216, 196, 168] },
-      { name: 'Kreide',     rgb: [240, 236, 226] }
+  {
+    id: 'nord', name: 'Nordlicht',
+    colors: [
+      { name: 'Eisblau',    hex: '#6f9fb5' },
+      { name: 'Fjord',      hex: '#4a7a78' },
+      { name: 'Tanne',      hex: '#2f4a3c' },
+      { name: 'Flechte',    hex: '#8aa38c' },
+      { name: 'Amethyst',   hex: '#5b5580' },
+      { name: 'Heidekraut', hex: '#8d7fa0' },
+      { name: 'Beere',      hex: '#7a3f52' },
+      { name: 'Tiefsee',    hex: '#1f4a5c' },
+      { name: 'Polarnacht', hex: '#23304a' }
+    ]
+  },
+  {
+    id: 'faerber', name: 'Färbergarten',
+    colors: [
+      { name: 'Krapp',         hex: '#a4423a' },
+      { name: 'Safran',        hex: '#d59b3a' },
+      { name: 'Färberginster', hex: '#9a9d4a' },
+      { name: 'Waid',          hex: '#34527a' },
+      { name: 'Indigo tief',   hex: '#26365e' },
+      { name: 'Cochenille',    hex: '#8e3550' },
+      { name: 'Malve',         hex: '#7d5570' },
+      { name: 'Walnuss',       hex: '#6b4a33' },
+      { name: 'Rinde',         hex: '#4a3527' }
+    ]
+  },
+  {
+    id: 'rauch', name: 'Rauchglas',
+    colors: [
+      { name: 'Altrosa',    hex: '#a3807c' },
+      { name: 'Schilf',     hex: '#8b8f7c' },
+      { name: 'Farn',       hex: '#61694f' },
+      { name: 'Taubenblau', hex: '#78838c' },
+      { name: 'Mauve',      hex: '#8b7480' },
+      { name: 'Trüffel',    hex: '#6a5b52' },
+      { name: 'Kastanie',   hex: '#55403a' },
+      { name: 'Zinn',       hex: '#575c60' },
+      { name: 'Basalt',     hex: '#3b3b3d' }
     ]
   }
-};
+];
+
+function hexRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/* Dieselbe Welt als Kreide auf getöntem Papier. Nicht von Hand ein zweites
+   Mal ausgesucht, sondern abgeleitet: Farbton bleibt, Helligkeit steigt,
+   Buntheit wird leicht zurückgenommen. So bleibt die Stimmung einer Welt
+   bei Tag und bei Nacht dieselbe, und der dunkelste Pigmentstift wird
+   ganz von selbst zum hellsten – die Kreide. */
+function asChalk(rgb) {
+  const r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+
+  let h = 0, sat = 0;
+  if (d > 0) {
+    sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r)      h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else                h = ((r - g) / d + 4) / 6;
+  }
+
+  const L = 0.74;
+  const S = Math.min(0.46, sat * 0.92);
+  if (S === 0) return [Math.round(L * 255), Math.round(L * 255), Math.round(L * 255)];
+
+  const q = L < 0.5 ? L * (1 + S) : L + S - L * S;
+  const pp = 2 * L - q;
+  const chan = function (t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return pp + (q - pp) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return pp + (q - pp) * (2 / 3 - t) * 6;
+    return pp;
+  };
+  return [
+    Math.round(chan(h + 1 / 3) * 255),
+    Math.round(chan(h) * 255),
+    Math.round(chan(h - 1 / 3) * 255)
+  ];
+}
+
+/* Welche Welt auf einem Blatt liegt, steckt im Seed – aber in einem eigenen
+   Zweig davon, damit sie nicht mit der Zähligkeit des Reliefs mitwandert. */
+function worldFor(seed) {
+  return WORLDS[Math.floor(mulberry32((seed ^ 0x9e3779b9) >>> 0)() * WORLDS.length)];
+}
+
+function pigmentsOf(world, mode) {
+  const chalk = SHEETS[mode].chalk;
+  return world.colors.map(function (c) {
+    const rgb = hexRgb(c.hex);
+    return { name: c.name, rgb: chalk ? asChalk(rgb) : rgb };
+  });
+}
 
 
 /* ---------------------------------------------------------------------------
@@ -648,6 +771,8 @@ function clamp255(v) {
 
 const sheet = {
   plan: null,
+  world: null,
+  pigments: null,
   relief: null,
   dens: null,
   pix: null,
@@ -857,15 +982,172 @@ const Klang = {
 
 
 /* ---------------------------------------------------------------------------
-   10. Die Hand
+   10. Die zweite Hand – das Blatt bewegen
+
+   Beim Ausmalen auf Papier malt eine Hand und die andere schiebt das Blatt
+   zurecht. Genau so hier: Ein Finger reibt, zwei Finger bewegen das Papier.
+   Das ist kein Bedienelement, keine Einstellung und kein Modus – es ist die
+   zweite Hand, und sie muss niemandem erklärt werden.
+
+   Der Unterschied zum Zoom des Browsers ist wesentlich: Der vergrößert die
+   ganze Stube, samt Pigmenten, die dann aus dem Bild wandern. Hier bewegt
+   sich nur das Blatt. Die Stifte bleiben auf dem Tisch liegen.
+
+   Verrechnet wird ohne einen einzigen Blick ins Layout: Die Lage des Blattes
+   folgt allein aus Grundgröße, Maßstab und Verschiebung. Das hält toLocal()
+   frei von getBoundingClientRect, das sonst bei jedem Zeigerereignis ein
+   Neuberechnen der Seite erzwingen würde.
+   ------------------------------------------------------------------------- */
+
+const view = {
+  scale: 1, tx: 0, ty: 0,
+  base: 0,                    // Kantenlänge bei bildfüllender Ansicht
+  cx: 0, cy: 0,               // Mitte des Blattes im Fenster, ohne Verschiebung
+  left: 0, top: 0, size: 0,   // daraus abgeleitet: wo das Blatt gerade liegt
+  perCss: 1,                  // Blatt-Einheiten je Bildschirmpunkt
+  anim: null
+};
+
+function viewLimit(scale) {
+  /* Das Blatt darf nie so weit wandern, dass daneben Leere entsteht. */
+  return Math.max(0, (scale - 1) * view.base * 0.5);
+}
+
+function applyView() {
+  view.size = view.base * view.scale;
+  view.left = view.cx + view.tx - view.size * 0.5;
+  view.top  = view.cy + view.ty - view.size * 0.5;
+  view.perCss = view.size > 0 ? SIZE / view.size : 1;
+  canvas.style.transform =
+    'translate(' + view.tx + 'px,' + view.ty + 'px) scale(' + view.scale + ')';
+}
+
+function setView(scale, tx, ty) {
+  view.scale = scale;
+  view.tx = tx;
+  view.ty = ty;
+  applyView();
+}
+
+/* Weich über die Grenze hinaus, damit nichts hart anschlägt. */
+function rubber(value, min, max) {
+  if (value < min) return min - (min - value) * VIEW_RUBBER;
+  if (value > max) return max + (value - max) * VIEW_RUBBER;
+  return value;
+}
+
+function clampedView() {
+  const scale = Math.max(1, Math.min(VIEW_MAX, view.scale));
+  const lim = viewLimit(scale);
+  return {
+    scale: scale,
+    tx: Math.max(-lim, Math.min(lim, view.tx)),
+    ty: Math.max(-lim, Math.min(lim, view.ty))
+  };
+}
+
+function stopViewAnim() {
+  if (view.anim) { cancelAnimationFrame(view.anim.id); view.anim = null; }
+}
+
+function animateView(target, duration) {
+  stopViewAnim();
+  const from = { scale: view.scale, tx: view.tx, ty: view.ty };
+  if (Math.abs(from.scale - target.scale) < 0.0005 &&
+      Math.abs(from.tx - target.tx) < 0.5 &&
+      Math.abs(from.ty - target.ty) < 0.5) return;
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setView(target.scale, target.tx, target.ty);
+    return;
+  }
+
+  const start = performance.now();
+  const step = function (now) {
+    const t = Math.min(1, (now - start) / duration);
+    const e = 1 - Math.pow(1 - t, 3);
+    setView(
+      from.scale + (target.scale - from.scale) * e,
+      from.tx + (target.tx - from.tx) * e,
+      from.ty + (target.ty - from.ty) * e
+    );
+    if (t < 1) view.anim.id = requestAnimationFrame(step);
+    else view.anim = null;
+  };
+  view.anim = { id: requestAnimationFrame(step) };
+}
+
+function settleView() { animateView(clampedView(), VIEW_SNAP_MS); }
+
+/* Der Weg zurück ist kein Knopf, sondern dieselbe Ruhe, die auch die
+   Pigmente abtreten lässt: Wer die Hand hebt und einen Augenblick nichts
+   tut, bekommt sein ganzes Mandala zu sehen. */
+function viewHome() { animateView({ scale: 1, tx: 0, ty: 0 }, VIEW_HOME_MS); }
+
+/* Die laufende Zwei-Finger-Geste. */
+const grip = {
+  active: false,
+  a: 0, b: 0,                 // die beiden beteiligten Zeiger
+  dist: 0, mx: 0, my: 0,      // Ausgangsabstand und -mitte
+  scale: 1, tx: 0, ty: 0      // Ansicht beim Beginn der Geste
+};
+
+function gripBegin(p1, p2) {
+  stopViewAnim();
+  grip.active = true;
+  grip.a = p1.id; grip.b = p2.id;
+  grip.dist = Math.max(1, Math.hypot(p1.x - p2.x, p1.y - p2.y));
+  grip.mx = (p1.x + p2.x) * 0.5;
+  grip.my = (p1.y + p2.y) * 0.5;
+  grip.scale = view.scale;
+  grip.tx = view.tx;
+  grip.ty = view.ty;
+}
+
+function gripMove(p1, p2) {
+  const dist = Math.max(1, Math.hypot(p1.x - p2.x, p1.y - p2.y));
+  const mx = (p1.x + p2.x) * 0.5;
+  const my = (p1.y + p2.y) * 0.5;
+
+  const wanted = grip.scale * (dist / grip.dist);
+  const scale = rubber(wanted, 1, VIEW_MAX);
+
+  /* Der Punkt unter der Mitte der beiden Finger soll dort bleiben, wo er ist. */
+  const ox = grip.mx - view.cx, oy = grip.my - view.cy;
+  const ux = (ox - grip.tx) / grip.scale;
+  const uy = (oy - grip.ty) / grip.scale;
+
+  const lim = viewLimit(scale);
+  setView(
+    scale,
+    rubber((mx - view.cx) - scale * ux, -lim, lim),
+    rubber((my - view.cy) - scale * uy, -lim, lim)
+  );
+}
+
+function gripEnd() {
+  grip.active = false;
+  settleView();
+}
+
+
+/* ---------------------------------------------------------------------------
+   11. Die Hand
 
    Zeigerereignisse werden nur eingesammelt; aufgetragen wird einmal je Bild.
    Das entkoppelt die Eingaberate von der Darstellung, ergibt genau eine
    Übertragung ans Bild je Bild und macht die Verweildauer sauber messbar.
 
-   Handballen: Es malt ausschließlich der erste Kontakt. Wer minutenlang über
-   ein Blatt reibt, legt die Hand auf – ohne diese Regel wäre jede Sitzung
-   nach zwei Minuten ruiniert.
+   Werkzeug wird nicht gewählt, sondern erkannt: Finger und Stift kommen als
+   verschiedene Zeigerarten herein und bekommen ihre eigene Kontaktbreite und
+   ihren eigenen Umgang mit Druck. Man kann mitten in einem Blatt wechseln,
+   ohne irgendwo etwas umzustellen.
+
+   Handballen: Es malt immer nur ein Kontakt. Wer minutenlang über ein Blatt
+   reibt, legt die Hand auf – ohne diese Regel wäre jede Sitzung nach zwei
+   Minuten ruiniert. Solange ein Stift arbeitet, werden Berührungen deshalb
+   vollständig verworfen; mit dem Finger entscheidet die Zeit darüber, ob ein
+   zweiter Kontakt die zweite Hand ist oder der Ballen.
    ------------------------------------------------------------------------- */
 
 const hand = {
@@ -873,20 +1155,32 @@ const hand = {
   down: false,
   x: 0, y: 0,
   press: 0.5,
-  radius: R_FINGER,
+  radius: 0,
+  pen: false,
   queue: [],
+  moved: false,
+  downAt: 0,
   lastFrame: 0,
   lastMove: 0
 };
 
+/* Alle aufliegenden Zeiger, damit die zweite Hand erkannt werden kann. */
+const touching = new Map();
+
 let canvas, ctx, imageData;
 
 function toLocal(event) {
-  const rect = canvas.getBoundingClientRect();
   return [
-    ((event.clientX - rect.left) / rect.width) * SIZE,
-    ((event.clientY - rect.top) / rect.height) * SIZE
+    ((event.clientX - view.left) / view.size) * SIZE,
+    ((event.clientY - view.top) / view.size) * SIZE
   ];
+}
+
+/* Kontaktbreite: physisch gedacht, in Blatt-Einheiten umgerechnet. Holt man
+   das Blatt näher, deckt dieselbe Fingerkuppe weniger Bildfläche ab – genau
+   wie in Wirklichkeit. */
+function contactRadius(pen) {
+  return (pen ? R_PEN_CSS : R_FINGER_CSS) * view.perCss;
 }
 
 function pressureOf(event) {
@@ -899,48 +1193,125 @@ function pressureOf(event) {
   return 0.5;
 }
 
+function startStroke(event) {
+  hand.id = event.pointerId;
+  hand.down = true;
+  hand.pen = event.pointerType === 'pen';
+  hand.radius = contactRadius(hand.pen);
+  hand.press = pressureOf(event);
+  const p = toLocal(event);
+  hand.x = p[0]; hand.y = p[1];
+  hand.queue.length = 0;
+  hand.moved = false;
+  hand.downAt = performance.now();
+  hand.lastFrame = hand.downAt;
+  hand.lastMove = hand.downAt;
+  Klang.wake();
+}
+
+function endStroke() {
+  if (!hand.down) return;
+  hand.id = null;
+  hand.down = false;
+  hand.queue.length = 0;
+  Klang.rest();
+  scheduleSave();
+}
+
 function bindHand() {
   canvas.addEventListener('pointerdown', function (event) {
-    if (hand.id !== null || !event.isPrimary) return;
     event.preventDefault();
-
-    hand.id = event.pointerId;
-    hand.down = true;
-    hand.radius = event.pointerType === 'pen' ? R_PEN : R_FINGER;
-    hand.press = pressureOf(event);
-    const p = toLocal(event);
-    hand.x = p[0]; hand.y = p[1];
-    hand.queue.length = 0;
-    hand.lastFrame = performance.now();
-    hand.lastMove = hand.lastFrame;
-
-    canvas.setPointerCapture(event.pointerId);
-    Klang.wake();
+    touching.set(event.pointerId, {
+      id: event.pointerId, x: event.clientX, y: event.clientY, pen: event.pointerType === 'pen'
+    });
+    /* Das Einfangen des Zeigers darf nie den Rest dieses Handlers
+       verhindern. Safari wirft hier gelegentlich, und eine Ausnahme an
+       dieser Stelle hieße: Der Strich beginnt gar nicht erst. */
+    try { canvas.setPointerCapture(event.pointerId); } catch (err) {}
     awaken();
+
+    /* Der Stift hat immer Vorrang. Liegt er auf, ist jede Berührung der
+       Handballen – und niemals die zweite Hand. */
+    if (event.pointerType === 'pen') {
+      if (hand.down && !hand.pen) endStroke();
+      if (!hand.down) startStroke(event);
+      return;
+    }
+    if (hand.down && hand.pen) return;
+
+    if (!hand.down) { startStroke(event); return; }
+
+    /* Ein zweiter Finger kurz nach dem ersten: die zweite Hand. Kommt er
+       später, hat die erste Hand längst zu reiben begonnen – dann ist es
+       der Ballen und wird verworfen. */
+    if (!grip.active && performance.now() - hand.downAt < GESTURE_GRACE) {
+      /* Ausdrücklich der reibende und der neu hinzugekommene Zeiger – nicht
+         irgendwelche zwei aus der Liste. Ein Kontakt, dessen Loslassen der
+         Browser verschluckt hat, bliebe sonst darin liegen und würde die
+         Geste an einem Punkt aufhängen, an dem längst kein Finger mehr ist. */
+      const erste = touching.get(hand.id);
+      const zweite = touching.get(event.pointerId);
+      if (erste && zweite && erste !== zweite) {
+        endStroke();
+        gripBegin(erste, zweite);
+      }
+    }
   });
 
   canvas.addEventListener('pointermove', function (event) {
-    if (event.pointerId !== hand.id) return;
     event.preventDefault();
+    const known = touching.get(event.pointerId);
+    if (known) { known.x = event.clientX; known.y = event.clientY; }
+
+    if (grip.active) {
+      const a = touching.get(grip.a), b = touching.get(grip.b);
+      if (a && b) gripMove(a, b);
+      return;
+    }
+
+    if (event.pointerId !== hand.id) return;
 
     const list = event.getCoalescedEvents ? event.getCoalescedEvents() : [event];
     for (let i = 0; i < list.length; i++) {
       const p = toLocal(list[i]);
+      if (!hand.moved &&
+          (Math.abs(p[0] - hand.x) > MOVE_WAKE || Math.abs(p[1] - hand.y) > MOVE_WAKE)) {
+        hand.moved = true;
+      }
       hand.queue.push(p[0], p[1]);
     }
     hand.press = pressureOf(event);
   });
 
   const lift = function (event) {
-    if (event.pointerId !== hand.id) return;
-    hand.id = null;
-    hand.down = false;
-    hand.queue.length = 0;
-    Klang.rest();
-    scheduleSave();
+    touching.delete(event.pointerId);
+    if (grip.active) {
+      if (event.pointerId === grip.a || event.pointerId === grip.b) gripEnd();
+      return;
+    }
+    if (event.pointerId === hand.id) endStroke();
   };
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
+
+  /* Auf dem Schreibtisch gibt es keine zweite Hand – dort tut das Rad
+     dasselbe. Für das iPad ist das ohne Bedeutung. */
+  canvas.addEventListener('wheel', function (event) {
+    event.preventDefault();
+    stopViewAnim();
+    awaken();
+    const factor = Math.exp(-event.deltaY * 0.0016);
+    const scale = Math.max(1, Math.min(VIEW_MAX, view.scale * factor));
+    const ox = event.clientX - view.cx, oy = event.clientY - view.cy;
+    const ux = (ox - view.tx) / view.scale;
+    const uy = (oy - view.ty) / view.scale;
+    const lim = viewLimit(scale);
+    setView(
+      scale,
+      Math.max(-lim, Math.min(lim, ox - scale * ux)),
+      Math.max(-lim, Math.min(lim, oy - scale * uy))
+    );
+  }, { passive: false });
 
   /* Safari fängt sonst Wischgesten ab. */
   canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
@@ -967,6 +1338,7 @@ function frame(now) {
   }
 
   tickStillness(now);
+  tickSave(now);
 }
 
 function applyHand(dt) {
@@ -994,8 +1366,15 @@ function applyHand(dt) {
 
   if (len < 0.4) {
     /* Die Hand steht. Auch das trägt auf – wer den Stift hält und wartet,
-       bekommt einen dunklen Fleck. Gedeckelt, damit es nicht ausufert. */
+       bekommt einen dunklen Fleck. Gedeckelt, damit es nicht ausufert.
+
+       Nur ganz am Anfang nicht: Solange sich noch nichts bewegt hat und die
+       Frist für die zweite Hand läuft, bleibt das Blatt unberührt. Ein
+       Reiben beginnt mit einer Bewegung, ein Heranholen mit zwei ruhenden
+       Fingern – und ohne diese Frist bliebe von jedem Heranholen ein
+       dunkler Punkt zurück. */
     q.length = 0;
+    if (!hand.moved && performance.now() - hand.downAt < GESTURE_GRACE) return;
     rub(hand.x, hand.y, hand.x, hand.y,
         Math.min(DWELL_CAP, dt * 0.35), hand.radius, rgb);
     return;
@@ -1109,10 +1488,22 @@ const Speicher = {
 };
 
 let saveTimer = 0;
+let saving = false;
+let savedAt = 0;
 
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveCurrent, SAVE_MS);
+}
+
+/* Gesichert wird sonst nur, wenn die Hand kurz innehält. Wer eine Viertel-
+   stunde am Stück kreist, ohne abzusetzen, hätte bis dahin nichts auf der
+   Platte. Deshalb zusätzlich eine Langstreckensicherung – selten genug, dass
+   sie nicht stört, und ausdrücklich nur zwischen zwei Bildern. */
+function tickSave(now) {
+  if (saving || !sheet.touched || !Speicher.ok) return;
+  if (now - savedAt < LONG_SAVE_MS) return;
+  saveCurrent();
 }
 
 function snapshot() {
@@ -1126,13 +1517,53 @@ function snapshot() {
 }
 
 async function saveCurrent() {
-  if (!Speicher.ok || !sheet.touched) return;
+  if (!Speicher.ok || !sheet.touched || saving) return;
+  saving = true;
+  savedAt = performance.now();
+  try {
+    const blob = await snapshot();
+    if (!blob) return;
+    await Speicher.put('kv', {
+      blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
+      pigment: pigmentIndex, zeit: Date.now()
+    }, 'blatt');
+    savedAt = performance.now();
+  } finally {
+    saving = false;
+  }
+}
+
+/* Ein Blatt weglegen: als Ganzes auf den Stapel, mit allem, was es
+   wiederherstellbar macht. */
+async function shelveCurrent() {
+  if (!sheet.touched || !Speicher.ok) return false;
   const blob = await snapshot();
-  if (!blob) return;
-  await Speicher.put('kv', {
-    blob: blob, seed: sheet.seed, mode: sheet.mode,
-    pigment: pigmentIndex, zeit: Date.now()
-  }, 'blatt');
+  if (!blob) return false;
+  await Speicher.put('blaetter', {
+    id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
+    blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
+    zeit: Date.now()
+  });
+  return true;
+}
+
+/* Ein gesichertes Blatt wird wieder das laufende – beim Start und beim
+   Aufnehmen vom Stapel derselbe Weg. */
+async function adoptSheet(rec) {
+  makeSheet(rec.seed, rec.mode, rec.world);
+  buildPigments();
+  setPigment(rec.pigment || 0);
+
+  const img = await loadBitmap(rec.blob);
+  if (img) {
+    ctx.drawImage(img, 0, 0, SIZE, SIZE);
+    imageData = ctx.getImageData(0, 0, SIZE, SIZE);
+    sheet.pix = imageData.data;
+    densityFromPixels();
+    sheet.touched = true;
+  }
+  paint();
+  return !!img;
 }
 
 /* Dichte aus der Helligkeit zurückrechnen. */
@@ -1184,13 +1615,13 @@ let pigmentIndex = 0;
 const ui = {};
 
 function current() {
-  return sheet.look.pigments[pigmentIndex];
+  return sheet.pigments[pigmentIndex];
 }
 
 function buildPigments() {
   const strip = ui.pigments;
   strip.innerHTML = '';
-  sheet.look.pigments.forEach(function (pig, i) {
+  sheet.pigments.forEach(function (pig, i) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'pigment';
@@ -1203,7 +1634,7 @@ function buildPigments() {
 }
 
 function setPigment(i) {
-  pigmentIndex = Math.max(0, Math.min(sheet.look.pigments.length - 1, i));
+  pigmentIndex = Math.max(0, Math.min(sheet.pigments.length - 1, i));
   const all = ui.pigments.querySelectorAll('.pigment');
   for (let k = 0; k < all.length; k++) {
     all[k].setAttribute('aria-pressed', k === pigmentIndex ? 'true' : 'false');
@@ -1246,12 +1677,14 @@ function closeStack() {
 }
 
 function showStackItem() {
+  if (typeof resetDiscard === 'function') resetDiscard();
   const empty = stack.items.length === 0;
   ui.stackEmpty.hidden = !empty;
   ui.stackFigure.hidden = empty;
   ui.stackPrev.disabled = empty || stack.at <= 0;
   ui.stackNext.disabled = empty || stack.at >= stack.items.length - 1;
   ui.stackRemove.hidden = empty;
+  ui.stackTake.hidden = empty;
   if (empty) return;
 
   if (stack.url) URL.revokeObjectURL(stack.url);
@@ -1266,27 +1699,75 @@ function stepStack(delta) {
   showStackItem();
 }
 
+/* Ein Blatt vom Stapel wieder aufnehmen. Es wird das laufende Blatt, und
+   das bisherige wandert dafür auf den Stapel – zwei Blätter tauschen die
+   Plätze. Kein Speichern, kein Laden, kein Dialog; auf dem Tisch tut man
+   genau das, wenn man ein liegengebliebenes Blatt wieder hervorholt.
+
+   Die Reihenfolge ist Absicht: erst das laufende Blatt in Sicherheit
+   bringen, dann das andere holen, und erst wenn das geglückt ist, den
+   alten Eintrag entfernen. Bricht etwas dazwischen ab, liegt schlimmsten-
+   falls ein Blatt doppelt – aber keines fehlt. */
+async function takeStackItem() {
+  if (!stack.items.length) return;
+  const item = stack.items[stack.at];
+
+  clearTimeout(saveTimer);
+  await shelveCurrent();
+
+  document.body.classList.add('is-turning');
+  await new Promise(function (r) { setTimeout(r, 260); });
+
+  const ok = await adoptSheet(item);
+  document.body.classList.remove('is-turning');
+
+  if (ok) {
+    await Speicher.del('blaetter', item.id);
+    await saveCurrent();
+  }
+  closeStack();
+  awaken();
+}
+
+/* Das Verwerfen ist das einzige Endgültige in dieser App – überall sonst
+   geht nichts verloren. Deshalb als einzige Stelle eine Rückfrage, und zwar
+   ohne Dialog: Der Knopf selbst fragt, und wer danebentippt oder wartet,
+   hat nichts getan.
+
+   Es hieß hier einmal „Weglegen“. Genau das tut aber „Neues Blatt“ – ein
+   Blatt weglegen heißt, es auf den Stapel zu legen. Dasselbe Wort für das
+   Gegenteil zu verwenden, hat Arbeit gekostet. */
+let discardArmed = 0;
+
+function resetDiscard() {
+  discardArmed = 0;
+  ui.stackRemove.textContent = 'Verwerfen';
+  ui.stackRemove.classList.remove('is-armed');
+}
+
 async function removeStackItem() {
   if (!stack.items.length) return;
+
+  if (!discardArmed || Date.now() - discardArmed > 5000) {
+    discardArmed = Date.now();
+    ui.stackRemove.textContent = 'Wirklich verwerfen';
+    ui.stackRemove.classList.add('is-armed');
+    return;
+  }
+
   const item = stack.items[stack.at];
   await Speicher.del('blaetter', item.id);
   stack.items.splice(stack.at, 1);
   if (stack.at >= stack.items.length) stack.at = Math.max(0, stack.items.length - 1);
+  resetDiscard();
   showStackItem();
 }
 
 /* Das laufende Blatt weglegen und ein frisches nehmen. */
 async function newSheet() {
   setTray(false);
-  if (sheet.touched && Speicher.ok) {
-    const blob = await snapshot();
-    if (blob) {
-      await Speicher.put('blaetter', {
-        id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
-        blob: blob, seed: sheet.seed, mode: sheet.mode, zeit: Date.now()
-      });
-    }
-  }
+  clearTimeout(saveTimer);
+  await shelveCurrent();
   await Speicher.del('kv', 'blatt');
 
   document.body.classList.add('is-turning');
@@ -1318,6 +1799,9 @@ function awaken() {
   if (still) {
     still = false;
     document.body.classList.remove('is-still');
+    /* Sinkt das Blatt gerade in die Vollansicht zurück und jemand legt die
+       Hand wieder auf, bleibt es stehen, wo es ist. Die Hand hat Vorrang. */
+    stopViewAnim();
   }
 }
 
@@ -1327,6 +1811,8 @@ function tickStillness(now) {
   if (now - lastTouch < STILL_MS) return;
   still = true;
   document.body.classList.add('is-still');
+  /* Der Abschluss zeigt das ganze Mandala, nicht einen Ausschnitt. */
+  viewHome();
 }
 
 
@@ -1346,10 +1832,18 @@ function hintStrength() {
 }
 
 /* Baut Relief, Papier und Puffer für ein Blatt. */
-function makeSheet(seed, mode) {
+function makeSheet(seed, mode, worldId) {
   sheet.seed   = seed >>> 0;
   sheet.mode   = SHEETS[mode] ? mode : 'tag';
   sheet.look   = SHEETS[sheet.mode];
+
+  /* Die Welt steckt im Seed. Gesicherte Blätter tragen sie zusätzlich bei
+     sich: Käme später eine Welt dazu, verschöbe sich sonst die Farbe eines
+     Blattes, das längst gemalt ist. */
+  sheet.world = (worldId && WORLDS.filter(function (w) { return w.id === worldId; })[0])
+              || worldFor(sheet.seed);
+  sheet.pigments = pigmentsOf(sheet.world, sheet.mode);
+
   sheet.plan   = buildPlan(sheet.seed);
   sheet.relief = rasterRelief(sheet.plan);
 
@@ -1388,10 +1882,22 @@ function fitSheet() {
   const side = Math.max(160, Math.floor(Math.min(w, h)));
   canvas.style.width  = side + 'px';
   canvas.style.height = side + 'px';
+
+  /* Grundgröße und Mitte merken, damit die zweite Hand ohne einen einzigen
+     Blick ins Layout rechnen kann. Die Mitte steht fest: Eine Verschiebung
+     des Blattes ändert nur seine Darstellung, nicht seinen Platz im Raster. */
+  view.base = side;
+  const box = ui.wrap.getBoundingClientRect();
+  view.cx = box.left + box.width * 0.5 - view.tx;
+  view.cy = box.top + box.height * 0.5 - view.ty;
+
+  const fit = clampedView();
+  setView(fit.scale, fit.tx, fit.ty);
 }
 
 function cacheUi() {
   ui.room        = document.querySelector('.room');
+  ui.wrap        = document.querySelector('.sheet-wrap');
   ui.pigments    = document.getElementById('pigments');
   ui.mark        = document.getElementById('mark');
   ui.tray        = document.getElementById('tray');
@@ -1405,6 +1911,7 @@ function cacheUi() {
   ui.stackEmpty  = document.getElementById('stack-empty');
   ui.stackPrev   = document.getElementById('stack-prev');
   ui.stackNext   = document.getElementById('stack-next');
+  ui.stackTake   = document.getElementById('stack-take');
   ui.stackRemove = document.getElementById('stack-remove');
   ui.stackClose  = document.getElementById('stack-close');
   ui.hint        = document.getElementById('hint');
@@ -1435,6 +1942,7 @@ function bindUi() {
 
   ui.stackPrev.addEventListener('click', function () { stepStack(-1); });
   ui.stackNext.addEventListener('click', function () { stepStack(1); });
+  ui.stackTake.addEventListener('click', takeStackItem);
   ui.stackRemove.addEventListener('click', removeStackItem);
   ui.stackClose.addEventListener('click', closeStack);
 
@@ -1481,26 +1989,15 @@ async function start() {
   let resumed = null;
   if (stored) resumed = await Speicher.get('kv', 'blatt');
 
-  makeSheet(
-    resumed ? resumed.seed : (Math.random() * 4294967296) >>> 0,
-    resumed ? resumed.mode : preferredMode()
-  );
-
-  buildPigments();
-  setPigment(resumed ? (resumed.pigment || 0) : 0);
-
   if (resumed) {
-    const img = await loadBitmap(resumed.blob);
-    if (img) {
-      ctx.drawImage(img, 0, 0, SIZE, SIZE);
-      imageData = ctx.getImageData(0, 0, SIZE, SIZE);
-      sheet.pix = imageData.data;
-      densityFromPixels();
-      sheet.touched = true;
-    }
+    await adoptSheet(resumed);
+  } else {
+    makeSheet((Math.random() * 4294967296) >>> 0, preferredMode());
+    buildPigments();
+    setPigment(0);
+    paint();
   }
 
-  paint();
   fitSheet();
   bindUi();
   bindHand();
@@ -1533,17 +2030,23 @@ async function start() {
 /* Für den Testlauf in tools/test-atelier3.js. Die App selbst benutzt nichts
    davon – es ist ein Fenster, kein Bedienelement. */
 window.Blatt = {
-  SIZE: SIZE, R_DISC: R_DISC,
-  sheet: sheet, hand: hand,
+  SIZE: SIZE, R_DISC: R_DISC, VIEW_MAX: VIEW_MAX,
+  sheet: sheet, hand: hand, view: view,
+  contactRadius: contactRadius,
+  setViewForTest: function (scale, tx, ty) { stopViewAnim(); setView(scale, tx || 0, ty || 0); },
+  viewHome: viewHome,
   buildPlan: buildPlan, fieldAt: fieldAt,
-  makeSheet: function (seed, mode) { makeSheet(seed, mode); buildPigments(); setPigment(0); paint(); },
+  WORLDS: WORLDS,
+  makeSheet: function (seed, mode, world) {
+    makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();
+  },
   setPigment: setPigment,
   rubPath: function (points, dwell, press) {
     const rgb = current().rgb;
     setBite(press === undefined ? 0.5 : press);
     for (let i = 0; i + 3 < points.length; i += 2) {
       rub(points[i], points[i + 1], points[i + 2], points[i + 3],
-          dwell, R_FINGER, rgb);
+          dwell, contactRadius(false), rgb);
     }
     paint();
   },

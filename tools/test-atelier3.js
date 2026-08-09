@@ -265,8 +265,15 @@ async function run() {
       }));
     };
 
-    /* Nur der zweite Kontakt – der Handballen – bewegt sich. */
+    /* Nur der zweite Kontakt – der Handballen – bewegt sich. Er kommt
+       bewusst spät: Ein zweiter Finger kurz nach dem ersten wäre die zweite
+       Hand und damit ein anderer Fall. */
     mach('pointerdown', 1, true, box.left + box.width * 0.5, box.top + box.height * 0.5);
+    for (let i = 0; i < 6; i++) {
+      mach('pointermove', 1, true,
+           box.left + box.width * (0.5 + i * 0.004), box.top + box.height * 0.5);
+    }
+    await new Promise(function (r) { setTimeout(r, 420); });
     mach('pointerdown', 2, false, box.left + box.width * 0.2, box.top + box.height * 0.8);
     for (let i = 0; i < 30; i++) {
       mach('pointermove', 2, false,
@@ -281,9 +288,124 @@ async function run() {
       for (let x = (S * 0.12) | 0; x < (S * 0.5) | 0; x += 2) { sum += B.sheet.dens[y * S + x]; n++; }
     }
     mach('pointerup', 1, true, box.left + box.width * 0.5, box.top + box.height * 0.5);
+    mach('pointerup', 2, false, box.left + box.width * 0.5, box.top + box.height * 0.8);
     return sum / n;
   });
   prüfe('zweiter Kontakt malt nicht', ballen < 1e-6, 'Dichte ' + ballen.toExponential(1));
+
+  /* ---- Farbwelten ------------------------------------------------------- */
+  console.log('\nFarbwelten');
+  const welten = await page.evaluate(function () {
+    const B = window.Blatt;
+    const gesehen = {};
+    for (let i = 0; i < 400; i++) {
+      B.makeSheet(1000 + i * 7919, 'tag');
+      gesehen[B.sheet.world.id] = (gesehen[B.sheet.world.id] || 0) + 1;
+    }
+
+    /* Dieselbe Welt bei Tag und bei Nacht: gleicher Farbton, hellere Kreide. */
+    B.makeSheet(4242, 'tag');
+    const tag = B.sheet.pigments.map(function (p) { return p.name; }).join(',');
+    const tagHell = B.sheet.pigments.map(function (p) {
+      return (p.rgb[0] + p.rgb[1] + p.rgb[2]) / 3;
+    });
+    const welt = B.sheet.world.id;
+    B.makeSheet(4242, 'nacht');
+    const nacht = B.sheet.pigments.map(function (p) { return p.name; }).join(',');
+    const nachtHell = B.sheet.pigments.map(function (p) {
+      return (p.rgb[0] + p.rgb[1] + p.rgb[2]) / 3;
+    });
+
+    /* Stabil: derselbe Seed muss dieselbe Welt ergeben. */
+    B.makeSheet(4242, 'tag');
+    const nochmal = B.sheet.world.id;
+
+    let heller = 0;
+    for (let i = 0; i < tagHell.length; i++) if (nachtHell[i] > tagHell[i]) heller++;
+
+    return {
+      anzahl: Object.keys(gesehen).length,
+      verteilung: gesehen,
+      gleich: tag === nacht,
+      heller: heller,
+      welt: welt,
+      stabil: welt === nochmal,
+      alle: B.WORLDS.length
+    };
+  });
+  prüfe('alle Farbwelten kommen vor', welten.anzahl === welten.alle,
+        Object.keys(welten.verteilung).join(', '));
+  prüfe('die Welt hängt am Blatt, nicht am Zufall', welten.stabil,
+        'Seed 4242 → ' + welten.welt);
+  prüfe('Tag und Nacht sind dieselbe Welt', welten.gleich);
+  prüfe('bei Nacht wird daraus Kreide', welten.heller === 9,
+        welten.heller + ' von 9 Pigmenten heller');
+
+  /* ---- Die zweite Hand -------------------------------------------------- */
+  console.log('\nDie zweite Hand');
+
+  const naeher = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1, 0, 0);
+    const weit = B.contactRadius(false);
+    B.setViewForTest(2, 0, 0);
+    const nah = B.contactRadius(false);
+    const stift = B.contactRadius(true);
+    B.setViewForTest(1, 0, 0);
+    return { weit: weit, nah: nah, stift: stift };
+  });
+  prüfe('Kontakt bleibt am Glas, nicht am Bild',
+        Math.abs(naeher.nah - naeher.weit / 2) < 0.01,
+        naeher.weit.toFixed(1) + ' Einheiten → ' + naeher.nah.toFixed(1) + ' bei doppelter Ansicht');
+  prüfe('Stift ist feiner als der Finger', naeher.stift < naeher.weit);
+
+  /* Zwei Finger holen das Blatt heran – mit echten Zeigerereignissen. */
+  const geste = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1, 0, 0);
+    const c = document.getElementById('sheet');
+    const box = c.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    const mach = function (typ, id, primär, x, y) {
+      c.dispatchEvent(new PointerEvent(typ, {
+        pointerId: id, isPrimary: primär, pointerType: 'touch',
+        clientX: x, clientY: y, bubbles: true, cancelable: true, pressure: 0.5
+      }));
+    };
+
+    const vorher = B.sheet.touched;
+    mach('pointerdown', 11, true,  cx - 40, cy);
+    mach('pointerdown', 12, false, cx + 40, cy);
+    for (let i = 1; i <= 10; i++) {
+      const d = 40 + i * 12;
+      mach('pointermove', 11, true,  cx - d, cy);
+      mach('pointermove', 12, false, cx + d, cy);
+    }
+    const gezoomt = B.view.scale;
+    const schmutz = B.sheet.touched !== vorher;
+    mach('pointerup', 11, true,  cx - 160, cy);
+    mach('pointerup', 12, false, cx + 160, cy);
+    await new Promise(function (r) { setTimeout(r, 600); });
+    return { gezoomt: gezoomt, nachher: B.view.scale, schmutz: schmutz, max: B.VIEW_MAX };
+  });
+  prüfe('zwei Finger holen das Blatt heran', geste.gezoomt > 1.3,
+        'Maßstab ' + geste.gezoomt.toFixed(2));
+  prüfe('kein Pigment beim Heranholen', !geste.schmutz);
+  prüfe('Anschlag hält', geste.nachher <= geste.max + 0.001,
+        'nach dem Loslassen ' + geste.nachher.toFixed(2) + ' von höchstens ' + geste.max);
+
+  /* Kleiner als bildfüllend darf es nicht bleiben. */
+  const zurueck = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.setViewForTest(1.8, 120, -60);
+    B.viewHome();
+    await new Promise(function (r) { setTimeout(r, 2400); });
+    return { scale: B.view.scale, tx: B.view.tx, ty: B.view.ty };
+  });
+  prüfe('das Blatt sinkt in die Vollansicht zurück',
+        Math.abs(zurueck.scale - 1) < 0.01 &&
+        Math.abs(zurueck.tx) < 1 && Math.abs(zurueck.ty) < 1,
+        'Maßstab ' + zurueck.scale.toFixed(2));
 
   /* ---- Was es nicht gibt ------------------------------------------------ */
   console.log('\nWas es nicht gibt');
@@ -293,6 +415,7 @@ async function run() {
       knöpfe: document.querySelectorAll('button').length,
       pigmente: document.querySelectorAll('.pigment').length,
       zurück: /rückgängig|undo|radier|löschen/.test(text),
+      verwerfen: (document.getElementById('stack-remove') || {}).textContent,
       zahl: /\d+\s*%/.test(text),
       speichern: /speichern|sichern/.test(text)
     };
@@ -301,6 +424,8 @@ async function run() {
   prüfe('kein Rückgängig, kein Radierer', !bedienung.zurück);
   prüfe('keine Prozentanzeige', !bedienung.zahl);
   prüfe('kein Speichern-Knopf', !bedienung.speichern);
+  prüfe('Verwerfen heißt nicht Weglegen', bedienung.verwerfen === 'Verwerfen',
+        'im Stapel steht: ' + bedienung.verwerfen);
 
   /* ---- Layout ----------------------------------------------------------- */
   console.log('\nLayout');
@@ -354,6 +479,62 @@ async function run() {
       ? 'ok' : 'FEHLT';
     prüfe('Blatt überlebt den Neustart', fortsetzen === 'ok',
           'Dichte ' + vorher.dichte.toExponential(1) + ' → ' + nachher.dichte.toExponential(1));
+
+    /* Der ganze Kreislauf: weglegen, wiederfinden, aufnehmen, weitermalen. */
+    console.log('\nWeglegen und wiederaufnehmen');
+    const altSeed = nachher.seed;
+    const altDichte = nachher.dichte;
+
+    await p2.click('#mark');
+    await p2.click('#tray-new');
+    await p2.waitForFunction(function (alt) {
+      return window.Blatt.sheet.seed !== alt;
+    }, altSeed, { timeout: 10000 });
+    const frisch = await p2.evaluate(function () {
+      return { seed: window.Blatt.sheet.seed, dichte: window.Blatt.meanDensity() };
+    });
+    prüfe('„Neues Blatt“ bringt ein leeres', frisch.seed !== altSeed && frisch.dichte < 1e-6);
+
+    await p2.click('#mark');
+    await p2.click('#tray-stack');
+    await p2.waitForTimeout(500);
+    const imStapel = await p2.evaluate(function () {
+      return {
+        sichtbar: !document.getElementById('stack').hidden,
+        aufnehmen: !document.getElementById('stack-take').hidden,
+        leer: !document.getElementById('stack-empty').hidden
+      };
+    });
+    prüfe('das weggelegte Blatt liegt im Stapel',
+          imStapel.sichtbar && imStapel.aufnehmen && !imStapel.leer);
+
+    await p2.click('#stack-take');
+    await p2.waitForTimeout(1400);
+    const wieder = await p2.evaluate(function () {
+      return {
+        seed: window.Blatt.sheet.seed,
+        dichte: window.Blatt.meanDensity(),
+        welt: window.Blatt.sheet.world.id,
+        zu: document.getElementById('stack').hidden
+      };
+    });
+    prüfe('Aufnehmen holt genau dieses Blatt zurück',
+          wieder.seed === altSeed && wieder.dichte > altDichte * 0.4 && wieder.zu,
+          'Dichte ' + wieder.dichte.toExponential(1));
+
+    /* Und es lässt sich darauf weitermalen. */
+    const box2 = await p2.locator('#sheet').boundingBox();
+    await p2.mouse.move(box2.x + box2.width * 0.35, box2.y + box2.height * 0.62);
+    await p2.mouse.down();
+    for (let i = 0; i < 40; i++) {
+      await p2.mouse.move(box2.x + box2.width * (0.35 + i * 0.007), box2.y + box2.height * 0.62);
+    }
+    await p2.mouse.up();
+    await p2.waitForTimeout(200);
+    const weiter = await p2.evaluate(function () { return window.Blatt.meanDensity(); });
+    prüfe('auf dem aufgenommenen Blatt lässt sich weitermalen', weiter > wieder.dichte,
+          wieder.dichte.toExponential(1) + ' → ' + weiter.toExponential(1));
+
     await p2.close();
   } finally {
     server.close();

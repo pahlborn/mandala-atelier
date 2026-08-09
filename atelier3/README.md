@@ -75,6 +75,48 @@ n-zählig drehsymmetrisch, aus konzentrischen Bändern: Rosette, Blütenkränze,
 Gitter, Perlen, Wellen, Strahlen, Bögen, dazwischen Randlinien. Erhebungen
 sind die Ornamentlinien, dazwischen liegen Flächen tiefer.
 
+**Die zweite Hand.** Ein Finger reibt, **zwei Finger bewegen das Blatt** –
+heranholen, verschieben. Beim Ausmalen auf Papier malt eine Hand und die
+andere schiebt das Blatt zurecht; genau das ist gemeint. Kein Bedienelement,
+keine Einstellung, kein Modus.
+
+Der Unterschied zum Zoom des Browsers ist wesentlich: Der vergrößert die
+ganze Stube samt Pigmenten, die dabei aus dem Bild wandern. Hier bewegt sich
+nur das Blatt, die Stifte bleiben auf dem Tisch liegen.
+
+Der Weg zurück ist kein Knopf: Nach vierzig Sekunden Ruhe **sinkt das Blatt
+mit in die Vollansicht zurück**, zusammen mit dem Abtreten der Pigmente. Der
+Abschluss zeigt so immer das ganze Mandala und nie einen Ausschnitt – und man
+kann sich nicht aussperren.
+
+Grenzen: nie kleiner als bildfüllend, nach oben Anschlag bei 2,2. Über die
+Grenzen lässt es sich weich hinausziehen und federt beim Loslassen zurück.
+Der obere Anschlag ist nicht willkürlich – jenseits davon sieht man nicht
+mehr Mandala, sondern das Raster der 1280 Punkte. Bis dahin liest es sich
+als Papierstruktur, so wie man beim Naherangehen an echtes Papier Fasern
+sieht und keine feineren Blüten.
+
+**Der Kontakt klebt am Glas, nicht am Bild.** Eine Fingerkuppe ist rund zwölf
+Millimeter breit, und daran ändert sich nichts, wenn man näher herangeht.
+Deshalb steht der Kontaktradius in Bildschirmpunkten (`R_FINGER_CSS`,
+`R_PEN_CSS`) und wird erst zur Laufzeit in Blatt-Einheiten umgerechnet. Holt
+man das Blatt heran, deckt dieselbe Fingerkuppe **weniger** Bildfläche ab –
+so wird feine Arbeit möglich, ohne dass es dafür einen Regler gäbe. Stünde
+der Radius wie früher fest in Blatt-Koordinaten, wüchse der Finger beim
+Heranholen mit und das Näherkommen wäre nutzlos.
+
+**Werkzeug wird nicht gewählt, sondern erkannt.** Finger und Stift kommen als
+verschiedene Zeigerarten herein und bekommen ihre eigene Kontaktbreite und
+ihren eigenen Umgang mit Druck. Man kann mitten in einem Blatt wechseln, ohne
+irgendwo etwas umzustellen. Solange ein Stift aufliegt, werden Berührungen
+vollständig verworfen – das ist der Handballen. Mit dem Finger entscheidet
+die Zeit: ein zweiter Kontakt innerhalb von 260 ms ist die zweite Hand, ein
+späterer ist der Ballen.
+
+In derselben Frist trägt ein **ruhender** Finger noch kein Pigment auf. Ein
+Reiben beginnt mit einer Bewegung, ein Heranholen mit zwei ruhenden Fingern –
+ohne diese Frist bliebe von jedem Heranholen ein dunkler Punkt zurück.
+
 **Was die Hand tut, bestimmt, wie tief der Kontakt greift.**
 
 | Hand | Blatt |
@@ -104,6 +146,38 @@ läuft damit in einen Fixpunkt: satt gebaut, aber nie tot. **Nichts
 verschwindet, und nichts lässt sich zumatschen** — deshalb braucht es kein
 Rückgängig und keinen Radierer. Nicht als Strenge, sondern weil es keinen
 Zustand gibt, aus dem man gerettet werden müsste.
+
+## Die Farbwelten
+
+Die vier Farbwelten des Mandala Ateliers, unverändert übernommen –
+**Erdpigmente, Nordlicht, Färbergarten, Rauchglas**. Ihre Stimmung ist das
+eigentliche Kapital. Neun je Welt statt vierzehn: Der Griff soll aus dem
+Handgelenk kommen, nicht aus einer Abwägung.
+
+**Gewählt wird die Welt nicht.** Sie gehört zum Blatt, so wie das Relief, und
+steckt im Seed. Man setzt sich an einen Tisch, auf dem heute die Erdpigmente
+liegen; morgen liegt Nordlicht da. Eine Auswahl wäre eine Entscheidung vor
+dem ersten Strich, ein gedeckter Tisch ist keine – und Stifte sucht man sich
+auf einem fremden Tisch auch nicht aus. Wer eine andere Stimmung will, nimmt
+ein neues Blatt.
+
+Der Zweig des Seeds für die Welt ist ein anderer als der fürs Relief, sonst
+wanderte die Farbe mit der Zähligkeit mit. Gesicherte Blätter tragen ihre
+Welt zusätzlich bei sich: Käme später eine fünfte dazu, verschöbe sich sonst
+die Farbe eines längst gemalten Blattes.
+
+**Die Kreide wird abgeleitet, nicht ein zweites Mal ausgesucht.** `asChalk()`
+behält den Farbton, hebt die Helligkeit und nimmt die Buntheit leicht zurück.
+So ist eine Welt bei Tag und bei Nacht dieselbe Welt – und der dunkelste
+Pigmentstift wird ganz von selbst zum hellsten, der Kreide.
+
+**Kein Weiß bei Tag.** Pigment liegt dort subtraktiv; ein weißer Stift hätte
+den Wert 255 und würde jede dunklere Stelle aufhellen. Er wäre ein Radierer
+mit anderem Namen, und es gibt auch kein harmloses Elfenbein – jedes Pigment,
+das heller ist als das, was daliegt, hellt auf. Gebraucht wird es ohnehin
+nicht: **In dieser App ist Weiß schon da. Es heißt „nicht reiben“.** Beim
+Nachtblatt dagegen ist Weiß ein vollwertiges Pigment, weil es dort auf
+getöntem Grund hinzufügt statt wegzunehmen.
 
 **Tag und Nacht sind kein Thema, sondern zwei Papiere.** Bei Tag helles
 Papier mit subtraktivem Pigment, bei Nacht getöntes Papier mit heller Kreide
@@ -149,8 +223,32 @@ Zügen gearbeitet wird.
 Atelier darf die bis zu 128 MB belegen. Hier gibt es sie nicht — eine
 philosophische Entscheidung mit angenehmem Nebeneffekt.
 
-**Speicher.** Das laufende Blatt wird entprellt in IndexedDB gesichert, als
-zusammengesetztes Bild plus Seed des Reliefs. Beim Fortsetzen wird die Dichte
+## Blätter weglegen und wieder aufnehmen
+
+Es gibt genau **ein laufendes Blatt**. Daneben liegt der **Stapel**.
+
+- **„Neues Blatt“** legt das laufende auf den Stapel und holt ein frisches.
+- **„Aufnehmen“** im Stapel macht ein früheres Blatt wieder zum laufenden –
+  das bisherige wandert dafür auf den Stapel. Zwei Blätter tauschen die
+  Plätze, so wie auf dem Tisch. Kein Speichern, kein Laden, kein Dialog.
+- **„Verwerfen“** ist die einzige Stelle in dieser App, an der wirklich
+  etwas verloren geht, und deshalb die einzige mit einer Rückfrage – ohne
+  Dialog: Der Knopf selbst fragt, wer danebentippt oder wartet, hat nichts
+  getan.
+
+Beim Aufnehmen ist die Reihenfolge Absicht: erst das laufende Blatt in
+Sicherheit bringen, dann das andere holen, und erst wenn das geglückt ist,
+den alten Eintrag entfernen. Bricht etwas dazwischen ab, liegt schlimmsten-
+falls ein Blatt doppelt – aber keines fehlt.
+
+Wiederhergestellt wird über **einen** Weg, `adoptSheet()`, den sich Start und
+Aufnehmen teilen.
+
+**Speicher.** Das laufende Blatt wird 700 ms nach jedem Strich in IndexedDB
+gesichert, als zusammengesetztes Bild plus Seed, Papierzustand und Welt.
+Dazu eine **Langstreckensicherung**: Wer eine Viertelstunde am Stück kreist,
+ohne abzusetzen, hätte sonst bis dahin nichts auf der Platte – deshalb
+zusätzlich alle 25 Sekunden, ausdrücklich nur zwischen zwei Bildern. Beim Fortsetzen wird die Dichte
 aus der Helligkeit zurückgerechnet — eine Näherung, aber eine ehrliche: Das
 Blatt erinnert sich an das, was man sieht. Ein Totgang (`GRAIN_DEADBAND`)
 sorgt dafür, dass Papierkorn und Randabschattung nicht als Pigment gelesen
@@ -243,16 +341,33 @@ dem Finger **und** mit der aufliegenden Hand, Klang, Dunkelmodus.
 
 2. **Die Prägung mit Byte-Werten rechnen.** Siehe oben — Faktor 255.
 
-3. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
+3. **Zwei Finger nach Reihenfolge aus der Liste greifen.** Die Zwei-Finger-Geste
+   nimmt ausdrücklich den *reibenden* und den *neu hinzugekommenen* Zeiger.
+   Nahm sie stattdessen die ersten beiden aus der Liste der aufliegenden
+   Kontakte, hing sie an einem Zeiger, dessen Loslassen der Browser
+   verschluckt hatte – die Geste zog dann an einem Punkt, an dem längst kein
+   Finger mehr war.
+
+4. **`setPointerCapture` ohne Absicherung.** Es wirft gelegentlich, und eine
+   Ausnahme an dieser Stelle heißt: Der Strich beginnt gar nicht erst. Immer
+   in `try` einpacken.
+
+5. **„Weglegen“ an zwei Stellen für Gegensätzliches.** Im Fach legt „Neues
+   Blatt“ das laufende Blatt weg – auf den Stapel. Im Stapel hieß der Knopf
+   zum endgültigen Löschen ebenfalls „Weglegen“. Heißt jetzt „Verwerfen“ und
+   fragt einmal nach; es ist die einzige Stelle in dieser App, an der etwas
+   wirklich verloren geht.
+
+6. **Blockiges Papier.** Ein bloßes `hash2(x >> 4, y >> 4)` für die
    Wolkigkeit ergibt ein sichtbares Schachbrett. Papier hat keine Kacheln,
    also zwischen den Gitterpunkten weich überblenden.
 
-4. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
+7. **Die Höhen zu weit auseinander.** Beim ersten Versuch lag die Fläche bei
    0,11 gegen Linien bei 1,0. Ergebnis: Man bekam ausschließlich Linien, die
    Flächen nahmen praktisch nie Farbe an. Die Stufen und die Gamma-Werte
    müssen zusammen gedacht werden.
 
-5. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
+8. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
    der Fenstergröße wandern, wäre bei jeder Drehung des iPads die Arbeit weg.
 
 ## Grenzen
