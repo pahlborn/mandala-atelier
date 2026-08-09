@@ -14,8 +14,9 @@ nebeneinander, und man kann eine Person abwechselnd in beide setzen.
 > zugeschnappt sind, steht in [`../atelier3/README.md`](../atelier3/README.md).
 > Was sich gegenüber diesem Entwurf geändert hat, steht unten in Abschnitt 16.
 >
-> Was jetzt noch fehlt, ist das Einzige, was dieses Papier nicht selbst
-> liefern kann: **Menschen, die beide Apps benutzen.** Abschnitt 14.
+> Was noch offen ist – allen voran die Neigung des Apple Pencil – steht in
+> Abschnitt 17. Und was dieses Papier nicht selbst liefern kann: **Menschen,
+> die beide Apps benutzen.** Abschnitt 14.
 
 ---
 
@@ -121,7 +122,8 @@ Menschen abgenommen wird, weil sie ihm sonst gestellt würde.
 - **Keine Symmetrie-Einstellung.** Die Ordnung liegt im Blatt, nicht in einem
   Regler.
 - **Keine Vorlagenauswahl.** Das Blatt, das daliegt, ist dein Blatt.
-- **Keine Farbwelten.** Neun Pigmente. Ein Satz. Fertig.
+- **Keine Wahl der Farbwelt.** Neun Pigmente liegen bereit. Welche neun,
+  entscheidet das Blatt, nicht ein Menü – siehe Abschnitt 16.
 - **Kein Speichern-Knopf.** Siehe Abschnitt 7.
 - **Keine Prozentanzeige, keine Zeit, keine Zahl irgendwo.**
 - **Keine Vollbild-Taste**, weil es nie etwas anderes als Vollbild gibt.
@@ -401,6 +403,25 @@ Kreide — dieselbe Rechnung, umgedreht. Beides gibt es analog. Welches ein
 Blatt ist, entscheidet sich bei seiner Entstehung und bleibt dann; ein Blatt
 wechselt nicht die Farbe, nur weil es Abend wird.
 
+**Die Farbwelten sind zurückgekommen, ohne die Wahl.** Der Entwurf strich in
+Abschnitt 5 die Farbwelten des Mandala Ateliers ersatzlos, weil eine Welt zu
+wählen eine Meta-Entscheidung wäre. Damit ging aber etwas verloren, das keine
+Bedienlast ist, sondern Stimmung – und Stimmung zu wählen ist Selbst-
+bestimmung, nicht Arbeit. Jetzt sind alle vier wieder da (Erdpigmente,
+Nordlicht, Färbergarten, Rauchglas), zu je neun Pigmenten, aber **ohne
+Auswahl**: Die Welt gehört zum Blatt wie das Relief und steckt im Seed. Man
+setzt sich an einen Tisch, auf dem heute die Erdpigmente liegen. Null
+Entscheidungen, volle Vielfalt – und analog wahrer als eine Auswahl, denn
+die Stifte auf einem fremden Tisch sucht man sich auch nicht aus.
+
+**Weiß gibt es nur bei Nacht.** Beim Tagblatt liegt Pigment subtraktiv; ein
+weißer Stift würde jede dunklere Stelle aufhellen und wäre damit der
+Radiergummi, den dieser Entwurf ausdrücklich nicht will. Es gibt auch kein
+harmloses Elfenbein – jedes Pigment, das heller ist als das, was daliegt,
+hellt auf. Gebraucht wird es ohnehin nicht: In dieser App ist Weiß schon da,
+es heißt „nicht reiben“. Auf getöntem Nachtpapier dagegen fügt helle Kreide
+hinzu statt wegzunehmen, und dort ist sie ein vollwertiges Pigment.
+
 **Die Prägung hat einen Regler bekommen.** Abschnitt 9 nennt die Sichtbarkeit
 des unberührten Reliefs als größtes Risiko und verlangt, sie in drei bis vier
 Stufen an Menschen auszuprobieren. Dafür gibt es jetzt **`?relief=0…2`** —
@@ -415,6 +436,73 @@ also exakt die Fassung, vor der Abschnitt 9 warnt. Das war nur zu sehen,
 weil ein Bild davon gerendert und angesehen wurde. **Diese Zahl bleibt die
 Stelle, an der der Entwurf steht oder fällt**, und sie gehört als Erstes an
 echte Hände, bevor irgendetwas anderes verfeinert wird.
+
+## 17. Was offen ist
+
+Der Reihe nach, damit nichts davon in einem Gesprächsverlauf verschwindet.
+
+### Apple Pencil: die Neigung fehlt
+
+**Das ist der größte offene Punkt.** Geschoben, weil kein Pencil zur Hand ist.
+
+Druck wird bereits gelesen und wirkt (er geht in dieselbe Griffkurve wie die
+Langsamkeit), und die Spitze bekommt eine feinere Kontaktbreite als der
+Finger. Die **Neigung** wird dagegen überhaupt nicht ausgewertet.
+
+Warum das mehr ist als eine Feinheit: **Niemand reibt eine Münze mit der
+Bleistiftspitze durch.** Man legt den Stift fast flach und reibt mit der
+Flanke. Das ist nicht eine mögliche Technik unter vielen, das ist *die*
+Technik der Frottage – jedes Kind macht es beim ersten Versuch von selbst
+so. Diese App hat also ein Medium gewählt, dessen kanonische Geste sie nicht
+kennt.
+
+Sie würde fugenlos in das passen, was schon da ist:
+
+- **aufrecht** – kleine Kontaktfläche, die Kraft konzentriert sich, greift
+  punktuell tief: man fährt die Ornamentkanten nach, es entsteht eine
+  Zeichnung;
+- **flach** – breite Kontaktfläche, dieselbe Kraft verteilt sich, küsst nur
+  die Höhen, aber über eine große Fläche: das Muster kommt ganzflächig
+  hervor.
+
+Dieselbe Spannweite von Hauch bis Fläche, die heute an Tempo und Druck
+hängt – nur an einer Handhaltung, die niemand lernen muss. Die Richtung, in
+die der Stift zeigt, würde die Kontaktfläche zu einer **Ellipse** dehnen, so
+wie die Mine es tut; der Strich bekäme eine Faser.
+
+**Erster Schritt ist nicht Bauen, sondern Messen.** Ein kleines Prüfblatt,
+das anzeigt, was Safari auf dem Gerät tatsächlich meldet – `tiltX`/`tiltY`
+beziehungsweise `altitudeAngle`/`azimuthAngle`, und wie fein. Erst wenn das
+bekannt ist, lohnt der Umbau der Kontaktfläche von Kreis auf Ellipse.
+
+**Und die Linie, die dabei zu halten ist:** Wird der Pencil deutlich besser
+als der Finger, wird aus Blatt still und leise eine Pencil-App. Einen Finger
+hat jeder, einen Pencil nicht. Der Pencil soll **Nuance** bringen, nicht
+**Fähigkeit** – alles muss mit dem Finger vollständig erreichbar bleiben.
+Das ist es heute, weil dort die Langsamkeit den Griff trägt.
+
+Für den Vergleich gehört außerdem notiert, **womit** jemand gearbeitet hat.
+Sonst vermischen sich später zwei Fragen zu einer, und man weiß nicht mehr,
+ob das Relief gewirkt hat oder die Haltung des Arms.
+
+### Die Prägung an echten Händen kalibrieren
+
+Abschnitt 9 nennt sie als größtes Risiko des Entwurfs. Der Regler dafür
+steht bereit (`?relief=0…2`, unsichtbar in der Oberfläche). Drei bis vier
+Stufen an Menschen ausprobieren, bevor irgendetwas anderes verfeinert wird.
+
+### Die Langstreckensicherung am iPad nachmessen
+
+Alle 25 Sekunden wird mitten in einem langen Zug ein Bild von 1280 × 1280
+kodiert. Ob das ein spürbares Stocken gibt, sagt kein Schreibtisch – das
+merkt man beim Malen. Falls ja: entweder seltener sichern, oder nur in einem
+Moment, in dem die Hand ohnehin langsam ist.
+
+### Und dann erst: der Vergleich
+
+Alles Obige ist Vorbereitung. Die eigentliche offene Frage bleibt die aus
+Abschnitt 14, und die beantwortet kein Code.
+
 
 ---
 
