@@ -195,8 +195,16 @@ symmetrischen Füllen wie eine offene Linie – auch wenn die Geometrie
 geschlossen ist. Offene Linien müssen bis an Nabe **und** Außenring laufen.
 Der Testlauf misst beides.
 
-Bei Zähl- und Rechenmandalas erscheint automatisch eine **Farblegende** in der
-Bedienleiste („Ergebnis 7“, „4 Punkte“). Sie wird aus den tatsächlich
+Bei Zähl- und Rechenmandalas steht die **Aufgabenstellung** über dem Blatt,
+freundlich formuliert und an das Kind gerichtet – ohne sie erschließt sich
+nicht, was zu tun ist. Sie steht auch auf dem Druckbogen.
+
+Die Aufgabe verweist auf die Farben, also müssen die erreichbar sein: Bei
+diesen Motiven wird die Schnellzugriffsleiste **selbst zur Legende** und zeigt
+statt der vollen Palette genau die gebrauchten Farben, jede mit ihrer Zahl
+daneben. Eine Legende, die in einer Schublade liegt, hilft einem Kind nicht.
+
+Zusätzlich erscheint die ausführliche **Farblegende** in der Bedienleiste („Ergebnis 7“, „4 Punkte“). Sie wird aus den tatsächlich
 vorkommenden Werten erzeugt, nicht fest verdrahtet; ein Klick auf einen
 Legendeneintrag wählt die Farbe aus.
 

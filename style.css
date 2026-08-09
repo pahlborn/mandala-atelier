@@ -168,6 +168,24 @@ body.is-quiet .topbar { display: none; }
   overflow: hidden;
 }
 
+/* ---- Aufgabenstellung -------------------------------------
+   Eine Zeile über dem Blatt, freundlich formuliert und an das
+   Kind gerichtet. Nur bei den Zähl- und Rechenmandalas. */
+.task {
+  flex: none;
+  margin: 0;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.task strong { font-family: var(--font-display); font-weight: 600; }
+
 /* ---- Schnellzugriff ---------------------------------------
    Farben, Werkzeuge und Schritte werden beim Malen ständig
    gebraucht – sie dürfen nicht in einer Schublade liegen. */
@@ -209,6 +227,41 @@ body.is-quiet .topbar { display: none; }
   flex: 1 1 auto;
   min-width: 0;
   padding: 3px 1px;
+}
+
+/* Legendenknopf: Farbe und Zahl zusammen, damit die Aufgabe ohne Umweg
+   lösbar ist. */
+.quick-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 4px 11px 4px 5px;
+  cursor: pointer;
+}
+
+.quick-legend .dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+}
+
+.quick-legend .val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-legend:hover { border-color: var(--accent); }
+
+.quick-legend.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .quick-colors .pigment {
@@ -273,7 +326,42 @@ body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
 
 @media (max-width: 700px) {
   .quick-tools .tool { padding: 8px 10px; gap: 5px; }
-  .quick-colors .pigment { width: 30px; height: 30px; }
+  /* Legendenknopf: Farbe und Zahl zusammen, damit die Aufgabe ohne Umweg
+   lösbar ist. */
+.quick-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 4px 11px 4px 5px;
+  cursor: pointer;
+}
+
+.quick-legend .dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+}
+
+.quick-legend .val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-legend:hover { border-color: var(--accent); }
+
+.quick-legend.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.quick-colors .pigment { width: 30px; height: 30px; }
   .zoom-level { min-width: 54px; }
 }
 

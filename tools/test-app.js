@@ -241,7 +241,8 @@ async function run() {
   ];
 
   /* Mit der längsten Farblegende – genau dieser Fall hat die Bühne
-     zusammengedrückt, bis das Blatt unter der Bedienleiste lag. */
+     zusammengedrückt, bis das Blatt unter der Bedienleiste lag. Gezählt
+     werden dabei die Legendenknöpfe; bei den Ziermotiven die Pigmente. */
   await page.evaluate(function () { window.MandalaAtelier.loadMotif('zaehlen10'); });
 
   for (const viewport of VIEWPORTS) {
@@ -256,7 +257,7 @@ async function run() {
          eine seitlich scrollbare Reihe findet niemand. */
       const row = document.getElementById('quick-palette').getBoundingClientRect();
       const swatches = Array.prototype.slice.call(
-        document.querySelectorAll('#quick-palette .pigment'));
+        document.querySelectorAll('#quick-palette .pigment, #quick-palette .quick-legend'));
       const shown = swatches.filter(function (el) {
         const b = el.getBoundingClientRect();
         return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
@@ -286,6 +287,28 @@ async function run() {
       (box.overflow ? ', ← Seite läuft seitlich über' : '')
     );
   }
+  /* Und dasselbe noch einmal mit der vollen Palette eines Ziermotivs. */
+  await page.evaluate(function () { window.MandalaAtelier.loadMotif('sternkranz'); });
+  for (const viewport of VIEWPORTS) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.waitForTimeout(120);
+    const box = await page.evaluate(function () {
+      const row = document.getElementById('quick-palette').getBoundingClientRect();
+      const swatches = Array.prototype.slice.call(
+        document.querySelectorAll('#quick-palette .pigment'));
+      const shown = swatches.filter(function (el) {
+        const b = el.getBoundingClientRect();
+        return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
+      }).length;
+      return { pigments: swatches.length, shown: shown };
+    });
+    if (box.shown !== box.pigments || box.pigments !== 14) {
+      layoutProblems.push(viewport.name + ' (Palette)');
+    }
+  }
+  console.log('  volle Palette in allen Auflösungen: ' +
+    (layoutProblems.length ? '← Befund' : '14 von 14'));
+
   await page.setViewportSize({ width: 1400, height: 1000 });
   await page.waitForTimeout(150);
 
@@ -346,6 +369,46 @@ async function run() {
   if (!strokeOk) tapProblems.push('Zeichnen');
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
+
+  /* Aufgabenstellung: Bei Zähl- und Rechenmandalas muss sie sichtbar sein,
+     sonst erschließt sich die Aufgabe nicht. Und die Legende, auf die sie
+     verweist, muss ohne Schublade erreichbar sein. */
+  console.log('\nAufgabenstellung');
+  const tasks = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    return app.MOTIFS.map(function (motif) {
+      app.loadMotif(motif.id);
+      const banner = document.getElementById('task');
+      const chips = document.querySelectorAll('#quick-palette .quick-legend');
+      const exercise = motif.kind === 'count' || motif.kind === 'math';
+      return {
+        name: motif.name,
+        exercise: exercise,
+        shown: !banner.hidden,
+        text: banner.hidden ? '' : banner.textContent.trim(),
+        chips: chips.length,
+        legend: app.state.legend.length
+      };
+    });
+  });
+
+  const taskProblems = [];
+  tasks.forEach(function (row) {
+    if (row.exercise) {
+      if (!row.shown || row.text.length < 40) taskProblems.push(row.name + ' (Aufgabe)');
+      if (row.chips !== row.legend || !row.chips) taskProblems.push(row.name + ' (Legende)');
+    } else if (row.shown) {
+      taskProblems.push(row.name + ' (Aufgabe, obwohl keine)');
+    }
+  });
+  tasks.filter(function (r) { return r.exercise; }).forEach(function (row) {
+    console.log(pad('  ' + row.name, 26) +
+      pad(row.shown ? 'Aufgabe sichtbar' : '← FEHLT', 20) +
+      row.chips + ' Legendenknöpfe in der Leiste');
+  });
+  console.log('  bei den übrigen ' +
+    tasks.filter(function (r) { return !r.exercise && !r.shown; }).length +
+    ' Motiven keine Aufgabenzeile');
 
   /* Vergrößern: Knöpfe, richtige Koordinaten trotz Maßstab, und – der
      eigentliche Anlass – zwei Finger dürfen nie einen Strich hinterlassen. */
@@ -638,6 +701,7 @@ async function run() {
   if (!galleryOk) broken.push('Galerie');
   if (!atelierOk) broken.push('Atelier');
   if (!zoomOk) broken.push('Vergrößern');
+  broken.push.apply(broken, taskProblems);
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 

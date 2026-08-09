@@ -805,6 +805,8 @@ const MOTIFS = [
   {
     id: 'zaehlen6', world: 'kids', axes: 6,
     name: 'Zähl bis 6', note: 'Punkte zählen, nach Anzahl färben',
+    task: 'Zähl die Punkte in einem Feld. Unten in der Leiste steht bei jeder '
+      + 'Farbe eine Zahl – nimm die Farbe mit deiner Anzahl und tippe ins Feld.',
     kind: 'count',
     bands: [[R_IN, 250], [250, R_OUT]],
     values: [1, 2, 3, 4, 5, 6],
@@ -813,6 +815,8 @@ const MOTIFS = [
   {
     id: 'zaehlen10', world: 'kids', axes: 10,
     name: 'Zähl bis 10', note: 'Punkte zählen bis zehn',
+    task: 'Zähl die Punkte in einem Feld. Unten in der Leiste steht bei jeder '
+      + 'Farbe eine Zahl – nimm die Farbe mit deiner Anzahl und tippe ins Feld.',
     kind: 'count',
     bands: [[R_IN, 250], [250, R_OUT]],
     values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -821,6 +825,9 @@ const MOTIFS = [
   {
     id: 'rechnen10', world: 'kids', axes: 8,
     name: 'Rechenmandala ZR 10', note: 'Plus und Minus im Zahlenraum 10',
+    task: 'Rechne die Aufgabe in einem Feld aus. Unten in der Leiste steht bei '
+      + 'jeder Farbe eine Zahl – nimm die Farbe mit deinem Ergebnis und tippe '
+      + 'ins Feld.',
     kind: 'math',
     bands: [[R_IN, 250], [250, R_OUT]],
     values: [3, 5, 6, 8, 10],
@@ -831,6 +838,9 @@ const MOTIFS = [
   {
     id: 'rechnen20', world: 'kids', axes: 10,
     name: 'Rechenmandala ZR 20', note: 'Plus und Minus im Zahlenraum 20',
+    task: 'Rechne die Aufgabe in einem Feld aus. Unten in der Leiste steht bei '
+      + 'jeder Farbe eine Zahl – nimm die Farbe mit deinem Ergebnis und tippe '
+      + 'ins Feld.',
     kind: 'math',
     bands: [[R_IN, 250], [250, R_OUT]],
     values: [7, 9, 12, 15, 18],
@@ -1633,6 +1643,7 @@ function setGallery(open) {
 const ui = {};
 
 function cacheUi() {
+  ui.task       = document.getElementById('task');
   ui.stage      = document.querySelector('.stage');
   ui.stack      = document.getElementById('stack');
   ui.worlds     = document.getElementById('worlds');
@@ -1735,6 +1746,26 @@ function buildPalette() {
       button.setAttribute('aria-label', pigment.name);
       host.appendChild(button);
     });
+  });
+  if (state.legend.length) buildQuickLegend();
+}
+
+/* Bei Zähl- und Rechenmandalas hilft die volle Palette nicht weiter – dort
+   zählen genau die Farben der Legende, und zwar mit ihrer Zahl daneben.
+   Die Aufgabe verweist darauf; sie darf nicht in einer Schublade liegen. */
+function buildQuickLegend() {
+  ui.quickPalette.textContent = '';
+  state.legend.forEach(function (item) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'quick-legend';
+    button.dataset.hex = item.hex;
+    button.title = item.text;
+    button.setAttribute('aria-label', item.text);
+    button.innerHTML = '<span class="dot"></span><span class="val"></span>';
+    button.querySelector('.dot').style.background = item.hex;
+    button.querySelector('.val').textContent = item.value;
+    ui.quickPalette.appendChild(button);
   });
 }
 
@@ -1842,6 +1873,7 @@ function loadMotif(id) {
   renderMotif();
   Store.set('motif', motif ? motif.id : '');
   renderLegend();
+  buildPalette();
   syncUI();
 }
 
@@ -1948,9 +1980,13 @@ function printSheet() {
     ' display:flex; flex-direction:column; align-items:center; }' +
     'h1 { font-size: 13pt; font-weight: 600; margin: 0 0 4mm; }' +
     'p { font-size: 9pt; color:#6d6559; margin: 3mm 0 0; }' +
+    'p.task { font-size: 10.5pt; color:#242424; margin: 0 0 5mm;' +
+    ' max-width: 150mm; text-align: center; }' +
     'img { width: 100%; max-width: 170mm; height: auto; }' +
     '</style></head><body>' +
     '<h1>' + escapeText(title) + (person ? ' – ' + escapeText(person) : '') + '</h1>' +
+    (state.motif && state.motif.task
+      ? '<p class="task">' + escapeText(state.motif.task) + '</p>' : '') +
     '<img src="' + out.toDataURL('image/png') + '" alt="">' +
     '<p>Mandala Atelier</p>' +
     '</body></html>'
@@ -1994,9 +2030,10 @@ function syncUI() {
   ui.tools.forEach(function (button) {
     button.classList.toggle('is-active', button.dataset.tool === state.tool);
   });
-  Array.prototype.forEach.call(document.querySelectorAll('.pigment'), function (button) {
-    button.classList.toggle('is-active', button.dataset.hex === state.color);
-  });
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.pigment, .quick-legend'), function (button) {
+      button.classList.toggle('is-active', button.dataset.hex === state.color);
+    });
   Array.prototype.forEach.call(ui.psets.children, function (button) {
     button.classList.toggle('is-active', button.dataset.palette === state.palette);
   });
@@ -2008,6 +2045,18 @@ function syncUI() {
     button.classList.toggle('is-active',
       state.motif ? id === state.motif.id : id === '');
   });
+
+  /* Aufgabenstellung über dem Blatt – nur wo es eine gibt. */
+  const task = state.motif && state.motif.task;
+  if (task) {
+    ui.task.innerHTML = '<strong></strong> ';
+    ui.task.firstChild.textContent = state.motif.name + ':';
+    ui.task.appendChild(document.createTextNode(task));
+  }
+  if (ui.task.hidden === !!task) {
+    ui.task.hidden = !task;
+    fitStage();
+  }
 
   ui.mirror.checked = state.mirror;
   ui.guides.checked = state.guides;
@@ -2299,7 +2348,7 @@ function bindEvents() {
     const set = target.closest('.pset');
     if (set) { setPalette(set.dataset.palette); return; }
 
-    const pigment = target.closest('.pigment, .legend button');
+    const pigment = target.closest('.pigment, .legend button, .quick-legend');
     if (pigment) {
       state.color = pigment.dataset.hex;
       Store.set('color', state.color);
