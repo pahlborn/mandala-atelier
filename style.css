@@ -152,14 +152,90 @@ body.is-quiet .topbar { display: none; }
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .stage {
-  position: absolute;
-  inset: 0;
+  flex: 1;
+  min-height: 0;
+  position: relative;
   display: grid;
   place-items: center;
   padding: var(--gap);
+}
+
+/* ---- Schnellzugriff ---------------------------------------
+   Farben, Werkzeuge und Schritte werden beim Malen ständig
+   gebraucht – sie dürfen nicht in einer Schublade liegen. */
+.quickbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--edge);
+  background: var(--surface);
+}
+
+.quick-tools { display: flex; gap: 5px; flex: none; }
+
+.quick-tools .tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.quick-tools .glyph { font-size: 16px; line-height: 1; }
+
+.quick-colors {
+  display: flex;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 3px 1px;
+}
+
+.quick-colors .pigment {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  aspect-ratio: auto;
+}
+
+.quick-actions { display: flex; gap: 5px; flex: none; }
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.icon-button:hover { border-color: var(--accent); }
+.icon-button:disabled { opacity: .35; cursor: default; }
+
+/* Eingeklappt: nur noch der Aufklapp-Knopf bleibt stehen. */
+body.quick-collapsed .quick-tools,
+body.quick-collapsed .quick-colors,
+body.quick-collapsed #btn-undo,
+body.quick-collapsed #btn-redo { display: none; }
+
+body.quick-collapsed .quickbar { justify-content: flex-end; padding-top: 4px; padding-bottom: 4px; }
+body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
+
+@media (max-width: 700px) {
+  .quick-tools .tool-name { display: none; }
+  .quick-tools .tool { padding: 8px 11px; }
 }
 
 body.is-quiet .stage { padding: 6px; }
@@ -468,6 +544,17 @@ body.is-quiet .stage { padding: 6px; }
   white-space: nowrap;
 }
 
+.owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
 .owner input {
   width: 11em;
   padding: 7px 10px;
@@ -479,7 +566,18 @@ body.is-quiet .stage { padding: 6px; }
 @media (max-width: 560px) {
   .overlay-head { flex-wrap: wrap; }
   .owner { width: 100%; margin-left: 0; }
-  .owner input { flex: 1; width: auto; }
+  .owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
+.owner input { flex: 1; width: auto; }
 }
 
 .overlay-body {
@@ -495,6 +593,32 @@ body.is-quiet .stage { padding: 6px; }
   margin: 12vh auto;
   text-align: center;
   color: var(--text-soft);
+}
+
+.overlay-foot {
+  margin-top: 26px;
+  border-top: 1px solid var(--edge);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  flex-wrap: wrap;
+}
+
+.overlay-foot p { margin: 0; max-width: 46em; font-size: 12.5px; color: var(--text-soft); }
+
+.overlay-actions { display: flex; gap: 8px; }
+.overlay-actions .action { width: auto; margin: 0; white-space: nowrap; }
+
+.mixer input[type="color"] {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  padding: 2px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }
 
 .works {

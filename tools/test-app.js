@@ -314,6 +314,85 @@ async function run() {
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
 
+  /* Größe der einzelnen Felder. Nicht nur „läuft Farbe bis in die Ecken“,
+     sondern: Wie viel färbt ein Tipp wirklich? Zu große Felder wirken wie
+     eine offene Linie, auch wenn die Geometrie geschlossen ist. Für die
+     Messung wird die Symmetrie abgeschaltet, sonst misst man n Felder. */
+  console.log('\nGrößtes Einzelfeld je Motiv');
+  const cells = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const canvas = app.layers.fill.canvas;
+    const w = canvas.width, h = canvas.height, dpr = w / app.SIZE;
+    const ctx = canvas.getContext('2d');
+    const rOut = app.R_OUT * dpr;
+
+    function measure() {
+      const data = ctx.getImageData(0, 0, w, h).data;
+      let inside = 0, filled = 0;
+      const sectors = new Set();
+      for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+          const dx = x - w / 2, dy = y - h / 2;
+          if (dx * dx + dy * dy > rOut * rOut) continue;
+          inside++;
+          if (data[(y * w + x) * 4 + 3] > 0) {
+            filled++;
+            sectors.add(Math.round(((Math.atan2(dy, dx) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 90)));
+          }
+        }
+      }
+      return { share: (filled / inside) * 100, degrees: sectors.size * 2 };
+    }
+
+    return app.MOTIFS.map(function (motif) {
+      let worst = { share: 0, degrees: 0 };
+      [70, 120, 170, 220, 270, 320, 370, 400].forEach(function (r) {
+        [0, 0.15, 0.3, -0.15].forEach(function (offset) {
+          app.loadMotif(motif.id);
+          const kind = motif.kind;
+          motif.kind = 'count';                    // Symmetrie fürs Messen aus
+          const p = app.pol(r, -Math.PI / 2 + offset * (Math.PI * 2 / motif.axes));
+          app.floodFill(p[0], p[1], '#2e6b6b');
+          motif.kind = kind;
+          const result = measure();
+          if (result.share > worst.share) worst = result;
+        });
+      });
+      return {
+        id: motif.id,
+        name: motif.name,
+        kind: motif.kind || 'plain',
+        share: worst.share,
+        degrees: worst.degrees,
+        segment: 360 / motif.axes
+      };
+    });
+  });
+
+  /* Zähl- und Rechenmandalas haben absichtlich große Felder, ebenso das
+     Kindergarten-Motiv. Für alles andere gilt eine Obergrenze. */
+  const BIG_ON_PURPOSE = ['zaehlen6', 'zaehlen10', 'rechnen10', 'rechnen20', 'ersteformen'];
+  const cellProblems = [];
+
+  cells.sort(function (a, b) { return b.share - a.share; });
+  cells.slice(0, 6).forEach(function (cell) {
+    console.log(
+      pad('  ' + cell.name, 26) +
+      pad(cell.share.toFixed(1) + ' %', 10) +
+      pad(Math.round(cell.degrees) + '° breit', 13) +
+      'Segment ' + Math.round(cell.segment) + '°'
+    );
+  });
+
+  cells.forEach(function (cell) {
+    const limit = BIG_ON_PURPOSE.indexOf(cell.id) >= 0 ? 12 : 4;
+    /* Reicht ein Feld deutlich über sein Segment hinaus, ist eine Linie offen. */
+    if (cell.share > limit || cell.degrees > cell.segment * 1.6) cellProblems.push(cell.name);
+  });
+  if (cellProblems.length) {
+    console.log('  ← zu große oder segmentübergreifende Felder: ' + cellProblems.join(', '));
+  }
+
   /* Galerie: ablegen, wiederfinden, umbenennen, herausnehmen. */
   const gallery = await page.evaluate(function () {
     const app = window.MandalaAtelier;
@@ -352,6 +431,76 @@ async function run() {
   console.log('  Speicher: ' + (gallery.dauerhaft ? 'IndexedDB' : 'nur diese Sitzung'));
   console.log('  Ablegen, umbenennen, herausnehmen: ' + (galleryOk ? 'wie erwartet' : '← FEHLER'));
 
+  /* Personen, eigene Farbwelt und Sicherung. */
+  const atelier = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const out = {};
+
+    /* Eigene Farbwelt mischen */
+    app.setPalette('eigen');
+    app.state.color = app.pigments()[0].hex;
+    app.mixPigment('#123456');
+    out.mischen = app.pigments()[0].hex === '#123456' && app.state.color === '#123456';
+    app.setPalette('erde');
+
+    /* Getrennte Galerien */
+    return app.Gallery.open().then(function () {
+      app.addPerson();
+      app.renamePerson('Prüfung A');
+      const a = app.state.person;
+      app.loadMotif('bluete');
+      const p = app.pol(200, -Math.PI / 2);
+      app.floodFill(p[0], p[1], '#b5654a');
+      return app.keepWork()
+        .then(function () { return app.refreshGallery(); })
+        .then(function () {
+          out.werkeA = app.state.works.length;
+          app.addPerson();
+          app.renamePerson('Prüfung B');
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.werkeB = app.state.works.length;
+          app.selectPerson(a);
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.zurueckA = app.state.works.length;
+          return app.Gallery.all();
+        })
+        .then(function (works) {
+          out.alleHabenPerson = works.every(function (w) { return !!w.person; });
+          /* Sicherung: einlesen darf nichts verlieren und nichts doppeln. */
+          const backup = {
+            app: 'mandala-atelier', version: 1,
+            people: app.state.people,
+            ownPalette: app.PALETTES.filter(function (p) { return p.custom; })[0].colors,
+            works: works
+          };
+          const file = new File([JSON.stringify(backup)], 'sicherung.json',
+            { type: 'application/json' });
+          app.loadBackup(file);
+          return new Promise(function (resolve) { setTimeout(resolve, 500); });
+        })
+        .then(function () { return app.Gallery.all(); })
+        .then(function (after) {
+          out.nachEinlesen = after.length;
+          return out;
+        });
+    });
+  });
+
+  const atelierOk = atelier.mischen && atelier.werkeA === 1 && atelier.werkeB === 0 &&
+    atelier.zurueckA === 1 && atelier.alleHabenPerson &&
+    atelier.nachEinlesen === atelier.werkeA;
+
+  console.log('\nAtelier');
+  console.log('  Eigene Farbwelt mischen: ' + (atelier.mischen ? 'wie erwartet' : '← FEHLER'));
+  console.log('  Galerien getrennt: ' + atelier.werkeA + ' / ' + atelier.werkeB +
+    ' / zurück ' + atelier.zurueckA + (atelier.zurueckA === atelier.werkeA ? '   wie erwartet' : '   ← FEHLER'));
+  console.log('  Sicherung einlesen ohne Dopplung: ' +
+    (atelier.nachEinlesen === atelier.werkeA ? 'wie erwartet' : '← ' + atelier.nachEinlesen + ' statt ' + atelier.werkeA));
+
   /* Schriften: eingebettet, nicht nachgeladen. */
   const typeOk = await page.evaluate(async function () {
     await document.fonts.load('500 20px "IBM Plex Mono"');
@@ -374,7 +523,9 @@ async function run() {
   const broken = results.filter(function (r) {
     return r.leaked || (r.motif.kind !== 'plain' && r.legend === 0);
   }).map(function (r) { return r.motif.name; }).concat(tapProblems, layoutProblems);
+  broken.push.apply(broken, cellProblems);
   if (!galleryOk) broken.push('Galerie');
+  if (!atelierOk) broken.push('Atelier');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 
