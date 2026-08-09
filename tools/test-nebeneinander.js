@@ -20,6 +20,12 @@
         eigenen Vorrat ziehen. Sonst lägen die Dateien der zweiten App
         doppelt und veralteten unbemerkt.
 
+     3. Eine neue Fassung von Blatt muss auf dem Gerät ankommen, auch wenn
+        die Cache-Version einmal zu erhöhen vergessen wurde. Genau das ist
+        zweimal passiert, und das Gerät blieb stumm auf der alten Fassung
+        stehen – ein Fehler, den man auf dem Schreibtisch nie sieht, weil
+        dort kein Worker läuft.
+
    Dafür braucht es einen echten Origin – über file:// gibt es keine Service
    Worker. Der Testlauf startet deshalb kurz einen winzigen Dateiserver.
    ========================================================================== */
@@ -43,10 +49,15 @@ async function run() {
      die Datei byteweise und zwingt den Browser zu einer Neufassung des
      Workers – nur so lässt sich das Aufräumen beim Aktivieren auslösen. */
   let swAbrufe = 0;
+  let frischeFassung = false;
   const server = await startServer(function (rel, body) {
     if (rel === 'sw.js') {
       swAbrufe++;
       if (swAbrufe > 1) return body + '\n/* Neufassung ' + swAbrufe + ' */\n';
+    }
+    /* Eine neue Fassung von Blatt, ohne dass die Cache-Version steigt. */
+    if (rel === 'atelier3/app.js' && frischeFassung) {
+      return body + '\nwindow.__frischeFassung = true;\n';
     }
     return body;
   });
@@ -84,6 +95,28 @@ async function run() {
       });
     }
     prüfe('Blatt übernimmt der eigene Worker', wer === 'atelier3/sw.js', wer);
+
+    /* ---- Kommt eine neue Fassung an, auch ohne Versionswechsel? --------- */
+    frischeFassung = true;
+
+    await page.reload();
+    await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
+    const nochAlt = await page.evaluate(function () {
+      return window.__frischeFassung === true;
+    });
+    /* Erwartet: noch die alte Fassung, sofort aus dem Vorrat. Im Hintergrund
+       wird jetzt nachgeladen. */
+    await page.waitForTimeout(1200);
+
+    await page.reload();
+    await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
+    const jetztNeu = await page.evaluate(function () {
+      return window.__frischeFassung === true;
+    });
+    prüfe('neue Fassung kommt auch ohne Versionswechsel an', jetztNeu,
+          nochAlt ? 'schon beim ersten Neuladen' : 'beim zweiten Öffnen');
+    prüfe('der Start bleibt sofort und offlinefähig', !nochAlt,
+          nochAlt ? 'es wurde aufs Netz gewartet' : 'erst Vorrat, dann auffrischen');
 
     /* ---- Zieht der Worker des Ateliers fremde Dateien in seinen Vorrat? -- */
     const inhalt = await page.evaluate(async function () {
