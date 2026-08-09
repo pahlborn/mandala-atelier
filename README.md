@@ -114,6 +114,11 @@ Farbwelt müssen dort sichtbar sein; eine seitlich scrollbare Reihe findet
 niemand, auf dem Telefon waren zwei von vierzehn zu sehen. Deshalb bricht die
 Reihe um, statt zu schieben. Der Testlauf zählt sie in fünf Auflösungen.
 
+Die Werkzeuge tragen gezeichnete Symbole und **behalten ihre Beschriftung**,
+auch auf dem Telefon. Vorher standen dort Zeichen aus dem Zeichensatz; `⌫`
+las sich als Rücktaste, nicht als Radiergummi. Ein Wort ist verlässlicher als
+ein Symbol – die Leiste darf dafür eine Zeile mehr brauchen.
+
 **Vergrößern.** Knöpfe für Plus, Minus und Zurücksetzen, dazu Zwei-Finger-Gesten
 zum Zoomen und Schieben. Der Anlass war, dass der Versuch zu zoomen sonst im
 Zeichnen landete: Sobald ein zweiter Finger aufsetzt, wird der eben begonnene

@@ -193,7 +193,10 @@ body.is-quiet .topbar { display: none; }
   white-space: nowrap;
 }
 
-.quick-tools .glyph { font-size: 16px; line-height: 1; }
+/* Zeichensatz-Symbole waren zu unklar – ⌫ liest sich als Rücktaste, nicht
+   als Radiergummi. Deshalb gezeichnete Symbole, und die Beschriftung bleibt
+   stehen: sie ist das verlässlichste Zeichen. */
+.quick-tools .glyph { width: 19px; height: 19px; flex: none; display: block; }
 
 /* Alle Pigmente der Farbwelt müssen sichtbar sein. Eine seitlich
    scrollbare Reihe findet niemand – auf schmalen Geräten waren zwei von
@@ -269,9 +272,9 @@ body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
 }
 
 @media (max-width: 700px) {
-  .quick-tools .tool-name { display: none; }
-  .quick-tools .tool { padding: 8px 11px; }
+  .quick-tools .tool { padding: 8px 10px; gap: 5px; }
   .quick-colors .pigment { width: 30px; height: 30px; }
+  .zoom-level { min-width: 54px; }
 }
 
 body.is-quiet .stage { padding: 6px; }
