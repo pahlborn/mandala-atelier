@@ -8,6 +8,15 @@ Wurzelverzeichnis, lauffähig, unverändert. 3.0 entsteht daneben, mit eigenem
 Icon, eigenem Start, eigenem Speicher. Auf dem iPad liegen dann zwei Apps
 nebeneinander, und man kann eine Person abwechselnd in beide setzen.
 
+> **Stand: gebaut.** Dieses Papier ist der Entwurf; die App steht in
+> [`../atelier3/`](../atelier3/) und läuft. Wie sie technisch gebaut ist,
+> welche Zahlen die Stellschrauben sind und welche Fallen beim Bauen
+> zugeschnappt sind, steht in [`../atelier3/README.md`](../atelier3/README.md).
+> Was sich gegenüber diesem Entwurf geändert hat, steht unten in Abschnitt 16.
+>
+> Was jetzt noch fehlt, ist das Einzige, was dieses Papier nicht selbst
+> liefern kann: **Menschen, die beide Apps benutzen.** Abschnitt 14.
+
 ---
 
 ## 1. Warum überhaupt ein zweites Atelier
@@ -356,21 +365,56 @@ Behauptung „senkt nachweislich den Cortisolspiegel“ ist deutlich stärker, a
 die Evidenz hergibt. Was wir bauen, ist eine Tätigkeit mit plausibler Wirkung.
 Nichts verlässt das Gerät, in keiner der beiden Apps.
 
-## 15. Was noch entschieden werden muss
+## 15. Was beim Bauen entschieden wurde
 
-- **Der Name.** „Blatt“ ist mein Vorschlag: die App, die einfach nur ein Blatt
-  ist. Alternativen: „Durchreiben“, „Relief“, oder gar kein Name auf dem
-  Homescreen, nur das Icon.
-- **Neun Pigmente — welche neun?** Aus den vier heutigen Farbwelten einen Satz
-  destillieren, der für sich steht und sich gut mischt.
-- **Wie kommt man an ein frisches Blatt?** Es muss möglich sein, darf aber nicht
-  danach schreien. Ein sehr stilles Zeichen in einer Ecke, das den Stapel und
-  ein neues Blatt anbietet. Kein Menüknopf, aber auch keine geheime Geste —
-  Geheimnisse sind gegenüber Erreichbarkeit unfair.
-- **Klang an oder aus beim ersten Start?** Er gehört zum Kern, verzerrt aber den
-  Vergleich, weil Atelier 2 stumm ist. Ich wäre dafür, ihn als Teil von 3.0 zu
-  testen und diesen Umstand beim Auswerten offen mitzudenken, statt den Entwurf
-  für die Messbarkeit zu beschneiden.
+Die offenen Punkte aus dem Entwurf, und wie sie ausgegangen sind:
+
+- **Der Name** ist „Blatt“ geworden: die App, die einfach nur ein Blatt ist.
+- **Die neun Pigmente** sind aus den vier Farbwelten des Mandala Ateliers
+  destilliert: Terrakotta, Ocker, Moos, Petrol, Indigo, Pflaume, Krapp,
+  Walnuss, Ruß. Sie mischen sich gut übereinander und decken den Kreis ab,
+  ohne bunt zu werden.
+- **Ein frisches Blatt** kommt über ein sehr stilles Zeichen unten rechts,
+  das ein Fach mit drei Zeilen öffnet: Neues Blatt, Blätter, Ton. Kein
+  Menüknopf, der ruft — aber auch keine geheime Geste.
+- **Der Klang** ist an, sehr leise, abschaltbar im Fach. Er gehört zum Kern,
+  und den Entwurf für die Messbarkeit zu beschneiden wäre der falsche Handel.
+  Dass Atelier 2 stumm ist, gehört beim Auswerten offen mitgedacht.
+
+## 16. Was sich gegenüber dem Entwurf geändert hat
+
+Drei Dinge, die sich erst beim Bauen zeigten:
+
+**Der Griff darf keine Schwelle sein.** Der Entwurf beschrieb Druck als das,
+was bestimmt, wie tief der Kontakt ins Relief greift. In der ersten Fassung
+war das eine Schwelle — und damit nahmen die Flächen bei einem Gerät ohne
+Drucksensor **nie** Farbe an; man bekam ausschließlich Linien. Jetzt ist es
+eine weiche Kurve ohne Nullstelle, gespeist aus Druck **und Langsamkeit**.
+Wer verweilt, greift in die Fläche. Das ist nicht nur der Notnagel für
+fehlende Sensoren, es ist die bessere Umsetzung des eigenen Versprechens:
+Die Langsamkeit trägt die Ausdruckskraft, nicht die Hardware.
+
+**Tag und Nacht sind zwei Papiere geworden, nicht zwei Themen.** Der Entwurf
+sagte dazu nichts. Ein helles Blatt am Abend blendet, ein dunkles Blatt mit
+subtraktivem Pigment wäre farblos. Also: bei Nacht getöntes Papier und helle
+Kreide — dieselbe Rechnung, umgedreht. Beides gibt es analog. Welches ein
+Blatt ist, entscheidet sich bei seiner Entstehung und bleibt dann; ein Blatt
+wechselt nicht die Farbe, nur weil es Abend wird.
+
+**Die Prägung hat einen Regler bekommen.** Abschnitt 9 nennt die Sichtbarkeit
+des unberührten Reliefs als größtes Risiko und verlangt, sie in drei bis vier
+Stufen an Menschen auszuprobieren. Dafür gibt es jetzt **`?relief=0…2`** —
+unsichtbar in der Oberfläche, damit Testpersonen nichts davon merken.
+Voreingestellt ist ein sehr zurückhaltender Wert: Auf dem unberührten Blatt
+ahnt man, dass etwas darunter liegt, lesen kann man es nicht.
+
+Beim Bauen ist übrigens genau der befürchtete Fehler einmal passiert. Die
+Prägung war um den Faktor 255 zu stark, und das unberührte Blatt zeigte das
+vollständige Mandala als saubere Strichzeichnung — ein geprägtes Ausmalbuch,
+also exakt die Fassung, vor der Abschnitt 9 warnt. Das war nur zu sehen,
+weil ein Bild davon gerendert und angesehen wurde. **Diese Zahl bleibt die
+Stelle, an der der Entwurf steht oder fällt**, und sie gehört als Erstes an
+echte Hände, bevor irgendetwas anderes verfeinert wird.
 
 ---
 

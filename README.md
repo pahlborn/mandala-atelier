@@ -1,5 +1,18 @@
 # Mandala Atelier
 
+> **In diesem Repository liegen zwei Apps.** Diese hier im Wurzelverzeichnis,
+> und daneben in [`atelier3/`](atelier3/) die App **„Blatt“ (Atelier 3.0)** –
+> kein Nachfolger, sondern eine **Gegenprobe** mit der entgegengesetzten
+> Wette. Beide bleiben lauffähig, beide werden getrennt installiert, und
+> Menschen sollen sie vergleichen. Das Warum steht in
+> [`docs/atelier-3.md`](docs/atelier-3.md), das Wie in
+> [`atelier3/README.md`](atelier3/README.md).
+>
+> Kurz: Atelier 2 wettet, **Ordnung wird geschenkt** – eine Handbewegung wird
+> achtundvierzigfach. Blatt wettet, **Ordnung wird hervorgebracht** – nichts
+> wird vervielfältigt, man reibt ein verborgenes Relief hervor. Welches die
+> bessere Viertelstunde ergibt, entscheiden Testpersonen, nicht Argumente.
+
 Eine Web-App für Erwachsene, um Mandalas zu **gestalten und zu kolorieren**.
 Schwesterprojekt zur Kinder-App „Malstudio“, aber eigenständig: eigenes Repo,
 eigene Zielgruppe, eigene Gestaltung.
@@ -24,6 +37,10 @@ arbeitet der Service Worker nicht:
 Danach die Seite in Safari öffnen und über „Teilen → Zum Home-Bildschirm“
 ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
 
+Für den Vergleich zusätzlich `/atelier3/` ablegen. Die beiden Apps haben
+eigene Icons, eigene Namen, eigene Service-Worker-Bereiche und eigene
+Speicher – sie gehen einander vollständig aus dem Weg.
+
 ## Randbedingungen
 
 - **Alles offline, alles im Browser.** Keine Server, keine KI zur Laufzeit,
@@ -43,6 +60,9 @@ ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
 
 ## Dateien
 
+    docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
+    atelier3/               Zweite App „Blatt“ – eigenes README dort
+
     index.html              App-Gerüst, Schubladen, Galerie
     fonts.css               Schriften als Daten-URI (erzeugt)
     style.css               Design-Tokens, Hell/Dunkel, Layout
@@ -54,6 +74,8 @@ ablegen. Die App startet dann im Vollbild und läuft auch ohne Netz.
     tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
+    tools/gen-atelier3-icons.js  Icons für „Blatt“
+    tools/test-atelier3.js  Testlauf für „Blatt“
     package.json            Nur devDependencies (playwright-core) für tools/
 
 Zur Laufzeit hat die App **keine Abhängigkeiten**. `node_modules` wird nur für
@@ -179,7 +201,8 @@ kommen dort dazu. Bausteine: `petalPoints`, `wedgeBandPoints`, `diamondPoints`,
 ## Testen
 
     npm install          # nur playwright-core, kein Browser-Download nötig
-    node tools/test-app.js
+    npm test             # diese App
+    npm run test:alle    # beide Apps
 
 Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
 

@@ -27,6 +27,29 @@ function findChrome() {
       if (stat.isFile()) return candidate;
     }
   }
+  return findInPlaywrightCache();
+}
+
+/* Playwright legt seine Browser versioniert ab (chromium-1194/…). Der feste
+   Pfad oben trifft das nicht, deshalb hier noch einmal mit Nachsehen. */
+function findInPlaywrightCache() {
+  const roots = [
+    process.env.PLAYWRIGHT_BROWSERS_PATH,
+    '/opt/pw-browsers',
+    path.join(process.env.HOME || '', '.cache', 'ms-playwright')
+  ];
+
+  for (const root of roots) {
+    if (!root || !fs.existsSync(root)) continue;
+    let entries;
+    try { entries = fs.readdirSync(root); } catch (err) { continue; }
+
+    for (const entry of entries.sort().reverse()) {
+      if (entry.indexOf('chromium') !== 0) continue;
+      const binary = path.join(root, entry, 'chrome-linux', 'chrome');
+      if (fs.existsSync(binary) && fs.statSync(binary).isFile()) return binary;
+    }
+  }
   return null;
 }
 
