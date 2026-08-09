@@ -515,6 +515,9 @@ const MOTIFS = [
     name: 'Blüte', note: 'Acht große Blätter, viel Fläche',
     build: function (p) {
       drawRing(p, 122, 2);
+      drawRing(p, 214, 1.4);
+      drawRing(p, 306, 1.4);
+      drawRing(p, 368, 1.4);
       drawClosedLoop(p, petalPoints(120, 402, p.step * 0.44, 30), 2.4);
       drawClosedLoop(p, petalPoints(124, 300, p.step * 0.26, 26), 1.8);
       drawClosedLoop(p, rotatePoints(petalPoints(126, 250, p.step * 0.24, 24), p.step / 2), 1.8);
@@ -539,11 +542,14 @@ const MOTIFS = [
     id: 'muschelspirale', world: 'natur', axes: 6,
     name: 'Muschelspirale', note: 'Sechs Arme, weite Bögen',
     build: function (p) {
-      drawRing(p, 300, 1.6);
-      drawRing(p, 200, 1.6);
-      drawRing(p, 100, 1.6);
+      drawRing(p, 360, 1.6);
+      drawRing(p, 290, 1.6);
+      drawRing(p, 220, 1.6);
+      drawRing(p, 150, 1.6);
+      drawRing(p, 90, 1.6);
+      /* Die Arme müssen Nabe und Außenring wirklich berühren. */
       [0, 0.33, 0.66].forEach(function (offset) {
-        drawPolyline(p, rotatePoints(spiralPoints(50, 404, p.step * 1.85, 64), offset * p.step), 2);
+        drawPolyline(p, rotatePoints(spiralPoints(R_IN, R_OUT, p.step * 1.85, 72), offset * p.step), 2);
       });
       drawDotAccent(p, 250, 7, 1.6);
     }
@@ -578,9 +584,11 @@ const MOTIFS = [
     id: 'ruhefeld', world: 'zen', axes: 8,
     name: 'Ruhefeld', note: 'Wenige große Flächen, viel Raum',
     build: function (p) {
+      drawRing(p, 388, 1.6);
       drawRing(p, 356, 1.6);
       drawRing(p, 250, 1.6);
       drawRing(p, 150, 1.6);
+      drawRing(p, 92, 1.6);
       drawClosedLoop(p, wedgeBandPoints(254, 352, p.step * 0.36, 16), 2);
       drawClosedLoop(p, rotatePoints(wedgeBandPoints(154, 246, p.step * 0.30, 16), p.step / 2), 2);
       drawDotAccent(p, 382, 9, 1.6);
@@ -594,8 +602,13 @@ const MOTIFS = [
     name: 'Winter', note: 'Schneekristall mit Seitenästen',
     build: function (p) {
       drawRing(p, 372, 1.4);
+      drawRing(p, 300, 1.4);
+      drawRing(p, 224, 1.4);
+      drawRing(p, 150, 1.4);
       drawRing(p, 96, 1.6);
-      drawPolyline(p, [pol(50, UP), pol(398, UP)], 2.6);
+      /* Von Nabe bis Außenring durchgezogen – ein offenes Ende würde
+         benachbarte Felder verbinden. */
+      drawPolyline(p, [pol(R_IN, UP), pol(R_OUT, UP)], 2.6);
       [[150, 62], [225, 72], [300, 62], [356, 44]].forEach(function (pair) {
         drawPolyline(p, [pol(pair[0], UP), branchTip(pair[0], pair[1], 1)], 2);
         drawPolyline(p, [pol(pair[0], UP), branchTip(pair[0], pair[1], -1)], 2);
@@ -607,7 +620,9 @@ const MOTIFS = [
     id: 'fruehling', world: 'jahr', axes: 8,
     name: 'Frühling', note: 'Knospen in drei Lagen',
     build: function (p) {
+      drawRing(p, 356, 1.4);
       drawRing(p, 300, 1.6);
+      drawRing(p, 226, 1.4);
       drawRing(p, 150, 1.6);
       drawClosedLoop(p, petalPoints(302, 398, p.step * 0.26, 24, 0.7), 2.2);
       drawClosedLoop(p, rotatePoints(petalPoints(302, 362, p.step * 0.20, 24, 0.7), p.step / 2), 1.8);
@@ -1066,8 +1081,28 @@ function guideTick(time) {
    ------------------------------------------------------------------------- */
 
 const history = [];
+const future = [];          // Wiederherstellen
 
 function pushHistory(names) {
+  future.length = 0;        // ein neuer Zug verwirft den Wiederherstellen-Weg
+  history.push(snapshot(names));
+  trimHistory();
+  syncUI();
+}
+
+/* Das Speicherlimit gilt für beide Stapel zusammen – sonst verdoppelt
+   Wiederherstellen den Verbrauch auf dem iPad. */
+function trimHistory() {
+  const weigh = function (sum, e) { return sum + e.bytes; };
+  let total = history.reduce(weigh, 0) + future.reduce(weigh, 0);
+  while (history.length > HISTORY_MAX) total -= history.shift().bytes;
+  while (future.length > HISTORY_MAX) total -= future.pop().bytes;
+  while (total > HISTORY_BYTES && (history.length > 1 || future.length)) {
+    total -= (future.length ? future.pop() : history.shift()).bytes;
+  }
+}
+
+function snapshot(names) {
   const entry = { layers: {}, bytes: 0 };
   names.forEach(function (name) {
     const source = layers[name].canvas;
@@ -1078,18 +1113,10 @@ function pushHistory(names) {
     entry.layers[name] = copy;
     entry.bytes += source.width * source.height * 4;
   });
-  history.push(entry);
-
-  let total = history.reduce(function (sum, e) { return sum + e.bytes; }, 0);
-  while (history.length > HISTORY_MAX || (history.length > 1 && total > HISTORY_BYTES)) {
-    total -= history.shift().bytes;
-  }
-  syncUI();
+  return entry;
 }
 
-function undo() {
-  const entry = history.pop();
-  if (!entry) return;
+function applyEntry(entry) {
   Object.keys(entry.layers).forEach(function (name) {
     const ctx = layers[name].ctx;
     ctx.save();
@@ -1098,6 +1125,23 @@ function undo() {
     ctx.drawImage(entry.layers[name], 0, 0);
     ctx.restore();
   });
+}
+
+function undo() {
+  const entry = history.pop();
+  if (!entry) return;
+  future.push(snapshot(Object.keys(entry.layers)));
+  applyEntry(entry);
+  trimHistory();
+  syncUI();
+}
+
+function redo() {
+  const entry = future.pop();
+  if (!entry) return;
+  history.push(snapshot(Object.keys(entry.layers)));
+  applyEntry(entry);
+  trimHistory();
   syncUI();
 }
 
@@ -1337,6 +1381,7 @@ function cacheUi() {
   ui.controls   = document.getElementById('controls');
   ui.floatbar   = document.getElementById('floatbar');
   ui.palette    = document.getElementById('palette');
+  ui.quickPalette = document.getElementById('quick-palette');
   ui.psets      = document.getElementById('palette-sets');
   ui.axes       = document.getElementById('axes');
   ui.legend     = document.getElementById('legend');
@@ -1346,6 +1391,8 @@ function cacheUi() {
   ui.guides     = document.getElementById('guides');
   ui.width      = document.getElementById('width');
   ui.undo       = document.getElementById('btn-undo');
+  ui.redo       = document.getElementById('btn-redo');
+  ui.quickCollapse = document.getElementById('btn-quick-collapse');
   ui.clear      = document.getElementById('btn-clear');
   ui.save       = document.getElementById('btn-save');
   ui.theme      = document.getElementById('btn-theme');
@@ -1403,17 +1450,20 @@ function buildPaletteSets() {
   });
 }
 
+/* Die Pigmente stehen zweimal: in der Schublade und im Schnellzugriff. */
 function buildPalette() {
-  ui.palette.textContent = '';
-  pigments().forEach(function (pigment) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'pigment';
-    button.style.background = pigment.hex;
-    button.dataset.hex = pigment.hex;
-    button.title = pigment.name;
-    button.setAttribute('aria-label', pigment.name);
-    ui.palette.appendChild(button);
+  [ui.palette, ui.quickPalette].forEach(function (host) {
+    host.textContent = '';
+    pigments().forEach(function (pigment) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pigment';
+      button.style.background = pigment.hex;
+      button.dataset.hex = pigment.hex;
+      button.title = pigment.name;
+      button.setAttribute('aria-label', pigment.name);
+      host.appendChild(button);
+    });
   });
 }
 
@@ -1476,6 +1526,7 @@ function loadMotif(id) {
 
   state.motif = motif;
   history.length = 0;
+  future.length = 0;
   clearLayer('fill');
   clearLayer('draw');
 
@@ -1523,6 +1574,7 @@ function clearSheet() {
     loadMotif(state.motif.id);
   } else {
     history.length = 0;
+    future.length = 0;
     clearLayer('fill');
     clearLayer('draw');
     syncUI();
@@ -1575,7 +1627,7 @@ function syncUI() {
   ui.tools.forEach(function (button) {
     button.classList.toggle('is-active', button.dataset.tool === state.tool);
   });
-  Array.prototype.forEach.call(ui.palette.children, function (button) {
+  Array.prototype.forEach.call(document.querySelectorAll('.pigment'), function (button) {
     button.classList.toggle('is-active', button.dataset.hex === state.color);
   });
   Array.prototype.forEach.call(ui.psets.children, function (button) {
@@ -1594,6 +1646,7 @@ function syncUI() {
   ui.guides.checked = state.guides;
   ui.width.value = state.width;
   ui.undo.disabled = history.length === 0;
+  ui.redo.disabled = future.length === 0;
 
   if (!state.motif) {
     ui.hint.textContent = 'Leeres Blatt · zeichne ein Segment, der Rest entsteht von selbst';
@@ -1786,6 +1839,13 @@ function bindEvents() {
   }
 
   ui.undo.addEventListener('click', undo);
+  ui.redo.addEventListener('click', redo);
+  ui.quickCollapse.addEventListener('click', function () {
+    const collapsed = document.body.classList.toggle('quick-collapsed');
+    ui.quickCollapse.title = collapsed ? 'Leiste ausklappen' : 'Leiste einklappen';
+    Store.set('quickCollapsed', collapsed);
+    fitStage();
+  });
   ui.clear.addEventListener('click', clearSheet);
   ui.save.addEventListener('click', exportImage);
   ui.keep.addEventListener('click', keepWork);
@@ -1828,7 +1888,7 @@ function bindEvents() {
   document.addEventListener('keydown', function (event) {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault();
-      undo();
+      event.shiftKey ? redo() : undo();
       return;
     }
     if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -1872,6 +1932,10 @@ function start() {
   state.guides = Store.get('guides', state.guides);
   setTheme(Store.get('theme', preferredTheme()));
   setOwner(Store.get('owner', ''));
+  if (Store.get('quickCollapsed', false)) {
+    document.body.classList.add('quick-collapsed');
+    ui.quickCollapse.title = 'Leiste ausklappen';
+  }
 
   fitStage();
   loadMotif(Store.get('motif', 'sternkranz'));

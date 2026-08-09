@@ -59,6 +59,32 @@
   </section>
 
   <!-- ---------------------------------------------------------------
+       Schnellzugriff: was beim Malen ständig gebraucht wird.
+       Bleibt sichtbar, auch im Vollbild.
+       --------------------------------------------------------------- -->
+  <div class="quickbar" id="quickbar">
+    <div class="quick-tools" role="group" aria-label="Werkzeug">
+      <button type="button" class="tool is-active" data-tool="pen" title="Stift (1)">
+        <span class="glyph" aria-hidden="true">✎</span><span class="tool-name">Stift</span>
+      </button>
+      <button type="button" class="tool" data-tool="fill" title="Füllen (2)">
+        <span class="glyph" aria-hidden="true">◑</span><span class="tool-name">Füllen</span>
+      </button>
+      <button type="button" class="tool" data-tool="eraser" title="Radierer (3)">
+        <span class="glyph" aria-hidden="true">⌫</span><span class="tool-name">Radierer</span>
+      </button>
+    </div>
+
+    <div class="quick-colors" id="quick-palette" role="group" aria-label="Pigment"></div>
+
+    <div class="quick-actions" role="group" aria-label="Schritte">
+      <button type="button" class="icon-button" id="btn-undo" title="Rückgängig (Cmd/Strg+Z)" aria-label="Rückgängig">↺</button>
+      <button type="button" class="icon-button" id="btn-redo" title="Wiederherstellen (Cmd/Strg+Umschalt+Z)" aria-label="Wiederherstellen">↻</button>
+      <button type="button" class="icon-button" id="btn-quick-collapse" title="Leiste einklappen" aria-label="Leiste einklappen">▾</button>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------------------
        Schublade links: Motivwelten
        --------------------------------------------------------------- -->
   <aside id="library" class="drawer drawer-left" aria-label="Motivwelten" aria-hidden="true">
@@ -128,10 +154,7 @@
 
       <section class="panel">
         <h3>Blatt</h3>
-        <div class="row">
-          <button type="button" id="btn-undo" class="action">Rückgängig</button>
-          <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
-        </div>
+        <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
         <button type="button" id="btn-keep" class="action primary">In die Galerie legen</button>
         <button type="button" id="btn-save" class="action">Als Bild speichern</button>
       </section>
