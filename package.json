@@ -2,11 +2,15 @@
   "name": "mandala-atelier",
   "version": "1.0.0",
   "private": true,
-  "description": "Mandalas gestalten und kolorieren – offline im Browser. Zur Laufzeit ohne Abhängigkeiten.",
+  "description": "Zwei Ateliers nebeneinander: Mandalas gestalten und kolorieren (Wurzel) und „Blatt“ – Atelier 3.0 als Gegenprobe (atelier3/). Offline im Browser, zur Laufzeit ohne Abhängigkeiten.",
   "license": "UNLICENSED",
   "scripts": {
     "test": "node tools/test-app.js",
-    "icons": "node tools/gen-icons.js"
+    "test:atelier3": "node tools/test-atelier3.js",
+    "test:nebeneinander": "node tools/test-nebeneinander.js",
+    "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js",
+    "icons": "node tools/gen-icons.js",
+    "icons:atelier3": "node tools/gen-atelier3-icons.js"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"
