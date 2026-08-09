@@ -271,6 +271,24 @@ body.is-quiet .topbar { display: none; }
   aspect-ratio: auto;
 }
 
+/* Grundformen. Nur sichtbar, solange das Werkzeug „Form“ gewählt ist. */
+.quick-shapes { display: flex; flex-wrap: wrap; gap: 5px; flex: none; }
+
+.shape {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  cursor: pointer;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.shape:hover { border-color: var(--accent); }
+.shape.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+body.quick-collapsed .quick-shapes { display: none; }
+
 .quick-actions { display: flex; gap: 5px; flex: none; }
 
 .quick-zoom { display: flex; align-items: center; gap: 5px; flex: none; }
@@ -326,6 +344,7 @@ body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
 
 @media (max-width: 700px) {
   .quick-tools .tool { padding: 8px 10px; gap: 5px; }
+  .shape { padding: 8px 9px; font-size: 13px; }
   /* Legendenknopf: Farbe und Zahl zusammen, damit die Aufgabe ohne Umweg
    lösbar ist. */
 .quick-legend {

@@ -146,6 +146,15 @@ verfügbar (Safari im privaten Modus), hält die App die Werke nur für die
 laufende Sitzung – und sagt das, statt es stillschweigend zu schlucken. Jedes
 Werk hat einen Titel. Alles bleibt auf dem Gerät und wird nirgends hingeschickt.
 
+**Grundformen.** Freihand gezogene Kreise werden krumm – das liegt an der
+Sache, nicht am Können. Das Werkzeug **Form** setzt deshalb dieselben fünf
+Bausteine exakt, aus denen auch die Vorlagen bestehen: Ring, Speiche, Blatt,
+Raute, Band. Aufsetzen legt Anfang und Achse fest, Ziehen nach außen die
+Länge, seitliches Ziehen die Breite; losgelassen wird die Form auf allen
+Achsen zugleich gesetzt. Die Vorschau liegt auf der Rasterebene, die ohnehin
+laufend neu gezeichnet wird – so bleibt nichts zurück, wenn man abbricht.
+Der Testlauf misst die Rundheit an 72 Winkeln.
+
 **Symmetrie.** `segmentLine(p0, p1)` zeichnet jede Linie n-mal um die Mitte
 rotiert; bei aktiver Spiegelung zusätzlich an der Waagerechten gespiegelt.
 Achsen 6/8/10/12/16/24, mit Spiegelung also bis 48-fach.

@@ -256,6 +256,8 @@ const state = {
   guides:     true,
   fillAll:    true,   // ein Tipp färbt alle gleichwertigen Felder
   tool:       'pen',
+  shape:      'ring',   // Grundform des Form-Werkzeugs
+  shapeFrom:  null,     // Anfasspunkt, solange gezogen wird
   palette:    'erde',
   color:      PALETTES[0].colors[0].hex,
   width:      4,
@@ -1033,6 +1035,105 @@ function strokeOn(ctx, a, b, erasing) {
 
 
 /* ---------------------------------------------------------------------------
+   8b. Grundformen
+
+   Freihand gezogene Kreise werden krumm – das liegt nicht am Können, sondern
+   an der Sache. Die 26 Vorlagen bestehen aus fünf Bausteinen, und genau die
+   gibt es hier als Werkzeug: Ring, Speiche, Blatt, Raute, Band. Sie entstehen
+   aus denselben Funktionen wie die Vorlagen, sind also exakt.
+
+   Bedienung: Aufsetzen legt Anfang und Achse fest, Ziehen nach außen die
+   Länge, seitliches Ziehen die Breite. Losgelassen wird die Form auf allen
+   Achsen zugleich gesetzt.
+   ------------------------------------------------------------------------- */
+
+const SHAPE_NAMES = {
+  ring:    'Ring',
+  spoke:   'Speiche',
+  petal:   'Blatt',
+  diamond: 'Raute',
+  band:    'Band'
+};
+
+function polarOf(point) {
+  const dx = point[0] - CX, dy = point[1] - CY;
+  return { r: Math.hypot(dx, dy), a: Math.atan2(dy, dx) };
+}
+
+/* Kürzester Winkelabstand, damit der Sprung bei ±180° nicht stört. */
+function angleGap(a, b) {
+  let d = a - b;
+  while (d > Math.PI) d -= TAU;
+  while (d < -Math.PI) d += TAU;
+  return d;
+}
+
+/* Aus Anfasspunkt und aktuellem Punkt die Form beschreiben. */
+function shapeFigure(from, to) {
+  const start = polarOf(from);
+  const now = polarOf(to);
+  const step = TAU / state.axes;
+  const rInner = Math.max(R_IN * 0.5, Math.min(start.r, now.r));
+  const rOuter = Math.max(rInner + 6, Math.max(start.r, now.r));
+  const spread = Math.abs(angleGap(now.a, start.a));
+  const half = Math.max(step * 0.12, Math.min(step * 0.46, spread || step * 0.3));
+
+  return {
+    kind: state.shape,
+    angle: start.a,
+    rInner: rInner,
+    rOuter: rOuter,
+    half: half,
+    radius: now.r
+  };
+}
+
+/* Die Form auf einen Kontext zeichnen – für Vorschau wie fürs Festlegen. */
+function strokeFigure(ctx, figure, color, width) {
+  const pen = makePen(ctx, state.axes);
+  /* Die Bausteine liegen um UP; hierher gedreht, wo der Finger aufsetzte. */
+  const turn = figure.angle - UP;
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  if (figure.kind === 'ring') {
+    drawRing(pen, Math.max(8, figure.radius), width);
+  } else if (figure.kind === 'spoke') {
+    drawPolyline(pen, rotatePoints(
+      [pol(figure.rInner, UP), pol(figure.rOuter, UP)], turn), width);
+  } else if (figure.kind === 'petal') {
+    drawClosedLoop(pen, rotatePoints(
+      petalPoints(figure.rInner, figure.rOuter, figure.half, 26), turn), width);
+  } else if (figure.kind === 'diamond') {
+    drawClosedLoop(pen, rotatePoints(
+      diamondPoints(figure.rInner, figure.rOuter, figure.half), turn), width);
+  } else if (figure.kind === 'band') {
+    drawClosedLoop(pen, rotatePoints(
+      wedgeBandPoints(figure.rInner, figure.rOuter, figure.half, 16), turn), width);
+  }
+
+  ctx.restore();
+}
+
+/* Vorschau liegt auf der Rasterebene – die wird ohnehin dauernd neu gemalt. */
+function previewFigure(figure) {
+  renderGuides();
+  const ctx = layers.guide.ctx;
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  strokeFigure(ctx, figure, state.color, state.width);
+  ctx.restore();
+}
+
+function commitFigure(figure) {
+  strokeFigure(layers.draw.ctx, figure, state.color, state.width);
+}
+
+
+/* ---------------------------------------------------------------------------
    9. Füllen
 
    Scanline-Flood-Fill mit Span-Verfolgung. Pro Symmetrie-Position wird ein
@@ -1652,6 +1753,7 @@ function cacheUi() {
   ui.floatbar   = document.getElementById('floatbar');
   ui.palette    = document.getElementById('palette');
   ui.quickPalette = document.getElementById('quick-palette');
+  ui.quickShapes  = document.getElementById('quick-shapes');
   ui.psets      = document.getElementById('palette-sets');
   ui.axes       = document.getElementById('axes');
   ui.legend     = document.getElementById('legend');
@@ -1787,6 +1889,11 @@ function loadOwnPalette() {
 
 /* Ein Pigment der eigenen Farbwelt umfärben. */
 function mixPigment(hex) {
+  ui.quickShapes.hidden = state.tool !== 'shape';
+  Array.prototype.forEach.call(ui.quickShapes.children, function (button) {
+    button.classList.toggle('is-active', button.dataset.shape === state.shape);
+  });
+
   const own = ownPalette();
   const index = own.colors.reduce(function (found, c, i) {
     return c.hex === state.color ? i : found;
@@ -2069,6 +2176,11 @@ function syncUI() {
         ? 'Ein Tipp färbt alle gleichwertigen Felder zugleich.'
         : 'Ein Tipp färbt nur das angetippte Feld.');
   ui.width.value = state.width;
+  ui.quickShapes.hidden = state.tool !== 'shape';
+  Array.prototype.forEach.call(ui.quickShapes.children, function (button) {
+    button.classList.toggle('is-active', button.dataset.shape === state.shape);
+  });
+
   const own = ownPalette();
   ui.mixer.hidden = state.palette !== own.id;
   if (!ui.mixer.hidden) ui.mixColor.value = state.color;
@@ -2257,6 +2369,7 @@ function bindEvents() {
   /* Beginnt eine Geste, wird der eben angefangene Strich zurückgenommen –
      sonst bliebe von jedem Zoomversuch ein Kringel stehen. */
   function abandonStroke() {
+    if (state.shapeFrom) { state.shapeFrom = null; renderGuides(); }
     if (!state.drawing) return;
     state.drawing = false;
     const entry = history.pop();
@@ -2278,6 +2391,13 @@ function bindEvents() {
     }
 
     const point = toLocal(event);
+
+    if (state.tool === 'shape') {
+      canvas.setPointerCapture(event.pointerId);
+      state.shapeFrom = point;
+      previewFigure(shapeFigure(point, point));
+      return;
+    }
 
     if (state.tool === 'fill') {
       pushHistory(['fill']);
@@ -2309,11 +2429,27 @@ function bindEvents() {
       return;
     }
 
+    if (state.shapeFrom) {
+      event.preventDefault();
+      previewFigure(shapeFigure(state.shapeFrom, toLocal(event)));
+      return;
+    }
+
     if (!state.drawing) return;
     event.preventDefault();
     const point = toLocal(event);
     segmentLine(state.last, point);
     state.last = point;
+  });
+
+  canvas.addEventListener('pointerup', function (event) {
+    if (!state.shapeFrom) return;
+    const figure = shapeFigure(state.shapeFrom, toLocal(event));
+    state.shapeFrom = null;
+    renderGuides();
+    pushHistory(['draw']);
+    commitFigure(figure);
+    say(SHAPE_NAMES[figure.kind] + ' gesetzt.');
   });
 
   ['pointerup', 'pointercancel'].forEach(function (type) {
@@ -2344,6 +2480,15 @@ function bindEvents() {
 
     const tool = target.closest('.tool');
     if (tool) { state.tool = tool.dataset.tool; syncUI(); return; }
+
+    const shape = target.closest('.shape');
+    if (shape) {
+      state.shape = shape.dataset.shape;
+      state.tool = 'shape';
+      Store.set('shape', state.shape);
+      syncUI();
+      return;
+    }
 
     const set = target.closest('.pset');
     if (set) { setPalette(set.dataset.palette); return; }
@@ -2461,7 +2606,7 @@ function bindEvents() {
     if (event.key === '-') { zoomBy(1 / 1.25); return; }
     if (event.key === '0') { resetZoom(); return; }
 
-    const keys = { '1': 'pen', '2': 'fill', '3': 'eraser' };
+    const keys = { '1': 'pen', '2': 'fill', '3': 'shape', '4': 'eraser' };
     if (keys[event.key]) { state.tool = keys[event.key]; syncUI(); return; }
     if (event.key === 'm') toggleDrawer('library');
     if (event.key === 'w') toggleDrawer('controls');
@@ -2498,6 +2643,7 @@ function start() {
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
   state.fillAll = Store.get('fillAll', state.fillAll);
+  state.shape = Store.get('shape', state.shape);
   setTheme(Store.get('theme', preferredTheme()));
   state.people = Store.get('people', [{ id: 'p1', name: Store.get('owner', '') }]);
   state.person = Store.get('person', state.people[0].id);
@@ -2535,6 +2681,9 @@ window.MandalaAtelier = {
   setZoom: setZoom,
   zoomBy: zoomBy,
   resetZoom: resetZoom,
+  shapeFigure: shapeFigure,
+  commitFigure: commitFigure,
+  SHAPE_NAMES: SHAPE_NAMES,
   Gallery: Gallery,
   keepWork: keepWork,
   setPalette: setPalette,
