@@ -193,7 +193,7 @@ async function run() {
       return { id: id, expected: motif.axes, hit: hit, of: motif.axes, kind: 'Positionen' };
     }
 
-    return [
+    const rows = [
       tap('sternkranz', 340, 0),
       tap('mustertanz', 300, 0.2),
       tap('zaehlen6', 330, 0),
@@ -201,6 +201,20 @@ async function run() {
       tap('rechnen10', 330, 0),
       tap('rechnen20', 330, 0)
     ];
+
+    /* Schalter aus: dann färbt auch bei den Ziermotiven ein Tipp nur ein
+       Feld. Bei den Aufgabenmandalas ändert der Schalter nichts – dort ist
+       das Einzelfüllen Bedingung, nicht Einstellung. */
+    app.state.fillAll = false;
+    const single = tap('sternkranz', 340, 0);
+    const exercise = tap('zaehlen6', 330, 0);
+    app.state.fillAll = true;
+
+    rows.push({ id: 'sternkranz, Schalter aus', expected: 1, hit: single.hit,
+                of: single.of, kind: 'Positionen' });
+    rows.push({ id: 'zaehlen6, Schalter aus', expected: 1, hit: exercise.hit,
+                of: exercise.of, kind: 'Feldern' });
+    return rows;
   });
 
   const tapProblems = [];
@@ -222,6 +236,7 @@ async function run() {
     { name: 'iPad quer',  width: 1180, height: 820 },
     { name: 'iPad hoch',  width: 820,  height: 1180 },
     { name: 'Telefon',    width: 390,  height: 844 },
+    { name: 'Telefon groß', width: 430, height: 932 },
     { name: 'Schreibtisch', width: 1600, height: 900 }
   ];
 
@@ -236,20 +251,38 @@ async function run() {
     const box = await page.evaluate(function () {
       const stack = document.getElementById('stack').getBoundingClientRect();
       const stage = document.querySelector('.stage').getBoundingClientRect();
+
+      /* Alle Pigmente der Farbwelt müssen im Schnellzugriff sichtbar sein –
+         eine seitlich scrollbare Reihe findet niemand. */
+      const row = document.getElementById('quick-palette').getBoundingClientRect();
+      const swatches = Array.prototype.slice.call(
+        document.querySelectorAll('#quick-palette .pigment'));
+      const shown = swatches.filter(function (el) {
+        const b = el.getBoundingClientRect();
+        return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
+      }).length;
+
       return {
         width: stack.width,
         height: stack.height,
         contained: stack.top >= stage.top - 1 && stack.bottom <= stage.bottom + 1,
-        overflow: document.documentElement.scrollWidth > window.innerWidth + 1
+        overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+        pigments: swatches.length,
+        shown: shown
       };
     });
     const square = Math.abs(box.width - box.height) <= 1;
-    if (!square || box.overflow || !box.contained) layoutProblems.push(viewport.name);
+    const allShown = box.shown === box.pigments;
+    if (!square || box.overflow || !box.contained || !allShown) {
+      layoutProblems.push(viewport.name);
+    }
     console.log(
       pad('  ' + viewport.name, 26) +
       pad(Math.round(box.width) + ' × ' + Math.round(box.height), 16) +
+      pad(box.shown + '/' + box.pigments + ' Farben', 14) +
       (square ? 'quadratisch' : '← gestaucht') +
       (box.contained ? '' : ', ← ragt aus der Bühne') +
+      (allShown ? '' : ', ← Farben abgeschnitten') +
       (box.overflow ? ', ← Seite läuft seitlich über' : '')
     );
   }
@@ -314,6 +347,163 @@ async function run() {
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
 
+  /* Vergrößern: Knöpfe, richtige Koordinaten trotz Maßstab, und – der
+     eigentliche Anlass – zwei Finger dürfen nie einen Strich hinterlassen. */
+  console.log('\nVergrößern');
+  const zoom = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.resetZoom();
+    app.loadMotif('sternkranz');
+
+    app.zoomBy(1.25);
+    app.zoomBy(1.25);
+    const scaled = app.state.zoom;
+
+    /* Ein Tipp muss trotz Maßstab an der gemeinten Stelle landen. */
+    const canvas = app.layers.draw.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const sx = rect.left + (450 / 900) * rect.width;
+    const sy = rect.top + (180 / 900) * rect.height;
+    const touch = function (type, id, x, y) {
+      return new PointerEvent(type, {
+        clientX: x, clientY: y, pointerId: id,
+        pointerType: 'touch', bubbles: true, isPrimary: id === 1
+      });
+    };
+    canvas.dispatchEvent(touch('pointerdown', 1, sx, sy));
+    canvas.dispatchEvent(touch('pointerup', 1, sx, sy));
+
+    const dpr = canvas.width / app.SIZE;
+    const data = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let hit = false;
+    const x = Math.round(450 * dpr), y = Math.round(180 * dpr);
+    for (let oy = -8; oy <= 8 && !hit; oy++) {
+      for (let ox = -8; ox <= 8 && !hit; ox++) {
+        if (data[((y + oy) * canvas.width + (x + ox)) * 4 + 3] > 60) hit = true;
+      }
+    }
+
+    /* Zwei Finger: schieben und zoomen, aber nicht malen. */
+    app.resetZoom();
+    app.loadMotif('sternkranz');
+    const before = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data.slice();
+    const box = canvas.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    canvas.dispatchEvent(touch('pointerdown', 1, cx - 60, cy));
+    canvas.dispatchEvent(touch('pointerdown', 2, cx + 60, cy));
+    for (let i = 1; i <= 8; i++) {
+      canvas.dispatchEvent(touch('pointermove', 1, cx - 60 - i * 8, cy));
+      canvas.dispatchEvent(touch('pointermove', 2, cx + 60 + i * 8, cy));
+    }
+    canvas.dispatchEvent(touch('pointerup', 1, cx - 120, cy));
+    canvas.dispatchEvent(touch('pointerup', 2, cx + 120, cy));
+    const after = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    let changed = 0;
+    for (let i = 3; i < after.length; i += 4 * 64) {
+      if (after[i] !== before[i]) changed++;
+    }
+    const gestureZoom = app.state.zoom;
+    app.resetZoom();
+
+    return {
+      scaled: scaled,
+      reset: app.state.zoom,
+      hit: hit,
+      clean: changed === 0,
+      gestureZoom: gestureZoom
+    };
+  });
+
+  const zoomOk = Math.abs(zoom.scaled - 1.5625) < 0.01 && zoom.reset === 1 &&
+    zoom.hit && zoom.clean && zoom.gestureZoom > 1.5;
+  console.log('  Knöpfe: ' + Math.round(zoom.scaled * 100) + ' %, zurück auf ' +
+    Math.round(zoom.reset * 100) + ' %');
+  console.log('  Zeichnen trifft trotz Maßstab: ' + (zoom.hit ? 'ja' : '← NEIN'));
+  console.log('  Zwei Finger zoomen auf ' + Math.round(zoom.gestureZoom * 100) +
+    ' % und hinterlassen keinen Strich: ' + (zoom.clean ? 'ja' : '← NEIN'));
+
+  /* Größe der einzelnen Felder. Nicht nur „läuft Farbe bis in die Ecken“,
+     sondern: Wie viel färbt ein Tipp wirklich? Zu große Felder wirken wie
+     eine offene Linie, auch wenn die Geometrie geschlossen ist. Für die
+     Messung wird die Symmetrie abgeschaltet, sonst misst man n Felder. */
+  console.log('\nGrößtes Einzelfeld je Motiv');
+  const cells = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const canvas = app.layers.fill.canvas;
+    const w = canvas.width, h = canvas.height, dpr = w / app.SIZE;
+    const ctx = canvas.getContext('2d');
+    const rOut = app.R_OUT * dpr;
+
+    function measure() {
+      const data = ctx.getImageData(0, 0, w, h).data;
+      let inside = 0, filled = 0;
+      const sectors = new Set();
+      for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+          const dx = x - w / 2, dy = y - h / 2;
+          if (dx * dx + dy * dy > rOut * rOut) continue;
+          inside++;
+          if (data[(y * w + x) * 4 + 3] > 0) {
+            filled++;
+            sectors.add(Math.round(((Math.atan2(dy, dx) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 90)));
+          }
+        }
+      }
+      return { share: (filled / inside) * 100, degrees: sectors.size * 2 };
+    }
+
+    return app.MOTIFS.map(function (motif) {
+      let worst = { share: 0, degrees: 0 };
+      [70, 120, 170, 220, 270, 320, 370, 400].forEach(function (r) {
+        [0, 0.15, 0.3, -0.15].forEach(function (offset) {
+          app.loadMotif(motif.id);
+          const kind = motif.kind;
+          motif.kind = 'count';                    // Symmetrie fürs Messen aus
+          const p = app.pol(r, -Math.PI / 2 + offset * (Math.PI * 2 / motif.axes));
+          app.floodFill(p[0], p[1], '#2e6b6b');
+          motif.kind = kind;
+          const result = measure();
+          if (result.share > worst.share) worst = result;
+        });
+      });
+      return {
+        id: motif.id,
+        name: motif.name,
+        kind: motif.kind || 'plain',
+        share: worst.share,
+        degrees: worst.degrees,
+        segment: 360 / motif.axes
+      };
+    });
+  });
+
+  /* Zähl- und Rechenmandalas haben absichtlich große Felder, ebenso das
+     Kindergarten-Motiv. Für alles andere gilt eine Obergrenze. */
+  const BIG_ON_PURPOSE = ['zaehlen6', 'zaehlen10', 'rechnen10', 'rechnen20', 'ersteformen'];
+  const cellProblems = [];
+
+  cells.sort(function (a, b) { return b.share - a.share; });
+  cells.slice(0, 6).forEach(function (cell) {
+    console.log(
+      pad('  ' + cell.name, 26) +
+      pad(cell.share.toFixed(1) + ' %', 10) +
+      pad(Math.round(cell.degrees) + '° breit', 13) +
+      'Segment ' + Math.round(cell.segment) + '°'
+    );
+  });
+
+  cells.forEach(function (cell) {
+    const limit = BIG_ON_PURPOSE.indexOf(cell.id) >= 0 ? 12 : 4;
+    /* Reicht ein Feld deutlich über sein Segment hinaus, ist eine Linie offen. */
+    if (cell.share > limit || cell.degrees > cell.segment * 1.6) cellProblems.push(cell.name);
+  });
+  if (cellProblems.length) {
+    console.log('  ← zu große oder segmentübergreifende Felder: ' + cellProblems.join(', '));
+  }
+
   /* Galerie: ablegen, wiederfinden, umbenennen, herausnehmen. */
   const gallery = await page.evaluate(function () {
     const app = window.MandalaAtelier;
@@ -352,6 +542,76 @@ async function run() {
   console.log('  Speicher: ' + (gallery.dauerhaft ? 'IndexedDB' : 'nur diese Sitzung'));
   console.log('  Ablegen, umbenennen, herausnehmen: ' + (galleryOk ? 'wie erwartet' : '← FEHLER'));
 
+  /* Personen, eigene Farbwelt und Sicherung. */
+  const atelier = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const out = {};
+
+    /* Eigene Farbwelt mischen */
+    app.setPalette('eigen');
+    app.state.color = app.pigments()[0].hex;
+    app.mixPigment('#123456');
+    out.mischen = app.pigments()[0].hex === '#123456' && app.state.color === '#123456';
+    app.setPalette('erde');
+
+    /* Getrennte Galerien */
+    return app.Gallery.open().then(function () {
+      app.addPerson();
+      app.renamePerson('Prüfung A');
+      const a = app.state.person;
+      app.loadMotif('bluete');
+      const p = app.pol(200, -Math.PI / 2);
+      app.floodFill(p[0], p[1], '#b5654a');
+      return app.keepWork()
+        .then(function () { return app.refreshGallery(); })
+        .then(function () {
+          out.werkeA = app.state.works.length;
+          app.addPerson();
+          app.renamePerson('Prüfung B');
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.werkeB = app.state.works.length;
+          app.selectPerson(a);
+          return app.refreshGallery();
+        })
+        .then(function () {
+          out.zurueckA = app.state.works.length;
+          return app.Gallery.all();
+        })
+        .then(function (works) {
+          out.alleHabenPerson = works.every(function (w) { return !!w.person; });
+          /* Sicherung: einlesen darf nichts verlieren und nichts doppeln. */
+          const backup = {
+            app: 'mandala-atelier', version: 1,
+            people: app.state.people,
+            ownPalette: app.PALETTES.filter(function (p) { return p.custom; })[0].colors,
+            works: works
+          };
+          const file = new File([JSON.stringify(backup)], 'sicherung.json',
+            { type: 'application/json' });
+          app.loadBackup(file);
+          return new Promise(function (resolve) { setTimeout(resolve, 500); });
+        })
+        .then(function () { return app.Gallery.all(); })
+        .then(function (after) {
+          out.nachEinlesen = after.length;
+          return out;
+        });
+    });
+  });
+
+  const atelierOk = atelier.mischen && atelier.werkeA === 1 && atelier.werkeB === 0 &&
+    atelier.zurueckA === 1 && atelier.alleHabenPerson &&
+    atelier.nachEinlesen === atelier.werkeA;
+
+  console.log('\nAtelier');
+  console.log('  Eigene Farbwelt mischen: ' + (atelier.mischen ? 'wie erwartet' : '← FEHLER'));
+  console.log('  Galerien getrennt: ' + atelier.werkeA + ' / ' + atelier.werkeB +
+    ' / zurück ' + atelier.zurueckA + (atelier.zurueckA === atelier.werkeA ? '   wie erwartet' : '   ← FEHLER'));
+  console.log('  Sicherung einlesen ohne Dopplung: ' +
+    (atelier.nachEinlesen === atelier.werkeA ? 'wie erwartet' : '← ' + atelier.nachEinlesen + ' statt ' + atelier.werkeA));
+
   /* Schriften: eingebettet, nicht nachgeladen. */
   const typeOk = await page.evaluate(async function () {
     await document.fonts.load('500 20px "IBM Plex Mono"');
@@ -374,7 +634,10 @@ async function run() {
   const broken = results.filter(function (r) {
     return r.leaked || (r.motif.kind !== 'plain' && r.legend === 0);
   }).map(function (r) { return r.motif.name; }).concat(tapProblems, layoutProblems);
+  broken.push.apply(broken, cellProblems);
   if (!galleryOk) broken.push('Galerie');
+  if (!atelierOk) broken.push('Atelier');
+  if (!zoomOk) broken.push('Vergrößern');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
 

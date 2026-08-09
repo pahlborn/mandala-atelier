@@ -152,14 +152,129 @@ body.is-quiet .topbar { display: none; }
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .stage {
-  position: absolute;
-  inset: 0;
+  flex: 1;
+  min-height: 0;
+  position: relative;
   display: grid;
   place-items: center;
   padding: var(--gap);
+  /* Zwingend: beim Vergrößern ragt das Blatt über die Bühne hinaus und
+     würde sonst über die Schnellzugriffsleiste gemalt. */
+  overflow: hidden;
+}
+
+/* ---- Schnellzugriff ---------------------------------------
+   Farben, Werkzeuge und Schritte werden beim Malen ständig
+   gebraucht – sie dürfen nicht in einer Schublade liegen. */
+.quickbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--edge);
+  background: var(--surface);
+}
+
+.quick-tools { display: flex; gap: 5px; flex: none; }
+
+.quick-tools .tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+/* Zeichensatz-Symbole waren zu unklar – ⌫ liest sich als Rücktaste, nicht
+   als Radiergummi. Deshalb gezeichnete Symbole, und die Beschriftung bleibt
+   stehen: sie ist das verlässlichste Zeichen. */
+.quick-tools .glyph { width: 19px; height: 19px; flex: none; display: block; }
+
+/* Alle Pigmente der Farbwelt müssen sichtbar sein. Eine seitlich
+   scrollbare Reihe findet niemand – auf schmalen Geräten waren zwei von
+   vierzehn zu sehen. Deshalb umbrechen statt schieben. */
+.quick-colors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 3px 1px;
+}
+
+.quick-colors .pigment {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  aspect-ratio: auto;
+}
+
+.quick-actions { display: flex; gap: 5px; flex: none; }
+
+.quick-zoom { display: flex; align-items: center; gap: 5px; flex: none; }
+
+.zoom-level {
+  min-width: 62px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.zoom-level:hover { border-color: var(--accent); color: var(--text); }
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.icon-button:hover { border-color: var(--accent); }
+.icon-button:disabled { opacity: .35; cursor: default; }
+
+/* Eingeklappt: nur noch der Aufklapp-Knopf bleibt stehen. */
+body.quick-collapsed .quick-tools,
+body.quick-collapsed .quick-colors,
+body.quick-collapsed #btn-undo,
+body.quick-collapsed #btn-redo,
+body.quick-collapsed .quick-zoom { display: none; }
+
+body.quick-collapsed .quickbar { justify-content: flex-end; padding-top: 4px; padding-bottom: 4px; }
+body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
+
+/* Unterhalb dieser Breite reicht eine Zeile nicht mehr für alles:
+   Werkzeuge und Schritte teilen sich die erste, die Farben bekommen
+   die zweite in voller Breite. */
+@media (max-width: 900px) {
+  .quick-tools { flex: none; }
+  .quick-zoom { margin-left: auto; }
+  .quick-actions { margin-left: auto; }
+  .quick-colors { order: 3; flex-basis: 100%; }
+}
+
+@media (max-width: 700px) {
+  .quick-tools .tool { padding: 8px 10px; gap: 5px; }
+  .quick-colors .pigment { width: 30px; height: 30px; }
+  .zoom-level { min-width: 54px; }
 }
 
 body.is-quiet .stage { padding: 6px; }
@@ -170,6 +285,7 @@ body.is-quiet .stage { padding: 6px; }
    Skript einmal gelaufen ist. */
 .canvas-stack {
   position: relative;
+  transform-origin: center center;
   aspect-ratio: 1 / 1;
   max-width: 100%;
   max-height: 100%;
@@ -405,7 +521,14 @@ body.is-quiet .stage { padding: 6px; }
   font-size: 13.5px;
 }
 
-.switch input { accent-color: var(--accent); width: 17px; height: 17px; }
+.switch input { accent-color: var(--accent); width: 17px; height: 17px; flex: none; }
+
+.switch-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
 
 /* ---- Aktionen --------------------------------------------- */
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
@@ -468,6 +591,17 @@ body.is-quiet .stage { padding: 6px; }
   white-space: nowrap;
 }
 
+.owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
 .owner input {
   width: 11em;
   padding: 7px 10px;
@@ -479,7 +613,18 @@ body.is-quiet .stage { padding: 6px; }
 @media (max-width: 560px) {
   .overlay-head { flex-wrap: wrap; }
   .owner { width: 100%; margin-left: 0; }
-  .owner input { flex: 1; width: auto; }
+  .owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
+.owner input { flex: 1; width: auto; }
 }
 
 .overlay-body {
@@ -495,6 +640,32 @@ body.is-quiet .stage { padding: 6px; }
   margin: 12vh auto;
   text-align: center;
   color: var(--text-soft);
+}
+
+.overlay-foot {
+  margin-top: 26px;
+  border-top: 1px solid var(--edge);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  flex-wrap: wrap;
+}
+
+.overlay-foot p { margin: 0; max-width: 46em; font-size: 12.5px; color: var(--text-soft); }
+
+.overlay-actions { display: flex; gap: 8px; }
+.overlay-actions .action { width: auto; margin: 0; white-space: nowrap; }
+
+.mixer input[type="color"] {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  padding: 2px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }
 
 .works {

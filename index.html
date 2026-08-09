@@ -59,6 +59,38 @@
   </section>
 
   <!-- ---------------------------------------------------------------
+       Schnellzugriff: was beim Malen ständig gebraucht wird.
+       Bleibt sichtbar, auch im Vollbild.
+       --------------------------------------------------------------- -->
+  <div class="quickbar" id="quickbar">
+    <div class="quick-tools" role="group" aria-label="Werkzeug">
+      <button type="button" class="tool is-active" data-tool="pen" title="Stift (1)">
+        <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.2L15.6 5.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.2 19 4 20z"/><path d="M14.2 6.6l3.2 3.2"/></svg><span class="tool-name">Stift</span>
+      </button>
+      <button type="button" class="tool" data-tool="fill" title="Füllen (2)">
+        <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5l7.6 7.6a1.4 1.4 0 0 1 0 2L13 18.7a1.4 1.4 0 0 1-2 0l-5.6-5.6a1.4 1.4 0 0 1 0-2L11 5.5z"/><path d="M9 5.5L7.2 3.7"/><path d="M19.6 15.4c.9 1.3 1.4 2.2 1.4 2.9a1.4 1.4 0 0 1-2.8 0c0-.7.5-1.6 1.4-2.9z" fill="currentColor" stroke="none"/></svg><span class="tool-name">Füllen</span>
+      </button>
+      <button type="button" class="tool" data-tool="eraser" title="Radierer (3)">
+        <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 19.5H20"/><path d="M14.4 4.6l5 5a1.6 1.6 0 0 1 0 2.3l-7.1 7.1a1.6 1.6 0 0 1-2.3 0l-5-5a1.6 1.6 0 0 1 0-2.3l7.1-7.1a1.6 1.6 0 0 1 2.3 0z"/><path d="M9.3 9.7l5 5"/></svg><span class="tool-name">Radierer</span>
+      </button>
+    </div>
+
+    <div class="quick-colors" id="quick-palette" role="group" aria-label="Pigment"></div>
+
+    <div class="quick-zoom" role="group" aria-label="Zeichenfläche vergrößern">
+      <button type="button" class="icon-button" id="btn-zoom-out" title="Verkleinern (−)" aria-label="Verkleinern">−</button>
+      <button type="button" class="zoom-level" id="zoom-level" title="Auf Anfang zurück (0)" aria-label="Vergrößerung zurücksetzen">100 %</button>
+      <button type="button" class="icon-button" id="btn-zoom-in" title="Vergrößern (+)" aria-label="Vergrößern">+</button>
+    </div>
+
+    <div class="quick-actions" role="group" aria-label="Schritte">
+      <button type="button" class="icon-button" id="btn-undo" title="Rückgängig (Cmd/Strg+Z)" aria-label="Rückgängig">↺</button>
+      <button type="button" class="icon-button" id="btn-redo" title="Wiederherstellen (Cmd/Strg+Umschalt+Z)" aria-label="Wiederherstellen">↻</button>
+      <button type="button" class="icon-button" id="btn-quick-collapse" title="Leiste einklappen" aria-label="Leiste einklappen">▾</button>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------------------
        Schublade links: Motivwelten
        --------------------------------------------------------------- -->
   <aside id="library" class="drawer drawer-left" aria-label="Motivwelten" aria-hidden="true">
@@ -106,6 +138,10 @@
         <h3>Farbwelt</h3>
         <div class="palette-sets" id="palette-sets" role="group" aria-label="Farbwelt wählen"></div>
         <div class="palette" id="palette" role="group" aria-label="Pigment wählen"></div>
+        <label class="field mixer" id="mixer" hidden>
+          <span>Gewähltes Pigment mischen</span>
+          <input type="color" id="mix-color">
+        </label>
       </section>
 
       <section class="panel" id="legend-panel" hidden>
@@ -124,16 +160,19 @@
           <input type="checkbox" id="guides" checked>
           <span>Hilfsraster</span>
         </label>
+        <label class="switch">
+          <input type="checkbox" id="fill-all" checked>
+          <span>Füllen wirkt auf alle Achsen</span>
+        </label>
+        <p class="switch-note" id="fill-all-note"></p>
       </section>
 
       <section class="panel">
         <h3>Blatt</h3>
-        <div class="row">
-          <button type="button" id="btn-undo" class="action">Rückgängig</button>
-          <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
-        </div>
+        <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
         <button type="button" id="btn-keep" class="action primary">In die Galerie legen</button>
         <button type="button" id="btn-save" class="action">Als Bild speichern</button>
+        <button type="button" id="btn-print" class="action">Druckbogen (A4)</button>
       </section>
 
       <p class="drawer-foot" id="stage-hint">Wähle ein Motiv oder beginne auf dem leeren Blatt.</p>
@@ -151,10 +190,13 @@
       <h2 id="gallery-title">Galerie</h2>
       <p class="overlay-note" id="gallery-count"></p>
     </div>
-    <label class="owner">
-      <span>Galerie von</span>
-      <input type="text" id="gallery-owner" maxlength="28" placeholder="Name eintragen">
-    </label>
+    <div class="owner">
+      <label>
+        <span>Galerie von</span>
+        <select id="person-select" aria-label="Person wählen"></select>
+      </label>
+      <input type="text" id="gallery-owner" maxlength="28" placeholder="Name" aria-label="Person umbenennen">
+    </div>
     <button type="button" class="drawer-close" id="btn-gallery-close" aria-label="Galerie schließen">✕</button>
   </header>
   <div class="overlay-body">
@@ -163,6 +205,18 @@
       „In die Galerie legen“ hierher.
     </p>
     <div class="works" id="works"></div>
+    <footer class="overlay-foot">
+      <p>
+        Werke liegen nur auf diesem Gerät. Eine Sicherung ist zugleich der Weg
+        auf ein zweites Gerät – sie enthält alle Personen, deren Werke und die
+        eigene Farbwelt.
+      </p>
+      <div class="overlay-actions">
+        <button type="button" class="action" id="btn-backup-save">Sicherung speichern</button>
+        <button type="button" class="action" id="btn-backup-load">Sicherung einlesen</button>
+        <input type="file" id="backup-file" accept="application/json,.json" hidden>
+      </div>
+    </footer>
   </div>
 </section>
 
