@@ -518,7 +518,14 @@ body.is-quiet .stage { padding: 6px; }
   font-size: 13.5px;
 }
 
-.switch input { accent-color: var(--accent); width: 17px; height: 17px; }
+.switch input { accent-color: var(--accent); width: 17px; height: 17px; flex: none; }
+
+.switch-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
 
 /* ---- Aktionen --------------------------------------------- */
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }

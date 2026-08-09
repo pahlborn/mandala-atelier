@@ -254,6 +254,7 @@ const state = {
   axes:       12,
   mirror:     false,
   guides:     true,
+  fillAll:    true,   // ein Tipp färbt alle gleichwertigen Felder
   tool:       'pen',
   palette:    'erde',
   color:      PALETTES[0].colors[0].hex,
@@ -1043,11 +1044,22 @@ function packColor(hex) {
     : ((r << 24) | (g << 16) | (b << 8) | 255)) >>> 0;
 }
 
-/* Bei Zähl- und Rechenmandalas trägt jedes Feld einen eigenen Wert. Dort
-   färbt ein Tipp nur das angetippte Feld – sonst bekämen alle gleichwertigen
-   Positionen dieselbe Farbe und die Aufgabe wäre hinfällig. */
+/* Zwei Fragen, eine Antwort:
+
+   Bei Zähl- und Rechenmandalas trägt jedes Feld einen eigenen Wert. Dort färbt
+   ein Tipp immer nur das angetippte Feld – sonst bekämen Felder mit
+   verschiedenen Ergebnissen dieselbe Farbe und die Aufgabe wäre hinfällig.
+   Das ist keine Einstellung, sondern eine Bedingung.
+
+   Sonst entscheidet der Schalter „Füllen wirkt auf alle Achsen“. An ist das
+   Voreingestellte – der Komfortgewinn gegenüber Papier. Aus, wer jedes Feld
+   einzeln setzen und dabei eigene Muster legen will. */
+function isExercise(motif) {
+  return !!motif && (motif.kind === 'count' || motif.kind === 'math');
+}
+
 function fillsSymmetrically(motif) {
-  return !motif || (motif.kind !== 'count' && motif.kind !== 'math');
+  return !isExercise(motif) && state.fillAll;
 }
 
 function floodFill(x, y, hex) {
@@ -1636,6 +1648,8 @@ function cacheUi() {
   ui.legendHead = document.getElementById('legend-title');
   ui.mirror     = document.getElementById('mirror');
   ui.guides     = document.getElementById('guides');
+  ui.fillAll    = document.getElementById('fill-all');
+  ui.fillAllNote= document.getElementById('fill-all-note');
   ui.width      = document.getElementById('width');
   ui.zoomIn     = document.getElementById('btn-zoom-in');
   ui.zoomOut    = document.getElementById('btn-zoom-out');
@@ -1997,6 +2011,14 @@ function syncUI() {
 
   ui.mirror.checked = state.mirror;
   ui.guides.checked = state.guides;
+  ui.fillAll.checked = state.fillAll;
+  ui.fillAll.disabled = isExercise(state.motif);
+  ui.fillAllNote.textContent = isExercise(state.motif)
+    ? 'Bei Zähl- und Rechenmandalas wird immer einzeln gefüllt – sonst bekämen '
+      + 'Felder mit verschiedenen Ergebnissen dieselbe Farbe.'
+    : (state.fillAll
+        ? 'Ein Tipp färbt alle gleichwertigen Felder zugleich.'
+        : 'Ein Tipp färbt nur das angetippte Feld.');
   ui.width.value = state.width;
   const own = ownPalette();
   ui.mixer.hidden = state.palette !== own.id;
@@ -2294,6 +2316,12 @@ function bindEvents() {
     Store.set('mirror', state.mirror);
   });
 
+  ui.fillAll.addEventListener('change', function () {
+    state.fillAll = ui.fillAll.checked;
+    Store.set('fillAll', state.fillAll);
+    syncUI();
+  });
+
   ui.guides.addEventListener('change', function () {
     state.guides = ui.guides.checked;
     Store.set('guides', state.guides);
@@ -2420,6 +2448,7 @@ function start() {
   state.width  = Store.get('width', state.width);
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
+  state.fillAll = Store.get('fillAll', state.fillAll);
   setTheme(Store.get('theme', preferredTheme()));
   state.people = Store.get('people', [{ id: 'p1', name: Store.get('owner', '') }]);
   state.person = Store.get('person', state.people[0].id);
