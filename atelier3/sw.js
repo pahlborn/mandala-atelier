@@ -1,16 +1,19 @@
 /* ============================================================================
-   Mandala Atelier – Service Worker
+   Atelier 3.0 – Service Worker
 
-   WICHTIG: Bei jedem Release die Cache-Version erhöhen. Sonst zeigt das iPad
-   weiter die alte Fassung, auch wenn die Dateien längst neu sind.
+   Eigener Geltungsbereich (/atelier3/) und eigener Cache-Name. Beides ist
+   zwingend: Ohne das griffe diese App dem Mandala Atelier in den Cache, und
+   auf dem iPad läge am Ende nur noch eine der beiden im Speicher. Für den
+   Vergleich müssen sie sich vollständig aus dem Weg gehen.
+
+   WICHTIG: Bei jedem Release die Version erhöhen.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-7';
+const CACHE = 'atelier3-v1-0';
 
 const SHELL = [
   './',
   './index.html',
-  './fonts.css',
   './style.css',
   './app.js',
   './manifest.webmanifest',
@@ -35,32 +38,22 @@ self.addEventListener('activate', function (event) {
     caches.keys()
       .then(function (keys) {
         return Promise.all(keys.map(function (key) {
-          /* Nur die eigenen alten Fassungen wegräumen. Unter derselben
-             Adresse liegt in /atelier3/ die Schwester-App „Blatt“; ein
-             pauschales Aufräumen würde ihr bei jedem Release hier den
-             Offline-Vorrat löschen. */
+          /* Nur die eigenen alten Fassungen wegräumen – der Cache der
+             Schwester-App geht uns nichts an. */
           if (key === CACHE) return null;
-          return key.indexOf('mandala-atelier-') === 0 ? caches.delete(key) : null;
+          return key.indexOf('atelier3-') === 0 ? caches.delete(key) : null;
         }));
       })
       .then(function () { return self.clients.claim(); })
   );
 });
 
-/* Die App holt nichts von außen – Schriften stecken als Daten-URI in
-   fonts.css. Deshalb genügt hier ein Weg: erst Cache, dann Netz. */
+/* Diese App holt nichts von außen – keine Schriften, keine Klänge, keine
+   Bilder. Deshalb genügt ein Weg: erst Cache, dann Netz. */
 self.addEventListener('fetch', function (event) {
   const request = event.request;
   if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
-
-  /* Der Geltungsbereich dieses Workers schließt /atelier3/ mit ein, weil er
-     eine Ebene darüber liegt. Die Schwester-App hat aber ihren eigenen
-     Worker und ihren eigenen Vorrat – hier nichts anfassen, sonst lägen
-     ihre Dateien doppelt und veralteten unbemerkt. */
-  if (url.pathname.indexOf('/atelier3/') !== -1) return;
+  if (new URL(request.url).origin !== self.location.origin) return;
 
   event.respondWith(
     caches.match(request).then(function (hit) {
