@@ -437,6 +437,56 @@ weil ein Bild davon gerendert und angesehen wurde. **Diese Zahl bleibt die
 Stelle, an der der Entwurf steht oder fällt**, und sie gehört als Erstes an
 echte Hände, bevor irgendetwas anderes verfeinert wird.
 
+**Der Auftrag hing an der Zeit, und das war falsch herum.** Das erste
+Testen am iPad hat es gezeigt: „Bei großen Flächen ist der Farbauftrag so
+gering, dass es eher wie Geschmiere aussieht. Bleibt man länger auf einer
+Stelle, gibt es punktuelle dunklere Flecken.“ Zwei Beobachtungen, ein
+Fehler. Der Auftrag war als Verweildauer je Pixel gerechnet — wer schnell
+strich, legte fast nichts ab, wer stehenblieb, brannte ein Loch.
+
+Beim Frottieren ist es umgekehrt. Farbe wandert durch Reibung auf das
+Papier, und Reibung braucht Weg. Eine ruhende Hand hat nichts mehr zu
+geben; sie hat abgegeben, was an dieser Stelle abzugeben war. Jetzt zählt
+der Weg: Ein Zug über eine Stelle legt dasselbe ab, ob langsam oder
+schnell gefahren.
+
+Damit verliert die Langsamkeit nichts — sie ändert nur etwas anderes, und
+zwar das Richtige. Was sie schon immer tat und weiterhin tut, ist die
+**Tiefe** des Griffs: Wer verweilt, holt aus den Mulden herauf, was ein
+flüchtiger Zug auf den Graten liegen lässt. Der Unterschied zwischen Zeit
+und Weg ist damit auch philosophisch der bessere: Die App belohnt nicht
+mehr das Zögern, sondern die Arbeit, und das Verweilen bringt nicht mehr
+Farbe, sondern mehr Grund.
+
+Gemessen, jeweils zwölf zügige Bahnen über eine große Fläche gegen
+1,2 Sekunden Stehenbleiben an einer Stelle:
+
+| | Fläche, Dichte im Mittel | Verweilfleck, Spitze | Verhältnis |
+|---|---|---|---|
+| vorher | 0,012 | 0,989 | 83 : 1 |
+| jetzt  | 0,120 | 0,393 | 3,3 : 1 |
+
+Nach 36 Bahnen sind jetzt 95 % der überstrichenen Fläche gedeckt; vorher
+waren es 9 %. Die Strichzeichnung beim leichten Zug ist geblieben (Grat zu
+Grund 2,5 : 1) — das war die eigentliche Gefahr dieser Umstellung und
+wurde an gerenderten Bildern nachgesehen, nicht nur an Zahlen.
+
+**Das Papier ist wählbar geworden.** Tag und Nacht kamen ausschließlich aus
+der Systemeinstellung. Wer das dunkle Papier schöner findet — „es ist
+ruhiger, die Farben leuchten teilweise“ —, aber sein Gerät hell stehen hat,
+kam nicht heran. Jetzt liegen in der Blattlade zwei kleine Papiere, jedes
+in seinem Ton, mit drei Pigmenten der gewählten Welt darauf. Man wählt
+nicht „hell“ oder „dunkel“, sondern sieht, wie die Farbe darauf liegen
+wird; und solange die Lade offen steht, nimmt der Raum den Ton schon an.
+Das Gerät bleibt der Anfangswert, es ist nur nicht mehr das letzte Wort.
+
+**Die Tischkante.** Holt man das Blatt heran, wächst es unter der
+Pigmentleiste hindurch, und die Stifte sehen aus, als lägen sie in der
+Zeichnung. Unter ihnen liegt jetzt ein Streifen Tisch, der nach oben hin
+ausläuft — in exakt der Farbe des Raums, also auf dem Tisch unsichtbar und
+nur dort zu sehen, wo das Blatt darunterliegt. Kein Zustand, kein Umschalten
+mit dem Maßstab: Es stimmt in jeder Lage von selbst.
+
 ## 17. Was offen ist
 
 Der Reihe nach, damit nichts davon in einem Gesprächsverlauf verschwindet.
