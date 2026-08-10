@@ -223,6 +223,46 @@ Zügen gearbeitet wird.
 Atelier darf die bis zu 128 MB belegen. Hier gibt es sie nicht — eine
 philosophische Entscheidung mit angenehmem Nebeneffekt.
 
+## Ein Satz an der Tür
+
+Beim Aufschlagen eines frischen Blattes steht für einen Moment ein Satz da.
+**Nur dort** – nicht beim Fortsetzen, nicht während des Malens, nicht am Ende.
+Er verschwindet von selbst; es gibt nichts zu bestätigen.
+
+Warum nur an der Tür: Alles andere in dieser App ist **Material**. Papier,
+Pigment, Relief, Klang reden nicht mit einem, sie sind einfach da, und
+deshalb verschwinden sie nach zwei Minuten. Ein Satz ist kein Material – er
+wendet sich an jemanden, und im selben Moment ist eine zweite Person im
+Raum. Dazu kommt: Reiben und Lesen sind zwei verschiedene Arten von
+Aufmerksamkeit. Der Mechanismus dieser App bindet die Aufmerksamkeit an eine
+wortlose, körperliche Aufgabe; Sprache schaltet ein anderes System an. Ein
+Satz legt sich nicht neben den Fluss, er wechselt den Modus.
+
+Vor dem ersten Strich stört das nicht – da kommt man an. Mitten im Malen
+schon, und zwar auch dann, wenn man ihn gar nicht liest: **Wer weiß, dass
+jederzeit etwas erscheinen könnte, wartet mit einem Teil darauf.** Das ist
+Wachsamkeit, und Wachsamkeit ist der Zustand, aus dem die Viertelstunde
+herausführen soll. Was immer da ist, verschwindet; was jederzeit auftauchen
+kann, wird beobachtet.
+
+**Zur Sprache.** In keinem der fünfundzwanzig Sätze kommt „du“ vor. Sobald
+einer anspricht, gibt es jemanden, der spricht – und wer „du darfst“ sagt,
+ist eine Instanz, die Erlaubnis erteilt. In einer App, deren ganzer Sinn
+ist, dass niemand zusieht, richtete das genau die Instanz ein, die sie
+leugnet. Aus demselben Grund kein Imperativ: „Lass es so stehen“ verlangt
+etwas, „Es muss nicht gleichmäßig werden“ nicht.
+
+Die stärksten Sätze sprechen über das Material und dabei nebenbei über etwas
+anderes. Neue gehören in das Feld `THOUGHTS` in `app.js` und sonst nirgends –
+keine Kennungen, keine Fassungen, keine Freigaben, keine zweite Sprache. Es
+sind fünfundzwanzig Zeichenketten.
+
+Ein Satz wiederholt sich nicht, solange er unter den letzten neun war.
+
+**Bewusst nicht gebaut:** Gedanken *während* des Malens. Nicht verworfen,
+sondern zurückgestellt, bis das an der Tür ein paar Wochen erlebt ist. Der
+Testlauf hält fest, dass beim Fortsetzen eines Blattes geschwiegen wird.
+
 ## Blätter weglegen und wieder aufnehmen
 
 Es gibt genau **ein laufendes Blatt**. Daneben liegt der **Stapel**.

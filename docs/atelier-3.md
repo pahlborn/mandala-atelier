@@ -498,6 +498,18 @@ kodiert. Ob das ein spürbares Stocken gibt, sagt kein Schreibtisch – das
 merkt man beim Malen. Falls ja: entweder seltener sichern, oder nur in einem
 Moment, in dem die Hand ohnehin langsam ist.
 
+### Gedanken während des Malens
+
+Zurückgestellt, nicht verworfen. An der Tür steht seit Kurzem ein Satz, wenn
+man ein frisches Blatt aufschlägt; das Währenddessen wurde bewusst
+ausgelassen, weil ein Satz, der jederzeit erscheinen könnte, Wachsamkeit
+erzeugt – auch bei dem, der ihn nicht liest.
+
+Zu entscheiden ist das erst, wenn die Tür ein paar Wochen erlebt ist. Und
+wenn es kommt, dann abschaltbar und im Vergleich ausgeschaltet: Sonst weiß
+man hinterher nicht mehr, ob eine Wirkung vom Durchreiben kam oder von den
+Sätzen.
+
 ### Und dann erst: der Vergleich
 
 Alles Obige ist Vorbereitung. Die eigentliche offene Frage bleibt die aus

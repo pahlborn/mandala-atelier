@@ -360,6 +360,102 @@ function kindById(id) {
   return KINDS.filter(function (k) { return k.id === id; })[0] || null;
 }
 
+
+/* ---------------------------------------------------------------------------
+   Ein Satz an der Tür
+
+   Beim Aufschlagen eines frischen Blattes steht für einen Moment ein Satz da.
+   Nur dort – nicht beim Fortsetzen, nicht während des Malens, nicht am Ende.
+
+   Warum nur an der Tür: Alles andere in dieser App ist Material. Papier,
+   Pigment, Relief, Klang reden nicht mit einem, sie sind einfach da, und
+   deshalb verschwinden sie nach zwei Minuten. Ein Satz ist kein Material –
+   er wendet sich an jemanden, und im selben Moment ist eine zweite Person
+   im Raum. Reiben und Lesen sind außerdem zwei verschiedene Arten von
+   Aufmerksamkeit: Der Mechanismus dieser App bindet die Aufmerksamkeit an
+   eine wortlose, körperliche Aufgabe, Sprache schaltet ein ganz anderes
+   System an. Ein Satz legt sich nicht neben den Fluss, er wechselt den Modus.
+
+   Vor dem ersten Strich stört das nicht – da kommt man an. Mitten im Malen
+   schon, und zwar auch dann, wenn man ihn gar nicht liest: Wer weiß, dass
+   jederzeit etwas erscheinen könnte, wartet mit einem Teil darauf. Das ist
+   Wachsamkeit, und Wachsamkeit ist genau der Zustand, aus dem die
+   Viertelstunde herausführen soll.
+
+   Zur Sprache: In keinem der Sätze kommt „du“ vor. Sobald einer anspricht,
+   gibt es jemanden, der spricht – und wer „du darfst“ sagt, ist eine
+   Instanz, die Erlaubnis erteilt. In einer App, deren ganzer Sinn ist, dass
+   niemand zusieht, richtete das genau die Instanz ein, die sie leugnet.
+   Beobachtungen lassen einen dagegen in Ruhe. Aus demselben Grund kein
+   Imperativ: „Lass es so stehen“ verlangt etwas, „Es muss nicht gleichmäßig
+   werden“ nicht.
+
+   Die stärksten Sätze sprechen über das Material und dabei nebenbei über
+   etwas anderes. Neue gehören hier hinein und sonst nirgends – keine
+   Kennungen, keine Fassungen, keine Freigaben. Es sind fünfundzwanzig
+   Zeichenketten. */
+const THOUGHTS = [
+  /* Der Rahmen */
+  'Hier gibt es nichts zu erreichen.',
+  'Niemand zählt mit.',
+  'Hier ist keine Uhr.',
+  'Es kann nichts kaputtgehen.',
+  'Hier gibt es nichts zurückzunehmen.',
+  'Es ist nur ein Blatt.',
+
+  /* Das Material */
+  'Unter dem Papier liegt schon etwas.',
+  'Das Muster war vor der Hand da.',
+  'Papier nimmt nicht überall gleich an.',
+  'Langsam wird dunkler als schnell.',
+  'Zwei Farben übereinander ergeben eine dritte.',
+  'Eine dünne Schicht ist auch eine Schicht.',
+  'Noch ein Strich verändert alles.',
+
+  /* Was ungleichmäßig bleibt */
+  'Es muss nicht gleichmäßig werden.',
+  'Eine Spur bleibt eine Spur.',
+  'Was liegt, gehört jetzt dazu.',
+  'Unregelmäßig ist auch eine Beschaffenheit.',
+  'Nichts hier wird nachgebessert.',
+
+  /* Kein Ende */
+  'Fertig ist keine Eigenschaft dieses Blattes.',
+  'Ein Drittel ist auch ein Mandala.',
+  'Man hört irgendwann auf. Das ist alles.',
+  'Es läuft nichts davon.',
+
+  /* Schlicht */
+  'Manchmal ist es einfach nur Farbe auf Papier.',
+  'Nicht alles muss etwas bedeuten.',
+  'Das Blatt hat keine Meinung.'
+];
+
+/* Ein Satz soll sich nicht so bald wiederholen. Gemerkt werden die zuletzt
+   gezeigten – mehr Buchführung braucht es nicht. */
+const THOUGHT_MEMORY = 9;
+
+function nextThought() {
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem('atelier3-gedanken') || '[]'); } catch (err) {}
+  if (!Array.isArray(seen)) seen = [];
+
+  const frei = [];
+  for (let i = 0; i < THOUGHTS.length; i++) {
+    if (seen.indexOf(i) === -1) frei.push(i);
+  }
+  if (!frei.length) {
+    for (let i = 0; i < THOUGHTS.length; i++) frei.push(i);
+  }
+
+  const wahl = frei[(Math.random() * frei.length) | 0];
+  seen.push(wahl);
+  while (seen.length > THOUGHT_MEMORY) seen.shift();
+  try { localStorage.setItem('atelier3-gedanken', JSON.stringify(seen)); } catch (err) {}
+
+  return THOUGHTS[wahl];
+}
+
 /* Ohne Charakter verhält sich der Generator genau wie bisher. Das ist
    Absicht: Blätter, die vor den Kategorien entstanden sind, tragen keinen
    – und müssen beim Wiederaufnehmen dasselbe Relief bekommen wie damals. */
@@ -1940,6 +2036,9 @@ async function takeFreshSheet(seed) {
   paint();
   document.body.classList.remove('is-turning');
   awaken();
+
+  /* Die Tür. Nur hier – nicht beim Fortsetzen, nicht während des Malens. */
+  showHint(nextThought(), 7000);
 }
 
 
@@ -2288,6 +2387,26 @@ function bindUi() {
   });
 }
 
+/* Ein- und ausblenden, ohne dass irgendetwas bestätigt werden müsste. Wer
+   die Hand auflegt, lässt ihn verschwinden; wer wartet, auch. */
+let hintTimer = 0;
+
+function showHint(text, hold) {
+  clearTimeout(hintTimer);
+  ui.hint.textContent = text;
+  ui.hint.hidden = false;
+  requestAnimationFrame(function () { ui.hint.classList.add('is-on'); });
+
+  const dismiss = function () {
+    clearTimeout(hintTimer);
+    ui.hint.classList.remove('is-on');
+    hintTimer = setTimeout(function () { ui.hint.hidden = true; }, 1200);
+    canvas.removeEventListener('pointerdown', dismiss);
+  };
+  canvas.addEventListener('pointerdown', dismiss);
+  hintTimer = setTimeout(dismiss, hold);
+}
+
 function syncSoundLabel() {
   ui.traySound.textContent = Klang.muted ? 'Ton an' : 'Ton aus';
 }
@@ -2323,20 +2442,13 @@ async function start() {
   bindUi();
   bindHand();
 
-  /* Der einzige Satz, den diese App je sagt – und nur beim allerersten Mal. */
+  /* Beim allerersten Mal steht dort das Einzige, was diese App je erklärt.
+     Danach nie wieder – ab dann gehört die Stelle den Gedanken. */
   let seen = false;
   try { seen = localStorage.getItem('atelier3-gesehen') === 'ja'; } catch (err) {}
   if (!seen && !sheet.touched) {
-    ui.hint.hidden = false;
-    requestAnimationFrame(function () { ui.hint.classList.add('is-on'); });
-    const dismiss = function () {
-      ui.hint.classList.remove('is-on');
-      setTimeout(function () { ui.hint.hidden = true; }, 900);
-      try { localStorage.setItem('atelier3-gesehen', 'ja'); } catch (err) {}
-      canvas.removeEventListener('pointerdown', dismiss);
-    };
-    canvas.addEventListener('pointerdown', dismiss);
-    setTimeout(dismiss, 9000);
+    showHint('Streiche über das Blatt.', 9000);
+    try { localStorage.setItem('atelier3-gesehen', 'ja'); } catch (err) {}
   }
 
   document.body.classList.add('is-ready');
@@ -2359,6 +2471,8 @@ window.Blatt = {
   openLade: openLade,
   lade: lade,
   KINDS: KINDS,
+  THOUGHTS: THOUGHTS,
+  nextThought: nextThought,
   buildPlan: buildPlan, fieldAt: fieldAt,
   WORLDS: WORLDS,
   makeSheet: function (seed, mode, world) {

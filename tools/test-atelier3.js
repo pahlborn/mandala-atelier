@@ -378,13 +378,25 @@ async function run() {
   const ladeAuf = await page.evaluate(async function () {
     const B = window.Blatt;
     B.openLade();
-    await new Promise(function (r) { setTimeout(r, 900); });
+    for (let i = 0; i < 120; i++) {
+      await new Promise(function (r) { requestAnimationFrame(r); });
+      const alle = document.querySelectorAll('.lade-sheet canvas');
+      if (alle.length === 6 && Array.prototype.every.call(alle, function (cv) {
+        const d = cv.getContext('2d').getImageData(cv.width >> 1, 0, 1, cv.height).data;
+        for (let k = 0; k < d.length; k += 4) if (d[k] !== d[0]) return true;
+        return false;
+      })) break;
+    }
     return {
       offen: !document.getElementById('lade').hidden,
       kategorien: document.querySelectorAll('.lade-kind').length,
       welten: document.querySelectorAll('.lade-world').length,
       blaetter: document.querySelectorAll('.lade-sheet canvas').length,
-      gemalt: Array.prototype.every.call(
+      /* Die Vorschauen entstehen eine je Bild, damit die Lade sofort
+         dasteht. Wie viele sind fertig, und wie schwach ist die
+         schwächste? Beides sagen, sonst weiß man bei einem Befund nicht,
+         ob es am Aussehen lag oder am Zeitpunkt. */
+      kontraste: Array.prototype.map.call(
         document.querySelectorAll('.lade-sheet canvas'),
         function (cv) {
           const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
@@ -394,14 +406,18 @@ async function run() {
             if (l < min) min = l;
             if (l > max) max = l;
           }
-          return max - min > 25;
+          return Math.round(max - min);
         })
     };
   });
   prüfe('die Lade zeigt Stimmung, Pigmente und Blätter',
         ladeAuf.offen && ladeAuf.kategorien === 4 && ladeAuf.welten === 4 && ladeAuf.blaetter === 6,
         ladeAuf.kategorien + ' Stimmungen, ' + ladeAuf.welten + ' Welten, ' + ladeAuf.blaetter + ' Blätter');
-  prüfe('die Ausschnitte zeigen wirklich etwas', ladeAuf.gemalt);
+  const fertig = ladeAuf.kontraste.filter(function (c) { return c > 25; }).length;
+  prüfe('die Ausschnitte zeigen wirklich etwas',
+        fertig === ladeAuf.kontraste.length,
+        fertig + ' von ' + ladeAuf.kontraste.length + ' fertig, Kontraste ' +
+        ladeAuf.kontraste.join('/'));
 
   const gewechselt = await page.evaluate(async function () {
     const B = window.Blatt;
@@ -557,6 +573,74 @@ async function run() {
     prüfe('Farbe unter dem Finger', t.versatz < 12,
           t.wie + ': ' + (isFinite(t.versatz) ? t.versatz.toFixed(0) + ' Einheiten daneben' : 'nichts gemalt'));
   });
+
+  /* ---- Der Satz an der Tür ---------------------------------------------- */
+  console.log('\nDer Satz an der Tür');
+  const gedanken = await page.evaluate(function () {
+    const B = window.Blatt;
+    const alle = B.THOUGHTS;
+
+    /* Kein „du“: Sobald ein Satz anspricht, gibt es jemanden, der spricht. */
+    const anrede = alle.filter(function (t) {
+      return /\b(du|dir|dich|dein\w*)\b/i.test(t);
+    });
+
+    /* Kein Imperativ: „Lass es so stehen“ verlangt etwas, eine Beobachtung
+       nicht. */
+    const befehl = alle.filter(function (t) {
+      return /^(lass|schau|bleib|nimm|probier|folge|denk|atme|halt)/i.test(t);
+    });
+
+    /* Keine Erlaubnis erteilende Stimme. */
+    const erlaubnis = alle.filter(function (t) {
+      return /du (musst|darfst|kannst|sollst)/i.test(t);
+    });
+
+    /* Und keiner soll sich zu bald wiederholen. */
+    try { localStorage.removeItem('atelier3-gedanken'); } catch (err) {}
+    const gezogen = [];
+    for (let i = 0; i < 9; i++) gezogen.push(B.nextThought());
+    const doppelt = gezogen.length !== new Set(gezogen).size;
+
+    return {
+      anzahl: alle.length,
+      anrede: anrede, befehl: befehl, erlaubnis: erlaubnis,
+      doppelt: doppelt,
+      laengster: Math.max.apply(null, alle.map(function (t) { return t.length; }))
+    };
+  });
+  prüfe('fünfundzwanzig Gedanken', gedanken.anzahl === 25, gedanken.anzahl + ' Stück');
+  prüfe('keiner sagt „du“', gedanken.anrede.length === 0, gedanken.anrede.join(' | '));
+  prüfe('keiner befiehlt', gedanken.befehl.length === 0, gedanken.befehl.join(' | '));
+  prüfe('keiner erteilt Erlaubnis', gedanken.erlaubnis.length === 0, gedanken.erlaubnis.join(' | '));
+  prüfe('keine Wiederholung in neun Zügen', !gedanken.doppelt);
+  prüfe('alle bleiben kurz', gedanken.laengster <= 48, 'längster ' + gedanken.laengster + ' Zeichen');
+
+  /* Er erscheint an der Tür – und nur dort. */
+  const tuer = await page.evaluate(async function () {
+    const B = window.Blatt;
+    const hint = document.getElementById('hint');
+
+    /* Beim bloßen Neuaufbauen eines Blattes: kein Satz. */
+    hint.hidden = true;
+    hint.textContent = '';
+    B.makeSheet(4242, 'tag');
+    await new Promise(function (r) { setTimeout(r, 200); });
+    const beimFortsetzen = !hint.hidden;
+
+    /* Beim Aufschlagen aus der Lade: einer. */
+    B.openLade();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    document.querySelector('.lade-sheet').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    return {
+      beimFortsetzen: beimFortsetzen,
+      text: hint.hidden ? '' : hint.textContent,
+      ausBibliothek: B.THOUGHTS.indexOf(hint.textContent) !== -1
+    };
+  });
+  prüfe('beim Fortsetzen schweigt die App', !tuer.beimFortsetzen);
+  prüfe('am frischen Blatt steht ein Satz', tuer.ausBibliothek, tuer.text ? '„' + tuer.text + '“' : 'nichts');
 
   /* ---- Was es nicht gibt ------------------------------------------------ */
   console.log('\nWas es nicht gibt');
