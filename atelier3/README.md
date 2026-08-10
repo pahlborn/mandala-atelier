@@ -117,21 +117,51 @@ In derselben Frist trägt ein **ruhender** Finger noch kein Pigment auf. Ein
 Reiben beginnt mit einer Bewegung, ein Heranholen mit zwei ruhenden Fingern –
 ohne diese Frist bliebe von jedem Heranholen ein dunkler Punkt zurück.
 
-**Was die Hand tut, bestimmt, wie tief der Kontakt greift.**
+**Der Weg trägt auf, nicht die Zeit.** Farbe wandert durch Reibung auf das
+Papier, und Reibung braucht Weg. Ein Zug über eine Stelle legt `PASS` ab,
+gleich ob langsam oder schnell gefahren; eine ruhende Hand hat nichts mehr
+zu geben und trägt nur noch langsam nach (`REST_RATE`, ungefähr ein Zug je
+Sekunde).
+
+Das stand lange falsch herum — der Auftrag hing an der Verweildauer — und
+es waren **zwei Beschwerden aus einem Rechenfehler**: große Flächen blieben
+blass wie Geschmiere, weil zügiges Streichen fast nichts ablegte, und jedes
+Zögern brannte einen dunklen Fleck. Wer daran wieder dreht, dreht an beidem
+gleichzeitig.
+
+Zwei Feinheiten sind nötig, damit „ein Zug ist ein Zug“ auch stimmt, wenn
+ein Gerät die Hand hundertmal je Sekunde meldet:
+
+* Der Auftrag eines Teilstücks ist `PASS · seg/(seg + span)`, nicht
+  `PASS · seg/span`. `span` ist die *wirksame* Breite des Kontakts
+  (`CONTACT_SPAN · radius`, das Integral des Kontaktprofils). Jedes
+  Teilstück trägt auch an seinen beiden Enden eine halbe Kontaktscheibe
+  mit sich; ohne den Nenner legten viele winzige Stücke fast doppelt so
+  viel ab wie wenige große.
+* Die Dichte wächst mit `add = dep/(1 + dep/2) · (1 − cur)`, der billigen
+  Fassung von `1 − e^(−dep)`. Damit multiplizieren sich die Restanteile zu
+  `e^(−Summe)`: Die Summe zählt, die Stückelung nicht.
+
+Gemessen: über einen Bereich von 1 bis 120 Teilstücken je Strich bleibt die
+Dichte innerhalb von 4 %. Der Test `der Weg trägt auf, nicht die Zeit` hält
+das fest.
+
+**Was die Hand tut, bestimmt, wie tief der Kontakt greift.** Nicht mehr,
+wie viel — sondern wie tief.
 
 | Hand | Blatt |
 |---|---|
-| langsam | viel Pigment, satte Farbe |
-| schnell | wenig Pigment, luftiger Hauch |
-| fest (wo Druck gemeldet wird) | greift bis in die Tiefen, wird flächig |
-| leicht | küsst nur die Höhen, das Ornament tritt scharf hervor |
+| langsam | greift bis in die Mulden, die Fläche füllt sich |
+| schnell | streift die Grate, das Ornament tritt als Zeichnung hervor |
+| fest (wo Druck gemeldet wird) | dasselbe wie langsam, nur bewusst |
 | noch einmal darüber | dichter — bis es asymptotisch nicht mehr weitergeht |
 
 Die Griffkurve ist `bite = (relief)^gamma`, **keine Schwelle**. Es gibt keinen
-Zustand, in dem gar nichts passiert. Wer lange genug an einer Stelle bleibt,
+Zustand, in dem gar nichts passiert. Wer oft genug über eine Stelle geht,
 füllt sie auch mit leichter Hand. Das ist wichtig, weil die meisten Geräte
 überhaupt keinen Druck melden — dort trägt die Langsamkeit die ganze
-Ausdruckskraft (`GAMMA_LIGHT`/`GAMMA_FIRM`, gespeist aus Druck **und** Tempo).
+Ausdruckskraft (`GAMMA_LIGHT`/`GAMMA_FIRM`, gespeist aus Druck **und** Tempo,
+mit `GRIP_BASE` als Boden: auch der flüchtigste Kontakt greift ein wenig).
 
 **Der Abstand der Höhenstufen ist die eigentliche Gestaltungsentscheidung.**
 `OUTER 0.16 < BASE 0.38 < Plateaus 0.52…0.70 < Linien 1.0`. Zu weit
@@ -184,6 +214,19 @@ Papier mit subtraktivem Pigment, bei Nacht getöntes Papier mit heller Kreide
 (dieselbe Rechnung, nur `screen` statt `multiply`). Welches ein Blatt ist,
 entscheidet sich bei seiner Entstehung und bleibt dann — ein Blatt wechselt
 nicht die Farbe, nur weil es Abend wird. Der Raum folgt dem Blatt.
+
+**Gewählt wird das Papier in der Lade, nicht am Gerät.** Zwei kleine
+Kacheln, jede in ihrem eigenen Ton, mit drei Pigmenten der gerade gewählten
+Welt darauf: Man wählt nicht „hell“ oder „dunkel“, sondern sieht, wie die
+Farbe darauf liegen wird. Solange die Lade offen steht, nimmt der Raum den
+Ton schon an — die Entscheidung ist zu sehen, nicht vorzustellen.
+
+Die Herkunft ist eine Kette mit drei Gliedern: was zuletzt gewählt wurde
+(`localStorage['atelier3-papier']`), sonst was das Gerät für die Tageszeit
+hält, sonst Tag. Das Gerät zu fragen ist als *Anfang* richtig — es weiß
+etwas über den Raum, in dem jemand sitzt. Es als letztes Wort zu nehmen war
+falsch: Wer beim dunklen Papier bleiben will, obwohl das Gerät hell steht,
+soll dafür nicht das Betriebssystem umstellen müssen.
 
 ## Technischer Aufbau
 
@@ -419,6 +462,22 @@ dem Finger **und** mit der aufliegenden Hand, Klang, Dunkelmodus.
 
 9. **Die Größe des Canvas ändern.** `SIZE` ist fest. Würde sie mit `dpr` oder
    der Fenstergröße wandern, wäre bei jeder Drehung des iPads die Arbeit weg.
+
+10. **Den Auftrag an der Zeit aufhängen.** `dwell = dt/len` sah plausibel aus
+    und war die Ursache für zwei Beschwerden auf einmal: Flächen blieben
+    blass, Zögern brannte Flecken. Beim Frottieren zählt der Weg. Wer hier
+    wieder etwas mit `dt` einführt, holt sich beides zurück — und die
+    zweite Hälfte des Fehlers ist leiser als die erste: Selbst mit
+    weglängen-basiertem Auftrag bleibt ein Rest Zeitverhalten übrig, wenn
+    man nicht auf die *wirksame* Kontaktbreite normiert und die Sättigung
+    stückelungsfrei rechnet (siehe oben, gemessen 30 % Unterschied
+    zwischen kriechend und zügig, bevor beides drin war).
+
+11. **Die Systemeinstellung für das letzte Wort halten.** Tag/Nacht kam
+    ausschließlich aus `prefers-color-scheme`. Wer das dunkle Papier
+    schöner findet, aber sein iPad hell stehen hat, konnte es nicht
+    bekommen, ohne das ganze Gerät umzustellen. Das Gerät ist ein guter
+    Anfangswert, nie mehr.
 
 ## Grenzen
 

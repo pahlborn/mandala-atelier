@@ -29,6 +29,7 @@ body {
   /* Der Raum folgt dem Blatt, nicht der Uhr: Ein Nachtblatt liegt auch am
      Morgen noch auf einem nächtlichen Tisch. */
   --room:   #e6dfd1;
+  --room-0: rgba(230, 223, 209, 0);   /* derselbe Ton, nur durchsichtig */
   --edge:   rgba(60, 48, 32, 0.16);
   --quiet:  rgba(52, 42, 30, 0.42);
   --plain:  rgba(38, 30, 20, 0.78);
@@ -49,6 +50,7 @@ body.is-ready { opacity: 1; }
 
 body[data-sheet='nacht'] {
   --room:   #121114;
+  --room-0: rgba(18, 17, 20, 0);
   --edge:   rgba(0, 0, 0, 0.5);
   --quiet:  rgba(228, 220, 206, 0.34);
   --plain:  rgba(232, 226, 214, 0.82);
@@ -131,6 +133,30 @@ body.is-turning #sheet { opacity: 0; }
   gap: 10px;
   padding: 0 64px;
   transition: opacity 1400ms ease, transform 1400ms ease;
+}
+
+/* Die Tischkante.
+
+   Bei voller Ansicht endet das Blatt oberhalb der Pigmente, und alles ist
+   klar: Stifte auf dem Tisch, Blatt daneben. Holt man das Blatt aber heran,
+   wächst es unter den Stiften hindurch – und dann sieht es aus, als wäre
+   die Palette in die Zeichnung geraten.
+
+   Deshalb liegt unter den Pigmenten ein Streifen Tisch, der nach oben hin
+   ausläuft. Er hat exakt die Farbe des Raums, ist auf dem Tisch also nicht
+   zu sehen; sichtbar wird er nur dort, wo das Blatt darunter liegt. Kein
+   Schalter, kein Zustand, nichts, was mit dem Maßstab umgeschaltet werden
+   müsste – es stimmt in jeder Lage von selbst. */
+.strip::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: -58px;
+  bottom: calc(-1 * (env(safe-area-inset-bottom) + 24px));
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--room-0) 0%, var(--room) 62%);
 }
 
 .pigment {
@@ -253,12 +279,24 @@ body.is-turning #sheet { opacity: 0; }
   inset: 0;
   z-index: 30;
   display: flex;
-  align-items: center;
   justify-content: center;
+  /* „safe“ ist hier kein Zierrat: Ein zentrierter Inhalt, der höher ist als
+     das Fenster, wird oben abgeschnitten und lässt sich dorthin auch nicht
+     scrollen. Mit „safe center“ rückt er an den Anfang, sobald es eng wird.
+     Die einfache Fassung steht davor, für Browser, die „safe“ nicht kennen. */
+  align-items: center;
+  align-items: safe center;
   overflow-y: auto;
   padding: calc(env(safe-area-inset-top) + 24px) 24px
            calc(env(safe-area-inset-bottom) + 24px);
   background: var(--room);
+}
+
+/* Auf niedrigen Fenstern rücken die Reihen zusammen, statt dass die Lade
+   zum Scrollen zwingt. */
+@media (max-height: 720px) {
+  .lade-inner { gap: 16px; }
+  .lade-sheets { gap: 10px; }
 }
 
 .lade-inner {
@@ -301,6 +339,62 @@ body.is-turning #sheet { opacity: 0; }
 }
 
 .lade-kind:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+/* Dann das Papier. Zwei kleine Blätter, jedes in seinem eigenen Ton, mit
+   drei Pigmenten darauf – man wählt nicht „hell“ oder „dunkel“, sondern
+   sieht, wie die Farbe darauf liegen wird. Klein gehalten und ohne
+   Überschrift: Es ist eine Nebensache neben der Stimmung, aber eine, die
+   man haben will, ohne am Gerät etwas umzustellen. */
+.lade-papers {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.lade-paper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 76px;
+  padding: 11px 0 9px;
+  border: 1px solid rgba(128, 128, 128, 0.28);
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.lade-paper .paper-dots { display: flex; gap: 4px; }
+
+.lade-paper .paper-dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+/* Die Beschriftung steht auf dem Papier und muss deshalb auf beiden Tönen
+   lesbar sein – hell auf dunkel, dunkel auf hell. Sie folgt nicht dem
+   Thema der App, sondern dem Papier, das sie zeigt. */
+.lade-paper .paper-word {
+  font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.lade-paper[data-paper='tag']   .paper-word { color: #5c574d; }
+.lade-paper[data-paper='nacht'] .paper-word { color: #b3aca1; }
+
+.lade-paper:hover { transform: translateY(-1px); }
+
+.lade-paper[aria-pressed='true'] {
+  border-color: var(--plain);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.lade-paper:focus-visible { outline: 2px solid var(--plain); outline-offset: 3px; }
 
 /* Danach die Farbwelten als das, was sie sind: Pigmente. Ohne Namen –
    über eine Beschriftung müsste man erst nachdenken, über Farbe nicht. */
@@ -397,7 +491,9 @@ body.is-turning #sheet { opacity: 0; }
 .lade-bar button:focus-visible { outline: 2px solid var(--plain); outline-offset: -2px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .lade-sheet, .lade-world, .lade-kind { transition-duration: 1ms !important; }
+  .lade-sheet, .lade-world, .lade-kind, .lade-paper {
+    transition-duration: 1ms !important;
+  }
 }
 
 /* ---------------------------------------------------------------------------

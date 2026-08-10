@@ -10,7 +10,8 @@
    wird, ob die Zusagen des Entwurfs auch wirklich gelten:
 
      * Es wird nichts von außen geholt.
-     * Die Hand hinterlässt eine Spur, und langsam ist dunkler als schnell.
+     * Die Hand hinterlässt eine Spur, und der Weg trägt auf, nicht die Zeit.
+     * Verweilen greift tiefer, brennt aber kein Loch.
      * Wiederholung vertieft, sättigt aber und kippt nie ins Schwarze.
      * Was gerieben wurde, ist n-zählig drehsymmetrisch.
      * Das unberührte Papier verrät das Relief fast nicht.
@@ -122,38 +123,127 @@ async function run() {
   const nachStrich = await page.evaluate(function () { return window.Blatt.meanDensity(); });
   prüfe('Reiben trägt auf', nachStrich > 0);
 
-  /* Langsam gegen schnell, sonst gleich. */
+  /* Der Weg trägt auf, nicht die Zeit. Zweimal derselbe Bogen, einmal in
+     sechzig winzigen Schritten, einmal in sechs großen: Das ist derselbe
+     Strich, nur anders schnell gefahren – und es muss dasselbe daliegen.
+
+     Vorher galt das Gegenteil, und es war der Grund für zwei Beschwerden
+     auf einmal: Fläche blieb blass wie Geschmiere, und jedes Zögern brannte
+     einen dunklen Fleck. */
   const tempo = await page.evaluate(function () {
     const B = window.Blatt;
-    const C = B.SIZE / 2, r = B.R_DISC * 0.5, TAU = Math.PI * 2;
-    const bogen = function (von, bis) {
+    const C = B.SIZE / 2, halb = B.R_DISC * 0.45;
+    /* Zwei gerade Strecken, spiegelbildlich zur Mitte: Auf einer Geraden
+       liegen grob und fein gesetzte Punkte auf demselben Weg, sodass die
+       Messung wirklich das Tempo prüft und nicht die Sehne. */
+    const strecke = function (y, n) {
       const pts = [];
-      for (let i = 0; i <= 60; i++) {
-        const a = von + (bis - von) * (i / 60);
-        pts.push(C + Math.cos(a) * r, C + Math.sin(a) * r);
-      }
+      for (let i = 0; i <= n; i++) pts.push(C - halb + (2 * halb) * (i / n), y);
       return pts;
     };
-    const messe = function (von, bis) {
+    const messe = function (y) {
       let sum = 0, n = 0;
       for (let i = 0; i <= 60; i++) {
-        const a = von + (bis - von) * (i / 60);
-        const x = Math.round(C + Math.cos(a) * r);
-        const y = Math.round(C + Math.sin(a) * r);
-        sum += B.sheet.dens[y * B.SIZE + x];
+        const x = Math.round(C - halb + (2 * halb) * (i / 60));
+        sum += B.sheet.dens[Math.round(y) * B.SIZE + x];
         n++;
       }
       return sum / n;
     };
 
+    /* Zweimal dieselbe Strecke auf demselben Relief, jedes Mal auf
+       frischem Blatt – sonst verglichen wir nebenbei zwei Orte. */
+    const y = C + B.R_DISC * 0.35;
+    B.makeSheet(4242, 'tag'); B.setPigment(0);
+    B.rubPath(strecke(y, 60), 0.5);       // kriechend, in winzigen Schritten
+    const kriechend = messe(y);
+    B.makeSheet(4242, 'tag'); B.setPigment(0);
+    B.rubPath(strecke(y, 12), 0.5);       // zügig, in großen Schritten
+    return { kriechend: kriechend, zügig: messe(y) };
+  });
+  /* Zwei Schranken, und die obere ist die wichtige: Kriechen darf keinen
+     Vorteil bringen, sonst ist das Zeitverhalten durch die Hintertür
+     zurück. Die untere hält fest, dass zügiges Arbeiten auch nicht
+     bestraft wird. Eng gesetzt, denn beides soll gleich sein. */
+  const anteil = tempo.kriechend / Math.max(1e-6, tempo.zügig);
+  prüfe('der Weg trägt auf, nicht die Zeit', anteil < 1.15 && anteil > 0.87,
+        'kriechend ' + tempo.kriechend.toFixed(3) + ', zügig ' +
+        tempo.zügig.toFixed(3) + ' – Faktor ' + anteil.toFixed(2));
+
+  /* Was die Langsamkeit stattdessen ändert: die Tiefe. Ein fester, ruhiger
+     Kontakt holt auch aus dem ebenen Grund Farbe, ein flüchtiger streift
+     nur die Grate. Gemessen als Verhältnis Grund zu Grat. */
+  const griff = await page.evaluate(function () {
+    const B = window.Blatt;
+    const C = B.SIZE / 2, r = B.R_DISC * 0.5;
+    const ring = function (von, bis) {
+      const pts = [];
+      for (let i = 0; i <= 24; i++) {
+        const a = von + (bis - von) * (i / 24);
+        pts.push(C + Math.cos(a) * r, C + Math.sin(a) * r);
+      }
+      return pts;
+    };
+    /* Grund gegen Grat, nur dort gemessen, wo die Hand war. */
+    const tiefe = function (von, bis) {
+      const S = B.SIZE, d = B.sheet.dens, rel = B.sheet.relief;
+      let hs = 0, hn = 0, ts = 0, tn = 0;
+      for (let i = 0; i <= 240; i++) {
+        const a = von + (bis - von) * (i / 240);
+        for (let dr = -10; dr <= 10; dr += 2) {
+          const x = Math.round(C + Math.cos(a) * (r + dr));
+          const y = Math.round(C + Math.sin(a) * (r + dr));
+          const o = y * S + x, v = d[o];
+          if (v < 0.004) continue;
+          if (rel[o] > 200) { hs += v; hn++; }
+          else if (rel[o] < 120) { ts += v; tn++; }
+        }
+      }
+      return (ts / Math.max(1, tn)) / Math.max(1e-6, hs / Math.max(1, hn));
+    };
+
     B.makeSheet(4242, 'tag');
     B.setPigment(0);
-    B.rubPath(bogen(0, 0.6), 2.2, 0.5);            // langsam
-    B.rubPath(bogen(Math.PI, Math.PI + 0.6), 0.35, 0.5);  // schnell
-    return { langsam: messe(0, 0.6), schnell: messe(Math.PI, Math.PI + 0.6) };
+    B.rubPath(ring(0, 0.7), 0.15);                    // flüchtig
+    B.rubPath(ring(Math.PI, Math.PI + 0.7), 1.0);     // fest und ruhig
+    return { flüchtig: tiefe(0, 0.7), fest: tiefe(Math.PI, Math.PI + 0.7) };
   });
-  prüfe('langsam ist dichter', tempo.langsam > tempo.schnell * 1.8,
-        tempo.langsam.toFixed(3) + ' gegen ' + tempo.schnell.toFixed(3));
+  prüfe('der feste Griff holt aus dem Grund', griff.fest > griff.flüchtig * 1.5,
+        'Grund/Grat flüchtig ' + griff.flüchtig.toFixed(2) +
+        ', fest ' + griff.fest.toFixed(2));
+
+  /* Und das Stillhalten brennt kein Loch mehr. Eine Sekunde auf derselben
+     Stelle darf nicht dunkler werden als ein paar ehrliche Züge über eine
+     Fläche – sonst belohnt die App das Zögern statt die Arbeit. */
+  {
+    await page.evaluate(function () {
+      window.Blatt.makeSheet(4242, 'tag'); window.Blatt.setPigment(0);
+    });
+    const box = await page.locator('#sheet').boundingBox();
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.62);
+    await page.mouse.down();
+    await page.waitForTimeout(1100);
+    await page.mouse.up();
+    await page.waitForTimeout(80);
+    const fleck = await page.evaluate(function () {
+      let m = 0; const d = window.Blatt.sheet.dens;
+      for (let i = 0; i < d.length; i += 3) if (d[i] > m) m = d[i];
+      return m;
+    });
+    await page.evaluate(function () {
+      window.Blatt.makeSheet(4242, 'tag'); window.Blatt.setPigment(0);
+    });
+    await reibe(page, { radius: 0.5, from: 0, to: Math.PI * 0.6, steps: 30 });
+    await reibe(page, { radius: 0.5, from: 0, to: Math.PI * 0.6, steps: 30 });
+    const zug = await page.evaluate(function () {
+      let m = 0; const d = window.Blatt.sheet.dens;
+      for (let i = 0; i < d.length; i += 3) if (d[i] > m) m = d[i];
+      return m;
+    });
+    prüfe('Stillhalten brennt kein Loch', fleck < zug,
+          'eine Sekunde stehen ' + fleck.toFixed(2) +
+          ', zwei Züge ' + zug.toFixed(2));
+  }
 
   /* ---- Wiederholung: vertieft, sättigt, kippt nicht --------------------- */
   console.log('\nWiederholung');
@@ -176,7 +266,7 @@ async function run() {
     };
     const stufen = [];
     for (let lap = 0; lap < 40; lap++) {
-      B.rubPath(pts, 2.0, 0.7);
+      B.rubPath(pts, 0.7);
       if (lap === 0 || lap === 4 || lap === 39) stufen.push(spitze());
     }
 
@@ -214,8 +304,8 @@ async function run() {
       const a = (i / 400) * TAU;
       pts.push(C + Math.cos(a) * r, C + Math.sin(a) * r);
     }
-    B.rubPath(pts, 1.6, 0.6);
-    B.rubPath(pts, 1.6, 0.6);
+    B.rubPath(pts, 0.6);
+    B.rubPath(pts, 0.6);
 
     /* Gemessen wird die Dichte, nicht die Helligkeit: Das Papierkorn ist
        ortsfest und nicht drehsymmetrisch, es würde die Messung sonst
@@ -446,6 +536,47 @@ async function run() {
   prüfe('die Farbwelt lässt sich wählen', gewechselt.welt);
   prüfe('die Stimmung lässt sich wählen', gewechselt.stimmung);
   prüfe('das gewählte Blatt kommt genau so', gewechselt.genommen && gewechselt.zu);
+
+  /* Das Papier. Wer beim dunklen bleiben will, obwohl das Gerät hell steht,
+     soll das hier tun können – und beim nächsten Öffnen soll es noch so
+     sein. Geprüft wird die ganze Kette: wählen, sehen, mitnehmen, behalten. */
+  const papier = await page.evaluate(async function () {
+    const B = window.Blatt;
+    B.openLade();
+    await new Promise(function (r) { setTimeout(r, 400); });
+    const kacheln = document.querySelectorAll('.lade-paper');
+
+    document.querySelector('.lade-paper[data-paper="nacht"]').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+    const raumDunkel = document.body.dataset.sheet === 'nacht';
+
+    const seed = Number(document.querySelector('.lade-sheet').dataset.seed) >>> 0;
+    document.querySelector('.lade-sheet').click();
+    await new Promise(function (r) { setTimeout(r, 900); });
+
+    return {
+      zwei: kacheln.length === 2,
+      raumDunkel: raumDunkel,
+      blattDunkel: B.sheet.mode === 'nacht' && B.sheet.seed === seed,
+      gemerkt: localStorage.getItem('atelier3-papier')
+    };
+  });
+  prüfe('die Lade zeigt beide Papiere', papier.zwei);
+  prüfe('der Raum nimmt den Ton sofort an', papier.raumDunkel);
+  prüfe('das Papier kommt mit dem Blatt', papier.blattDunkel);
+  prüfe('das Papier bleibt gewählt', papier.gemerkt === 'nacht',
+        'gemerkt: ' + papier.gemerkt);
+
+  /* Zurück auf Tag, damit die folgenden Prüfungen auf dem hellen Papier
+     laufen wie bisher. */
+  await page.evaluate(async function () {
+    window.Blatt.openLade();
+    await new Promise(function (r) { setTimeout(r, 300); });
+    document.querySelector('.lade-paper[data-paper="tag"]').click();
+    await new Promise(function (r) { setTimeout(r, 600); });
+    document.getElementById('lade-close').click();
+    window.Blatt.makeSheet(4242, 'tag');
+  });
 
   /* ---- Die zweite Hand -------------------------------------------------- */
   console.log('\nDie zweite Hand');

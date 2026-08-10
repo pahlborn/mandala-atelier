@@ -46,9 +46,28 @@ const HALF   = SIZE / 2;
 const R_DISC = HALF * 0.92;          // Außenrand des Mandalas in Pixeln
 const TAU    = Math.PI * 2;
 
-/* Stellschrauben des Auftrags. */
-const RATE        = 0.20;   // Pigment je Millisekunde Verweildauer je Pixel
-const DWELL_CAP   = 3.0;    // ms/px – deckelt das Stehenbleiben an einer Stelle
+/* Stellschrauben des Auftrags.
+
+   PASS ist das Maß aller Dinge: so viel Pigment legt ein einziges
+   Überstreichen an einer Stelle ab, wenn dort ein Grat liegt. Nicht je
+   Sekunde – je Überstreichen.
+
+   Das ist der Unterschied zwischen Reiben und Drücken, und lange stand hier
+   das Falsche. Vorher hing der Auftrag an der Zeit: Wer langsam fuhr, trug
+   mehr auf, wer stillhielt, am meisten. Beim Frottieren ist es umgekehrt.
+   Farbe wandert durch Reibung auf das Papier, und Reibung braucht Weg. Eine
+   ruhende Hand hat nichts mehr zu geben – sie hat abgegeben, was an dieser
+   Stelle abzugeben war. Deshalb blieb große Fläche blass wie Geschmiere,
+   während jedes Zögern einen dunklen Fleck einbrannte. Beides derselbe
+   Rechenfehler.
+
+   Jetzt zählt der Weg. Ein Zug über eine Stelle legt PASS ab, ob langsam
+   oder schnell gefahren. Was die Langsamkeit weiterhin ändert, ist nicht die
+   Menge, sondern die Tiefe: Sie greift bis in die Mulden (siehe setBite).
+   Und das Stillhalten trägt noch ein wenig nach – REST_RATE Überstreichen je
+   Sekunde –, damit eine wartende Hand nicht ganz folgenlos aufliegt. */
+const PASS      = 0.46;   // Auftrag je Überstreichen, auf dem Grat
+const REST_RATE = 1.0;    // wie viele Überstreichen eine Sekunde Stillstand wiegt
 /* Der Kontakt wird in Bildschirmpunkten gemessen, nicht in Blatt-Koordinaten.
    Eine Fingerkuppe klebt am Glas, nicht am Bild: Sie ist rund zwölf Millimeter
    breit, und daran ändert sich nichts, wenn man näher herangeht. Erst dadurch
@@ -59,9 +78,24 @@ const DWELL_CAP   = 3.0;    // ms/px – deckelt das Stehenbleiben an einer Stel
    Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
 const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
 const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
-const GAMMA_LIGHT = 3.6;    // leichter/schneller Kontakt: fast nur die Höhen
-const GAMMA_FIRM  = 0.7;    // fester/langsamer Kontakt: greift bis in die Tiefen
+const GAMMA_LIGHT = 2.0;    // leichter/schneller Kontakt: vor allem die Höhen
+const GAMMA_FIRM  = 0.30;   // fester/langsamer Kontakt: greift bis in die Tiefen
+const GRIP_BASE   = 0.18;   // auch der flüchtigste Kontakt greift ein wenig
 const MIX_SUB     = 0.5;    // wie subtraktiv Pigment über Pigment mischt
+/* Ein Finger ist keine Kuppe, sondern eine Fläche mit weichem Rand: innen
+   voller Kontakt, und erst das äußere Stück läuft aus. CONTACT_SOFT ist
+   dieses äußere Stück, gemessen am Radius.
+
+   CONTACT_SPAN ist daraus abgeleitet und wird gebraucht, um den Auftrag auf
+   den Weg umzurechnen: Es ist die Breite, die dieser Kontakt effektiv hat,
+   wenn man das weiche Auslaufen zu einem harten Rand zusammenrechnet
+   (Integral des Profils über den Durchmesser). Wer stattdessen naiv mit dem
+   vollen Durchmesser rechnet, bekommt eine kriechende Hand, die ein Viertel
+   weniger ablegt als eine zügige – genau das Zeitverhalten, das wir gerade
+   losgeworden sind, nur leiser. */
+const CONTACT_SOFT = 0.45;
+const CONTACT_RIM  = 1 / CONTACT_SOFT;
+const CONTACT_SPAN = 2 - CONTACT_SOFT;
 const SAT_LIMIT   = 0.985;  // Dichte läuft asymptotisch, kippt nie
 
 /* Wie deutlich das Relief im unberührten Papier durchscheint. Das ist die
@@ -953,9 +987,9 @@ function setBite(press) {
   for (let i = 0; i < 256; i++) biteLut[i] = Math.pow(i / 255, gamma);
 }
 
-/* Trägt entlang einer Strecke auf. dwell ist die Verweildauer in
-   Millisekunden je Pixel Weg – daraus kommt die Dunkelheit. */
-function rub(ax, ay, bx, by, dwell, radius, rgb) {
+/* Trägt entlang einer Strecke auf. load ist der Auftrag für dieses eine
+   Überstreichen: 1,0 hieße, die Stelle wird in einem Zug gedeckt. */
+function rub(ax, ay, bx, by, load, radius, rgb) {
   const relief = sheet.relief;
   const dens   = sheet.dens;
   const pix    = sheet.pix;
@@ -973,7 +1007,7 @@ function rub(ax, ay, bx, by, dwell, radius, rgb) {
   if (x1 < x0 || y1 < y0) return;
 
   const r2 = radius * radius;
-  const amount = RATE * dwell;
+  const amount = load > 1 ? 1 : load;   // ein Zug deckt höchstens ganz
 
   for (let y = y0; y <= y1; y++) {
     const row = y * SIZE;
@@ -996,12 +1030,31 @@ function rub(ax, ay, bx, by, dwell, radius, rgb) {
       const cur = dens[o];
       if (cur >= SAT_LIMIT) continue;
 
-      /* Weiche Kontaktkurve, keine harte Scheibe. */
-      const q = 1 - d2 / r2;
-      const dep = amount * q * q * biteLut[relief[o]] * tooth(x, y);
+      /* Der flache Kern mit weichem Rand (siehe CONTACT_SOFT). Vorher stand
+         hier eine quadratische Glocke – die trug im Mittel nur ein Drittel
+         dessen auf, was die Mitte bekam, und deshalb sah Flächenarbeit aus
+         wie Geschmiere statt wie gedeckte Farbe. */
+      let q = (1 - Math.sqrt(d2) / radius) * CONTACT_RIM;
+      if (q > 1) q = 1;
+      const dep = amount * q * q * (3 - 2 * q) * biteLut[relief[o]] * tooth(x, y);
       if (dep < 0.00025) continue;
 
-      const add = dep * (1 - cur);
+      /* dep ist die Gabe, add ist, was davon ankommt. Dass noch Platz sein
+         muss, macht (1 - cur). Der Bruch davor macht etwas Feineres: Er
+         sorgt dafür, dass es nicht darauf ankommt, in wie vielen Häppchen
+         eine Gabe eintrifft.
+
+         Ohne ihn bliebe ein Rest Zeitverhalten übrig. Ein Gerät meldet die
+         Hand hundertmal in der Sekunde; wer langsam fährt, dessen Weg wird
+         also in viel kleinere Stücke zerlegt als der eines schnellen – und
+         viele kleine Gaben sättigen weniger als wenige große. Gemessen
+         waren das dreißig Prozent Unterschied zwischen kriechend und zügig,
+         leise wieder dieselbe Verwechslung von Zeit und Weg.
+
+         dep/(1 + dep/2) ist die billige Fassung von 1 − e^(−dep). Mit ihr
+         multiplizieren sich die Restanteile zu e^(−Summe): Die Summe zählt,
+         die Stückelung nicht. */
+      const add = dep / (1 + dep * 0.5) * (1 - cur);
       if (add < 0.00025) continue;
       dens[o] = cur + add;
 
@@ -1512,11 +1565,14 @@ function applyHand(dt) {
      Langsamkeit den größeren Teil: wer verweilt, greift in die Fläche,
      wer wischt, streift nur die Höhen. */
   const slow = 1 - Math.min(1, speed / 1.1);
-  setBite(Math.min(1, hand.press * 0.62 + slow * 0.44));
+  setBite(Math.min(1, GRIP_BASE + hand.press * 0.55 + slow * 0.40));
 
   if (len < 0.4) {
-    /* Die Hand steht. Auch das trägt auf – wer den Stift hält und wartet,
-       bekommt einen dunklen Fleck. Gedeckelt, damit es nicht ausufert.
+    /* Die Hand steht. Sie trägt noch ein wenig nach, aber wenig: eine ganze
+       Sekunde Stillstand wiegt ungefähr einen einzigen Zug. Was in dieser
+       Sekunde tatsächlich geschieht, ist etwas anderes – der Griff wird
+       fester (slow geht auf 1), und der Kontakt reicht bis in die Mulden.
+       Wer verweilt, holt Tiefe herauf, nicht Dunkelheit.
 
        Nur ganz am Anfang nicht: Solange sich noch nichts bewegt hat und die
        Frist für die zweite Hand läuft, bleibt das Blatt unberührt. Ein
@@ -1526,14 +1582,23 @@ function applyHand(dt) {
     q.length = 0;
     if (!hand.moved && performance.now() - hand.downAt < GESTURE_GRACE) return;
     rub(hand.x, hand.y, hand.x, hand.y,
-        Math.min(DWELL_CAP, dt * 0.35), hand.radius, rgb);
+        PASS * REST_RATE * dt * 0.001, hand.radius, rgb);
     return;
   }
 
-  const dwell = Math.min(DWELL_CAP, dt / len);
+  /* Weg statt Zeit. Ein Teilstück legt so viel ab, wie es an frischer Fläche
+     erschließt: seine Länge, gemessen an der wirksamen Breite des
+     Kontakts. Zieht die
+     Hand weit, ist das ein volles Überstreichen; kriecht sie in vielen
+     kleinen Schritten dahin, teilen sich diese Schritte dasselbe eine
+     Überstreichen untereinander auf. So kommt an jeder Stelle genau einmal
+     PASS an, gleich wie schnell die Hand dort war. */
+  const span = CONTACT_SPAN * hand.radius;
   px = hand.x; py = hand.y;
   for (let i = 0; i < q.length; i += 2) {
-    rub(px, py, q[i], q[i + 1], dwell, hand.radius, rgb);
+    const dx = q[i] - px, dy = q[i + 1] - py;
+    const seg = Math.sqrt(dx * dx + dy * dy);
+    rub(px, py, q[i], q[i + 1], PASS * seg / (seg + span), hand.radius, rgb);
     px = q[i]; py = q[i + 1];
   }
   hand.x = px; hand.y = py;
@@ -1945,6 +2010,58 @@ function setLadeKind(id) {
   buildLadeSheets();
 }
 
+/* Die beiden Papiere. Sie zeigen sich selbst: ein Stück Papier in seinem
+   Ton, mit drei Pigmenten der gerade gewählten Welt darauf, so wie sie
+   darauf aussehen werden. Kein Schalter, keine Sonne, kein Mond – die
+   Sache selbst. */
+const PAPERS = [
+  { id: 'tag',   name: 'Tag' },
+  { id: 'nacht', name: 'Nacht' }
+];
+
+function buildLadePapers() {
+  ui.ladePapers.innerHTML = '';
+  PAPERS.forEach(function (p) {
+    const look = SHEETS[p.id];
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'lade-paper';
+    button.dataset.paper = p.id;
+    button.setAttribute('aria-label', p.name + 'papier');
+    button.setAttribute('aria-pressed', p.id === lade.mode ? 'true' : 'false');
+    button.style.background = 'rgb(' + look.paper.join(',') + ')';
+
+    const dots = document.createElement('span');
+    dots.className = 'paper-dots';
+    pigmentsOf(lade.world, p.id).forEach(function (pig, i) {
+      if (i !== 0 && i !== 4 && i !== 7) return;
+      const dot = document.createElement('span');
+      dot.style.background = 'rgb(' + pig.rgb.join(',') + ')';
+      dots.appendChild(dot);
+    });
+    button.appendChild(dots);
+
+    const word = document.createElement('span');
+    word.className = 'paper-word';
+    word.textContent = p.name;
+    button.appendChild(word);
+
+    ui.ladePapers.appendChild(button);
+  });
+}
+
+function setLadePaper(id) {
+  if (!SHEETS[id] || id === lade.mode) return;
+  lade.mode = id;
+  rememberMode(id);
+  document.body.dataset.sheet = id;
+  /* Dieselben Blätter, dasselbe Pigment – nur das Papier wechselt. Man
+     sieht unmittelbar, was das mit der Farbe macht. */
+  buildLadePapers();
+  buildLadeWorlds();
+  buildLadeSheets();
+}
+
 function buildLadeWorlds() {
   ui.ladeWorlds.innerHTML = '';
   WORLDS.forEach(function (w) {
@@ -2001,6 +2118,11 @@ function openLade() {
   freshSeeds();
   buildLadeKinds();
   ui.lade.hidden = false;
+  /* Solange die Lade offen steht, nimmt der Raum schon den Ton des
+     Papiers an, das gerade gewählt ist. Man sieht die Entscheidung, statt
+     sie sich vorzustellen. */
+  document.body.dataset.sheet = lade.mode;
+  buildLadePapers();
   buildLadeWorlds();
   buildLadeSheets();
   awaken();
@@ -2009,6 +2131,9 @@ function openLade() {
 function closeLade() {
   lade.pending++;
   ui.lade.hidden = true;
+  /* Wer die Lade wieder zumacht, ohne ein Blatt zu nehmen, bekommt den
+     Raum zurück, in dem das angefangene Blatt liegt. */
+  document.body.dataset.sheet = sheet.mode;
   awaken();
 }
 
@@ -2018,12 +2143,16 @@ function setLadeWorld(id) {
   lade.world = found;
   /* Dieselben Blätter, andere Pigmente – so lässt sich „dieser Charakter,
      aber kühler“ unmittelbar vergleichen. */
+  buildLadePapers();
   buildLadeWorlds();
   buildLadeSheets();
 }
 
 async function takeFreshSheet(seed) {
   closeLade();
+  /* closeLade gibt den Raum dem alten Blatt zurück – hier nicht, sonst
+     schlüge der Ton während des Umblätterns kurz zurück. */
+  document.body.dataset.sheet = lade.mode;
   clearTimeout(saveTimer);
   await shelveCurrent();
   await Speicher.del('kv', 'blatt');
@@ -2194,9 +2323,34 @@ function tickStillness(now) {
    16. Start
    ------------------------------------------------------------------------- */
 
-function preferredMode() {
+/* Tag oder Nacht ist keine Einstellung – es sind zwei Papiere. Auf dem
+   hellen liegt Pigment wie Buntstift, auf dem dunklen leuchtet es wie
+   Kreide, und ein Blatt behält sein Papier bis zuletzt.
+
+   Woher es kommt, ist eine Kette mit drei Gliedern: Was zuletzt in der
+   Lade gewählt wurde, sonst was das Gerät für die Tageszeit hält, sonst
+   Tag. Das Gerät zu fragen ist als Anfang richtig – es weiß etwas über den
+   Raum, in dem jemand sitzt. Aber es ist nur ein Anfang. Wer beim dunklen
+   Papier bleiben will, obwohl das Gerät hell steht, soll das nicht am
+   Betriebssystem umstellen müssen, sondern in der Lade, im Blick auf die
+   Papiere selbst. */
+const PAPER_KEY = 'atelier3-papier';
+
+function systemMode() {
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'nacht' : 'tag';
+}
+
+function preferredMode() {
+  try {
+    const kept = localStorage.getItem(PAPER_KEY);
+    if (kept === 'tag' || kept === 'nacht') return kept;
+  } catch (e) { /* Privatmodus: dann eben das Gerät fragen. */ }
+  return systemMode();
+}
+
+function rememberMode(mode) {
+  try { localStorage.setItem(PAPER_KEY, mode); } catch (e) { /* nicht wichtig */ }
 }
 
 function hintStrength() {
@@ -2307,6 +2461,7 @@ function cacheUi() {
   ui.stackNext   = document.getElementById('stack-next');
   ui.lade        = document.getElementById('lade');
   ui.ladeKinds   = document.getElementById('lade-kinds');
+  ui.ladePapers  = document.getElementById('lade-papers');
   ui.ladeWorlds  = document.getElementById('lade-worlds');
   ui.ladeSheets  = document.getElementById('lade-sheets');
   ui.ladeMore    = document.getElementById('lade-more');
@@ -2342,6 +2497,10 @@ function bindUi() {
   ui.ladeKinds.addEventListener('click', function (event) {
     const button = event.target.closest('.lade-kind');
     if (button) { setLadeKind(button.dataset.kind); awaken(); }
+  });
+  ui.ladePapers.addEventListener('click', function (event) {
+    const button = event.target.closest('.lade-paper');
+    if (button) { setLadePaper(button.dataset.paper); awaken(); }
   });
   ui.ladeWorlds.addEventListener('click', function (event) {
     const button = event.target.closest('.lade-world');
@@ -2482,12 +2641,21 @@ window.Blatt = {
     makeSheet(seed, mode, world, kind); buildPigments(); setPigment(0); paint();
   },
   setPigment: setPigment,
-  rubPath: function (points, dwell, press) {
+  /* Ein Zug über einen Pfad, wie ihn die Hand führen würde. Der Griff ist
+     einstellbar, die Menge nicht: Ein Überstreichen ist ein Überstreichen.
+     Diesselbe Rechnung wie in applyHand – ein Pfad aus tausend winzigen
+     Stücken muss dasselbe hinterlassen wie derselbe Pfad aus zehn großen,
+     sonst prüfte der Test etwas anderes als die App tut. */
+  rubPath: function (points, press) {
     const rgb = current().rgb;
+    const radius = contactRadius(false);
+    const span = CONTACT_SPAN * radius;
     setBite(press === undefined ? 0.5 : press);
     for (let i = 0; i + 3 < points.length; i += 2) {
+      const dx = points[i + 2] - points[i], dy = points[i + 3] - points[i + 1];
+      const seg = Math.sqrt(dx * dx + dy * dy);
       rub(points[i], points[i + 1], points[i + 2], points[i + 3],
-          dwell, contactRadius(false), rgb);
+          PASS * seg / (seg + span), radius, rgb);
     }
     paint();
   },
