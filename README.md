@@ -48,6 +48,33 @@ Die Seite gehört zu keiner der beiden Apps und ist bewusst nüchtern: keine
 Beschreibung einer Wirkung, keine Empfehlung, keine Reihenfolge – wer dort
 landet, könnte eine Testperson sein.
 
+## Die Arbeitsseite PA-APPS
+
+`PA-APPS.html` ist etwas anderes und darf nicht mit `beide.html` verwechselt
+werden. Dort stehen **drei** Apps – die beiden hier und das Malstudio aus dem
+Schwesterrepo – zusammen mit allem, was App Store Connect beim Einreichen
+abfragt: Titel, Untertitel, Marketingtext, Preis, Kategorie, Altersfreigabe,
+Datenschutz, Bedienungshilfen, Copyright und Beispielbilder, umschaltbar
+zwischen iPhone und iPad. Alle Angaben sind Vorschläge; was noch offen ist,
+steht in gelb gerahmten Kästen.
+
+Die Seite ist zum Weitergeben gedacht, solange nicht entschieden ist, ob
+überhaupt eine der Apps in den Store soll. **Für den Vergleich mit
+Testpersonen bleibt `beide.html` zuständig** – PA-APPS beschreibt, was die
+Apps tun sollen, und würde das Ergebnis verfärben.
+
+Die Beispielbilder erzeugt
+
+    node tools/gen-schaufenster.js
+
+Das Werkzeug startet die Apps, bedient sie ein wenig – ein leeres Blatt zeigt
+sonst nichts – und legt zwölf Aufnahmen in `pa-apps/` ab. Das Malstudio wird
+neben diesem Ordner gesucht, sonst `MALSTUDIO=/pfad/zu/malstudio` setzen.
+
+`sw.js` fasst `PA-APPS.html` und `pa-apps/` ausdrücklich nicht an. Sonst läge
+die Arbeitsseite im Offline-Vorrat und zeigte wochenlang einen alten Stand,
+ohne dass es jemandem auffiele.
+
 **Die beiden Apps gehen einander vollständig aus dem Weg:** eigene Icons und
 Namen, getrennte Service-Worker-Bereiche und Cache-Namen, getrennte
 Speicher (`mandala-atelier.*` gegen `atelier3-*`, eigene Datenbanken).
@@ -81,6 +108,8 @@ Dateien unverändert ausliefert.
     docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
+    PA-APPS.html            Arbeitsseite: drei Apps mit den Store-Angaben
+    pa-apps/                Beispielbilder dafür (erzeugt)
     .nojekyll               Pages liefert unverändert aus
 
     index.html              App-Gerüst, Schubladen, Galerie
@@ -94,6 +123,7 @@ Dateien unverändert ausliefert.
     tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
+    tools/gen-schaufenster.js    Beispielbilder für PA-APPS.html
     tools/gen-atelier3-icons.js  Icons für „Blatt“
     tools/test-atelier3.js  Testlauf für „Blatt“
     tools/test-nebeneinander.js  Prüft, dass sich beide Apps nicht stören

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>PA-APPS – Arbeitsstand</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Drei Apps zum Ausprobieren, dazu die Angaben, die der App Store verlangen würde.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon-192.png">
+
+<!--
+  PA-APPS – die Arbeitsseite.
+
+  Zwei Dinge auf einmal, und beide mit Absicht:
+
+  1. Die drei Apps lassen sich von hier aus starten und weitergeben.
+  2. Daneben steht alles, was App Store Connect beim Einreichen abfragt –
+     Titel, Untertitel, Marketingtext, Preis, Kategorie, Altersfreigabe,
+     Datenschutz, Bedienungshilfen, Copyright, Beispielbilder.
+
+  So sieht man vor der Entscheidung, wie eine Produktseite aussähe, und was
+  noch fehlt. Alle Zahlen und Texte sind Vorschläge, kein Beschluss. Was noch
+  offen ist, steht in den gelb gerahmten Kästen – die sind bewusst nicht zu
+  übersehen, damit nichts davon versehentlich als „fertig“ durchgeht.
+
+  Diese Seite gehört zu keiner der Apps. Sie ist nicht Teil des Angebots und
+  soll niemandem eine Meinung über eine der Apps einreden – anders als bei
+  beide.html darf sie hier aber beschreiben, was eine App tut. Wer den
+  Vergleich Mandala/Blatt mit Testpersonen durchführt, nimmt weiterhin
+  beide.html, nicht diese Seite.
+
+  Die Beispielbilder entstehen mit  node tools/gen-schaufenster.js  – echte
+  Aufnahmen der laufenden Apps, keine Montagen.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --room:   #efe9dd;
+    --card:   #f8f4ea;
+    --sunk:   #ece5d7;
+    --ink:    #2f2a22;
+    --quiet:  #6d6355;
+    --edge:   rgba(60, 48, 32, 0.16);
+    --line:   rgba(60, 48, 32, 0.12);
+    --blau:   #0a6c8f;
+    --blau-w: #e2eef3;
+    --merk:   #8a6d1f;
+    --merk-w: #f7eecf;
+    --merk-r: rgba(138, 109, 31, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --room:   #16151a;
+      --card:   #201f25;
+      --sunk:   #191920;
+      --ink:    #e8e2d6;
+      --quiet:  #9a9287;
+      --edge:   rgba(0, 0, 0, 0.5);
+      --line:   rgba(255, 255, 255, 0.10);
+      --blau:   #5fb8d8;
+      --blau-w: #17313c;
+      --merk:   #dcc078;
+      --merk-w: #2b2618;
+      --merk-r: rgba(220, 192, 120, 0.32);
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  /* Weiches Scrollen zu den Sprungmarken – aber nur, wenn Bewegung
+     erwünscht ist. Die Apps beachten „Bewegung reduzieren“ überall, dann
+     darf diese Seite nicht die Ausnahme sein. */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  body {
+    margin: 0;
+    padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px)
+             calc(clamp(40px, 8vw, 80px) + env(safe-area-inset-bottom));
+    background: var(--room);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 62rem; margin: 0 auto; }
+
+  h1 {
+    margin: 0 0 0.15em;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(30px, 6vw, 42px);
+    letter-spacing: -0.01em;
+  }
+
+  .lede { margin: 0 0 1.6rem; color: var(--quiet); max-width: 44rem; }
+
+  a { color: var(--blau); }
+
+  /* ---------- Schalter iPhone / iPad ---------------------------------- */
+
+  .modus {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 2.2rem;
+    padding: 12px 0;
+    background: linear-gradient(var(--room) 78%, transparent);
+  }
+
+  .modus > span {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+
+  .schalter {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--sunk);
+    border: 1px solid var(--line);
+  }
+
+  .schalter button {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 7px 18px;
+    background: transparent;
+    color: var(--quiet);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .schalter button[aria-pressed="true"] {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 2px var(--edge);
+  }
+
+  /* ---------- Übersicht ----------------------------------------------- */
+
+  /* Fünf Spalten passen auf ein Telefon nicht. Sie dürfen schieben – aber
+     in ihrem eigenen Kasten, nicht die ganze Seite. */
+  .rollt { overflow-x: auto; margin: 0 0 3rem; }
+
+  .uebersicht {
+    width: 100%;
+    min-width: 30rem;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  .uebersicht th, .uebersicht td {
+    text-align: left;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  .uebersicht th {
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--quiet);
+    font-weight: 600;
+  }
+
+  .uebersicht td:first-child { font-weight: 600; }
+
+  /* ---------- Produktseite -------------------------------------------- */
+
+  .app {
+    margin: 0 0 clamp(28px, 5vw, 44px);
+    padding: clamp(20px, 3.5vw, 32px);
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: 0 1px 2px var(--edge), 0 14px 34px -20px var(--edge);
+    scroll-margin-top: 72px;
+  }
+
+  .kopf { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+
+  .kopf img {
+    width: 92px;
+    height: 92px;
+    flex: 0 0 auto;
+    border-radius: 21px;                 /* Apples Ecken sind runder als sie wirken */
+    box-shadow: 0 1px 3px var(--edge);
+  }
+
+  .kopf-text { flex: 1 1 16rem; min-width: 0; }
+
+  .kopf h2 {
+    margin: 0;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(23px, 3.4vw, 29px);
+    line-height: 1.2;
+  }
+
+  .untertitel { margin: 2px 0 0; color: var(--quiet); font-size: 16px; }
+  .anbieter   { margin: 6px 0 0; color: var(--quiet); font-size: 13.5px; }
+
+  .laden { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+  .preis {
+    display: inline-block;
+    padding: 8px 26px;
+    border-radius: 999px;
+    background: var(--blau);
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  @media (prefers-color-scheme: dark) { .preis { color: #10222a; } }
+
+  .laden small { color: var(--quiet); font-size: 12px; }
+
+  /* Kennzahlenreihe, wie sie im Store unter dem Titel steht */
+  .kennzahlen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 4px;
+    margin: 22px 0 4px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .kennzahlen div { padding: 0 6px; }
+  .kennzahlen dt {
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+  .kennzahlen dd {
+    margin: 3px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .kennzahlen dd small { display: block; font-weight: 400; font-size: 12px; color: var(--quiet); }
+
+  /* ---------- Beispielbilder ------------------------------------------ */
+
+  .bilder {
+    display: flex;
+    gap: 14px;
+    margin: 24px -4px 6px;
+    padding: 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bilder figure { margin: 0; flex: 0 0 auto; scroll-snap-align: start; }
+
+  .bilder img {
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--sunk);
+    box-shadow: 0 2px 10px -4px var(--edge);
+  }
+
+  /* Telefon hochkant, Tablet quer – die Kanten stehen fest, damit beim
+     Umschalten nichts springt und die Reihe nicht neu umbricht. */
+  body[data-modus="iphone"] .bilder img { width: 216px;  height: 468px; }
+  body[data-modus="ipad"]   .bilder img { width: 430px;  height: 300px; }
+
+  .bilder figcaption {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--quiet);
+    text-align: center;
+  }
+
+  /* ---------- Abschnitte innerhalb einer Produktseite ------------------ */
+
+  .app h3 {
+    margin: 30px 0 0.5rem;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+
+  .app p { margin: 0 0 0.9rem; }
+  .app p:last-child { margin-bottom: 0; }
+
+  .werbetext { max-width: 40rem; }
+  .werbetext strong { font-weight: 600; }
+
+  .app ul { margin: 0 0 0.9rem; padding-left: 1.25em; }
+  .app li { margin-bottom: 0.3em; }
+
+  /* Datenschutz- und Bedienungshilfen-Kachel */
+  .kachel {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    margin-top: 8px;
+  }
+
+  .kachel > div {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--sunk);
+    font-size: 14.5px;
+  }
+
+  .kachel b { display: block; margin-bottom: 3px; }
+  .kachel span { color: var(--quiet); }
+
+  /* Angaben-Tabelle */
+  .angaben { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .angaben th, .angaben td {
+    text-align: left;
+    vertical-align: top;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .angaben th { width: 12rem; font-weight: 400; color: var(--quiet); }
+  .angaben tr:last-child th, .angaben tr:last-child td { border-bottom: 0; }
+
+  .zaehler { color: var(--quiet); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Merkkasten: was noch offen ist --------------------------- */
+
+  .merk {
+    margin-top: 26px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--merk-r);
+    background: var(--merk-w);
+    font-size: 14.5px;
+  }
+
+  .merk b {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--merk);
+    font-size: 12.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .merk ul { margin: 0; padding-left: 1.2em; }
+
+  /* ---------- Fuß ------------------------------------------------------ */
+
+  .schluss {
+    margin-top: clamp(30px, 6vw, 52px);
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+  }
+
+  .schluss h2 {
+    margin: 0 0 0.6rem;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: 25px;
+  }
+
+  .schluss ol { padding-left: 1.3em; }
+  .schluss li { margin-bottom: 0.5em; }
+
+  footer { margin-top: 2.4rem; font-size: 13.5px; color: var(--quiet); }
+
+  @media (max-width: 560px) {
+    .laden { align-items: flex-start; }
+    .angaben th { width: auto; display: block; padding-bottom: 0; border: 0; }
+    .angaben td { display: block; padding-top: 2px; }
+  }
+</style>
+</head>
+<body data-modus="ipad">
+<main>
+
+  <h1>PA-APPS</h1>
+  <p class="lede">Drei Apps zum Ausprobieren – und daneben die Angaben, die
+     App Store Connect beim Einreichen abfragen würde. Die Seite ist ein
+     Arbeitsstand zum Weitergeben, kein Angebot: <strong>alle Preise, Texte und
+     Einstufungen sind Vorschläge.</strong> Was noch fehlt, steht in den gelben
+     Kästen.</p>
+
+  <div class="modus">
+    <span>Beispielbilder</span>
+    <div class="schalter" role="group" aria-label="Gerät für die Beispielbilder">
+      <button type="button" data-gerat="iphone" aria-pressed="false">iPhone</button>
+      <button type="button" data-gerat="ipad" aria-pressed="true">iPad</button>
+    </div>
+    <span id="modus-hinweis" style="text-transform:none;letter-spacing:0">iPad, quer</span>
+  </div>
+
+  <!-- ==================== Übersicht ==================== -->
+
+  <p class="lede">Die drei nebeneinander – so ließe sich am schnellsten
+     entscheiden, welche überhaupt in den Store soll.</p>
+
+  <div class="rollt">
+  <table class="uebersicht">
+    <thead>
+      <tr>
+        <th scope="col">App</th>
+        <th scope="col">Für wen</th>
+        <th scope="col">Kategorie</th>
+        <th scope="col">Alter</th>
+        <th scope="col">Preis (Vorschlag)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="#mandala">Mandala Atelier</a></td>
+        <td>Erwachsene</td>
+        <td>Grafik&nbsp;&amp;&nbsp;Design</td>
+        <td>4+</td>
+        <td>4,99&nbsp;€ einmalig</td>
+      </tr>
+      <tr>
+        <td><a href="#blatt">Blatt</a></td>
+        <td>Erwachsene</td>
+        <td>Grafik&nbsp;&amp;&nbsp;Design</td>
+        <td>4+</td>
+        <td>2,99&nbsp;€ einmalig</td>
+      </tr>
+      <tr>
+        <td><a href="#malstudio">Sommer am Meer – Malstudio</a></td>
+        <td>Kinder, etwa 5–7</td>
+        <td>Bildung</td>
+        <td>4+</td>
+        <td>3,99&nbsp;€ einmalig</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ==================== Mandala Atelier ==================== -->
+
+  <section class="app" id="mandala">
+    <div class="kopf">
+      <img src="icon-192.png" alt="Symbol des Mandala Ateliers" width="92" height="92">
+      <div class="kopf-text">
+        <h2>Mandala Atelier</h2>
+        <p class="untertitel">Symmetrie zum Ausmalen</p>
+        <p class="anbieter">Entwickler: noch festzulegen · Version 1.0</p>
+      </div>
+      <div class="laden">
+        <a class="preis" href="./index.html">Öffnen</a>
+        <small>läuft sofort, ohne Netz</small>
+      </div>
+    </div>
+
+    <dl class="kennzahlen">
+      <div><dt>Alter</dt><dd>4+<small>keine Bedenken</small></dd></div>
+      <div><dt>Kategorie</dt><dd>Grafik<small>&amp; Design</small></dd></div>
+      <div><dt>Sprache</dt><dd>DE<small>nur Deutsch</small></dd></div>
+      <div><dt>Käufe in der App</dt><dd>Nein<small>keine</small></dd></div>
+      <div><dt>Werbung</dt><dd>Nein<small>keine</small></dd></div>
+    </dl>
+
+    <div class="bilder" data-app="mandala">
+      <figure>
+        <img alt="Ein farbig ausgemaltes Mandala mit der Werkzeugleiste darunter"
+             data-iphone="pa-apps/mandala-werkstatt-iphone.jpg"
+             data-ipad="pa-apps/mandala-werkstatt-ipad.jpg" loading="lazy">
+        <figcaption>Ein Segment färben – der Rest folgt</figcaption>
+      </figure>
+      <figure>
+        <img alt="Die Motivlade mit den fertigen Vorlagen"
+             data-iphone="pa-apps/mandala-motive-iphone.jpg"
+             data-ipad="pa-apps/mandala-motive-ipad.jpg" loading="lazy">
+        <figcaption>26 Vorlagen in der Motivlade</figcaption>
+      </figure>
+    </div>
+
+    <h3>Marketingtext</h3>
+    <div class="werbetext">
+      <p><strong>Eine Handbewegung, achtundvierzigfach.</strong></p>
+
+      <p>Im Mandala Atelier zeichnet man ein einziges Segment – den Rest setzt
+         die App. Aus einem Strich wird ein Kranz, aus einer Linie ein Muster.
+         Dieses Gefühl ist das eigentliche Werkzeug: Ordnung entsteht nicht
+         durch Sorgfalt, sie wird geschenkt.</p>
+
+      <p>Wer lieber färbt als zeichnet, findet 26 fertige Vorlagen und fünf
+         Farbwelten aus gedeckten Pigmenten – Erdpigmente, Nordlicht,
+         Färbergarten, Rauchglas und eine, die man sich selbst mischt. Füllen
+         setzt Farbe in ein Feld und zugleich in alle übrigen Segmente.</p>
+
+      <p>Krumme Kreise sind eine Frage der Sache, nicht des Könnens. Das
+         Werkzeug <em>Form</em> setzt deshalb dieselben fünf Bausteine exakt,
+         aus denen auch die Vorlagen bestehen: Ring, Speiche, Blatt, Raute,
+         Band.</p>
+
+      <p>Fertige Werke bleiben auf dem Gerät, in einer Galerie mit Titeln. Es
+         gibt einen Druckbogen in A4 – wahlweise nur die Linien, zum Ausmalen
+         mit echten Stiften. Und eine Sicherungsdatei, die zugleich der Weg auf
+         ein zweites Gerät ist.</p>
+
+      <p><strong>Keine Gamification.</strong> Keine Sterne, keine Pokale, keine
+         Serien. Wer hier malt, will abschalten, nicht gewinnen.</p>
+
+      <p>Ohne Konto. Ohne Werbung. Ohne Netz. Nichts, was hier entsteht,
+         verlässt das Gerät.</p>
+    </div>
+
+    <h3>App-Datenschutz und Bedienungshilfen</h3>
+    <div class="kachel">
+      <div>
+        <b>Keine Daten erfasst</b>
+        <span>Die App sammelt nichts und sendet nichts. Werke und Einstellungen
+        liegen in der Galerie des Geräts (IndexedDB).</span>
+      </div>
+      <div>
+        <b>Bedienungshilfen: teilweise</b>
+        <span>Beschriftete Bedienelemente für VoiceOver, „Bewegung reduzieren“
+        wird beachtet, Hell und Dunkel getrennt gestaltet. Noch offen: Dynamic
+        Type und „Kontrast erhöhen“.</span>
+      </div>
+    </div>
+
+    <h3>Angaben für App Store Connect</h3>
+    <table class="angaben">
+      <tr><th>Name</th><td>Mandala Atelier <span class="zaehler">15/30 Zeichen</span></td></tr>
+      <tr><th>Untertitel</th><td>Symmetrie zum Ausmalen <span class="zaehler">22/30 Zeichen</span></td></tr>
+      <tr><th>Kategorie</th><td>Grafik &amp; Design (primär), Lifestyle (sekundär)</td></tr>
+      <tr><th>Preis</th><td>4,99 € einmalig – keine Käufe in der App, kein Abo</td></tr>
+      <tr><th>Altersfreigabe</th><td>4+ – keine bedenklichen Inhalte, keine Links nach außen, kein Chat</td></tr>
+      <tr><th>Schlüsselwörter</th><td>Mandala, Symmetrie, Ausmalen, Zeichnen, Meditation, Achtsamkeit, Muster, Offline</td></tr>
+      <tr><th>Sprachen</th><td>Deutsch</td></tr>
+      <tr><th>Geräte</th><td>iPad und iPhone, Quer- und Hochformat, Apple Pencil</td></tr>
+      <tr><th>Copyright</th><td>© 2026 <em>Name des Anbieters – noch festzulegen</em></td></tr>
+    </table>
+
+    <div class="merk">
+      <b>Noch zu entscheiden</b>
+      <ul>
+        <li>Neigung des Apple Pencil – steht als offener Punkt im Konzeptpapier
+            und wäre gegenüber Apples Richtlinie 4.2 ein starkes Argument.</li>
+        <li>App-Symbol in 1024 × 1024 <strong>ohne Alphakanal</strong> – die
+            vorhandenen Icons sind alle RGBA und würden abgelehnt.</li>
+        <li>Englische Fassung? Ohne sie bleibt der Store faktisch auf den
+            deutschsprachigen Raum beschränkt.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== Blatt ==================== -->
+
+  <section class="app" id="blatt">
+    <div class="kopf">
+      <img src="atelier3/icon-192.png" alt="Symbol der App Blatt" width="92" height="92">
+      <div class="kopf-text">
+        <h2>Blatt</h2>
+        <p class="untertitel">Streichen, bis etwas erscheint</p>
+        <p class="anbieter">Entwickler: noch festzulegen · Version 1.0</p>
+      </div>
+      <div class="laden">
+        <a class="preis" href="./atelier3/index.html">Öffnen</a>
+        <small>läuft sofort, ohne Netz</small>
+      </div>
+    </div>
+
+    <dl class="kennzahlen">
+      <div><dt>Alter</dt><dd>4+<small>keine Bedenken</small></dd></div>
+      <div><dt>Kategorie</dt><dd>Grafik<small>&amp; Design</small></dd></div>
+      <div><dt>Sprache</dt><dd>DE<small>nur Deutsch</small></dd></div>
+      <div><dt>Käufe in der App</dt><dd>Nein<small>keine</small></dd></div>
+      <div><dt>Werbung</dt><dd>Nein<small>keine</small></dd></div>
+    </dl>
+
+    <div class="bilder" data-app="blatt">
+      <figure>
+        <img alt="Ein Bogen Papier, auf dem ein Mandala-Relief hervorgerieben wurde"
+             data-iphone="pa-apps/blatt-werkstatt-iphone.jpg"
+             data-ipad="pa-apps/blatt-werkstatt-ipad.jpg" loading="lazy">
+        <figcaption>Reiben, bis das Relief hervorkommt</figcaption>
+      </figure>
+      <figure>
+        <img alt="Die Blattlade zum Wählen des nächsten Bogens"
+             data-iphone="pa-apps/blatt-lade-iphone.jpg"
+             data-ipad="pa-apps/blatt-lade-ipad.jpg" loading="lazy">
+        <figcaption>Die Lade: wonach ist dir heute?</figcaption>
+      </figure>
+    </div>
+
+    <h3>Marketingtext</h3>
+    <div class="werbetext">
+      <p><strong>Nichts wird vervielfältigt. Es ist schon da.</strong></p>
+
+      <p>Blatt gibt einem einen leeren Bogen. Man streicht mit dem Finger
+         darüber, und unter der Hand kommt eine Zeichnung hervor – so, wie man
+         als Kind eine Münze unter Papier durchgerieben hat. Nicht schneller,
+         wenn man drückt. Nur, wenn man bleibt.</p>
+
+      <p>Die Bewegung ist die ganze Bedienung. Kein Stift, keine Werkzeugleiste,
+         keine Entscheidung vorweg. Neun Pigmente liegen unter dem Bogen bereit,
+         mehr braucht es nicht.</p>
+
+      <p>Was fertig ist, wird weggelegt und bleibt im Stapel. Wer ein neues
+         Blatt nimmt, wird gefragt, wonach ihm heute ist – und bekommt eines,
+         das er nicht ausgesucht hat.</p>
+
+      <p>Die App hält sich zurück, solange gearbeitet wird: Die Bedienung liegt
+         hinter einer kleinen Marke in der Ecke und kommt nur, wenn man sie
+         holt.</p>
+
+      <p>Ohne Konto. Ohne Werbung. Ohne Netz.</p>
+    </div>
+
+    <h3>App-Datenschutz und Bedienungshilfen</h3>
+    <div class="kachel">
+      <div>
+        <b>Keine Daten erfasst</b>
+        <span>Die App sammelt nichts und sendet nichts. Weggelegte Blätter
+        bleiben auf dem Gerät.</span>
+      </div>
+      <div>
+        <b>Bedienungshilfen: eingeschränkt</b>
+        <span>„Bewegung reduzieren“ wird beachtet, Bedienelemente sind
+        beschriftet. Aber: Die App <em>ist</em> eine Wischbewegung – ohne
+        Sehvermögen oder ohne Handmotorik ist sie kaum zu bedienen. Das sollte
+        in der Beschreibung stehen, nicht versteckt werden.</span>
+      </div>
+    </div>
+
+    <h3>Angaben für App Store Connect</h3>
+    <table class="angaben">
+      <tr><th>Name</th><td>Blatt <span class="zaehler">5/30 Zeichen</span></td></tr>
+      <tr><th>Untertitel</th><td>Streichen, bis etwas erscheint <span class="zaehler">30/30 Zeichen</span></td></tr>
+      <tr><th>Kategorie</th><td>Grafik &amp; Design (primär), Lifestyle (sekundär)</td></tr>
+      <tr><th>Preis</th><td>2,99 € einmalig – kleiner als das Atelier, weil die App bewusst weniger tut</td></tr>
+      <tr><th>Altersfreigabe</th><td>4+</td></tr>
+      <tr><th>Schlüsselwörter</th><td>Frottage, Reiben, Relief, Achtsamkeit, ruhig, Muster, Papier, Offline</td></tr>
+      <tr><th>Sprachen</th><td>Deutsch</td></tr>
+      <tr><th>Geräte</th><td>iPad und iPhone, Quer- und Hochformat</td></tr>
+      <tr><th>Copyright</th><td>© 2026 <em>Name des Anbieters – noch festzulegen</em></td></tr>
+    </table>
+
+    <div class="merk">
+      <b>Noch zu entscheiden</b>
+      <ul>
+        <li><strong>Der Name „Blatt“ ist im App Store sehr wahrscheinlich schon
+            vergeben</strong> – App-Namen sind weltweit eindeutig. Ein Zusatz
+            wird nötig sein, etwa „Blatt – Atelier“.</li>
+        <li>Reicht die App für Apples Richtlinie 4.2 („Minimum Functionality“)?
+            Von den dreien ist sie die schmalste und damit die gefährdetste.
+            Eine gemeinsame App mit dem Mandala Atelier wäre die Alternative –
+            widerspräche aber der Idee, beide getrennt zu vergleichen.</li>
+        <li>App-Symbol in 1024 × 1024 ohne Alphakanal.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== Malstudio ==================== -->
+
+  <section class="app" id="malstudio">
+    <div class="kopf">
+      <img src="pa-apps/icon-malstudio.png" alt="Symbol des Malstudios" width="92" height="92">
+      <div class="kopf-text">
+        <h2>Sommer am Meer – Malstudio</h2>
+        <p class="untertitel">Schritt für Schritt malen</p>
+        <p class="anbieter">Entwickler: noch festzulegen · Version 1.0</p>
+      </div>
+      <div class="laden">
+        <a class="preis" href="https://pahlborn.github.io/malstudio/">Öffnen</a>
+        <small>eigenes Repo, braucht Netz zum Laden</small>
+      </div>
+    </div>
+
+    <dl class="kennzahlen">
+      <div><dt>Alter</dt><dd>4+<small>für 5–7</small></dd></div>
+      <div><dt>Kategorie</dt><dd>Bildung<small>Kinder 6–8</small></dd></div>
+      <div><dt>Sprachen</dt><dd>DE&nbsp;·&nbsp;EN<small>umschaltbar</small></dd></div>
+      <div><dt>Käufe in der App</dt><dd>Nein<small>keine</small></dd></div>
+      <div><dt>Werbung</dt><dd>Nein<small>keine</small></dd></div>
+    </dl>
+
+    <div class="bilder" data-app="malstudio">
+      <figure>
+        <img alt="Die Motivauswahl des Malstudios mit dem Profil eines Kindes"
+             data-iphone="pa-apps/malstudio-auswahl-iphone.jpg"
+             data-ipad="pa-apps/malstudio-auswahl-ipad.jpg" loading="lazy">
+        <figcaption>Jedes Kind hat sein eigenes Studio</figcaption>
+      </figure>
+      <figure>
+        <img alt="Die Malansicht: links die Vorlage, in der Mitte das Blatt, rechts die Farben"
+             data-iphone="pa-apps/malstudio-malen-iphone.jpg"
+             data-ipad="pa-apps/malstudio-malen-ipad.jpg" loading="lazy">
+        <figcaption>Schritt 1 von 5: die Schale</figcaption>
+      </figure>
+    </div>
+
+    <h3>Marketingtext</h3>
+    <div class="werbetext">
+      <p><strong>Ein Sommer auf Albarella – und am Ende kann man eine Muschel
+         malen.</strong></p>
+
+      <p>Das Malstudio zerlegt jedes Motiv in fünf ruhige Schritte. Links steht
+         die Vorlage, und der Strich, der gerade dran ist, leuchtet rot. Rechts
+         daneben malt das Kind ihn nach. Kein Zeitdruck, kein Punktestand,
+         keine Niederlage – der nächste Schritt kommt, wenn er kommt.</p>
+
+      <p>Wer lieber färbt, schaltet auf <em>Ausmalen</em> und bekommt dieselben
+         Motive als fertige Umrisse. Und wer gar nichts nachmalen will, erfindet
+         unter <em>Eigenes Motiv</em> seine eigenen Schritte.</p>
+
+      <p>Die Motive kommen von einer Insel in der Poebene: Seepferdchen, Krabbe,
+         Silberpappel, Neptungras. Dazu ein Sammelalbum mit Stickern, eine
+         Schatzinsel und ein kleiner Wissensteil – warum Albarella so heißt,
+         woher der Sand kommt.</p>
+
+      <p>Eine freundliche Stimme liest die Schritte vor, im Hintergrund läuft
+         leise Musik. Beides lässt sich abschalten.</p>
+
+      <p>Mehrere Kinder teilen sich ein iPad, ohne sich in die Bilder zu malen:
+         Jedes hat sein eigenes Profil und seine eigene Galerie.</p>
+
+      <p>Ohne Konto. Ohne Werbung. Ohne Käufe in der App. Nichts verlässt das
+         Gerät.</p>
+    </div>
+
+    <h3>App-Datenschutz und Bedienungshilfen</h3>
+    <div class="kachel">
+      <div>
+        <b>Keine Daten erfasst</b>
+        <span>Der Vorname des Kindes und seine Bilder bleiben auf dem Gerät und
+        werden nirgends hingeschickt. Für die Altersfreigabe ist das der
+        entscheidende Punkt.</span>
+      </div>
+      <div>
+        <b>Bedienungshilfen: teilweise</b>
+        <span>Große Flächen, Sprachausgabe der Schritte, „Bewegung reduzieren“
+        wird beachtet, Deutsch und Englisch. Noch offen: Dynamic Type und
+        „Kontrast erhöhen“.</span>
+      </div>
+    </div>
+
+    <h3>Angaben für App Store Connect</h3>
+    <table class="angaben">
+      <tr><th>Name</th><td>Sommer am Meer – Malstudio <span class="zaehler">26/30 Zeichen</span></td></tr>
+      <tr><th>Untertitel</th><td>Schritt für Schritt malen <span class="zaehler">25/30 Zeichen</span></td></tr>
+      <tr><th>Kategorie</th><td>Bildung (primär), Kinder / 6–8 Jahre (sekundär)</td></tr>
+      <tr><th>Preis</th><td>3,99 € einmalig – bei Kinder-Apps ist ein einmaliger Preis der ehrlichste Weg</td></tr>
+      <tr><th>Altersfreigabe</th><td>4+ – kein Chat, keine Links nach außen, keine Käufe</td></tr>
+      <tr><th>Schlüsselwörter</th><td>Malen, Kinder, zeichnen lernen, Schritt für Schritt, Meer, Ausmalen, Sticker, Offline</td></tr>
+      <tr><th>Sprachen</th><td>Deutsch, Englisch</td></tr>
+      <tr><th>Geräte</th><td>iPad zuerst, iPhone möglich; Quer- und Hochformat</td></tr>
+      <tr><th>Copyright</th><td>© 2026 <em>Name des Anbieters – noch festzulegen</em></td></tr>
+    </table>
+
+    <div class="merk">
+      <b>Noch zu entscheiden</b>
+      <ul>
+        <li><strong>Kinder-Kategorie ja oder nein?</strong> Sie bringt
+            Sichtbarkeit, verlangt aber Zusätzliches: keinerlei Analyse durch
+            Dritte, keine Werbung, und jeder Link nach außen muss hinter eine
+            Elternschranke. Die App erfüllt das heute schon – man muss es nur
+            wissentlich zusagen.</li>
+        <li>Das Malstudio liegt in einem <strong>eigenen Repo</strong>
+            (<code>pahlborn/malstudio</code>) und wäre eine dritte, getrennte
+            Einreichung mit eigener Bundle-ID.</li>
+        <li>Die Beispielbilder oben zeigen ein frisch angelegtes Profil „Mia“.
+            Für den Store sollten es Aufnahmen mit gefüllter Galerie sein.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== Was für alle drei gilt ==================== -->
+
+  <section class="schluss">
+    <h2>Was für alle drei gilt</h2>
+
+    <p>Diese Punkte hängen nicht an einer einzelnen App, sondern am Konto. Sie
+       sind einmal zu klären – dann für alle drei.</p>
+
+    <ol>
+      <li><strong>Apple Developer Program</strong>, 99 € im Jahr, dazu ein Mac
+          mit Xcode. Ohne beides geht nichts in den Store.</li>
+      <li><strong>Händlerstatus nach dem DSA.</strong> Wer in der EU anbietet,
+          muss Name, Anschrift, Telefonnummer und E-Mail hinterlegen – sie
+          erscheinen <em>öffentlich</em> auf jeder Produktseite. Für eine
+          Privatperson ist das der unangenehmste Punkt und sollte zuerst
+          entschieden werden.</li>
+      <li><strong>Datenschutzerklärung als eigene Adresse.</strong> Pflicht für
+          jede App, auch wenn nichts erhoben wird. Eine schlichte Seite auf
+          GitHub Pages genügt – gibt es bisher für keine der drei.</li>
+      <li><strong>Support-Adresse</strong>, ebenfalls Pflicht.</li>
+      <li><strong>Nativer Rahmen.</strong> Alle drei sind Web-Apps und lassen
+          sich nicht direkt einreichen; sie brauchen ein Xcode-Projekt, das die
+          Dateien lokal bündelt. Dabei fällt der Service Worker weg – im Bundle
+          liegt ohnehin alles auf dem Gerät.</li>
+      <li><strong>Richtlinie 4.2.</strong> Apple lehnt Apps ab, die nur eine
+          verpackte Website sind. Offline-Betrieb, Apple Pencil und das Sichern
+          in die Fotos-App sind die Argumente dagegen.</li>
+    </ol>
+
+    <p>Ausführlich steht das im Gespräch zu dieser Seite. Solange nichts davon
+       entschieden ist, bleibt dieser Weg hier der bequemste: Adresse
+       weitergeben, in Safari öffnen, über <b>Teilen → Zum Home-Bildschirm</b>
+       ablegen. Danach starten die Apps im Vollbild und laufen ohne Netz.</p>
+
+    <p>Für den Vergleich Mandala gegen Blatt mit Testpersonen bitte weiterhin
+       <a href="./beide.html">beide.html</a> nehmen – die Seite hier beschreibt,
+       was die Apps tun sollen, und würde das Ergebnis verfärben.</p>
+
+    <footer>
+      Arbeitsstand, nicht veröffentlicht. Preise, Texte und Einstufungen sind
+      Vorschläge und keine Zusage. Die Beispielbilder sind echte Aufnahmen der
+      laufenden Apps, erzeugt mit <code>node tools/gen-schaufenster.js</code>.
+    </footer>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Der Schalter tauscht nur die Quellen aus. Die Bilder tragen beide
+     Adressen als data-Attribut bei sich, damit hier keine Namensliste
+     gepflegt werden muss – ein neues Bild braucht nur die zwei Attribute. */
+
+  var koerper = document.body;
+  var knoepfe = document.querySelectorAll('.schalter button');
+  var hinweis = document.getElementById('modus-hinweis');
+
+  var TEXT = { iphone: 'iPhone, hochkant', ipad: 'iPad, quer' };
+
+  function setzen(gerat, merken) {
+    if (gerat !== 'iphone' && gerat !== 'ipad') gerat = 'ipad';
+
+    koerper.setAttribute('data-modus', gerat);
+    hinweis.textContent = TEXT[gerat];
+
+    Array.prototype.forEach.call(knoepfe, function (knopf) {
+      knopf.setAttribute('aria-pressed', knopf.dataset.gerat === gerat ? 'true' : 'false');
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.bilder img'), function (bild) {
+      var quelle = bild.dataset[gerat];
+      if (quelle && bild.getAttribute('src') !== quelle) bild.setAttribute('src', quelle);
+    });
+
+    /* Beim Umschalten an den Anfang der Reihe – sonst steht man mitten in
+       einem Bild, das es in der anderen Breite so nicht mehr gibt. */
+    Array.prototype.forEach.call(document.querySelectorAll('.bilder'), function (reihe) {
+      reihe.scrollLeft = 0;
+    });
+
+    if (merken) {
+      try { localStorage.setItem('pa-apps.modus', gerat); } catch (e) {}
+    }
+  }
+
+  Array.prototype.forEach.call(knoepfe, function (knopf) {
+    knopf.addEventListener('click', function () { setzen(knopf.dataset.gerat, true); });
+  });
+
+  /* Erstwahl: was zuletzt gewählt war, sonst passend zum Fenster. Wer die
+     Seite auf dem Telefon aufmacht, will die Telefonbilder sehen. */
+  var gemerkt = null;
+  try { gemerkt = localStorage.getItem('pa-apps.modus'); } catch (e) {}
+
+  setzen(gemerkt || (window.matchMedia('(max-width: 700px)').matches ? 'iphone' : 'ipad'), false);
+})();
+</script>
+</body>
+</html>

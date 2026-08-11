@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-7';
+const CACHE = 'mandala-atelier-v1-8';
 
 const SHELL = [
   './',
@@ -61,6 +61,15 @@ self.addEventListener('fetch', function (event) {
      Worker und ihren eigenen Vorrat – hier nichts anfassen, sonst lägen
      ihre Dateien doppelt und veralteten unbemerkt. */
   if (url.pathname.indexOf('/atelier3/') !== -1) return;
+
+  /* PA-APPS.html ist die Arbeitsseite: Preise, Texte und Beispielbilder
+     ändern sich dort laufend. Erst-Cache-dann-Netz würde genau das
+     einfrieren – wer die Adresse weitergegeben hat, bekäme wochenlang den
+     alten Stand zu sehen, ohne dass es jemandem auffällt. Deshalb hier
+     nichts anfassen: Die Seite gehört nicht zur App und muss nicht ohne
+     Netz laufen. */
+  if (url.pathname.indexOf('/PA-APPS.html') !== -1) return;
+  if (url.pathname.indexOf('/pa-apps/') !== -1) return;
 
   event.respondWith(
     caches.match(request).then(function (hit) {
