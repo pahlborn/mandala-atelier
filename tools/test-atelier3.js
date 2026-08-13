@@ -456,7 +456,7 @@ async function run() {
     });
     return { stabil: stabil, profil: profil, namen: B.KINDS.map(function (k) { return k.name; }) };
   });
-  prüfe('vier Charaktere', charaktere.namen.length === 4, charaktere.namen.join(' · '));
+  prüfe('fünf Charaktere', charaktere.namen.length === 5, charaktere.namen.join(' · '));
   prüfe('ohne Charakter bleibt der Bauplan der alte', charaktere.stabil);
   prüfe('Ruhe ist ruhiger als Fülle',
         charaktere.profil.ruhe.n < charaktere.profil.fuelle.n &&
@@ -464,6 +464,80 @@ async function run() {
         'Achsen ' + charaktere.profil.ruhe.n.toFixed(1) + ' gegen ' +
         charaktere.profil.fuelle.n.toFixed(1) + ', Bänder ' +
         charaktere.profil.ruhe.b.toFixed(1) + ' gegen ' + charaktere.profil.fuelle.b.toFixed(1));
+
+  /* Die Anlage. Sie ist der einzige Charakter, der den Generator nicht biegt,
+     sondern ersetzt – und der einzige, dessen Relief nach innen abnimmt.
+     Gemessen wird genau auf dem Grat jedes Bauteils, nicht flächig: Ein
+     Flächenmittel ist von der blanken Fläche beherrscht und sagt nichts. */
+  console.log('\nDie Anlage');
+  const anlage = await page.evaluate(function () {
+    const B = window.Blatt;
+
+    /* Die Vierzähligkeit ist Bedingung, nicht Geschmack: Ein Quadrat ist
+       vierzählig, und die Rasterung setzt exakte Drehsymmetrie um 2π/n
+       voraus. Käme hier je ein anderes n heraus, zerfiele das Feld. */
+    let vier = true, teile = true;
+    for (let i = 0; i < 40; i++) {
+      const plan = B.buildPlan(3000 + i * 911, 'anlage');
+      if (plan.n !== 4) vier = false;
+      const arten = plan.bands.map(function (b) { return b.kind; });
+      ['yard', 'gate', 'wall', 'heart'].forEach(function (k) {
+        if (arten.indexOf(k) < 0) teile = false;
+      });
+    }
+
+    /* Die Staffelung: von außen nach innen muss das Relief abnehmen. */
+    const plan = B.buildPlan(20250813, 'anlage');
+    const wall = plan.bands.filter(function (b) { return b.kind === 'wall'; });
+    const yard = plan.bands.filter(function (b) { return b.kind === 'yard'; })[0];
+    const herz = plan.bands.filter(function (b) { return b.kind === 'heart'; })[0];
+    const S = 0.5;                       // Winkel abseits der Torachse
+    const rMid = plan.rules[1].r;
+    const at = function (rr, th) { return B.fieldAt(plan, rr, th); };
+    const rYard = (yard.s + yard.rOut) / 2;
+
+    const stufen = [
+      { ort: 'Schutzbereich', h: at((rMid + 1) / 2, 0) },
+      { ort: 'Vorhof',        h: at(rYard, Math.asin(yard.tie / rYard)) },
+      { ort: 'Palastmauer',   h: at(wall[0].s2 / Math.cos(S), S) },
+      { ort: 'Innenhof',      h: at(wall[1].s1 / Math.cos(S), S) },
+      { ort: 'Kammer',        h: at(wall[2].s1 / Math.cos(S), S) },
+      { ort: 'Mitte',         h: at(herz.r2, S) }
+    ];
+
+    /* Zwei leichte, zügige Züge – so viel holt eine flüchtige Hand heraus. */
+    stufen.forEach(function (s) {
+      s.dichte = 1 - Math.exp(-2 * 0.46 * Math.pow(s.h, 2.0));
+    });
+
+    let faellt = true;
+    for (let i = 1; i < stufen.length; i++) {
+      if (stufen[i].h >= stufen[i - 1].h) faellt = false;
+    }
+
+    /* Und die Untergrenze: Auch die Mitte muss deutlich über der blanken
+       Fläche liegen. Ein Bauteil, das man nicht mehr findet, wäre kein
+       Widerstand, sondern ein Fehler. */
+    const blank = at(0.45, 0.22);
+    const herzOben = stufen[stufen.length - 1].h;
+
+    return { vier: vier, teile: teile, faellt: faellt, stufen: stufen,
+             blank: blank, verhaeltnis: herzOben / blank,
+             spanne: stufen[0].dichte / stufen[stufen.length - 1].dichte };
+  });
+
+  anlage.stufen.forEach(function (s) {
+    console.log('  ' + pad(s.ort, 24) + pad('Relief ' + s.h.toFixed(2), 14) +
+                'nach zwei leichten Zügen ' + s.dichte.toFixed(2));
+  });
+  prüfe('eine Anlage ist immer vierzählig', anlage.vier, '40 Seeds');
+  prüfe('jede Anlage hat Vorhof, Tore, Mauern, Mitte', anlage.teile);
+  prüfe('das Relief nimmt nach innen ab', anlage.faellt,
+        'außen ' + anlage.stufen[0].dichte.toFixed(2) + ' gegen innen ' +
+        anlage.stufen[anlage.stufen.length - 1].dichte.toFixed(2) +
+        ', Spanne ' + anlage.spanne.toFixed(1) + '-fach');
+  prüfe('auch die Mitte bleibt auffindbar', anlage.verhaeltnis > 1.25,
+        (anlage.verhaeltnis).toFixed(2) + '-fach über der blanken Fläche');
 
   const ladeAuf = await page.evaluate(async function () {
     const B = window.Blatt;
@@ -501,7 +575,7 @@ async function run() {
     };
   });
   prüfe('die Lade zeigt Stimmung, Pigmente und Blätter',
-        ladeAuf.offen && ladeAuf.kategorien === 4 && ladeAuf.welten === 4 && ladeAuf.blaetter === 6,
+        ladeAuf.offen && ladeAuf.kategorien === 5 && ladeAuf.welten === 4 && ladeAuf.blaetter === 6,
         ladeAuf.kategorien + ' Stimmungen, ' + ladeAuf.welten + ' Welten, ' + ladeAuf.blaetter + ' Blätter');
   const fertig = ladeAuf.kontraste.filter(function (c) { return c > 25; }).length;
   prüfe('die Ausschnitte zeigen wirklich etwas',

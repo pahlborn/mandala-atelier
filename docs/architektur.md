@@ -194,11 +194,59 @@ Konkret zu beobachten wäre:
 
 ---
 
-## 9. Was offen ist
+## 9. Dieselbe Idee in „Blatt“ — und warum sie dort anders heißt
+
+Blatt hat die Anlage inzwischen auch, als fünften Charakter in der Blattlade.
+Es ist aber **keine Übertragung**, sondern eine zweite Fassung derselben Idee:
+Blatt kennt weder Ausmalen noch Motivkatalog noch Symmetrie, die etwas
+vervielfältigt. Man reibt ein verborgenes Relief hervor.
+
+Damit fällt der Träger der Idee weg — es gibt keine Symmetrie, die man staffeln
+könnte. Die Übersetzung geht über das, was Blatt stattdessen hat: die **Höhe des
+Reliefs**.
+
+> Im Atelier nimmt die **Maschine** nach innen immer weniger ab.
+> In Blatt gibt das **Papier** nach innen immer weniger her.
+
+Beide Male wird das Innere mehr und mehr die eigene Arbeit — und beide Male ist
+die Architektur dadurch eine Mechanik und nicht eine Zeichnung. Gemessen, auf
+dem Grat jedes Bauteils, nach zwei leichten Zügen: Schutzbereich 0,60 · Vorhof
+0,51 · Mauer 0,43 · Innenhof 0,35 · Kammer 0,28 · Mitte 0,24, gegen 0,12 auf
+blanker Fläche.
+
+| nach leichten Zügen über das ganze Blatt | danach nur innen, weiter leicht, aber oft |
+|---|---|
+| ![Anlage in Blatt, leicht gerieben](anlage-blatt-leicht.png) | ![Anlage in Blatt, innen weitergearbeitet](anlage-blatt-innen.png) |
+
+Links kommt der Schutzbereich fast von selbst, der Palast bleibt eine Ahnung.
+Rechts ist der Palast da — und die Mitte immer noch der ruhigste Ort.
+
+Drei Dinge, die beim Bauen in Blatt anders lagen:
+
+- **n = 4 ist dort Bedingung, nicht Wahl.** Die Rasterung setzt exakte
+  Drehsymmetrie um 2π/n voraus; ein Quadrat ist vierzählig. Die Ornamente im
+  Schutzbereich dürfen 16-, 20-, 24-zählig sein — Vielfache von vier.
+- **Der Grundriss wird bemessen, nicht gewürfelt.** Die vier anderen Charaktere
+  biegen den Generator, die Anlage ersetzt ihn. Gewürfelt werden die Maße.
+- **Geduld, nicht Kraft.** Wer die Mitte mit fester Hand holen will, bekommt
+  sie nicht: Fest greift bis in die Mulden, die Fläche füllt sich, und die
+  Architektur ersäuft. Das ist Blatts Bauart, keine Eigenheit der Anlage — aber
+  hier fällt es zum ersten Mal auf, weil es etwas zu ertränken gibt.
+
+Damit steht dieselbe Frage jetzt zweimal im Raum, in zwei entgegengesetzten
+Wetten. Das ist kein Zufall, sondern genau das Vergleichsprotokoll aus
+[`atelier-3.md`](atelier-3.md) §14 — nur diesmal an einem Gegenstand, den beide
+Apps teilen.
+
+---
+
+## 10. Was offen ist
 
 - **Aussehen der Tore.** Sie sind derzeit sehr technisch geraten; nach außen
   gesehen liest sich das Dach eher als Pfeil denn als Tor.
-- **Nur eine Vorlage.** Eine Welt mit einem einzigen Motiv ist keine Welt.
+- **Nur eine Vorlage im Atelier.** Eine Welt mit einem einzigen Motiv ist keine
+  Welt. (In Blatt entsteht bei jedem Griff eine neue Anlage — dort stellt sich
+  die Frage nicht.)
   Naheliegend wären eine schlichtere Anlage mit nur zwei Bereichen und eine mit
   einem stärker gegliederten Innenhof.
 - **Detail beim Näherkommen.** Reizvoll wäre, dass der Zoom nicht nur

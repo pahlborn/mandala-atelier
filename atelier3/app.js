@@ -387,7 +387,18 @@ const KINDS = [
   { id: 'fuelle', name: 'Fülle',
     axes: [14, 16, 16, 18, 18], bands: [5, 6], lw: [0.0058, 0.0082],
     wide:   ['petals', 'lattice', 'scallops', 'petals'],
-    narrow: ['beads', 'rays', 'waves', 'beads'] }
+    narrow: ['beads', 'rays', 'waves', 'beads'] },
+
+  /* Der fünfte fällt aus der Reihe, und zwar mit Absicht. Die anderen vier
+     biegen den Generator; dieser ersetzt ihn. Eine Anlage ist kein Kranz aus
+     Bändern, sondern ein Grundriss – und ein Grundriss lässt sich nicht
+     würfeln, nur bemessen. Gewürfelt werden hier die Maße, nicht die Ordnung.
+
+     Das Wort bleibt trotzdem eine Stimmung, keine Formenkunde: „Anlage“ sagt,
+     dass hier etwas gebaut ist, in das man hineingehen kann. */
+  { id: 'anlage', name: 'Anlage', plan: 'anlage',
+    axes: [4], bands: [8, 8], lw: [0.0050, 0.0064],
+    wide: [], narrow: [] }
 ];
 
 function kindById(id) {
@@ -499,6 +510,8 @@ function buildPlan(seed, kindId) {
   const span = function (a, b) { return a + rng() * (b - a); };
 
   const art = kindById(kindId);
+  if (art && art.plan === 'anlage') return buildAnlage(seed, rng, span, pick, art);
+
   const n  = pick(art ? art.axes : [8, 10, 12, 12, 12, 14, 16, 6, 18]);
   const lw = art ? span(art.lw[0], art.lw[1]) : span(0.0052, 0.0082);
 
@@ -556,6 +569,94 @@ function buildPlan(seed, kindId) {
   rules.push({ r: 1.0, style: 'double' });
 
   return { n: n, lw: lw, bands: bands, rules: rules, seed: seed };
+}
+
+/* ---------------------------------------------------------------------------
+   Der Bauplan einer Anlage
+
+   Hier wird nicht gewürfelt, welche Ordnung entsteht, sondern nur, in welchen
+   Maßen. Die Abfolge steht fest, weil sie die Sache selbst ist:
+
+       Schutzbereich → Vorhöfe → vier Tore → Mauer → Innenhof → Kammer → Mitte
+
+   Was der Seed verändert: die Weite der Bereiche, die Zahl der Mauerwerke im
+   Schutzbereich, die Maße der Torhäuser, der Abstand der Binder. Zwei Anlagen
+   sind so verschieden wie zwei Häuser desselben Baumeisters – und keine ist
+   dieselbe wie gestern.
+
+   Die zweite Festlegung steckt in den gain-Werten: von außen nach innen gibt
+   das Blatt immer weniger her. Der Schutzbereich kommt unter einer leichten
+   Hand fast von selbst; der Palast will eine langsamere; die Mitte kommt nur
+   unter einer geduldigen. Es ist dieselbe Idee wie die gestaffelte Symmetrie
+   im Mandala Atelier, aber in der Sprache dieser App: Dort nimmt die Maschine
+   nach innen immer weniger ab – hier gibt das Papier nach innen immer weniger
+   her. Beide Male wird das Innere mehr und mehr die eigene Arbeit.
+   ------------------------------------------------------------------------- */
+
+function buildAnlage(seed, rng, span, pick, art) {
+  const lw = span(art.lw[0], art.lw[1]);
+
+  const rRing  = span(0.760, 0.795);        // Grenze des Schutzbereichs
+  const sOut   = rRing / Math.SQRT2;        // die Mauerecken berühren den Ring
+  const sIn    = sOut * span(0.895, 0.925);
+  const sCourt = sOut * span(0.60, 0.66);
+  const sKam   = sOut * span(0.36, 0.42);
+  const rHeart = sOut * span(0.22, 0.27);
+  const rMid   = rRing + (1 - rRing) * span(0.45, 0.55);
+  const m      = pick([16, 20, 24]);        // Vielfache von vier, sonst bräche
+                                            // die Vierzähligkeit des Feldes
+  /* Die Tore müssen groß sein. Im ersten Anlauf waren sie zierlich bemessen
+     und lasen sich im Relief als Knöpfe auf der Mauer, nicht als Torhäuser –
+     und ein Tor, das man nicht als Tor erkennt, nimmt der ganzen Anlage den
+     Sinn: Es ist die Stelle, an der man hineingeht. */
+  const gateHalf = sOut * span(0.16, 0.20);
+  const t1 = sOut * span(0.070, 0.085);
+  const t2 = sOut * span(0.055, 0.068);
+  const t3 = sOut * span(0.045, 0.056);
+  const wallTie  = sOut * span(0.16, 0.22);
+  const courtTie = sOut * span(0.22, 0.30);
+
+  const bands = [
+    /* Schutzbereich: zwei gemauerte Ringbänder, gegeneinander versetzt. */
+    { kind: 'rays', r1: rMid,  r2: 1.0,   m: m, off: 0,           taper: false },
+    { kind: 'rays', r1: rRing, r2: rMid,  m: m, off: Math.PI / m, taper: false },
+
+    /* Vorhöfe zwischen Mauer und Ring, durch Quermauern geteilt. */
+    { kind: 'yard', r1: sOut, r2: rRing, s: sOut, rOut: rRing,
+      tie: courtTie, gain: 0.88, lws: 1.00 },
+
+    /* Die vier Torhäuser, auf der äußeren Flucht stehend und nach außen
+       in drei Stufen abnehmend. */
+    { kind: 'gate', r1: sOut, r2: sOut + t1 + t2 + t3 + lw * 4, gain: 0.84, lws: 1.00,
+      tiers: [
+        { half: gateHalf * 1.45, from: sOut,           to: sOut + t1 },
+        { half: gateHalf * 1.05, from: sOut + t1,      to: sOut + t1 + t2 },
+        { half: gateHalf * 0.62, from: sOut + t1 + t2, to: sOut + t1 + t2 + t3 }
+      ] },
+
+    /* Die Mauer: zwei Fluchten und Binder dazwischen, am Tor ausgespart. */
+    { kind: 'wall', r1: sIn, r2: sOut * Math.SQRT2, s1: sIn, s2: sOut,
+      tie: wallTie, gate: gateHalf * 1.7, gain: 0.78, lws: 0.95 },
+
+    /* Innenhof. Vor dem Tor bleibt ein Feld frei. */
+    { kind: 'wall', r1: sCourt, r2: sIn * Math.SQRT2, s1: sCourt, s2: sIn,
+      tie: courtTie, gate: courtTie * 0.5, gain: 0.68, lws: 0.86 },
+
+    /* Kammer. */
+    { kind: 'wall', r1: sKam, r2: sCourt * Math.SQRT2, s1: sKam, s2: sCourt,
+      tie: courtTie * 0.8, gate: 0, gain: 0.60, lws: 0.78 },
+
+    /* Die Mitte – flach, leer, das Letzte, was hochkommt. */
+    { kind: 'heart', r1: 0, r2: rHeart, plateau: span(0.42, 0.47), gain: 0.54, lws: 0.72 }
+  ];
+
+  const rules = [
+    { r: 1.0,   style: 'double' },
+    { r: rMid,  style: 'single' },
+    { r: rRing, style: 'double' }
+  ];
+
+  return { n: 4, lw: lw, bands: bands, rules: rules, seed: seed };
 }
 
 function bandParams(kind, r1, r2, n, rng, span, pick) {
@@ -728,6 +829,76 @@ function fieldAt(plan, rr, th) {
         ridge = Math.max(ridge, gauss(d - rho, lw) * outer);
         break;
       }
+
+      /* --- Die Anlage ---------------------------------------------------
+         Die folgenden drei sind keine Ornamente, sondern Bauteile, und sie
+         rechnen anders: Alles wird auf eine der vier Himmelsrichtungen
+         gefaltet. `per` ist der Abstand vom Mittelpunkt senkrecht zur Mauer,
+         `lat` die Lage längs der Mauer. Ein Quadrat ist in diesen Größen
+         einfach `per = s` – und weil die Faltung vierzählig ist, bleibt das
+         Feld exakt um 2π/4 drehsymmetrisch, so wie die Rasterung es verlangt.
+         Deshalb hat eine Anlage immer n = 4.
+
+         `gain` senkt die Höhe des Bauteils. Das ist bei den Anlagen kein
+         Detail, sondern die ganze Idee: Nach innen gibt das Blatt immer
+         weniger her, und was innen liegt, muss man sich erarbeiten. */
+
+      case 'wall': {
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = rr * Math.sin(a);
+        const w   = lw * b.lws;
+        let e = Math.max(gauss(per - b.s1, w), gauss(per - b.s2, w));
+        /* Binder zwischen den Fluchten – ohne sie ist die Mauer ein Band
+           ohne Maß, und im Relief verschwindet sie zur bloßen Doppellinie.
+           Am Tor bleiben sie weg, dort steht das Torhaus. */
+        if (per > b.s1 - lw && per < b.s2 + lw && Math.abs(lat) > b.gate) {
+          e = Math.max(e, gauss(distInt(lat / b.tie) * b.tie, w * 0.9));
+        }
+        ridge = Math.max(ridge, e * b.gain);
+        break;
+      }
+
+      case 'yard': {
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = rr * Math.sin(a);
+        if (per < b.s || rr > b.rOut) break;
+        /* Quermauern von der Mauerflucht bis an den Ring, an beiden Enden
+           weich auslaufend, damit nichts ins Nichts stößt. */
+        const fade = Math.min(1, (per - b.s) / (lw * 6)) *
+                     Math.min(1, (b.rOut - rr) / (lw * 6));
+        const e = gauss(distInt(lat / b.tie) * b.tie, lw * b.lws * 0.9) * Math.max(0, fade);
+        ridge = Math.max(ridge, e * b.gain);
+        break;
+      }
+
+      case 'gate': {
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = Math.abs(rr * Math.sin(a));
+        let e = 0;
+        for (let k = 0; k < b.tiers.length; k++) {
+          const t = b.tiers[k];
+          if (per >= t.from && per <= t.to) {
+            e = Math.max(e, gauss(lat - t.half, lw * b.lws));   // die Wangen
+          }
+          if (lat <= t.half) {
+            e = Math.max(e, gauss(per - t.to, lw * b.lws));     // die Deckplatte
+          }
+        }
+        ridge = Math.max(ridge, e * b.gain);
+        break;
+      }
+
+      case 'heart': {
+        /* Die Mitte. Das flachste Stück des ganzen Blattes und das einzige
+           ohne Ornament – sie kommt nur unter einer geduldigen Hand hoch,
+           und was dort entsteht, gehört niemandem sonst. */
+        if (rr < b.r2) plate = Math.max(plate, b.plateau);
+        ridge = Math.max(ridge, gauss(rr - b.r2, lw * b.lws) * b.gain);
+        break;
+      }
     }
   }
 
@@ -740,9 +911,10 @@ function fieldAt(plan, rr, th) {
     const d = rr - rule.r;
     if (d > reach) continue;
     if (d < -reach - lw * 3.2) continue;
-    if (d > -reach) ridge = Math.max(ridge, gauss(d, lw * 1.1));
+    const gain = rule.gain || 1;
+    if (d > -reach) ridge = Math.max(ridge, gauss(d, lw * 1.1) * gain);
     if (rule.style === 'double') {
-      ridge = Math.max(ridge, gauss(d + lw * 3.2, lw * 0.8));
+      ridge = Math.max(ridge, gauss(d + lw * 3.2, lw * 0.8) * gain);
     }
   }
 

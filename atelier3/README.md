@@ -177,6 +177,72 @@ verschwindet, und nichts lässt sich zumatschen** — deshalb braucht es kein
 Rückgängig und keinen Radierer. Nicht als Strenge, sondern weil es keinen
 Zustand gibt, aus dem man gerettet werden müsste.
 
+## Die Anlage — ein Grundriss statt eines Kranzes
+
+Der fünfte Charakter fällt aus der Reihe, und zwar mit Absicht. „Ruhe“,
+„Blüte“, „Klarheit“ und „Fülle“ **biegen** den Generator: andere Zähligkeit,
+andere Bandzahl, anderes Ornament. „Anlage“ **ersetzt** ihn.
+
+Denn ein Grundriss lässt sich nicht würfeln, nur bemessen. Die Abfolge steht
+fest, weil sie die Sache selbst ist:
+
+    Schutzbereich → Vorhöfe → vier Tore → Mauer → Innenhof → Kammer → Mitte
+
+Gewürfelt werden die Maße: Weite der Bereiche, Zahl der Mauerwerke im
+Schutzbereich (16, 20 oder 24), Größe der Torhäuser, Abstand der Binder. Zwei
+Anlagen sind so verschieden wie zwei Häuser desselben Baumeisters.
+
+**Eine Anlage hat immer n = 4.** Das ist keine Vorliebe, sondern Bedingung: Ein
+Quadrat ist vierzählig, und die Rasterung setzt exakte Drehsymmetrie um 2π/n
+voraus (siehe oben). Käme je ein anderes n heraus, zerfiele das Feld. Die
+Ornamente im Schutzbereich dürfen trotzdem 16-, 20- oder 24-zählig sein — alles
+Vielfache von vier.
+
+**Gerechnet wird in `per` und `lat`.** Die drei neuen Bauteile — `wall`,
+`yard`, `gate` — falten den Winkel auf eine der vier Himmelsrichtungen: `per`
+ist der Abstand vom Mittelpunkt senkrecht zur Mauer, `lat` die Lage längs der
+Mauer. Ein Quadrat ist in diesen Größen einfach `per = s`, und Binder sind
+Linien bei festem `lat`. Ohne diesen Kniff bräuchte es Kartesisches im
+Polarfeld, und die Nachschlagetabelle wäre hin.
+
+### Die Staffelung: nach innen gibt das Blatt weniger her
+
+Das ist der eigentliche Gedanke, und er ist die Übersetzung der gestaffelten
+Symmetrie aus dem Mandala Atelier in die Sprache dieser App. Dort nimmt die
+Maschine nach innen immer weniger ab. Hier gibt **das Papier** nach innen immer
+weniger her — über `gain` (Höhe des Grats) und `lws` (Breite des Grats):
+
+| Bereich | Relief | nach zwei leichten Zügen |
+|---|---|---|
+| Schutzbereich | 1,00 | 0,60 |
+| Vorhof | 0,88 | 0,51 |
+| Palastmauer | 0,78 | 0,43 |
+| Innenhof | 0,68 | 0,35 |
+| Kammer | 0,60 | 0,28 |
+| Mitte | 0,54 | 0,24 |
+| *blanke Fläche* | *0,38* | *0,12* |
+
+Beide Male wird das Innere mehr und mehr die eigene Arbeit. Der Testlauf misst
+die Reihe genau auf dem Grat jedes Bauteils — ein Flächenmittel wäre von der
+blanken Fläche beherrscht und sagte nichts.
+
+**Die Untergrenze ist so wichtig wie die Staffelung.** Auch die Mitte muss
+deutlich über der blanken Fläche liegen (gemessen: 1,4-fach). Ein Bauteil, das
+man nicht mehr findet, wäre kein Widerstand, sondern ein Fehler.
+
+**Und die Staffelung meint Geduld, nicht Kraft.** Wer die Mitte mit fester Hand
+holen will, bekommt sie nicht: Fest greift bis in die Mulden, die Fläche füllt
+sich, und die Architektur ersäuft in Pigment. Das ist keine Eigenheit der
+Anlage, sondern die Bauart dieser App — nur fällt es hier zum ersten Mal auf,
+weil es hier etwas zu ertränken gibt. Nach innen kommt man mit **oft**, nicht
+mit **stark**.
+
+**Die Mitte bleibt leer.** Sie ist das flachste Stück des Blattes und die
+einzige Stelle ohne Ornament. Sie füllt sich durchaus (gemessen 0,66 bis 0,79
+Dichte) — aber weil ringsum dichtes Mauerwerk steht, liest sie sich als der
+ruhige Ort. Ein Ziel ist sie nicht: Es gibt kein Ankommen, keine Meldung, nichts,
+was passiert, wenn man dort ist.
+
 ## Die Farbwelten
 
 Die vier Farbwelten des Mandala Ateliers, unverändert übernommen –
