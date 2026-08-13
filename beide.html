@@ -7,11 +7,23 @@
 <meta name="description" content="Beide Ateliers auf den Homescreen legen.">
 <meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" href="beide-icon-192.png">
+<link rel="apple-touch-icon" href="beide-icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Ateliers">
 
 <!--
   Diese Seite gehört zu keiner der beiden Apps. Sie hilft nur beim Ablegen
   auf dem Homescreen.
+
+  Sie hat trotzdem ein eigenes Symbol: Ohne apple-touch-icon legt iOS ein
+  Bildschirmfoto der Seite ab – grau und von nichts zu unterscheiden. Das
+  Symbol zeigt zwei Blätter und ist damit gegen die beiden App-Symbole
+  gesetzt, die je ein Mandala zeigen. Wer zum Malen greift, soll nicht
+  versehentlich hier landen.
+
+  Bewusst *kein* apple-mobile-web-app-capable: Diese Seite ist eine Seite,
+  keine App. Sie besteht aus Verweisen nach draußen, und dafür braucht es
+  die Adresszeile und den Zurück-Weg von Safari.
 
   Sie ist bewusst nüchtern gehalten: keine Beschreibung dessen, was die eine
   oder die andere App „bewirkt“, keine Empfehlung, keine Reihenfolge. Wer

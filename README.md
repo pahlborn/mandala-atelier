@@ -48,6 +48,13 @@ Die Seite gehört zu keiner der beiden Apps und ist bewusst nüchtern: keine
 Beschreibung einer Wirkung, keine Empfehlung, keine Reihenfolge – wer dort
 landet, könnte eine Testperson sein.
 
+Die Seite hat ein **eigenes Symbol** (`beide-icon-*.png`, `apple-touch-icon`):
+Ohne eines legt iOS ein Bildschirmfoto auf den Homescreen, und drei nicht
+unterscheidbare Kacheln wären schlimmer als zwei. Es zeigt zwei Blätter, die
+beiden App-Symbole je ein Mandala. Bewusst **kein**
+`apple-mobile-web-app-capable`: Die Seite besteht aus Verweisen nach draußen
+und braucht Adresszeile und Zurück-Weg von Safari.
+
 Ganz unten steht davon abgesetzt ein Abschnitt **Werkstatt**: zwei Aufrufe für
 die zwei Fassungen des Farbauftrags in Blatt (`?griff=zart` und `?griff=jetzt`),
 mit den gemessenen Zahlen und dem, was man dazu wissen muss. Er steht bewusst
@@ -90,6 +97,7 @@ Dateien unverändert ausliefert.
     docs/motive.html        Schautafel: 15 Motivfamilien (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
+    beide-icon-*.png        6 Icons der Einstiegsseite (erzeugt)
     .nojekyll               Pages liefert unverändert aus
 
     index.html              App-Gerüst, Schubladen, Galerie
@@ -103,6 +111,7 @@ Dateien unverändert ausliefert.
     tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/gen-motive.js     Erzeugt docs/motive.html
+    tools/gen-beide-icons.js  Icons der Einstiegsseite
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     tools/gen-atelier3-icons.js  Icons für „Blatt“
     tools/test-atelier3.js  Testlauf für „Blatt“

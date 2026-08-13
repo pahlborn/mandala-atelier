@@ -183,14 +183,19 @@ async function run() {
       };
       const proben = Array.from(document.querySelectorAll('.probe'))
         .map(function (a) { return a.getAttribute('href'); });
+      const apple = ziel('link[rel="apple-touch-icon"]');
       return {
         atelier: ziel('.app[href*="index.html"]'),
         blatt: ziel('.app[href*="atelier3"]'),
         proben: proben,
+        apple: apple,
         breiter: document.documentElement.scrollWidth >
                  document.documentElement.clientWidth + 1
       };
     });
+    seite.appleDa = seite.apple
+      ? (await page.request.get(server.url + '/' + seite.apple)).status()
+      : 0;
     prüfe('die Einstiegsseite führt zu beiden Apps',
           !!seite.atelier && !!seite.blatt);
     prüfe('sie führt zu beiden Fassungen des Auftrags',
@@ -199,6 +204,13 @@ async function run() {
           seite.proben.some(function (h) { return h.indexOf('griff=jetzt') !== -1; }),
           seite.proben.join(' · '));
     prüfe('sie ragt nicht seitlich heraus', !seite.breiter);
+    /* Ohne apple-touch-icon legt iOS ein Bildschirmfoto auf den Homescreen.
+       Und es muss ein eigenes sein: Drei nicht unterscheidbare Symbole
+       nebeneinander wären schlimmer als zwei. */
+    prüfe('die Einstiegsseite bringt ein eigenes Symbol mit',
+          !!seite.apple && seite.apple.indexOf('beide-icon') !== -1 &&
+          seite.appleDa === 200,
+          seite.apple + ' → HTTP ' + seite.appleDa);
 
     /* Und der Kern: Kommt hinter dem Aufruf auch wirklich eine andere
        Fassung heraus? Ein Anhängsel, das niemand liest, wäre schlimmer als
