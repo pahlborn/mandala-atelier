@@ -370,6 +370,171 @@ async function run() {
   console.log('  ein Zug erscheint an ' + strokeHits + ' von 8 Positionen   ' +
     (strokeOk ? 'wie erwartet' : '← erwartet: 8'));
 
+  /* Gestaffelte Symmetrie – das Eigentliche an den Anlagen: Die Achsenzahl
+     hängt nicht an der Einstellung, sondern daran, wo die Hand aufsetzt.
+     Geprüft wird beides: dass die Kopien da sind, wo sie hingehören, und
+     dass zwischen ihnen nichts steht. Dazu der heikle Fall, dass ein Zug
+     über eine Bereichsgrenze läuft – dort ändert sich die Achsenzahl
+     mitten im Strich, wenn man sie nicht am Aufsetzpunkt festhält. */
+  console.log('\nGestaffelte Symmetrie (Anlage)');
+
+  async function drawStroke(a, b) {
+    const from = toScreen(a), to = toScreen(b);
+    await page.mouse.move(from[0], from[1]);
+    await page.mouse.down();
+    await page.mouse.move(to[0], to[1], { steps: 6 });
+    await page.mouse.up();
+  }
+
+  const zoneRows = [];
+  const ZONE_CASES = [
+    { name: 'Schutzbereich', axes: 24, from: [450, 88],  to: [470, 108] },
+    { name: 'Palast',        axes: 4,  from: [450, 280], to: [470, 300] },
+    /* In der Mitte radial ziehen, und nicht zu nah an den Mittelpunkt: ein
+       schräger oder mittiger Zug überstreicht selbst mehrere Winkel und läge
+       nach der Drehung auf sich selbst. Die Gegenprobe meldete dann Kopien,
+       die keine sind. */
+    { name: 'Mitte',         axes: 1,  from: [450, 388], to: [450, 420] }
+  ];
+
+  for (const test of ZONE_CASES) {
+    await page.evaluate(function () {
+      const app = window.MandalaAtelier;
+      app.state.graded = true;
+      app.state.mirror = false;
+      app.state.tool = 'pen';
+      app.state.width = 4;
+      app.loadMotif('anlage');
+    });
+    await drawStroke(test.from, test.to);
+    zoneRows.push(await page.evaluate(function (test) {
+      const app = window.MandalaAtelier;
+      const canvas = app.layers.draw.canvas;
+      const dpr = canvas.width / app.SIZE;
+      const data = canvas.getContext('2d')
+        .getImageData(0, 0, canvas.width, canvas.height).data;
+
+      function paintedAt(dx, dy, turn) {
+        const c = Math.cos(turn), s = Math.sin(turn);
+        const x = Math.round((450 + dx * c - dy * s) * dpr);
+        const y = Math.round((450 + dx * s + dy * c) * dpr);
+        for (let oy = -7; oy <= 7; oy++) {
+          for (let ox = -7; ox <= 7; ox++) {
+            const index = ((y + oy) * canvas.width + (x + ox)) * 4 + 3;
+            if (data[index] > 60) return true;
+          }
+        }
+        return false;
+      }
+
+      const mid = [(test.from[0] + test.to[0]) / 2, (test.from[1] + test.to[1]) / 2];
+      const dx = mid[0] - 450, dy = mid[1] - 450;
+
+      /* Die erwarteten Kopien … */
+      let hits = 0;
+      for (let i = 0; i < test.axes; i++) {
+        if (paintedAt(dx, dy, i * (Math.PI * 2) / test.axes)) hits++;
+      }
+      /* … und die Gegenprobe: dazwischen darf nichts stehen. Gemessen wird
+         am feinsten Raster der Anlage, den 24 Achsen des Schutzbereichs. */
+      let extra = 0;
+      const every = 24 / test.axes;
+      for (let i = 0; i < 24; i++) {
+        if (i % every === 0) continue;
+        if (paintedAt(dx, dy, i * (Math.PI * 2) / 24)) extra++;
+      }
+      return { name: test.name, axes: test.axes, hits: hits, extra: extra };
+    }, test));
+  }
+
+  /* Ein Zug über die Grenze: er gehört dem Bereich, in dem er begann. */
+  await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.state.graded = true;
+    app.loadMotif('anlage');
+  });
+  await drawStroke([450, 200], [450, 100]);
+  const crossing = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const canvas = app.layers.draw.canvas;
+    const dpr = canvas.width / app.SIZE;
+    const data = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    /* Ein Punkt kurz hinter der Grenze, viermal um die Mitte gedreht. */
+    const dx = 0, dy = 200 - 450;
+    let hits = 0;
+    for (let i = 0; i < 4; i++) {
+      const turn = i * Math.PI / 2;
+      const c = Math.cos(turn), s = Math.sin(turn);
+      const x = Math.round((450 + dx * c - dy * s) * dpr);
+      const y = Math.round((450 + dx * s + dy * c) * dpr);
+      let found = false;
+      for (let oy = -7; oy <= 7 && !found; oy++) {
+        for (let ox = -7; ox <= 7 && !found; ox++) {
+          if (data[((y + oy) * canvas.width + (x + ox)) * 4 + 3] > 60) found = true;
+        }
+      }
+      if (found) hits++;
+    }
+    return hits;
+  });
+
+  /* Schalter aus: die Anlage verhält sich wie jede andere Vorlage. */
+  await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    app.loadMotif('anlage');
+    app.state.graded = false;
+    app.state.axes = 12;
+  });
+  await drawStroke([450, 280], [470, 300]);
+  const ungraded = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const canvas = app.layers.draw.canvas;
+    const dpr = canvas.width / app.SIZE;
+    const data = canvas.getContext('2d')
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    const dx = 460 - 450, dy = 290 - 450;
+    let hits = 0;
+    for (let i = 0; i < 12; i++) {
+      const turn = i * (Math.PI * 2) / 12;
+      const c = Math.cos(turn), s = Math.sin(turn);
+      const x = Math.round((450 + dx * c - dy * s) * dpr);
+      const y = Math.round((450 + dx * s + dy * c) * dpr);
+      let found = false;
+      for (let oy = -7; oy <= 7 && !found; oy++) {
+        for (let ox = -7; ox <= 7 && !found; ox++) {
+          if (data[((y + oy) * canvas.width + (x + ox)) * 4 + 3] > 60) found = true;
+        }
+      }
+      if (found) hits++;
+    }
+    app.state.graded = true;
+    return hits;
+  });
+
+  zoneRows.forEach(function (row) {
+    const ok = row.hits === row.axes && row.extra === 0;
+    if (!ok) tapProblems.push('Staffelung ' + row.name);
+    console.log(
+      pad('  ' + row.name, 26) +
+      pad(row.hits + ' von ' + row.axes + ' Kopien', 20) +
+      pad(row.extra + ' dazwischen', 18) +
+      (ok ? 'wie erwartet' : '← erwartet: ' + row.axes + ' und 0')
+    );
+  });
+
+  const crossOk = crossing === 4;
+  if (!crossOk) tapProblems.push('Staffelung über die Grenze');
+  console.log(pad('  über die Grenze', 26) +
+    pad(crossing + ' von 4 Kopien', 20) +
+    (crossOk ? 'der Zug bleibt beim Aufsetzpunkt' : '← erwartet: 4'));
+
+  const ungradedOk = ungraded === 12;
+  if (!ungradedOk) tapProblems.push('Staffelung abschaltbar');
+  console.log(pad('  Schalter aus', 26) +
+    pad(ungraded + ' von 12 Kopien', 20) +
+    (ungradedOk ? 'wie jede andere Vorlage' : '← erwartet: 12'));
+
   /* Grundformen: Freihand wird ein Kreis nie rund – das Form-Werkzeug muss
      es sein. Geprüft wird die Rundheit, dass die Vorschau nichts hinterlässt
      und dass Rückgängig eine Form wieder wegnimmt. */
@@ -611,7 +776,11 @@ async function run() {
           }
         }
       }
-      return { share: (filled / inside) * 100, degrees: sectors.size * 2 };
+      /* Ein Feld, das die Mitte enthält, deckt zwangsläufig alle Winkel ab.
+         Der Winkeltest ist dort blind und muss ausgesetzt werden – sonst
+         meldet er jede Anlage, deren Zentrum ein Feld ist. */
+      const middle = data[((h / 2 | 0) * w + (w / 2 | 0)) * 4 + 3] > 0;
+      return { share: (filled / inside) * 100, degrees: sectors.size * 2, middle: middle };
     }
 
     return app.MOTIFS.map(function (motif) {
@@ -634,6 +803,7 @@ async function run() {
         kind: motif.kind || 'plain',
         share: worst.share,
         degrees: worst.degrees,
+        middle: !!worst.middle,
         segment: 360 / motif.axes
       };
     });
@@ -656,8 +826,11 @@ async function run() {
 
   cells.forEach(function (cell) {
     const limit = BIG_ON_PURPOSE.indexOf(cell.id) >= 0 ? 12 : 4;
-    /* Reicht ein Feld deutlich über sein Segment hinaus, ist eine Linie offen. */
-    if (cell.share > limit || cell.degrees > cell.segment * 1.6) cellProblems.push(cell.name);
+    /* Reicht ein Feld deutlich über sein Segment hinaus, ist eine Linie offen.
+       Ausgenommen Felder um die Mitte: die decken immer alle Winkel ab. */
+    if (cell.share > limit || (!cell.middle && cell.degrees > cell.segment * 1.6)) {
+      cellProblems.push(cell.name);
+    }
   });
   if (cellProblems.length) {
     console.log('  ← zu große oder segmentübergreifende Felder: ' + cellProblems.join(', '));

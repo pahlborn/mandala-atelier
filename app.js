@@ -255,6 +255,8 @@ const state = {
   mirror:     false,
   guides:     true,
   fillAll:    true,   // ein Tipp färbt alle gleichwertigen Felder
+  graded:     true,   // bei Anlagen: die Achsenzahl folgt dem Bereich
+  strokeSym:  null,   // Symmetrie des laufenden Zuges, am Aufsetzpunkt bestimmt
   tool:       'pen',
   shape:      'ring',   // Grundform des Form-Werkzeugs
   shapeFrom:  null,     // Anfasspunkt, solange gezogen wird
@@ -443,6 +445,31 @@ function drawDotAccent(pen, r, radius, lineWidth) {
   });
 }
 
+/* Ein Quadrat ist vierfach drehsymmetrisch. Es darf deshalb so wenig durch
+   pen.repeat() wie der volle Kreis: bei 24 Achsen lägen sonst 24 gegeneinander
+   verdrehte Quadrate übereinander. Einmal zeichnen genügt. */
+function squarePoints(half) {
+  return [[CX - half, CY - half], [CX + half, CY - half],
+          [CX + half, CY + half], [CX - half, CY + half]];
+}
+
+function drawSquare(pen, half, lineWidth) {
+  pen.ctx.lineWidth = lineWidth || 2;
+  tracePath(pen.ctx, squarePoints(half), true);
+}
+
+/* Ein Ringband ohne Querwände ist ein einziges, riesiges Feld – ein Tipp
+   färbt dann den halben Rand. Jedes Band bekommt deshalb Wände; phase
+   verschiebt sie gegen das Nachbarband, das ergibt den Mauerverband. */
+function drawRingWalls(ctx, rInner, rOuter, count, phase, lineWidth) {
+  const step = TAU / count;
+  ctx.lineWidth = lineWidth || 1.6;
+  for (let i = 0; i < count; i++) {
+    const a = UP + (i + (phase || 0)) * step;
+    tracePath(ctx, [pol(rInner, a), pol(rOuter, a)], false);
+  }
+}
+
 /* Ende eines Seitenastes – für die Schneeflocke. */
 function branchTip(r, length, direction) {
   const base = pol(r, UP);
@@ -458,7 +485,12 @@ function branchTip(r, length, direction) {
 /* Ohne diesen Rahmen ist das Füllwerkzeug bei offenen Motiven unbrauchbar:
    ein Klick neben eine freistehende Blüte färbt sonst die gesamte Fläche.
    Außenring, Nabe und Speichen zerlegen auch den Hintergrund in geschlossene
-   Felder. Nicht entfernen. */
+   Felder. Nicht entfernen.
+
+   Ausnahme: Motive mit frame === false. Eine Anlage bringt ihren eigenen,
+   geschlossenen Rahmen mit – Speichen von der Nabe bis zum Rand würden ihr
+   quer durch den Palast laufen. Dass dabei nichts ausläuft, prüft der
+   Testlauf für jedes Motiv gleich mit. */
 function drawWedgeFrame(pen) {
   const ctx = pen.ctx;
   drawRing(pen, R_OUT, 2.6);
@@ -475,6 +507,7 @@ const WORLDS = [
   { id: 'natur',  title: 'Natur' },
   { id: 'zen',    title: 'Zen & Achtsamkeit' },
   { id: 'jahr',   title: 'Jahreszeiten' },
+  { id: 'anlage', title: 'Anlagen' },
   { id: 'kids',   title: 'Kids-Corner' }
 ];
 
@@ -766,6 +799,107 @@ const MOTIFS = [
     }
   },
 
+  /* --- Anlagen ----------------------------------------------------------
+     Kein komplizierteres Muster, sondern ein Grundriss. Von außen nach
+     innen: Schutzbereich, Vorhöfe, vier Tore, Palastmauer, Innenhof,
+     Kammer, Mitte. Die Vorlage bringt ihren eigenen Rahmen mit (frame:
+     false) – Speichen von der Nabe bis zum Rand liefen ihr quer durch den
+     Palast.
+
+     zones ist das Eigentliche daran: die Achsenzahl hängt hier nicht an der
+     Einstellung, sondern am Ort. Außen nimmt die Maschine fast alles ab, im
+     Palast noch die vier Himmelsrichtungen, in der Mitte nichts mehr.
+
+     Zwei Regeln, die beim Bauen sofort zuschnappen: Kein Ringband und kein
+     Mauerband ohne Querwände – sonst ist es ein einziges Feld. Und ein Tor
+     muss eine Schwelle haben, sonst sind Vorhof und Innenhof ein einziger
+     Raum, und ein Tipp färbt den halben Palast. */
+  {
+    id: 'anlage', world: 'anlage', axes: 4, frame: false,
+    name: 'Anlage', note: 'Vier Tore, drei Bereiche',
+    zones: [
+      { r: 74,    axes: 1,  name: 'Mitte' },
+      { r: 316,   axes: 4,  name: 'Palast' },
+      { r: R_OUT, axes: 24, name: 'Schutzbereich' }
+    ],
+    build: function (p) {
+      const ctx   = p.ctx;
+      const ARC   = 316;   // Grenze zwischen Schutzbereich und Palastbezirk
+      const WALL  = 225;   // äußere Flucht der Palastmauer
+      const WIN   = 205;   // innere Flucht
+      const COURT = 130;   // Innenhof zur Kammer
+      const HEART = 74;    // die Mitte, zugleich der freie Bereich
+      const GATE  = 38;    // halbe Breite der Torkammer
+      const four  = makePen(ctx, 4);
+
+      /* Schutzbereich: drei Ringbänder, gegeneinander versetzt gemauert. */
+      drawRing(p, R_OUT, 2.6);
+      drawRing(p, 380, 1.8);
+      drawRing(p, 348, 1.8);
+      drawRing(p, ARC, 2.4);
+      drawRingWalls(ctx, ARC, 348, 24, 0, 1.6);
+      drawRingWalls(ctx, 348, 380, 24, 0.5, 1.6);
+      drawRingWalls(ctx, 380, R_OUT, 24, 0, 1.6);
+
+      /* Die Palastmauer. Ihre Ecken treten durch den inneren Ring – das
+         trennt die vier Vorhöfe voneinander, sie berühren sich nur noch in
+         einem Punkt. */
+      drawSquare(p, WALL, 2.4);
+      drawSquare(p, WIN, 2.4);
+      drawSquare(p, COURT, 2.2);
+      drawRing(p, HEART, 2.2);
+
+      /* Alles Weitere wird einmal nach Norden gezeichnet und vierfach
+         gedreht – die vier Himmelsrichtungen sind hier keine Zierde,
+         sondern der Grundriss. */
+      four.repeat(function () {
+        /* Binder in der Mauer: aus dem Band wird Mauerwerk. */
+        [-190, -114, 114, 190].forEach(function (x) {
+          tracePath(ctx, [[CX + x, CY - WALL], [CX + x, CY - WIN]], false);
+        });
+
+        /* Das Tor. Der Durchgang ist eine Kammer *in* der Mauer: unten und
+           oben schließen ihn die beiden Mauerfluchten, links und rechts die
+           Wangen. Genau deshalb bleibt Farbe drin. Ein wirklich offener
+           Durchgang machte Vorhof und Innenhof zu einem einzigen Raum, und
+           ein Tipp färbte den halben Palast. Ein Tor ist hier also kein Loch,
+           sondern ein Bauwerk mit Schwelle.
+
+           Darüber, auf der äußeren Flucht, ein nach außen abnehmender
+           Aufbau. Eine einzelne Spitze läse sich, nach außen gedreht, als
+           Pfeil; die Stufen machen daraus ein Torhaus. Jede Stufe steht auf
+           der Deckplatte der darunterliegenden und ist dadurch geschlossen. */
+        ctx.lineWidth = 2.2;
+        tracePath(ctx, [[CX - GATE, CY - WIN], [CX - GATE, CY - WALL]], false);
+        tracePath(ctx, [[CX + GATE, CY - WIN], [CX + GATE, CY - WALL]], false);
+        [[62, WALL, 246], [44, 246, 264], [26, 264, 280]].forEach(function (tier) {
+          const half = tier[0], near = tier[1], far = tier[2];
+          tracePath(ctx, [[CX - half, CY - near], [CX - half, CY - far],
+                          [CX + half, CY - far], [CX + half, CY - near]], false);
+        });
+
+        /* Vorhof: Quermauern von der Palastmauer bis an den Ring. */
+        ctx.lineWidth = 1.6;
+        [-152, -78, 78, 152].forEach(function (x) {
+          const y = Math.sqrt(ARC * ARC - x * x);
+          tracePath(ctx, [[CX + x, CY - WALL], [CX + x, CY - y]], false);
+        });
+
+        /* Innenhof: drei Felder je Seite, das mittlere vor dem Tor. */
+        [-130, -68, 68, 130].forEach(function (x) {
+          tracePath(ctx, [[CX + x, CY - WIN], [CX + x, CY - COURT]], false);
+        });
+
+        /* Kammer: acht Felder um die Mitte. */
+        tracePath(ctx, [[CX, CY - COURT], [CX, CY - HEART]], false);
+        tracePath(ctx, [pol(HEART, UP + Math.PI / 4), [CX + COURT, CY - COURT]], false);
+      });
+
+      /* Die Mitte bleibt leer. Sie ist ein Ort in der Anlage, kein Ziel:
+         wer will, gestaltet sie; wer will, lässt sie. */
+    }
+  },
+
   /* --- Kids-Corner ------------------------------------------------------
      Eine Motivwelt innerhalb der ruhigen Erwachsenen-Oberfläche. Bedient
      wird sie von Eltern und Lehrkräften – deshalb kein Kinder-Look. */
@@ -985,15 +1119,43 @@ function drawCountDots(ctx, x, y, count, room, height) {
    segmentLine() zeichnet jede Linie n-mal um die Mitte rotiert; bei
    aktivierter Spiegelung zusätzlich an der Waagerechten gespiegelt.
    Bei 24 Achsen mit Spiegelung sind das 48 Linien je Zug.
+
+   Gestaffelte Symmetrie (Motive mit zones): Dort hängt die Achsenzahl nicht
+   an der Einstellung, sondern daran, wo die Hand aufsetzt. Außen nimmt die
+   Maschine fast alles ab, im Palast noch die vier Himmelsrichtungen, in der
+   Mitte nichts mehr. Das ist der Kern der Anlagen – ohne diese Staffelung
+   wäre eine Architektur nur ein Ornament mit Grundriss.
    ------------------------------------------------------------------------- */
 
-function symmetryPoints(x, y) {
-  const out  = [];
-  const step = TAU / state.axes;
-  const dx = x - CX, dy = y - CY;
-  const bases = state.mirror ? [[dx, dy], [dx, -dy]] : [[dx, dy]];
+/* Welcher Bereich liegt unter diesem Punkt? Ohne Anlage: keiner. */
+function zoneAt(x, y) {
+  const motif = state.motif;
+  if (!motif || !motif.zones || !state.graded) return null;
+  const r = Math.hypot(x - CX, y - CY);
+  const zones = motif.zones;
+  for (let i = 0; i < zones.length; i++) {
+    if (r <= zones[i].r) return zones[i];
+  }
+  return zones[zones.length - 1];
+}
 
-  for (let i = 0; i < state.axes; i++) {
+/* Die Symmetrie, die an dieser Stelle gilt: entweder die eingestellte oder
+   die des Bereichs. In der Mitte fällt auch die Spiegelung weg – dort soll
+   wirklich jeder Strich einzeln zählen. */
+function symmetryAt(point) {
+  const zone = point ? zoneAt(point[0], point[1]) : null;
+  if (!zone) return { axes: state.axes, mirror: state.mirror };
+  return { axes: zone.axes, mirror: zone.axes > 1 && state.mirror };
+}
+
+function symmetryPoints(x, y, sym) {
+  const use  = sym || { axes: state.axes, mirror: state.mirror };
+  const out  = [];
+  const step = TAU / use.axes;
+  const dx = x - CX, dy = y - CY;
+  const bases = use.mirror ? [[dx, dy], [dx, -dy]] : [[dx, dy]];
+
+  for (let i = 0; i < use.axes; i++) {
     const c = Math.cos(i * step), s = Math.sin(i * step);
     for (let b = 0; b < bases.length; b++) {
       const px = bases[b][0], py = bases[b][1];
@@ -1003,9 +1165,13 @@ function symmetryPoints(x, y) {
   return out;
 }
 
+/* Der ganze Zug gehört dem Bereich, in dem er begonnen hat. Sonst änderte
+   sich die Achsenzahl mitten im Strich, und die beiden Punktlisten hätten
+   verschiedene Längen. */
 function segmentLine(p0, p1) {
-  const a = symmetryPoints(p0[0], p0[1]);
-  const b = symmetryPoints(p1[0], p1[1]);
+  const sym = state.strokeSym || symmetryAt(p0);
+  const a = symmetryPoints(p0[0], p0[1], sym);
+  const b = symmetryPoints(p1[0], p1[1], sym);
   const erasing = state.tool === 'eraser';
 
   strokeOn(layers.draw.ctx, a, b, erasing);
@@ -1072,7 +1238,8 @@ function angleGap(a, b) {
 function shapeFigure(from, to) {
   const start = polarOf(from);
   const now = polarOf(to);
-  const step = TAU / state.axes;
+  const sym = state.strokeSym || symmetryAt(from);
+  const step = TAU / sym.axes;
   const rInner = Math.max(R_IN * 0.5, Math.min(start.r, now.r));
   const rOuter = Math.max(rInner + 6, Math.max(start.r, now.r));
   const spread = Math.abs(angleGap(now.a, start.a));
@@ -1084,13 +1251,14 @@ function shapeFigure(from, to) {
     rInner: rInner,
     rOuter: rOuter,
     half: half,
-    radius: now.r
+    radius: now.r,
+    sym: sym
   };
 }
 
 /* Die Form auf einen Kontext zeichnen – für Vorschau wie fürs Festlegen. */
 function strokeFigure(ctx, figure, color, width) {
-  const pen = makePen(ctx, state.axes);
+  const pen = makePen(ctx, figure.sym ? figure.sym.axes : state.axes);
   /* Die Bausteine liegen um UP; hierher gedreht, wo der Finger aufsetzte. */
   const turn = figure.angle - UP;
 
@@ -1173,6 +1341,13 @@ function fillsSymmetrically(motif) {
   return !isExercise(motif) && state.fillAll;
 }
 
+/* Eine Anlage mit eingeschalteter Staffelung. Ist der Schalter aus, verhält
+   sie sich wie jede andere Vorlage – dann gilt wieder die eingestellte
+   Achsenzahl, überall gleich. */
+function zonedMotif() {
+  return !!(state.motif && state.motif.zones && state.graded);
+}
+
 function floodFill(x, y, hex) {
   const w = layers.fill.canvas.width;
   const h = layers.fill.canvas.height;
@@ -1185,7 +1360,7 @@ function floodFill(x, y, hex) {
   const target = packColor(hex);
 
   const seeds = fillsSymmetrically(state.motif)
-    ? symmetryPoints(x, y)
+    ? symmetryPoints(x, y, symmetryAt([x, y]))
     : [[x, y]];
 
   let painted = false;
@@ -1276,12 +1451,45 @@ function renderGuides() {
   clearLayer('guide');
   if (!state.guides) return;
 
+  const zones = zonedMotif() ? state.motif.zones : null;
+
   ctx.save();
-  ctx.translate(CX, CY);
-  ctx.rotate(state.guideAngle);
-  ctx.translate(-CX, -CY);
+  /* Eine Anlage hat ein Oben – vier Tore in vier Richtungen. Ein Raster,
+     das sich darüber wegdreht, widerspräche dem, also steht es still. */
+  if (!zones) {
+    ctx.translate(CX, CY);
+    ctx.rotate(state.guideAngle);
+    ctx.translate(-CX, -CY);
+  }
   ctx.strokeStyle = palette().guide;
   ctx.lineWidth = 1;
+
+  /* Bei einer Anlage zeigt das Raster die Bereiche: jeder Ring ist eine
+     Grenze, und innerhalb eines Bereichs stehen so viele Achsen, wie dort
+     tatsächlich gelten. Man sieht der Fläche an, was die Hand dort tut. */
+  if (zones) {
+    let inner = 0;
+    zones.forEach(function (zone) {
+      ctx.beginPath();
+      ctx.arc(CX, CY, zone.r, 0, TAU);
+      ctx.stroke();
+
+      if (zone.axes > 1) {
+        const step = TAU / zone.axes;
+        ctx.beginPath();
+        for (let i = 0; i < zone.axes; i++) {
+          const a = UP + i * step;
+          const from = pol(inner, a), to = pol(zone.r, a);
+          ctx.moveTo(from[0], from[1]);
+          ctx.lineTo(to[0], to[1]);
+        }
+        ctx.stroke();
+      }
+      inner = zone.r;
+    });
+    ctx.restore();
+    return;
+  }
 
   [90, 170, 250, 330, 405].forEach(function (r) {
     ctx.beginPath();
@@ -1763,6 +1971,9 @@ function cacheUi() {
   ui.guides     = document.getElementById('guides');
   ui.fillAll    = document.getElementById('fill-all');
   ui.fillAllNote= document.getElementById('fill-all-note');
+  ui.graded     = document.getElementById('graded');
+  ui.gradedBox  = document.getElementById('graded-switch');
+  ui.gradedNote = document.getElementById('graded-note');
   ui.width      = document.getElementById('width');
   ui.zoomIn     = document.getElementById('btn-zoom-in');
   ui.zoomOut    = document.getElementById('btn-zoom-out');
@@ -1999,7 +2210,7 @@ function renderMotif() {
     ctx.fillStyle = palette().ink;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    drawWedgeFrame(pen);
+    if (motif.frame !== false) drawWedgeFrame(pen);
     motif.build(pen);
     ctx.restore();
   }
@@ -2144,8 +2355,13 @@ function syncUI() {
   Array.prototype.forEach.call(ui.psets.children, function (button) {
     button.classList.toggle('is-active', button.dataset.palette === state.palette);
   });
+  /* Bei einer Anlage bestimmt der Ort die Achsenzahl. Dann sind die Knöpfe
+     wirkungslos – also gesperrt, mit einem Satz dazu, statt stumm. */
+  const zoned = zonedMotif();
   Array.prototype.forEach.call(ui.axes.children, function (button) {
-    button.classList.toggle('is-active', Number(button.dataset.axes) === state.axes);
+    button.classList.toggle('is-active',
+      !zoned && Number(button.dataset.axes) === state.axes);
+    button.disabled = zoned;
   });
   Array.prototype.forEach.call(document.querySelectorAll('.motif'), function (button) {
     const id = button.dataset.motif;
@@ -2175,6 +2391,18 @@ function syncUI() {
     : (state.fillAll
         ? 'Ein Tipp färbt alle gleichwertigen Felder zugleich.'
         : 'Ein Tipp färbt nur das angetippte Feld.');
+  const anlage = !!(state.motif && state.motif.zones);
+  ui.gradedBox.hidden = !anlage;
+  ui.gradedNote.hidden = !anlage;
+  ui.graded.checked = state.graded;
+  if (anlage) {
+    ui.gradedNote.textContent = state.graded
+      ? state.motif.zones.map(function (zone) {
+          return zone.name + ': ' + (zone.axes > 1 ? zone.axes + '-fach' : 'frei');
+        }).reverse().join(' · ')
+      : 'Aus: überall dieselbe Achsenzahl, wie bei den anderen Vorlagen.';
+  }
+
   ui.width.value = state.width;
   ui.quickShapes.hidden = state.tool !== 'shape';
   Array.prototype.forEach.call(ui.quickShapes.children, function (button) {
@@ -2192,9 +2420,11 @@ function syncUI() {
     ui.hint.textContent = 'Leeres Blatt · zeichne ein Segment, der Rest entsteht von selbst';
   } else {
     ui.hint.textContent = state.motif.name + ' · ' + state.motif.note +
-      (fillsSymmetrically(state.motif)
-        ? ' · ein Tipp färbt alle gleichwertigen Felder'
-        : ' · ein Tipp färbt nur das angetippte Feld');
+      (zoned
+        ? ' · die Symmetrie folgt dem Bereich, in dem die Hand aufsetzt'
+        : fillsSymmetrically(state.motif)
+          ? ' · ein Tipp färbt alle gleichwertigen Felder'
+          : ' · ein Tipp färbt nur das angetippte Feld');
   }
 }
 
@@ -2369,6 +2599,7 @@ function bindEvents() {
   /* Beginnt eine Geste, wird der eben angefangene Strich zurückgenommen –
      sonst bliebe von jedem Zoomversuch ein Kringel stehen. */
   function abandonStroke() {
+    state.strokeSym = null;
     if (state.shapeFrom) { state.shapeFrom = null; renderGuides(); }
     if (!state.drawing) return;
     state.drawing = false;
@@ -2391,6 +2622,10 @@ function bindEvents() {
     }
 
     const point = toLocal(event);
+
+    /* Bei einer Anlage entscheidet der Aufsetzpunkt über die Achsenzahl,
+       und sie bleibt für den ganzen Zug gültig. */
+    state.strokeSym = symmetryAt(point);
 
     if (state.tool === 'shape') {
       canvas.setPointerCapture(event.pointerId);
@@ -2459,6 +2694,7 @@ function bindEvents() {
       /* Nach einer Geste nicht mit dem verbliebenen Finger weiterzeichnen. */
       if (touches.size === 0) state.drawing = false;
       else if (touches.size === 1) state.drawing = false;
+      if (!state.drawing && !state.shapeFrom) state.strokeSym = null;
     });
   });
 
@@ -2508,6 +2744,13 @@ function bindEvents() {
   ui.mirror.addEventListener('change', function () {
     state.mirror = ui.mirror.checked;
     Store.set('mirror', state.mirror);
+  });
+
+  ui.graded.addEventListener('change', function () {
+    state.graded = ui.graded.checked;
+    Store.set('graded', state.graded);
+    renderGuides();
+    syncUI();
   });
 
   ui.fillAll.addEventListener('change', function () {
@@ -2643,6 +2886,7 @@ function start() {
   state.mirror = Store.get('mirror', state.mirror);
   state.guides = Store.get('guides', state.guides);
   state.fillAll = Store.get('fillAll', state.fillAll);
+  state.graded = Store.get('graded', state.graded);
   state.shape = Store.get('shape', state.shape);
   setTheme(Store.get('theme', preferredTheme()));
   state.people = Store.get('people', [{ id: 'p1', name: Store.get('owner', '') }]);
@@ -2698,6 +2942,9 @@ window.MandalaAtelier = {
   floodFill: floodFill,
   makeFields: makeFields,
   makeLegend: makeLegend,
+  segmentLine: segmentLine,
+  symmetryAt: symmetryAt,
+  zoneAt: zoneAt,
   pol: pol,
   SIZE: SIZE,
   R_OUT: R_OUT

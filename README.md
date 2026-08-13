@@ -19,7 +19,7 @@ eigene Zielgruppe, eigene Gestaltung.
 
 Der Kern ist nicht das Ausmalbuch, sondern das **Symmetrie-Werkzeug**: Man
 zeichnet ein Segment, die App spiegelt den Rest. Dieses Gefühl ist das
-eigentliche Produkt. Die 26 fertigen Vorlagen sind die Ergänzung für alle, die
+eigentliche Produkt. Die 27 fertigen Vorlagen sind die Ergänzung für alle, die
 sofort losfärben wollen.
 
 Leitsatz: ruhig, erwachsen, entspannend. **Keine Gamification** – keine Sterne,
@@ -79,6 +79,7 @@ Dateien unverändert ausliefert.
 ## Dateien
 
     docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
+    docs/architektur.md     Konzept der Anlagen (Stufe 4.0)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
     .nojekyll               Pages liefert unverändert aus
@@ -202,6 +203,30 @@ Der Testlauf misst die Rundheit an 72 Winkeln.
 rotiert; bei aktiver Spiegelung zusätzlich an der Waagerechten gespiegelt.
 Achsen 6/8/10/12/16/24, mit Spiegelung also bis 48-fach.
 
+**Anlagen und gestaffelte Symmetrie (Stufe 4.0).** Eine Anlage ist kein
+komplizierteres Muster, sondern ein Grundriss: Schutzbereich, Vorhöfe, vier
+Tore, Palastmauer, Innenhof, Kammer, Mitte. Das Neue daran steckt nicht in der
+Zeichnung, sondern in `zones`: Dort hängt die Achsenzahl **nicht an der
+Einstellung, sondern am Ort** – außen 24-fach, im Palast vierfach, in der Mitte
+gar nicht mehr, auch ohne Spiegelung. Nach innen nimmt die Maschine immer
+weniger ab. Ohne diese Staffelung wäre eine Architektur nur ein Ornament mit
+Grundriss: Wer ein Tor gestaltet und dabei die drei anderen mitgestaltet, hat
+nichts entdeckt.
+
+Ein Zug gehört dem Bereich, in dem er **aufsetzt** (`state.strokeSym`), und
+behält dessen Achsenzahl bis zum Loslassen – sonst änderte sich die Symmetrie
+mitten im Strich, und die beiden Punktlisten in `segmentLine()` hätten
+verschiedene Längen. Der Schalter „Symmetrie folgt den Bereichen“ erscheint nur
+bei Anlagen; ist er aus, verhält sich die Vorlage wie jede andere. Solange er
+an ist, sind die Achsenknöpfe gesperrt, denn sie wirken dann nicht.
+
+Zwei Folgen, die dranhängen: Eine Anlage bringt ihren **eigenen Rahmen** mit
+(`frame: false`), weil `drawWedgeFrame()` ihr quer durch den Palast liefe. Und
+das **Hilfsraster steht still**, sobald eine Anlage geladen ist – vier Tore
+geben dem Blatt ein Oben; stattdessen zeigt das Raster die Bereiche mit je so
+vielen Achsen, wie dort gelten. Das Konzept dahinter steht in
+[`docs/architektur.md`](docs/architektur.md).
+
 **Füllen.** Scanline-Flood-Fill mit Span-Verfolgung. Es wird **pro
 Symmetrie-Position ein eigener Startpunkt** gesetzt – ein Tipp färbt alle
 gleichwertigen Felder zugleich. Das ist der Komfortgewinn gegenüber einem
@@ -229,7 +254,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (26 Vorlagen, 5 Welten)
+## Motivkatalog (27 Vorlagen, 6 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose
@@ -237,6 +262,7 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 - **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
   Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
+- **Anlagen:** Anlage
 - **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
   Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
   Rechenmandala ZR 20
@@ -278,7 +304,25 @@ kommen dort dazu. Bausteine: `petalPoints`, `wedgeBandPoints`, `diamondPoints`,
    Hat dazu geführt, dass die Legende der Rechenmandalas still leer blieb.
    Jetzt `Array.from(...)`. Der Testlauf prüft die Legende ausdrücklich.
 
-3. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
+3. **Ein Ringband ohne Querwände ist ein einziges Feld.** Bei den Anlagen war
+   der erste Entwurf ein umlaufendes Mauerband – ein Tipp färbte den halben
+   Rand. Jedes Band braucht Wände; gegen das Nachbarband versetzt, ergibt das
+   nebenbei den Mauerverband. Dasselbe gilt für ein Tor: Ein wirklich offener
+   Durchgang verbindet Vorhof und Innenhof zu einem Raum. Der Durchgang ist
+   deshalb eine Kammer *in* der Mauer, keine Lücke.
+
+4. **Ein Quadrat darf nicht durch `pen.repeat()`.** Es ist vierfach
+   drehsymmetrisch – bei 24 Achsen lägen 24 gegeneinander verdrehte Quadrate
+   übereinander. `drawSquare()` zeichnet einmal, genau wie `drawRing()`.
+
+5. **Der Testlauf meldete die Mitte als Fehler.** Ein Feld, das den
+   Mittelpunkt enthält, deckt zwangsläufig alle 360° ab; die Prüfung „reicht
+   ein Feld über sein Segment hinaus“ ist dort blind und wird ausgesetzt.
+   Ebenso: Ein Prüfzug dicht am Mittelpunkt liegt nach jeder Drehung auf sich
+   selbst. Beides waren Fehlalarme im Test, nicht Fehler im Motiv – aber man
+   erkennt das erst, wenn man es nachrechnet.
+
+6. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
    Canvas-Stapels, `aspect-ratio` allein genügt nicht (`flex: none`). Im
    Hochformat kam dazu, dass die Rasterzeile schrumpfte, sobald die Legende die
    Bedienleiste wachsen ließ (`min-height: auto` statt `0`). Der Testlauf misst
@@ -314,6 +358,10 @@ Der Durchlauf lädt jedes Motiv, füllt es an vielen Stellen und prüft:
   hinterlässt eine Zwei-Finger-Geste wirklich keinen Strich?
 - **Abgeschlossenheit** – holt die Seite wirklich nichts von außen?
 - **Zeichnen** – erscheint ein mit dem Zeiger gezogener Strich an allen Achsen?
+- **Gestaffelte Symmetrie** – bekommt ein Zug im Schutzbereich 24 Kopien, im
+  Palast 4, in der Mitte gar keine, und steht dazwischen wirklich nichts? Dazu
+  der heikle Fall: Ein Zug über eine Bereichsgrenze muss beim Aufsetzpunkt
+  bleiben.
 - **Seed** – liefern zwei Durchläufe dieselben Aufgaben?
 
 Zur Auswertung: Die Meldungen über Service Worker und `ERR_CONNECTION_RESET`
