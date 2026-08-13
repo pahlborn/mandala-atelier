@@ -78,9 +78,42 @@ const REST_RATE = 1.0;    // wie viele Überstreichen eine Sekunde Stillstand wi
    Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
 const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
 const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
-const GAMMA_LIGHT = 2.0;    // leichter/schneller Kontakt: vor allem die Höhen
+let   GAMMA_LIGHT = 2.0;    // leichter/schneller Kontakt: vor allem die Höhen
 const GAMMA_FIRM  = 0.30;   // fester/langsamer Kontakt: greift bis in die Tiefen
-const GRIP_BASE   = 0.18;   // auch der flüchtigste Kontakt greift ein wenig
+let   GRIP_BASE   = 0.18;   // auch der flüchtigste Kontakt greift ein wenig
+
+/* Die Trennschärfe der leichten Hand — zum Vergleichen über ?griff=…
+
+   Beim Umstieg auf den Wegauftrag (v1-4) wurden zwei Dinge zugleich geändert:
+   die **Menge** (Zeit → Weg, das war die Antwort auf zwei Befunde vom iPad)
+   und die **Trennschärfe** (GAMMA_LIGHT 3,6 → 2,0, dazu GRIP_BASE). Die
+   Trennschärfe verlangte kein Befund; sie kam mit.
+
+   Sie entscheidet aber genau darüber, ob eine leichte Hand nur die Ränder
+   hervorholt oder gleich die Flächen mitnimmt — und damit, ob man ein Blatt
+   erst zeichnen und danach ausmalen kann. Das Verhältnis Grat zu Fläche:
+
+       zart   3,4 / 0,07   rund 22:1   erst die Linien, dann die Fläche
+       mittel 2,8 / 0,10   rund 12:1   dazwischen
+       jetzt  2,0 / 0,18   rund  5:1   die Fläche kommt gleich mit
+
+   Der Wegauftrag bleibt in allen dreien unangetastet, GAMMA_FIRM auch: Die
+   feste, langsame Hand füllt überall gleich gut. Ohne Angabe bleibt alles,
+   wie es ist — die Oberfläche zeigt davon nichts. */
+const GRIPS = {
+  zart:   { light: 3.4, base: 0.07 },
+  mittel: { light: 2.8, base: 0.10 },
+  jetzt:  { light: 2.0, base: 0.18 }
+};
+
+function applyGrip() {
+  const raw = new URLSearchParams(location.search).get('griff');
+  const g = raw && GRIPS[raw.toLowerCase()];
+  if (!g) return 'jetzt';
+  GAMMA_LIGHT = g.light;
+  GRIP_BASE   = g.base;
+  return raw.toLowerCase();
+}
 const MIX_SUB     = 0.5;    // wie subtraktiv Pigment über Pigment mischt
 /* Ein Finger ist keine Kuppe, sondern eine Fläche mit weichem Rand: innen
    voller Kontakt, und erst das äußere Stück läuft aus. CONTACT_SOFT ist
@@ -2743,6 +2776,10 @@ function syncSoundLabel() {
 }
 
 async function start() {
+  /* Vor allem anderen: eine etwaige Griffkurve aus der Adresse übernehmen.
+     Sie muss stehen, bevor der erste Strich eine Nachschlagetabelle baut. */
+  applyGrip();
+
   canvas = document.getElementById('sheet');
   canvas.width = SIZE;
   canvas.height = SIZE;
@@ -2805,6 +2842,12 @@ window.Blatt = {
   THOUGHTS: THOUGHTS,
   nextThought: nextThought,
   buildPlan: buildPlan, fieldAt: fieldAt,
+  GRIPS: GRIPS,
+  griff: function () { return { light: GAMMA_LIGHT, base: GRIP_BASE }; },
+  setGriff: function (id) {
+    const g = GRIPS[id]; if (!g) return false;
+    GAMMA_LIGHT = g.light; GRIP_BASE = g.base; return true;
+  },
   WORLDS: WORLDS,
   makeSheet: function (seed, mode, world) {
     makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();

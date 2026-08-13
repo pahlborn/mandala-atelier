@@ -539,6 +539,62 @@ async function run() {
   prüfe('auch die Mitte bleibt auffindbar', anlage.verhaeltnis > 1.25,
         (anlage.verhaeltnis).toFixed(2) + '-fach über der blanken Fläche');
 
+  /* Die Trennschärfe der leichten Hand. Sie entscheidet, ob man ein Blatt
+     erst zeichnen und danach ausmalen kann – und sie war beim Umstieg auf
+     den Wegauftrag mitgeändert worden, ohne dass ein Befund das verlangt
+     hätte. Über ?griff= lässt sich vergleichen; geprüft wird beides: dass
+     die Voreinstellung unangetastet bleibt, und dass der Schalter die
+     Fläche zurückhält, ohne die Linie langsamer zu machen. */
+  console.log('\nDie Trennschärfe (?griff=)');
+  const trenn = await page.evaluate(function () {
+    const B = window.Blatt;
+    const messe = function (id) {
+      B.setGriff(id);
+      B.makeSheetFull(555123, 'tag', 'erde', 'bluete');
+      const S = B.SIZE, C = S / 2;
+      for (let rad = 14; rad < S * 0.47; rad += 18) {
+        const pts = [];
+        for (let i = 0; i <= 300; i++) {
+          const a = (i / 300) * Math.PI * 2;
+          pts.push(C + Math.cos(a) * rad, C + Math.sin(a) * rad);
+        }
+        B.rubPath(pts, 0.0);                       // leichte, zügige Hand
+      }
+      const rel = B.sheet.relief, den = B.sheet.dens;
+      let gS = 0, gN = 0, fS = 0, fN = 0;
+      for (let i = 0; i < rel.length; i += 13) {
+        const h = rel[i] / 255;
+        if (h > 0.90) { gS += den[i]; gN++; }
+        else if (h > 0.36 && h < 0.40) { fS += den[i]; fN++; }
+      }
+      return { linie: gS / gN, flaeche: fS / fN };
+    };
+    const vor = B.griff();
+    const werte = {};
+    ['jetzt', 'mittel', 'zart'].forEach(function (id) { werte[id] = messe(id); });
+    B.setGriff('jetzt');
+    return { vor: vor, werte: werte, namen: Object.keys(B.GRIPS) };
+  });
+
+  ['jetzt', 'mittel', 'zart'].forEach(function (id) {
+    const w = trenn.werte[id];
+    console.log('  ' + pad(id, 24) + pad('Linie ' + w.linie.toFixed(3), 14) +
+                pad('Fläche ' + w.flaeche.toFixed(3), 16) +
+                (w.linie / w.flaeche).toFixed(1) + ':1');
+  });
+  prüfe('ohne Angabe bleibt alles, wie es ist',
+        trenn.vor.light === 2.0 && trenn.vor.base === 0.18,
+        'GAMMA_LIGHT ' + trenn.vor.light + ', GRIP_BASE ' + trenn.vor.base);
+  const vJetzt = trenn.werte.jetzt.linie / trenn.werte.jetzt.flaeche;
+  const vZart  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
+  prüfe('zart hält die Fläche zurück', vZart > vJetzt * 2.5,
+        vZart.toFixed(1) + ':1 gegen ' + vJetzt.toFixed(1) + ':1');
+  prüfe('die Linie kommt trotzdem gleich schnell',
+        Math.abs(trenn.werte.zart.linie - trenn.werte.jetzt.linie) <
+        trenn.werte.jetzt.linie * 0.12,
+        trenn.werte.zart.linie.toFixed(3) + ' gegen ' +
+        trenn.werte.jetzt.linie.toFixed(3));
+
   const ladeAuf = await page.evaluate(async function () {
     const B = window.Blatt;
     B.openLade();

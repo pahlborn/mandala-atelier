@@ -163,6 +163,30 @@ füllt sie auch mit leichter Hand. Das ist wichtig, weil die meisten Geräte
 Ausdruckskraft (`GAMMA_LIGHT`/`GAMMA_FIRM`, gespeist aus Druck **und** Tempo,
 mit `GRIP_BASE` als Boden: auch der flüchtigste Kontakt greift ein wenig).
 
+### Die Trennschärfe der leichten Hand — `?griff=`
+
+Beim Umstieg auf den Wegauftrag wurden **zwei Dinge zugleich** geändert: die
+*Menge* (Zeit → Weg, die Antwort auf zwei Befunde vom iPad) und die
+*Trennschärfe* (`GAMMA_LIGHT` 3,6 → 2,0, dazu der neue Boden `GRIP_BASE`).
+Die Trennschärfe verlangte kein Befund; sie kam mit.
+
+Sie entscheidet aber genau darüber, ob eine leichte Hand nur die Ränder
+hervorholt oder gleich die Flächen mitnimmt — und damit, ob man ein Blatt
+**erst zeichnen und danach ausmalen** kann. Über `?griff=` lässt sich das
+vergleichen, ohne dass die Oberfläche etwas davon zeigt:
+
+| `?griff=` | Gamma | Linie | Fläche | Verhältnis |
+|---|---|---|---|---|
+| `zart` | 3,18 | 0,431 | 0,023 | 18,5 : 1 |
+| `mittel` | 2,55 | 0,438 | 0,043 | 10,2 : 1 |
+| *ohne Angabe* (`jetzt`) | 1,69 | 0,448 | 0,092 | 4,8 : 1 |
+
+Gemessen mit echtem Reiben, leichte zügige Hand über ein ganzes Blatt. Die
+Zahlen zeigen das Entscheidende: **Die Linie kommt in allen drei Fassungen
+gleich schnell** — nur die Fläche hält sich zurück. Der Wegauftrag bleibt
+unangetastet, `GAMMA_FIRM` auch: Die feste, langsame Hand füllt überall
+gleich gut. Ohne Angabe bleibt alles, wie es ist.
+
 **Der Abstand der Höhenstufen ist die eigentliche Gestaltungsentscheidung.**
 `OUTER 0.16 < BASE 0.38 < Plateaus 0.52…0.70 < Linien 1.0`. Zu weit
 auseinander, und man bekommt nie mehr als eine Zeichnung; zu eng, und alles
