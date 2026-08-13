@@ -50,6 +50,7 @@ async function run() {
      Workers – nur so lässt sich das Aufräumen beim Aktivieren auslösen. */
   let swAbrufe = 0;
   let frischeFassung = false;
+  let frischeSeite = false;
   const server = await startServer(function (rel, body) {
     if (rel === 'sw.js') {
       swAbrufe++;
@@ -58,6 +59,10 @@ async function run() {
     /* Eine neue Fassung von Blatt, ohne dass die Cache-Version steigt. */
     if (rel === 'atelier3/app.js' && frischeFassung) {
       return body + '\nwindow.__frischeFassung = true;\n';
+    }
+    /* Und eine geänderte Werkstattseite – sie muss sofort ankommen. */
+    if (rel === 'beide.html' && frischeSeite) {
+      return String(body).replace('</main>', '<p id="frisch">neu</p></main>');
     }
     return body;
   });
@@ -222,6 +227,19 @@ async function run() {
       const g = await page.evaluate(function () { return window.Blatt.griff(); });
       fassungen[href.indexOf('zart') !== -1 ? 'zart' : 'jetzt'] = g;
     }
+    /* Die Werkstattseite gehört keinem Release an: Wer sie ändert, erhöht
+       keine Cache-Version. Sie muss deshalb beim nächsten Öffnen neu da
+       sein – ohne zweites Öffnen, ohne Versionswechsel. Genau das ging
+       lange schief, weil der Worker jede je abgerufene Datei ablegte und
+       danach ewig aus dem Vorrat bediente. */
+    frischeSeite = true;
+    await page.goto(server.url + '/beide.html');
+    const sofort = await page.evaluate(function () {
+      return !!document.getElementById('frisch');
+    });
+    prüfe('eine geänderte Werkstattseite kommt sofort an', sofort,
+          sofort ? 'erst Netz, dann Vorrat' : 'sie kam aus dem Vorrat');
+
     prüfe('hinter den Aufrufen stehen zwei Fassungen',
           fassungen.zart && fassungen.jetzt &&
           fassungen.zart.light > fassungen.jetzt.light &&

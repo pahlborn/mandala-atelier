@@ -66,6 +66,19 @@ Aufrufe da sind und dass dahinter wirklich zwei verschiedene Fassungen stehen.
 Namen, getrennte Service-Worker-Bereiche und Cache-Namen, getrennte
 Speicher (`mandala-atelier.*` gegen `atelier3-*`, eigene Datenbanken).
 
+**Werkstattseiten holen erst vom Netz.** `beide.html` und alles unter `docs/`
+gehören keinem Release an – wer sie ändert, erhöht keine Cache-Version. Der
+Worker bedient sie deshalb *erst vom Netz, dann aus dem Vorrat*; offline
+bleiben sie erreichbar, nur in der Fassung von zuletzt. Für die App gilt
+weiter das Gegenteil (erst Vorrat, dann Netz), denn ihr Start soll sofort
+kommen und ihre Dateien hängen alle an der Cache-Version.
+
+Das war ein echter Fehler, und er hat gekostet: `store()` legt **jede** je
+abgerufene Datei ab, nicht nur die aus `SHELL`. Damit landete `beide.html` im
+Vorrat und wurde von da an ewig von dort bedient – fünfmal öffnen half nicht.
+Der Testlauf ändert die Seite jetzt im Flug und prüft, dass die Änderung beim
+nächsten Öffnen wirklich ankommt.
+
 Zwei Stellen mussten dafür ausdrücklich geregelt werden, beide in `sw.js`:
 Der Worker hier räumt beim Aktivieren **nur die eigenen** alten Caches weg
 (vorher alle – das hätte Blatt bei jedem Release den Offline-Vorrat

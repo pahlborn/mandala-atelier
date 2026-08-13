@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-11';
+const CACHE = 'mandala-atelier-v1-12';
 
 const SHELL = [
   './',
@@ -62,6 +62,34 @@ self.addEventListener('fetch', function (event) {
      ihre Dateien doppelt und veralteten unbemerkt. */
   if (url.pathname.indexOf('/atelier3/') !== -1) return;
 
+  /* Werkstattseiten: erst Netz, dann Vorrat.
+
+     Das war ein echter Fehler und hat jemanden eine Stunde gekostet. Der Weg
+     unten lautet „erst Vorrat, dann Netz“ – und store() legt *jede* je
+     abgerufene Datei ab, nicht nur den Vorrat aus SHELL. Damit landete auch
+     beide.html im Cache und wurde von da an ewig von dort bedient. Wer die
+     Seite ändert, sieht die Änderung nie: Sie steht in keiner SHELL-Liste,
+     also denkt niemand daran, dafür die Cache-Version zu erhöhen, und selbst
+     wer es tut, ist auf ein Gerät angewiesen, das den Worker auch wirklich
+     erneuert.
+
+     Für die App bleibt es beim alten Weg – ihr Start soll sofort kommen, und
+     ihre Dateien hängen alle an der Cache-Version. Für Seiten, die sich
+     unabhängig davon ändern, gilt das Gegenteil. Offline bleiben sie
+     erreichbar, nur eben in der Fassung von zuletzt. */
+  if (istWerkstatt(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then(function (response) { return store(request, response); })
+        .catch(function () {
+          return caches.match(request).then(function (hit) {
+            return hit || Response.error();
+          });
+        })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then(function (hit) {
       return hit || fetch(request).then(function (response) {
@@ -70,6 +98,12 @@ self.addEventListener('fetch', function (event) {
     })
   );
 });
+
+/* Alles, was nicht die App selbst ist: die Einstiegsseite und die Papiere
+   unter docs/. Sie gehören keinem Release an. */
+function istWerkstatt(pfad) {
+  return /(^|\/)beide\.html$/.test(pfad) || pfad.indexOf('/docs/') !== -1;
+}
 
 function store(request, response) {
   if (response && response.status === 200) {
