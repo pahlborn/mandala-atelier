@@ -458,6 +458,24 @@ function drawSquare(pen, half, lineWidth) {
   tracePath(pen.ctx, squarePoints(half), true);
 }
 
+/* Ein Zackenband: die Punkte springen abwechselnd zwischen innen und außen.
+   Reicht der Zacken über beide Randlinien hinaus, teilt er das Band von
+   selbst in Felder – es braucht keine Querwände. */
+function zigzagRingPoints(rInner, rOuter, count) {
+  const pts = [];
+  for (let i = 0; i < count * 2; i++) {
+    pts.push(pol(i % 2 ? rOuter : rInner, UP + (i / (count * 2)) * TAU));
+  }
+  return pts;
+}
+
+/* Wie drawWavyRing: gilt für alle Segmente zugleich, wird also nur einmal
+   gezeichnet – sonst lägen n gedrehte Kopien übereinander. */
+function drawZigzagRing(pen, rInner, rOuter, count, lineWidth) {
+  pen.ctx.lineWidth = lineWidth || 2;
+  tracePath(pen.ctx, zigzagRingPoints(rInner, rOuter, count), true);
+}
+
 /* Ein Ringband ohne Querwände ist ein einziges, riesiges Feld – ein Tipp
    färbt dann den halben Rand. Jedes Band bekommt deshalb Wände; phase
    verschiebt sie gegen das Nachbarband, das ergibt den Mauerverband. */
@@ -897,6 +915,134 @@ const MOTIFS = [
 
       /* Die Mitte bleibt leer. Sie ist ein Ort in der Anlage, kein Ziel:
          wer will, gestaltet sie; wer will, lässt sie. */
+    }
+  },
+
+  /* Die zweite Anlage. Der Anlass war ein Blick auf echte Thangkas: Dort
+     liegen außen fünf, sechs Bänder, und **jedes hat einen anderen
+     Rhythmus** – Lotosblätter, Perlen, Wellen, Flammen, Speichen. Unsere
+     erste Anlage hat dort zwei Bänder, beide dasselbe Mauerwerk, nur
+     versetzt. Das ist arm, und es lässt sich beheben, ohne eine einzige
+     Figur zu zeichnen.
+
+     Der Kniff, der das trägt: Jedes Band teilt sich **selbst** in Felder,
+     und zwar mit einem anderen Mittel. Die Perle greift über beide
+     Randlinien, die Welle schwingt über sie hinaus, der Zacken springt
+     darüber, das Blatt stößt mit beiden Spitzen durch. Nur das letzte Band
+     braucht noch Querwände. Deshalb sehen fünf Bänder verschieden aus, statt
+     fünfmal dasselbe Mauerwerk zu sein – und trotzdem ist keines ein
+     einziges großes Feld.
+
+     Weil jedes Band anders zählt, bekommt auch **jedes seine eigene Zone**:
+     Ein Tipp im Perlband färbt zweiunddreißig Felder, einer im Zackenband
+     zwanzig. Die Achsenzahl der Symmetrie folgt hier nicht nur dem Ort,
+     sondern dem Rhythmus des Bandes, in dem man steht. */
+  {
+    id: 'ringanlage', world: 'anlage', axes: 4, frame: false,
+    name: 'Ringanlage', note: 'Vier Tore, vier Ringbänder',
+    zones: [
+      { r: 42,    axes: 1,  name: 'Mitte' },
+      { r: 274,   axes: 4,  name: 'Palast' },
+      { r: 308,   axes: 24, name: 'Speichen' },
+      { r: 342,   axes: 24, name: 'Blätter' },
+      { r: 376,   axes: 20, name: 'Wellen' },
+      { r: R_OUT, axes: 32, name: 'Perlen' }
+    ],
+    build: function (p) {
+      const ctx   = p.ctx;
+      const ARC   = 274;                  // Grenze des Schutzbereichs
+      /* Zwei Punkte *über* ARC/√2: Die Mauerecken müssen den Ring
+         durchstoßen, nicht ihn berühren. Genau auf dem Ring berühren sie ihn
+         nur in einem Punkt, und die vier Vorhöfe hängen an den Ecken
+         zusammen – ein einziges Feld, das einmal rundherum läuft. Der
+         Testlauf hat es gemeldet: 360° breit. */
+      const WALL  = ARC / Math.SQRT2 + 2;
+      const WIN   = WALL - 18;
+      const COURT = 120;
+      const KAM   = 68;
+      const HEART = 42;
+      const GATE  = 30;
+      const four  = makePen(ctx, 4);
+      const p32   = makePen(ctx, 32);
+      const p24   = makePen(ctx, 24);
+
+      /* Die Randlinien der vier Bänder.
+
+         Erst waren es fünf, schmalere. Das ging schief: Jedes Ornament muss
+         ein Stück über seine Randlinien hinausreichen, um sich zu schließen,
+         und bei sechsundzwanzig Punkt Bandbreite ragte jedes so weit ins
+         Nachbarband, dass sich alles zu einem Geflecht verwob. Vier breite
+         Bänder lesen sich als vier Rhythmen; fünf schmale lasen sich als
+         Gitter. Breite schlägt Anzahl. */
+      drawRing(p, R_OUT, 2.6);
+      drawRing(p, 376, 1.8);
+      drawRing(p, 342, 1.8);
+      drawRing(p, 308, 1.8);
+      drawRing(p, ARC, 2.4);
+
+      /* … und jedes Band mit seinem eigenen Mittel geteilt.
+
+         Die zweite Falle steckte hier: Eine Welle, die ihre Randlinien
+         durchstößt, teilt das Band zwar von selbst – aber sie erzeugt dabei
+         Linsenformen, und Linsen sind genau das, was auch ein Blattkranz
+         macht. Zwei Bänder, dieselbe Bildsprache. Die Welle bleibt deshalb
+         *innerhalb* ihres Bandes und bekommt Querwände dazu. Dann liest sie
+         sich als Welle und nicht als zweite Reihe Blätter. */
+      drawDotAccent(p32, 393, 19, 1.8);                          // Perlen
+      drawWavyRing(p, 359, 10, 20, 1.8);                         // Wellen
+      drawRingWalls(ctx, 342, 376, 20, 0.5, 1.6);
+      drawClosedLoop(p24, petalPoints(306, 344, p24.step * 0.46), 1.8);
+      drawRingWalls(ctx, ARC, 308, 24, 0, 1.6);                  // Speichen
+
+      /* Der Palast – wie bei der ersten Anlage, nur enger, weil die Bänder
+         außen Platz brauchen. */
+      drawSquare(p, WALL, 2.4);
+      drawSquare(p, WIN, 2.4);
+      drawSquare(p, COURT, 2.2);
+      drawSquare(p, KAM, 2.0);
+      drawRing(p, HEART, 2.2);
+
+      four.repeat(function () {
+        /* Binder in der Mauer, am Tor ausgespart. */
+        [-158, -108, -58, 58, 108, 158].forEach(function (x) {
+          tracePath(ctx, [[CX + x, CY - WALL], [CX + x, CY - WIN]], false);
+        });
+
+        /* Das Tor: Kammer in der Mauer, darüber drei abnehmende Stufen. */
+        ctx.lineWidth = 2.2;
+        tracePath(ctx, [[CX - GATE, CY - WIN], [CX - GATE, CY - WALL]], false);
+        tracePath(ctx, [[CX + GATE, CY - WIN], [CX + GATE, CY - WALL]], false);
+        [[44, WALL, WALL + 18], [32, WALL + 18, WALL + 33],
+         [20, WALL + 33, WALL + 46]].forEach(function (tier) {
+          const half = tier[0], near = tier[1], far = tier[2];
+          tracePath(ctx, [[CX - half, CY - near], [CX - half, CY - far],
+                          [CX + half, CY - far], [CX + half, CY - near]], false);
+        });
+
+        /* Vorhof: Quermauern von der Mauerflucht bis an den Ring. */
+        ctx.lineWidth = 1.6;
+        [-170, -124, -62, 62, 124, 170].forEach(function (x) {
+          const y = Math.sqrt(ARC * ARC - x * x);
+          tracePath(ctx, [[CX + x, CY - WALL], [CX + x, CY - y]], false);
+        });
+
+        /* Innenhof und Kammer. */
+        [-120, -58, 58, 120].forEach(function (x) {
+          tracePath(ctx, [[CX + x, CY - WIN], [CX + x, CY - COURT]], false);
+        });
+        [-68, 0, 68].forEach(function (x) {
+          tracePath(ctx, [[CX + x, CY - COURT], [CX + x, CY - KAM]], false);
+        });
+
+        /* Zwischen Kammerquadrat und Mitte bleibt sonst ein umlaufender
+           Ring stehen – ein einziges Feld, das die ganze Mitte umschließt.
+           Acht Felder daraus: vier Quermauern, vier über die Ecken. */
+        tracePath(ctx, [[CX, CY - KAM], [CX, CY - HEART]], false);
+        tracePath(ctx, [pol(HEART, UP + Math.PI / 4),
+                        [CX + KAM, CY - KAM]], false);
+      });
+
+      /* Die Mitte bleibt auch hier leer. */
     }
   },
 

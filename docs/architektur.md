@@ -194,7 +194,52 @@ Konkret zu beobachten wäre:
 
 ---
 
-## 9. Dieselbe Idee in „Blatt“ — und warum sie dort anders heißt
+## 9. Die Ringanlage — was ein Blick auf echte Thangkas ändert
+
+Sieht man sich Kalachakra-Thangkas an, wird schnell klar, was unsere App
+**nicht** kann: Figuren, Schrift, Malerei, und eine Dichte, die bei 900
+Punkten Kantenlänge um das Fünfzig- bis Hundertfache über unserer liegt. Das
+ist eine Grenze, keine Aufgabe — und da wir ohnehin nur die Bauordnung
+übernehmen und nicht das Bildprogramm, fallen technische Grenze und
+inhaltliche Regel zusammen.
+
+Eines aber lässt sich lernen, ohne eine einzige Figur zu zeichnen: **den
+Rhythmus der äußeren Bänder.** Im Original liegen dort fünf, sechs Bänder, und
+jedes zählt anders — Lotosblätter, Perlen, Wellen, Flammen, Speichen. Unsere
+erste Anlage hat dort zwei, beide dasselbe Mauerwerk, nur versetzt.
+
+Die **Ringanlage** hat vier, jedes mit eigenem Takt:
+
+| Band | Takt | wie es sich teilt |
+|---|---|---|
+| Perlen | 32 | die Perle greift über beide Randlinien |
+| Wellen | 20 | Welle innerhalb, dazu Quermauern |
+| Blätter | 24 | das Blatt stößt mit beiden Spitzen durch |
+| Speichen | 24 | Quermauern |
+
+![Ringanlage, teilweise gefärbt](ringanlage-beispiel.png)
+
+Und daraus folgt eine Erweiterung der Staffelung: **Jedes Band bekommt seine
+eigene Zone.** Ein Tipp im Perlband färbt 32 Felder, einer im Wellenband 20,
+im Palast 4, in der Mitte eines. Die Achsenzahl folgt nicht mehr nur dem Ort,
+sondern dem Rhythmus des Bandes, in dem die Hand steht.
+
+Drei Fallen, alle beim ersten Anlauf zugeschnappt:
+
+1. **Fünf schmale Bänder verweben sich.** Jedes Ornament muss ein Stück über
+   seine Randlinien hinausreichen, um sich zu schließen; bei 26 Punkt
+   Bandbreite ragt es so weit ins Nachbarband, dass ein Geflecht entsteht.
+   Breite schlägt Anzahl.
+2. **Welle und Blattkranz sprechen dieselbe Sprache.** Eine Welle, die ihre
+   Randlinien durchstößt, erzeugt Linsenformen — und Linsen macht auch ein
+   Blattkranz. Die Welle bleibt deshalb innerhalb ihres Bandes.
+3. **Eine Mauerecke muss den Ring durchstoßen, nicht ihn berühren.** Genau auf
+   dem Ring hängen die vier Vorhöfe an den Ecken zusammen und sind ein Feld,
+   das einmal rundherum läuft. Der Testlauf meldete es als „360° breit“.
+
+---
+
+## 10. Dieselbe Idee in „Blatt“ — und warum sie dort anders heißt
 
 Blatt hat die Anlage inzwischen auch, als fünften Charakter in der Blattlade.
 Es ist aber **keine Übertragung**, sondern eine zweite Fassung derselben Idee:
@@ -240,13 +285,12 @@ Apps teilen.
 
 ---
 
-## 10. Was offen ist
+## 11. Was offen ist
 
 - **Aussehen der Tore.** Sie sind derzeit sehr technisch geraten; nach außen
   gesehen liest sich das Dach eher als Pfeil denn als Tor.
-- **Nur eine Vorlage im Atelier.** Eine Welt mit einem einzigen Motiv ist keine
-  Welt. (In Blatt entsteht bei jedem Griff eine neue Anlage — dort stellt sich
-  die Frage nicht.)
+- **Zwei Vorlagen im Atelier**, seit der Ringanlage. Eine dritte wäre eine mit
+  weniger, dafür größeren Feldern — die Ringanlage ist eher fein geraten.
   Naheliegend wären eine schlichtere Anlage mit nur zwei Bereichen und eine mit
   einem stärker gegliederten Innenhof.
 - **Detail beim Näherkommen.** Reizvoll wäre, dass der Zoom nicht nur

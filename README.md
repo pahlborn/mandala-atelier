@@ -19,7 +19,7 @@ eigene Zielgruppe, eigene Gestaltung.
 
 Der Kern ist nicht das Ausmalbuch, sondern das **Symmetrie-Werkzeug**: Man
 zeichnet ein Segment, die App spiegelt den Rest. Dieses Gefühl ist das
-eigentliche Produkt. Die 27 fertigen Vorlagen sind die Ergänzung für alle, die
+eigentliche Produkt. Die 28 fertigen Vorlagen sind die Ergänzung für alle, die
 sofort losfärben wollen.
 
 Leitsatz: ruhig, erwachsen, entspannend. **Keine Gamification** – keine Sterne,
@@ -251,6 +251,18 @@ verschiedene Längen. Der Schalter „Symmetrie folgt den Bereichen“ erscheint
 bei Anlagen; ist er aus, verhält sich die Vorlage wie jede andere. Solange er
 an ist, sind die Achsenknöpfe gesperrt, denn sie wirken dann nicht.
 
+**Die Ringanlage** treibt das weiter: Der Anlass war ein Blick auf echte
+Thangkas. Dort liegen außen fünf, sechs Bänder, und *jedes hat einen anderen
+Rhythmus*. Die erste Anlage hat dort zwei, beide dasselbe Mauerwerk. Die
+Ringanlage hat vier – Perlen, Wellen, Blätter, Speichen – und **jedes Band
+bekommt seine eigene Zone**: Ein Tipp im Perlband färbt 32 Felder, einer im
+Wellenband 20. Die Achsenzahl folgt hier nicht nur dem Ort, sondern dem
+Rhythmus des Bandes, in dem man steht.
+
+Der Kniff, der das trägt: Jedes Band teilt sich **selbst** in Felder, mit einem
+je anderen Mittel. Die Perle greift über beide Randlinien, das Blatt stößt mit
+beiden Spitzen durch; nur Wellen- und Speichenband brauchen Querwände.
+
 Zwei Folgen, die dranhängen: Eine Anlage bringt ihren **eigenen Rahmen** mit
 (`frame: false`), weil `drawWedgeFrame()` ihr quer durch den Palast liefe. Und
 das **Hilfsraster steht still**, sobald eine Anlage geladen ist – vier Tore
@@ -285,7 +297,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (27 Vorlagen, 6 Welten)
+## Motivkatalog (28 Vorlagen, 6 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose
@@ -293,7 +305,7 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 - **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
   Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
-- **Anlagen:** Anlage
+- **Anlagen:** Anlage, Ringanlage
 - **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
   Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
   Rechenmandala ZR 20
@@ -353,7 +365,22 @@ kommen dort dazu. Bausteine: `petalPoints`, `wedgeBandPoints`, `diamondPoints`,
    selbst. Beides waren Fehlalarme im Test, nicht Fehler im Motiv – aber man
    erkennt das erst, wenn man es nachrechnet.
 
-6. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
+6. **Zwei Bänder, dieselbe Bildsprache.** Beim Bau der Ringanlage stießen
+   erst fünf schmale Bänder aneinander: Jedes Ornament muss ein Stück über
+   seine Randlinien hinausreichen, um sich zu schließen, und bei 26 Punkt
+   Bandbreite ragte jedes so weit ins Nachbarband, dass sich alles zu einem
+   Geflecht verwob. **Breite schlägt Anzahl.** Dazu: Eine Welle, die ihre
+   Randlinien durchstößt, erzeugt Linsenformen – und Linsen macht auch ein
+   Blattkranz. Die Welle bleibt deshalb *innerhalb* ihres Bandes und bekommt
+   Querwände.
+
+7. **Eine Mauerecke muss den Ring durchstoßen, nicht ihn berühren.** Liegt sie
+   exakt darauf, hängen die vier Vorhöfe an den Ecken zusammen und sind ein
+   einziges Feld, das einmal rundherum läuft. Der Testlauf meldet das als
+   „360° breit". Dasselbe gilt für den Ring zwischen Kammer und Mitte: ohne
+   Quermauern umschließt er die Mitte als ein Feld.
+
+8. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
    Canvas-Stapels, `aspect-ratio` allein genügt nicht (`flex: none`). Im
    Hochformat kam dazu, dass die Rasterzeile schrumpfte, sobald die Legende die
    Bedienleiste wachsen ließ (`min-height: auto` statt `0`). Der Testlauf misst
