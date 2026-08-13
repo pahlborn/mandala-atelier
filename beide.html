@@ -118,6 +118,47 @@
 
   .note strong { color: var(--ink); }
 
+  /* Die zwei Fassungen des Farbauftrags. Bewusst schlichter als die beiden
+     Apps oben: Das hier ist Werkstatt, nicht Eingang. */
+  .proben {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin: 0 0 1rem;
+  }
+
+  .probe {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--edge);
+    background: var(--card);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .probe strong { display: block; font-size: 16px; font-weight: 600; }
+  .probe span   { display: block; font-size: 14px; color: var(--quiet); }
+
+  .werkstatt { margin-top: 2.8rem; }
+
+  table.werte {
+    width: 100%;
+    margin: 0 0 1rem;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    color: var(--quiet);
+  }
+
+  table.werte th, table.werte td {
+    padding: 5px 10px 5px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--edge);
+  }
+
+  table.werte th { font-weight: 600; color: var(--ink); }
+  table.werte td:not(:first-child) { font-variant-numeric: tabular-nums; }
+
   footer {
     margin-top: 2.6rem;
     font-size: 13.5px;
@@ -170,6 +211,60 @@
     durchführt, findet das Vorgehen im Konzeptpapier des Projekts – und sollte
     es Testpersonen vorher nicht zu lesen geben.
   </p>
+
+  <section class="werkstatt">
+    <h2>Werkstatt: zwei Fassungen von Blatt</h2>
+
+    <p style="margin-top:0; font-size:15px">
+      In Blatt entscheidet die Hand, <em>wie tief</em> der Kontakt greift.
+      Eine leichte, zügige Hand streift die Grate des Reliefs; eine langsame
+      oder feste greift bis in die Mulden und füllt die Fläche. Wie streng
+      diese Trennung ist, war lange nicht dieselbe – und daran hängt, ob man
+      ein Blatt <b>erst zeichnen und danach ausmalen</b> kann.
+    </p>
+
+    <p style="font-size:15px">
+      Hier stehen beide Fassungen nebeneinander. Sie unterscheiden sich in
+      genau einer Größe, und nur bei leichter Hand:
+    </p>
+
+    <div class="proben">
+      <a class="probe" href="./atelier3/index.html?griff=zart">
+        <strong>Blatt – zart</strong>
+        <span>Die leichte Hand holt fast nur die Ränder. Zum Ausmalen bleibt
+              die Fläche liegen.</span>
+      </a>
+      <a class="probe" href="./atelier3/index.html?griff=jetzt">
+        <strong>Blatt – jetzt</strong>
+        <span>Die leichte Hand nimmt die Fläche gleich mit. So ist es
+              gegenwärtig eingestellt.</span>
+      </a>
+    </div>
+
+    <table class="werte">
+      <tr><th>Fassung</th><th>Linie</th><th>Fläche</th><th>Verhältnis</th></tr>
+      <tr><td>zart</td><td>0,43</td><td>0,02</td><td>18,5 : 1</td></tr>
+      <tr><td>mittel</td><td>0,44</td><td>0,04</td><td>10,2 : 1</td></tr>
+      <tr><td>jetzt</td><td>0,45</td><td>0,09</td><td>4,8 : 1</td></tr>
+    </table>
+
+    <p style="font-size:14.5px; color:var(--quiet)">
+      Gemessen mit gleichmäßigem, leichtem Streichen über ein ganzes Blatt.
+      Die erste Spalte ist der Punkt: <b>Die Linie kommt in allen Fassungen
+      gleich schnell</b> – es hält sich nur die Fläche zurück. Eine feste,
+      langsame Hand füllt in beiden Fassungen gleich gut, und ein Blatt lässt
+      sich weiterhin nicht verderben.
+    </p>
+
+    <p class="note">
+      <strong>Was dabei zu wissen ist:</strong> Die Fassung hängt an der
+      Adresse, nicht am Gerät. Sie gilt für das Blatt, das man von hier aus
+      öffnet, und wird nirgends gemerkt – das Symbol auf dem Homescreen
+      startet immer in „jetzt“. Ein Zwischenwert liegt unter
+      <code>?griff=mittel</code>. Für das Mandala Atelier ändert sich nichts;
+      dort gibt es kein Relief.
+    </p>
+  </section>
 
   <footer>
     Beide Ateliers arbeiten ausschließlich auf dem Gerät: keine Konten, keine

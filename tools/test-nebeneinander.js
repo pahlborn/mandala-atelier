@@ -170,6 +170,53 @@ async function run() {
           überlebt ? '' : 'wurde gelöscht – siehe activate in sw.js');
     prüfe('sw.js wurde wirklich neu geholt', swAbrufe > 1, swAbrufe + ' Abrufe');
 
+    /* Die Einstiegsseite. Sie führt zu beiden Apps und zusätzlich zu den
+       zwei Fassungen des Farbauftrags in Blatt. Geprüft wird nicht, wie sie
+       aussieht, sondern dass die Aufrufe wirklich irgendwo ankommen: Ein
+       Anhängsel in einer Adresse ist genau die Sorte Sache, die still
+       verlorengeht – beim Umbenennen, beim Aufräumen, beim Verschieben. */
+    await page.goto(server.url + '/beide.html');
+    const seite = await page.evaluate(function () {
+      const ziel = function (sel) {
+        const a = document.querySelector(sel);
+        return a ? a.getAttribute('href') : null;
+      };
+      const proben = Array.from(document.querySelectorAll('.probe'))
+        .map(function (a) { return a.getAttribute('href'); });
+      return {
+        atelier: ziel('.app[href*="index.html"]'),
+        blatt: ziel('.app[href*="atelier3"]'),
+        proben: proben,
+        breiter: document.documentElement.scrollWidth >
+                 document.documentElement.clientWidth + 1
+      };
+    });
+    prüfe('die Einstiegsseite führt zu beiden Apps',
+          !!seite.atelier && !!seite.blatt);
+    prüfe('sie führt zu beiden Fassungen des Auftrags',
+          seite.proben.length === 2 &&
+          seite.proben.some(function (h) { return h.indexOf('griff=zart') !== -1; }) &&
+          seite.proben.some(function (h) { return h.indexOf('griff=jetzt') !== -1; }),
+          seite.proben.join(' · '));
+    prüfe('sie ragt nicht seitlich heraus', !seite.breiter);
+
+    /* Und der Kern: Kommt hinter dem Aufruf auch wirklich eine andere
+       Fassung heraus? Ein Anhängsel, das niemand liest, wäre schlimmer als
+       keines – es sähe nach einem Vergleich aus, ohne einer zu sein. */
+    const fassungen = {};
+    for (const href of seite.proben) {
+      await page.goto(server.url + '/' + href.replace(/^\.\//, ''));
+      await page.waitForFunction('window.Blatt');
+      const g = await page.evaluate(function () { return window.Blatt.griff(); });
+      fassungen[href.indexOf('zart') !== -1 ? 'zart' : 'jetzt'] = g;
+    }
+    prüfe('hinter den Aufrufen stehen zwei Fassungen',
+          fassungen.zart && fassungen.jetzt &&
+          fassungen.zart.light > fassungen.jetzt.light &&
+          fassungen.zart.base < fassungen.jetzt.base,
+          'zart ' + fassungen.zart.light + '/' + fassungen.zart.base +
+          ', jetzt ' + fassungen.jetzt.light + '/' + fassungen.jetzt.base);
+
   } finally {
     await browser.close();
     server.close();

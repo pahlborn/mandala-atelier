@@ -48,6 +48,13 @@ Die Seite gehört zu keiner der beiden Apps und ist bewusst nüchtern: keine
 Beschreibung einer Wirkung, keine Empfehlung, keine Reihenfolge – wer dort
 landet, könnte eine Testperson sein.
 
+Ganz unten steht davon abgesetzt ein Abschnitt **Werkstatt**: zwei Aufrufe für
+die zwei Fassungen des Farbauftrags in Blatt (`?griff=zart` und `?griff=jetzt`),
+mit den gemessenen Zahlen und dem, was man dazu wissen muss. Er steht bewusst
+hinter dem Hinweis zur Neutralität und nicht davor – wer nur die Apps ablegen
+will, muss ihn nicht lesen. Der Testlauf `test:nebeneinander` prüft, dass beide
+Aufrufe da sind und dass dahinter wirklich zwei verschiedene Fassungen stehen.
+
 **Die beiden Apps gehen einander vollständig aus dem Weg:** eigene Icons und
 Namen, getrennte Service-Worker-Bereiche und Cache-Namen, getrennte
 Speicher (`mandala-atelier.*` gegen `atelier3-*`, eigene Datenbanken).
