@@ -87,6 +87,7 @@ Dateien unverändert ausliefert.
 
     docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
     docs/architektur.md     Konzept der Anlagen (Stufe 4.0)
+    docs/motive.html        Schautafel: 15 Motivfamilien (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
     .nojekyll               Pages liefert unverändert aus
@@ -101,6 +102,7 @@ Dateien unverändert ausliefert.
     tools/browser.js        Sucht einen vorhandenen Chrome/Chromium
     tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
+    tools/gen-motive.js     Erzeugt docs/motive.html
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     tools/gen-atelier3-icons.js  Icons für „Blatt“
     tools/test-atelier3.js  Testlauf für „Blatt“
