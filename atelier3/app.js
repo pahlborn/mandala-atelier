@@ -78,63 +78,70 @@ const REST_RATE = 1.0;    // wie viele Überstreichen eine Sekunde Stillstand wi
    Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
 const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
 const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
-let   GAMMA_LIGHT = 2.0;    // leichter/schneller Kontakt: vor allem die Höhen
-let   GAMMA_FIRM  = 0.30;   // fester/langsamer Kontakt: greift bis in die Tiefen
-let   GRIP_BASE   = 0.18;   // auch der flüchtigste Kontakt greift ein wenig
-let   PRESS_W     = 0.55;   // wie stark der gemeldete Druck zählt
-let   SLOW_W      = 0.40;   // wie stark die Langsamkeit zählt
+/* Die Griffkurve — und warum die Voreinstellung heute eine andere ist.
 
-/* Die Trennschärfe der leichten Hand — zum Vergleichen über ?griff=…
+   Beim Umstieg auf den Wegauftrag (v1-4) wurden vier Dinge auf einmal
+   geändert. Nur eines war durch einen Befund gedeckt: die **Menge**
+   (Zeit → Weg), die Antwort auf zwei Beobachtungen vom iPad. Die drei
+   anderen kamen mit — GAMMA_LIGHT 3,6 → 2,0, GAMMA_FIRM 0,7 → 0,30, und ein
+   Boden GRIP_BASE 0,18, den es vorher gar nicht gab. Dazu verschoben sich
+   die Gewichte für Druck und Tempo von 0,62 / 0,44 auf 0,55 / 0,40.
 
-   Beim Umstieg auf den Wegauftrag (v1-4) wurden zwei Dinge zugleich geändert:
-   die **Menge** (Zeit → Weg, das war die Antwort auf zwei Befunde vom iPad)
-   und die **Trennschärfe** (GAMMA_LIGHT 3,6 → 2,0, GAMMA_FIRM 0,7 → 0,30,
-   dazu GRIP_BASE aus dem Nichts). Nur das Erste verlangte ein Befund; der
-   Rest kam mit.
+   Das entschied darüber, ob eine leichte Hand nur die Ränder hervorholt oder
+   gleich die Flächen mitnimmt — und damit, ob man ein Blatt **erst zeichnen
+   und danach ausmalen** kann. Gerechnet für einen Finger (ein iPad meldet
+   keinen Druck, also press = 0,5), Grat gegen blanke Fläche:
 
-   Sie entscheidet aber genau darüber, ob eine leichte Hand nur die Ränder
-   hervorholt oder gleich die Flächen mitnimmt — und damit, ob man ein Blatt
-   erst zeichnen und danach ausmalen kann.
+       zeichnend 3,6 / 0,70 / 0,00   gewischt 15,1 : 1   verweilt 4,9 : 1
+       zart      3,4 / 0,30 / 0,07   gewischt  9,5 : 1   verweilt 2,9 : 1
+       mittel    2,8 / 0,30 / 0,10   gewischt  6,0 : 1   verweilt 2,2 : 1
+       flaechig  2,0 / 0,30 / 0,18   gewischt  3,3 : 1   verweilt 1,7 : 1
 
-   Gerechnet für einen Finger (der meldet keinen Druck, also press = 0,5),
-   Grat gegen blanke Fläche:
+   Was `flaechig` mit der flüchtigsten Hand liefert, ist schlechter als das,
+   was `zeichnend` beim Trödeln liefert. Diese Trennschärfe war unter der
+   alten Voreinstellung bei keiner Geschwindigkeit mehr zu erreichen.
 
-       damals 3,6 / 0,70 / 0,00   gewischt 15 : 1   verweilt 4,9 : 1
-       zart   3,4 / 0,30 / 0,07   gewischt 9,5 : 1  verweilt 2,9 : 1
-       mittel 2,8 / 0,30 / 0,10   gewischt 6,0 : 1  verweilt 2,2 : 1
-       jetzt  2,0 / 0,30 / 0,18   gewischt 3,3 : 1  verweilt 1,7 : 1
+   `zeichnend` ist die Griffkurve bis v1-3, vollständig zurückgeholt, und sie
+   ist seit v1-12 wieder die Voreinstellung. Nicht aus Nostalgie, sondern
+   nach dem Handtest am iPad — die einzige Instanz, die hier entscheiden
+   kann. Der Satz dazu lautete: „Blatt damals schenkt einem die beste
+   Malfreude."
 
-   „damals“ ist die Griffkurve bis v1-3, vollständig — mitsamt der beiden
-   Gewichte, die sich damals ebenfalls unterschieden (0,62 / 0,44 statt
-   0,55 / 0,40). Es ist die Fassung, von der ein Bildschirmfoto vorliegt, auf
-   dem das ganze Mandala als Zeichnung dasteht und die Felder weiß geblieben
-   sind — und in die danach sauber hineingemalt wurde. Genau das, was heute
-   nicht mehr geht.
+   Die alten Namen `damals` und `jetzt` bleiben als Verweise gültig, damit
+   Adressen aus der Vergleichsphase nicht ins Leere laufen.
 
-   Der Wegauftrag bleibt in allen vieren unangetastet. Es geht allein um die
-   Griffkurve, damit sich in der Hand vergleichen lässt, was hier nur
-   ausgerechnet ist. Ohne Angabe bleibt alles, wie es ist — die Oberfläche
-   zeigt davon nichts. */
+   Der Wegauftrag bleibt in allen vieren unangetastet — es geht allein um die
+   Griffkurve. Die Oberfläche zeigt davon nichts. */
 const GRIPS = {
-  damals: { light: 3.6, firm: 0.70, base: 0.00, pressW: 0.62, slowW: 0.44 },
-  zart:   { light: 3.4, firm: 0.30, base: 0.07, pressW: 0.55, slowW: 0.40 },
-  mittel: { light: 2.8, firm: 0.30, base: 0.10, pressW: 0.55, slowW: 0.40 },
-  jetzt:  { light: 2.0, firm: 0.30, base: 0.18, pressW: 0.55, slowW: 0.40 }
+  zeichnend: { light: 3.6, firm: 0.70, base: 0.00, pressW: 0.62, slowW: 0.44 },
+  zart:      { light: 3.4, firm: 0.30, base: 0.07, pressW: 0.55, slowW: 0.40 },
+  mittel:    { light: 2.8, firm: 0.30, base: 0.10, pressW: 0.55, slowW: 0.40 },
+  flaechig:  { light: 2.0, firm: 0.30, base: 0.18, pressW: 0.55, slowW: 0.40 }
 };
 
+/* Aus der Vergleichsphase. `damals` ist heute die Voreinstellung, und
+   `jetzt` ist es nicht mehr — die Namen wären jetzt beide gelogen. */
+const GRIP_ALIAS = { damals: 'zeichnend', jetzt: 'flaechig' };
+
+const GRIFF_VOREINSTELLUNG = 'zeichnend';
+
+let GAMMA_LIGHT, GAMMA_FIRM, GRIP_BASE, PRESS_W, SLOW_W;
+
 function setGrip(g) {
-  GAMMA_LIGHT = g.light;
-  GAMMA_FIRM  = g.firm;
-  GRIP_BASE   = g.base;
-  PRESS_W     = g.pressW;
-  SLOW_W      = g.slowW;
+  GAMMA_LIGHT = g.light;   // leichter/schneller Kontakt: vor allem die Höhen
+  GAMMA_FIRM  = g.firm;    // fester/langsamer Kontakt: greift in die Tiefen
+  GRIP_BASE   = g.base;    // was auch der flüchtigste Kontakt schon greift
+  PRESS_W     = g.pressW;  // wie stark der gemeldete Druck zählt
+  SLOW_W      = g.slowW;   // wie stark die Langsamkeit zählt
 }
+setGrip(GRIPS[GRIFF_VOREINSTELLUNG]);
 
 function applyGrip() {
   const raw = new URLSearchParams(location.search).get('griff');
-  const name = raw && raw.toLowerCase();
+  const roh = raw && raw.toLowerCase();
+  const name = (roh && GRIP_ALIAS[roh]) || roh;
   const g = name && GRIPS[name];
-  if (!g) return 'jetzt';
+  if (!g) { setGrip(GRIPS[GRIFF_VOREINSTELLUNG]); return GRIFF_VOREINSTELLUNG; }
   setGrip(g);
   return name;
 }
@@ -3636,9 +3643,10 @@ window.Blatt = {
              pressW: PRESS_W, slowW: SLOW_W };
   },
   setGriff: function (id) {
-    const g = GRIPS[id]; if (!g) return false;
+    const g = GRIPS[GRIP_ALIAS[id] || id]; if (!g) return false;
     setGrip(g); return true;
   },
+  GRIFF_VOREINSTELLUNG: GRIFF_VOREINSTELLUNG,
   WORLDS: WORLDS,
   makeSheet: function (seed, mode, world) {
     makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();

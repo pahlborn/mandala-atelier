@@ -254,7 +254,7 @@ async function run() {
           !!seite.atelier && !!seite.blatt);
     prüfe('sie führt zu allen vier Fassungen des Auftrags',
           seite.proben.length === 4 &&
-          ['damals', 'zart', 'mittel', 'jetzt'].every(function (n) {
+          ['zeichnend', 'zart', 'mittel', 'flaechig'].every(function (n) {
             return seite.proben.some(function (h) { return h.indexOf('griff=' + n) !== -1; });
           }),
           seite.proben.join(' · '));
@@ -275,7 +275,7 @@ async function run() {
       await page.goto(server.url + '/' + href.replace(/^\.\//, ''));
       await page.waitForFunction('window.Blatt');
       const g = await page.evaluate(function () { return window.Blatt.griff(); });
-      const name = (href.match(/griff=(\w+)/) || [])[1] || 'jetzt';
+      const name = (href.match(/griff=(\w+)/) || [])[1] || 'zeichnend';
       fassungen[name] = g;
     }
     /* Die Werkstattseite gehört keinem Release an: Wer sie ändert, erhöht
@@ -296,7 +296,7 @@ async function run() {
        trennt die leichte Hand. Ein Anhängsel, das niemand liest, wäre
        schlimmer als keines – es sähe nach einem Vergleich aus, ohne einer
        zu sein. */
-    const reihe = ['damals', 'zart', 'mittel', 'jetzt'];
+    const reihe = ['zeichnend', 'zart', 'mittel', 'flaechig'];
     const alleDa = reihe.every(function (n) { return fassungen[n]; });
     let geordnet = alleDa;
     for (let i = 1; alleDa && i < reihe.length; i++) {

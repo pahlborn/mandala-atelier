@@ -739,40 +739,52 @@ async function run() {
     };
     const vor = B.griff();
     const werte = {};
-    ['jetzt', 'mittel', 'zart', 'damals'].forEach(function (id) { werte[id] = messe(id); });
-    B.setGriff('jetzt');
-    return { vor: vor, werte: werte, namen: Object.keys(B.GRIPS) };
+    ['flaechig', 'mittel', 'zart', 'zeichnend'].forEach(function (id) { werte[id] = messe(id); });
+    B.setGriff(B.GRIFF_VOREINSTELLUNG);
+    const prüfeAlias = function (alt, neu) {
+      B.setGriff(alt);
+      const a = B.griff();
+      B.setGriff(neu);
+      const b = B.griff();
+      return a.light === b.light && a.firm === b.firm && a.base === b.base;
+    };
+    const alias = prüfeAlias('damals', 'zeichnend') && prüfeAlias('jetzt', 'flaechig');
+    return { vor: vor, werte: werte, namen: Object.keys(B.GRIPS), alias: alias };
   });
 
-  ['jetzt', 'mittel', 'zart', 'damals'].forEach(function (id) {
+  ['flaechig', 'mittel', 'zart', 'zeichnend'].forEach(function (id) {
     const w = trenn.werte[id];
     console.log('  ' + pad(id, 24) + pad('Linie ' + w.linie.toFixed(3), 14) +
                 pad('Fläche ' + w.flaeche.toFixed(3), 16) +
                 (w.linie / w.flaeche).toFixed(1) + ':1');
   });
-  prüfe('ohne Angabe bleibt alles, wie es ist',
-        trenn.vor.light === 2.0 && trenn.vor.firm === 0.30 &&
-        trenn.vor.base === 0.18 && trenn.vor.pressW === 0.55 && trenn.vor.slowW === 0.40,
+  /* Die Voreinstellung ist seit v1-12 die zeichnende Kurve — die von bis
+     v1-3, nach dem Handtest am iPad zurückgeholt. Wer sie wieder verstellt,
+     verstellt genau das, was ein Blatt erst zeichenbar und danach ausmalbar
+     macht; deshalb steht sie hier Wert für Wert. */
+  prüfe('ohne Angabe kommt die zeichnende Kurve',
+        trenn.vor.light === 3.6 && trenn.vor.firm === 0.70 &&
+        trenn.vor.base === 0.00 && trenn.vor.pressW === 0.62 && trenn.vor.slowW === 0.44,
         'GAMMA_LIGHT ' + trenn.vor.light + ', GAMMA_FIRM ' + trenn.vor.firm +
         ', GRIP_BASE ' + trenn.vor.base);
 
-  /* „damals“ ist die Griffkurve bis v1-3, vollständig – und sie muss die
-     schärfste von allen sein. Sie ist der Grund für diesen ganzen Vergleich:
-     Von ihr gibt es ein Bildschirmfoto, auf dem das ganze Mandala als
-     Zeichnung dasteht und die Felder weiß geblieben sind. */
-  const vDamals = trenn.werte.damals.linie / trenn.werte.damals.flaeche;
-  const vZart2  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
-  prüfe('damals trennt am schärfsten', vDamals > vZart2,
-        vDamals.toFixed(1) + ':1 gegen zart ' + vZart2.toFixed(1) + ':1');
-  const vJetzt = trenn.werte.jetzt.linie / trenn.werte.jetzt.flaeche;
+  const vZeich = trenn.werte.zeichnend.linie / trenn.werte.zeichnend.flaeche;
+  const vZart2 = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
+  prüfe('die Voreinstellung trennt am schärfsten', vZeich > vZart2,
+        vZeich.toFixed(1) + ':1 gegen zart ' + vZart2.toFixed(1) + ':1');
+
+  /* Die Adressen aus der Vergleichsphase dürfen nicht ins Leere laufen. */
+  prüfe('die alten Namen bleiben gültig', trenn.alias,
+        'damals → zeichnend, jetzt → flaechig');
+  const vFlach = trenn.werte.flaechig.linie / trenn.werte.flaechig.flaeche;
   const vZart  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
-  prüfe('zart hält die Fläche zurück', vZart > vJetzt * 2.5,
-        vZart.toFixed(1) + ':1 gegen ' + vJetzt.toFixed(1) + ':1');
+  prüfe('flaechig nimmt die Fläche gleich mit', vZart > vFlach * 2.5,
+        'zart ' + vZart.toFixed(1) + ':1 gegen flaechig ' + vFlach.toFixed(1) + ':1');
   prüfe('die Linie kommt trotzdem gleich schnell',
-        Math.abs(trenn.werte.zart.linie - trenn.werte.jetzt.linie) <
-        trenn.werte.jetzt.linie * 0.12,
+        Math.abs(trenn.werte.zart.linie - trenn.werte.flaechig.linie) <
+        trenn.werte.flaechig.linie * 0.12,
         trenn.werte.zart.linie.toFixed(3) + ' gegen ' +
-        trenn.werte.jetzt.linie.toFixed(3));
+        trenn.werte.flaechig.linie.toFixed(3));
   prüfe('vier Griffe stehen zur Wahl', trenn.namen.length === 4,
         trenn.namen.join(' · '));
 

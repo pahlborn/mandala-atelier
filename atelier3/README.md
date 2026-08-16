@@ -178,10 +178,10 @@ das vergleichen, ohne dass die Oberfläche etwas davon zeigt:
 
 | `?griff=` | Werte | Linie | Fläche | Verhältnis |
 |---|---|---|---|---|
-| `damals` | 3,6 / 0,70 / 0,00 | 0,428 | 0,019 | **23,0 : 1** |
+| *ohne Angabe* (`zeichnend`) | 3,6 / 0,70 / 0,00 | 0,428 | 0,019 | **23,0 : 1** |
 | `zart` | 3,4 / 0,30 / 0,07 | 0,431 | 0,023 | 18,5 : 1 |
 | `mittel` | 2,8 / 0,30 / 0,10 | 0,438 | 0,043 | 10,2 : 1 |
-| *ohne Angabe* (`jetzt`) | 2,0 / 0,30 / 0,18 | 0,448 | 0,092 | 4,8 : 1 |
+| `flaechig` | 2,0 / 0,30 / 0,18 | 0,448 | 0,092 | 4,8 : 1 |
 
 Gemessen mit echtem Reiben, leichte zügige Hand über ein ganzes Blatt. Die
 Zahlen zeigen das Entscheidende: **Die Linie kommt in allen vier Fassungen
@@ -189,13 +189,20 @@ gleich schnell** — nur die Fläche hält sich zurück. Der Wegauftrag bleibt i
 allen unangetastet; es geht allein um die Griffkurve. Ohne Angabe bleibt
 alles, wie es ist.
 
-`damals` ist die Griffkurve bis `v1-3`, vollständig — mitsamt `GAMMA_FIRM`
-0,7 und den Gewichten 0,62 / 0,44, die damals ebenfalls andere waren. Sie
-steht hier nicht aus Nostalgie: Von ihr gibt es ein Bildschirmfoto, auf dem
-ein ganzes Mandala als **Zeichnung** dasteht — jeder Ring, jede Speiche, der
-Perlenkranz, die Rosette in der Mitte — und die Felder weiß geblieben sind,
-mit sauber hineingemalten Blättern in Rosa, Grün und Gelb. Genau das, was
-unter `jetzt` nicht mehr gelingt.
+**`zeichnend` ist seit `v1-12` die Voreinstellung** — die Griffkurve bis
+`v1-3`, vollständig zurückgeholt, mitsamt `GAMMA_FIRM` 0,7 und den Gewichten
+0,62 / 0,44, die damals ebenfalls andere waren.
+
+Nicht aus Nostalgie. Von ihr gab es ein Bildschirmfoto, auf dem ein ganzes
+Mandala als **Zeichnung** dasteht — jeder Ring, jede Speiche, der Perlenkranz,
+die Rosette in der Mitte — und die Felder weiß geblieben sind, mit sauber
+hineingemalten Blättern in Rosa, Grün und Gelb. Danach der Handtest am iPad,
+die einzige Instanz, die das entscheiden kann. Das Urteil lautete: *„Blatt
+damals schenkt einem die beste Malfreude."*
+
+Die Namen aus der Vergleichsphase, `?griff=damals` und `?griff=jetzt`, bleiben
+als Verweise gültig — sie führen auf `zeichnend` bzw. `flaechig`. Als Namen
+wären sie heute beide gelogen.
 
 Für einen Finger gerechnet (ein iPad meldet keinen Druck, gemessen mit
 [`docs/druck.html`](../docs/druck.html) — Geschwindigkeit ist der einzige
@@ -203,15 +210,16 @@ Hebel) sieht die Spreizung so aus:
 
 | `?griff=` | gewischt | verweilt | Spielraum |
 |---|---|---|---|
-| `damals` | 15,1 : 1 | 4,9 : 1 | 3,1-fach |
+| `zeichnend` | 15,1 : 1 | 4,9 : 1 | 3,1-fach |
 | `zart` | 9,5 : 1 | 2,9 : 1 | 3,3-fach |
 | `mittel` | 6,0 : 1 | 2,2 : 1 | 2,7-fach |
-| `jetzt` | 3,3 : 1 | 1,7 : 1 | 1,9-fach |
+| `flaechig` | 3,3 : 1 | 1,7 : 1 | 1,9-fach |
 
-Der schärfste Satz dazu: **Was `jetzt` mit der flüchtigsten Hand liefert
-(3,3 : 1), ist schlechter als das, was `damals` beim Trödeln lieferte
-(4,9 : 1).** Diese Trennschärfe ist unter `jetzt` bei keiner Geschwindigkeit
-mehr zu erreichen.
+Der schärfste Satz dazu: **Was `flaechig` mit der flüchtigsten Hand liefert
+(3,3 : 1), ist schlechter als das, was `zeichnend` beim Trödeln liefert
+(4,9 : 1).** Diese Trennschärfe war unter der alten Voreinstellung bei keiner
+Geschwindigkeit mehr zu erreichen — und sie ist der Grund, warum ein Blatt
+sich zwölf Fassungen lang nicht mehr erst zeichnen und dann ausmalen ließ.
 
 **Der Abstand der Höhenstufen ist die eigentliche Gestaltungsentscheidung.**
 `OUTER 0.16 < BASE 0.38 < Plateaus 0.52…0.70 < Linien 1.0`. Zu weit
