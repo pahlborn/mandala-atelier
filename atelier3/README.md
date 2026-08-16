@@ -269,8 +269,13 @@ was passiert, wenn man dort ist.
 
 ## Die Farbwelten
 
-Die vier Farbwelten des Mandala Ateliers, unverändert übernommen –
-**Erdpigmente, Nordlicht, Färbergarten, Rauchglas**. Ihre Stimmung ist das
+Die Farbwelten des Mandala Ateliers, unverändert übernommen – **Erdpigmente,
+Nordlicht, Färbergarten, Rauchglas** und **Goldgrund**. Goldgrund ist als
+einzige keine Sammlung von Tönen, sondern Leitern: vier Stufen Gold, drei Blau,
+dazu Purpur und der dunkle Grund. Sie entstand im Atelier für eine
+Kassettenkuppel, hat hier aber womöglich noch mehr Sinn – in Blatt entsteht ein
+Verlauf ohnehin unter der Hand, und wer Stufe für Stufe heller wählt, bekommt
+ihn zweimal. Ihre Stimmung ist das
 eigentliche Kapital. Neun je Welt statt vierzehn: Der Griff soll aus dem
 Handgelenk kommen, nicht aus einer Abwägung.
 

@@ -250,6 +250,32 @@ const WORLDS = [
       { name: 'Zinn',       hex: '#575c60' },
       { name: 'Basalt',     hex: '#3b3b3d' }
     ]
+  },
+
+  /* Goldgrund – als einzige Welt keine Sammlung von Tönen, sondern Leitern.
+
+     Sie kam aus dem Atelier herüber, wo sie für eine Kassettenkuppel
+     entstand: Was ein Gewölbe prächtig macht, ist nicht Sättigung, sondern
+     das Licht, das über die Wölbung läuft. Hier hat das noch mehr Sinn als
+     dort – in Blatt entsteht ein Verlauf ohnehin unter der Hand, und wer
+     Stufe für Stufe heller wählt, bekommt ihn zweimal.
+
+     Neun statt vierzehn, wie bei allen Welten hier: vier Stufen Gold, drei
+     Blau, dazu Purpur und der dunkle Grund. Der Griff soll aus dem
+     Handgelenk kommen, nicht aus einer Abwägung. */
+  {
+    id: 'gold', name: 'Goldgrund',
+    colors: [
+      { name: 'Bronze',    hex: '#463619' },
+      { name: 'Ocker',     hex: '#9b7c38' },
+      { name: 'Gold',      hex: '#c5a662' },
+      { name: 'Lichtgold', hex: '#e6d5a6' },
+      { name: 'Nachtblau', hex: '#1d2740' },
+      { name: 'Indigo',    hex: '#354670' },
+      { name: 'Himmel',    hex: '#93aac9' },
+      { name: 'Purpur',    hex: '#803c41' },
+      { name: 'Grund',     hex: '#26231d' }
+    ]
   }
 ];
 

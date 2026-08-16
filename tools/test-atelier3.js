@@ -631,7 +631,7 @@ async function run() {
     };
   });
   prüfe('die Lade zeigt Stimmung, Pigmente und Blätter',
-        ladeAuf.offen && ladeAuf.kategorien === 5 && ladeAuf.welten === 4 && ladeAuf.blaetter === 6,
+        ladeAuf.offen && ladeAuf.kategorien === 5 && ladeAuf.welten === 5 && ladeAuf.blaetter === 6,
         ladeAuf.kategorien + ' Stimmungen, ' + ladeAuf.welten + ' Welten, ' + ladeAuf.blaetter + ' Blätter');
   const fertig = ladeAuf.kontraste.filter(function (c) { return c > 25; }).length;
   prüfe('die Ausschnitte zeigen wirklich etwas',
