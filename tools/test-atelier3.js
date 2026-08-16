@@ -413,11 +413,24 @@ async function run() {
     let heller = 0;
     for (let i = 0; i < tagHell.length; i++) if (nachtHell[i] > tagHell[i]) heller++;
 
+    /* Worauf es wirklich ankommt: Jedes Pigment muss sich vom dunklen
+       Papier abheben. „Heller als am Tag“ ist nur der Regelfall – die
+       ohnehin fast weißen nimmt asChalk sogar etwas zurück, und das ist
+       richtig so, sonst blendeten sie. */
+    const nachtPapier = (39 + 36 + 32) / 3;   // SHEETS.nacht.paper
+    let blass = 0;
+    for (let i = 0; i < nachtHell.length; i++) {
+      if (nachtHell[i] < nachtPapier + 40) blass++;
+    }
+
     return {
       anzahl: Object.keys(gesehen).length,
       verteilung: gesehen,
       gleich: tag === nacht,
       heller: heller,
+      blass: blass,
+      papier: nachtPapier,
+      pigmente: tagHell.length,
       welt: welt,
       stabil: welt === nochmal,
       alle: B.WORLDS.length
@@ -428,8 +441,13 @@ async function run() {
   prüfe('die Welt hängt am Blatt, nicht am Zufall', welten.stabil,
         'Seed 4242 → ' + welten.welt);
   prüfe('Tag und Nacht sind dieselbe Welt', welten.gleich);
-  prüfe('bei Nacht wird daraus Kreide', welten.heller === 9,
-        welten.heller + ' von 9 Pigmenten heller');
+  /* Kein Pigment darf bei Nacht dunkler werden – sonst verschwände es auf
+     dem dunklen Papier. Dass ein paar der ohnehin fast weißen stehen
+     bleiben, ist kein Mangel: Sie sind schon Kreide. */
+  prüfe('bei Nacht hebt sich jedes Pigment vom Papier ab',
+        welten.blass === 0,
+        welten.heller + ' von ' + welten.pigmente + ' heller als am Tag, ' +
+        'keines blasser als Papier + 40');
 
   /* ---- Die Blattlade ---------------------------------------------------- */
   console.log('\nDie Blattlade');
@@ -916,7 +934,7 @@ async function run() {
       speichern: /speichern|sichern/.test(text)
     };
   });
-  prüfe('neun Pigmente', bedienung.pigmente === 9, bedienung.pigmente + ' Stück');
+  prüfe('vierzehn Pigmente', bedienung.pigmente === 14, bedienung.pigmente + ' Stück');
   prüfe('kein Rückgängig, kein Radierer', !bedienung.zurück);
   prüfe('keine Prozentanzeige', !bedienung.zahl);
   prüfe('kein Speichern-Knopf', !bedienung.speichern);

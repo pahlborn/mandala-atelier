@@ -200,81 +200,116 @@ const WORLDS = [
     colors: [
       { name: 'Terrakotta', hex: '#b5654a' },
       { name: 'Ocker',      hex: '#c89b3c' },
-      { name: 'Olive',      hex: '#6e7233' },
-      { name: 'Moos',       hex: '#3f5b3a' },
       { name: 'Petrol',     hex: '#2e6b6b' },
       { name: 'Indigo',     hex: '#3b4b7c' },
+      { name: 'Moos',       hex: '#3f5b3a' },
+      { name: 'Mohn',       hex: '#a8342f' },
+      { name: 'Nebelblau',  hex: '#7c93a8' },
       { name: 'Pflaume',    hex: '#6b3c5b' },
+      { name: 'Olive',      hex: '#6e7233' },
+      { name: 'Sand',       hex: '#d9c4a3' },
       { name: 'Rost',       hex: '#8c4a2f' },
-      { name: 'Anthrazit',  hex: '#333a3f' }
+      { name: 'Salbei',     hex: '#7c8c6b' },
+      { name: 'Anthrazit',  hex: '#333a3f' },
+      { name: 'Elfenbein',  hex: '#efe7d8' }
     ]
   },
   {
     id: 'nord', name: 'Nordlicht',
     colors: [
-      { name: 'Eisblau',    hex: '#6f9fb5' },
-      { name: 'Fjord',      hex: '#4a7a78' },
-      { name: 'Tanne',      hex: '#2f4a3c' },
-      { name: 'Flechte',    hex: '#8aa38c' },
-      { name: 'Amethyst',   hex: '#5b5580' },
-      { name: 'Heidekraut', hex: '#8d7fa0' },
-      { name: 'Beere',      hex: '#7a3f52' },
-      { name: 'Tiefsee',    hex: '#1f4a5c' },
-      { name: 'Polarnacht', hex: '#23304a' }
+      { name: 'Eisblau',     hex: '#6f9fb5' },
+      { name: 'Tanne',       hex: '#2f4a3c' },
+      { name: 'Amethyst',    hex: '#5b5580' },
+      { name: 'Tiefsee',     hex: '#1f4a5c' },
+      { name: 'Flechte',     hex: '#8aa38c' },
+      { name: 'Beere',       hex: '#7a3f52' },
+      { name: 'Gletscher',   hex: '#a9c6cd' },
+      { name: 'Fjord',       hex: '#4a7a78' },
+      { name: 'Heidekraut',  hex: '#8d7fa0' },
+      { name: 'Stahl',       hex: '#5d6a72' },
+      { name: 'Polarnacht',  hex: '#23304a' },
+      { name: 'Schiefer',    hex: '#3a4249' },
+      { name: 'Raureif',     hex: '#d3e0e2' },
+      { name: 'Möwe',        hex: '#eef1f2' }
     ]
   },
   {
     id: 'faerber', name: 'Färbergarten',
     colors: [
-      { name: 'Krapp',         hex: '#a4423a' },
-      { name: 'Safran',        hex: '#d59b3a' },
-      { name: 'Färberginster', hex: '#9a9d4a' },
-      { name: 'Waid',          hex: '#34527a' },
-      { name: 'Indigo tief',   hex: '#26365e' },
-      { name: 'Cochenille',    hex: '#8e3550' },
-      { name: 'Malve',         hex: '#7d5570' },
-      { name: 'Walnuss',       hex: '#6b4a33' },
-      { name: 'Rinde',         hex: '#4a3527' }
+      { name: 'Krapp',          hex: '#a4423a' },
+      { name: 'Safran',         hex: '#d59b3a' },
+      { name: 'Waid',           hex: '#34527a' },
+      { name: 'Färberginster',  hex: '#9a9d4a' },
+      { name: 'Cochenille',     hex: '#8e3550' },
+      { name: 'Walnuss',        hex: '#6b4a33' },
+      { name: 'Reseda',         hex: '#b9a94a' },
+      { name: 'Malve',          hex: '#7d5570' },
+      { name: 'Indigo tief',    hex: '#26365e' },
+      { name: 'Birke',          hex: '#cfc48a' },
+      { name: 'Katechu',        hex: '#8a6a4a' },
+      { name: 'Rinde',          hex: '#4a3527' },
+      { name: 'Ruß',            hex: '#2e2c2a' },
+      { name: 'Leinen',         hex: '#e6ddc9' }
     ]
   },
   {
     id: 'rauch', name: 'Rauchglas',
     colors: [
-      { name: 'Altrosa',    hex: '#a3807c' },
-      { name: 'Schilf',     hex: '#8b8f7c' },
-      { name: 'Farn',       hex: '#61694f' },
       { name: 'Taubenblau', hex: '#78838c' },
-      { name: 'Mauve',      hex: '#8b7480' },
-      { name: 'Trüffel',    hex: '#6a5b52' },
+      { name: 'Altrosa',    hex: '#a3807c' },
+      { name: 'Farn',       hex: '#61694f' },
       { name: 'Kastanie',   hex: '#55403a' },
+      { name: 'Mauve',      hex: '#8b7480' },
+      { name: 'Schilf',     hex: '#8b8f7c' },
       { name: 'Zinn',       hex: '#575c60' },
-      { name: 'Basalt',     hex: '#3b3b3d' }
+      { name: 'Trüffel',    hex: '#6a5b52' },
+      { name: 'Nebel',      hex: '#b6b2ab' },
+      { name: 'Basalt',     hex: '#3b3b3d' },
+      { name: 'Rauch',      hex: '#6e6a66' },
+      { name: 'Asche',      hex: '#8f8b85' },
+      { name: 'Perle',      hex: '#d7d3cb' },
+      { name: 'Kalk',       hex: '#ece8e0' }
     ]
   },
 
-  /* Goldgrund – als einzige Welt keine Sammlung von Tönen, sondern Leitern.
+  /* Goldgrund – als einzige Welt keine Sammlung von Tönen, sondern **Leitern**.
 
-     Sie kam aus dem Atelier herüber, wo sie für eine Kassettenkuppel
-     entstand: Was ein Gewölbe prächtig macht, ist nicht Sättigung, sondern
-     das Licht, das über die Wölbung läuft. Hier hat das noch mehr Sinn als
-     dort – in Blatt entsteht ein Verlauf ohnehin unter der Hand, und wer
-     Stufe für Stufe heller wählt, bekommt ihn zweimal.
+     Der Anlass war eine Kuppel: Was ein Gewölbe prächtig macht, ist nicht
+     Sättigung, sondern das Licht, das über die Wölbung läuft. Ein flaches
+     Füllwerkzeug kann keinen Verlauf – aber ein Mensch kann Ring für Ring
+     eine Stufe heller wählen, und dann wölbt sich das Bild von selbst.
 
-     Neun statt vierzehn, wie bei allen Welten hier: vier Stufen Gold, drei
-     Blau, dazu Purpur und der dunkle Grund. Der Griff soll aus dem
-     Handgelenk kommen, nicht aus einer Abwägung. */
+     Dafür braucht es Reihen desselben Tons, nicht vierzehn verschiedene.
+     Hier stehen vier: Gold in fünf Stufen, Indigo in vier, Purpur in drei,
+     dazu Grund und Kalk als Extreme. Die Stufen liegen 14 bis 22 L*
+     auseinander – gleichmäßig genug, dass eine Folge als Verlauf liest.
+
+     Gemessen ist sie mit 0,45 mittlerer Buntheit **genauso gedeckt** wie die
+     Erdpigmente (0,44). Sie ist nicht bunter, nur sortiert. Und Gold selbst
+     braucht kein Metall: Ein blasser Ocker auf dunklem Grund liest sich als
+     Gold – so haben Buchmaler es vor dem Blattgold gemacht.
+
+     Ein Nachteil, der dazugehört: Für die Zähl- und Rechenmandalas taugt sie
+     nicht. Deren Legende vergibt die ersten Einträge der Reihe nach, und
+     benachbarte Stufen einer Leiter sind einander zu ähnlich, um sie zu
+     zählen. Dafür sind die anderen vier Welten da. */
   {
     id: 'gold', name: 'Goldgrund',
     colors: [
-      { name: 'Bronze',    hex: '#463619' },
-      { name: 'Ocker',     hex: '#9b7c38' },
-      { name: 'Gold',      hex: '#c5a662' },
-      { name: 'Lichtgold', hex: '#e6d5a6' },
-      { name: 'Nachtblau', hex: '#1d2740' },
-      { name: 'Indigo',    hex: '#354670' },
-      { name: 'Himmel',    hex: '#93aac9' },
-      { name: 'Purpur',    hex: '#803c41' },
-      { name: 'Grund',     hex: '#26231d' }
+      { name: 'Bronze',     hex: '#463619' },
+      { name: 'Messing',    hex: '#6f5626' },
+      { name: 'Ocker',      hex: '#9b7c38' },
+      { name: 'Gold',       hex: '#c5a662' },
+      { name: 'Lichtgold',  hex: '#e6d5a6' },
+      { name: 'Nachtblau',  hex: '#1d2740' },
+      { name: 'Indigo',     hex: '#354670' },
+      { name: 'Kobalt',     hex: '#5c78a6' },
+      { name: 'Himmel',     hex: '#93aac9' },
+      { name: 'Ochsenblut', hex: '#4b2026' },
+      { name: 'Purpur',     hex: '#803c41' },
+      { name: 'Altrosa',    hex: '#b47673' },
+      { name: 'Grund',      hex: '#26231d' },
+      { name: 'Kalk',       hex: '#f1e8d3' }
     ]
   }
 ];
