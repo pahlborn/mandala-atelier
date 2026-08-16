@@ -79,40 +79,64 @@ const REST_RATE = 1.0;    // wie viele Überstreichen eine Sekunde Stillstand wi
 const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
 const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
 let   GAMMA_LIGHT = 2.0;    // leichter/schneller Kontakt: vor allem die Höhen
-const GAMMA_FIRM  = 0.30;   // fester/langsamer Kontakt: greift bis in die Tiefen
+let   GAMMA_FIRM  = 0.30;   // fester/langsamer Kontakt: greift bis in die Tiefen
 let   GRIP_BASE   = 0.18;   // auch der flüchtigste Kontakt greift ein wenig
+let   PRESS_W     = 0.55;   // wie stark der gemeldete Druck zählt
+let   SLOW_W      = 0.40;   // wie stark die Langsamkeit zählt
 
 /* Die Trennschärfe der leichten Hand — zum Vergleichen über ?griff=…
 
    Beim Umstieg auf den Wegauftrag (v1-4) wurden zwei Dinge zugleich geändert:
    die **Menge** (Zeit → Weg, das war die Antwort auf zwei Befunde vom iPad)
-   und die **Trennschärfe** (GAMMA_LIGHT 3,6 → 2,0, dazu GRIP_BASE). Die
-   Trennschärfe verlangte kein Befund; sie kam mit.
+   und die **Trennschärfe** (GAMMA_LIGHT 3,6 → 2,0, GAMMA_FIRM 0,7 → 0,30,
+   dazu GRIP_BASE aus dem Nichts). Nur das Erste verlangte ein Befund; der
+   Rest kam mit.
 
    Sie entscheidet aber genau darüber, ob eine leichte Hand nur die Ränder
    hervorholt oder gleich die Flächen mitnimmt — und damit, ob man ein Blatt
-   erst zeichnen und danach ausmalen kann. Das Verhältnis Grat zu Fläche:
+   erst zeichnen und danach ausmalen kann.
 
-       zart   3,4 / 0,07   rund 22:1   erst die Linien, dann die Fläche
-       mittel 2,8 / 0,10   rund 12:1   dazwischen
-       jetzt  2,0 / 0,18   rund  5:1   die Fläche kommt gleich mit
+   Gerechnet für einen Finger (der meldet keinen Druck, also press = 0,5),
+   Grat gegen blanke Fläche:
 
-   Der Wegauftrag bleibt in allen dreien unangetastet, GAMMA_FIRM auch: Die
-   feste, langsame Hand füllt überall gleich gut. Ohne Angabe bleibt alles,
-   wie es ist — die Oberfläche zeigt davon nichts. */
+       damals 3,6 / 0,70 / 0,00   gewischt 15 : 1   verweilt 4,9 : 1
+       zart   3,4 / 0,30 / 0,07   gewischt 9,5 : 1  verweilt 2,9 : 1
+       mittel 2,8 / 0,30 / 0,10   gewischt 6,0 : 1  verweilt 2,2 : 1
+       jetzt  2,0 / 0,30 / 0,18   gewischt 3,3 : 1  verweilt 1,7 : 1
+
+   „damals“ ist die Griffkurve bis v1-3, vollständig — mitsamt der beiden
+   Gewichte, die sich damals ebenfalls unterschieden (0,62 / 0,44 statt
+   0,55 / 0,40). Es ist die Fassung, von der ein Bildschirmfoto vorliegt, auf
+   dem das ganze Mandala als Zeichnung dasteht und die Felder weiß geblieben
+   sind — und in die danach sauber hineingemalt wurde. Genau das, was heute
+   nicht mehr geht.
+
+   Der Wegauftrag bleibt in allen vieren unangetastet. Es geht allein um die
+   Griffkurve, damit sich in der Hand vergleichen lässt, was hier nur
+   ausgerechnet ist. Ohne Angabe bleibt alles, wie es ist — die Oberfläche
+   zeigt davon nichts. */
 const GRIPS = {
-  zart:   { light: 3.4, base: 0.07 },
-  mittel: { light: 2.8, base: 0.10 },
-  jetzt:  { light: 2.0, base: 0.18 }
+  damals: { light: 3.6, firm: 0.70, base: 0.00, pressW: 0.62, slowW: 0.44 },
+  zart:   { light: 3.4, firm: 0.30, base: 0.07, pressW: 0.55, slowW: 0.40 },
+  mittel: { light: 2.8, firm: 0.30, base: 0.10, pressW: 0.55, slowW: 0.40 },
+  jetzt:  { light: 2.0, firm: 0.30, base: 0.18, pressW: 0.55, slowW: 0.40 }
 };
+
+function setGrip(g) {
+  GAMMA_LIGHT = g.light;
+  GAMMA_FIRM  = g.firm;
+  GRIP_BASE   = g.base;
+  PRESS_W     = g.pressW;
+  SLOW_W      = g.slowW;
+}
 
 function applyGrip() {
   const raw = new URLSearchParams(location.search).get('griff');
-  const g = raw && GRIPS[raw.toLowerCase()];
+  const name = raw && raw.toLowerCase();
+  const g = name && GRIPS[name];
   if (!g) return 'jetzt';
-  GAMMA_LIGHT = g.light;
-  GRIP_BASE   = g.base;
-  return raw.toLowerCase();
+  setGrip(g);
+  return name;
 }
 const MIX_SUB     = 0.5;    // wie subtraktiv Pigment über Pigment mischt
 /* Ein Finger ist keine Kuppe, sondern eine Fläche mit weichem Rand: innen
@@ -2501,7 +2525,7 @@ function applyHand(dt) {
      Langsamkeit den größeren Teil: wer verweilt, greift in die Fläche,
      wer wischt, streift nur die Höhen. */
   const slow = 1 - Math.min(1, speed / 1.1);
-  setBite(Math.min(1, GRIP_BASE + hand.press * 0.55 + slow * 0.40));
+  setBite(Math.min(1, GRIP_BASE + hand.press * PRESS_W + slow * SLOW_W));
 
   if (len < 0.4) {
     /* Die Hand steht. Sie trägt noch ein wenig nach, aber wenig: eine ganze
@@ -3607,10 +3631,13 @@ window.Blatt = {
   nextThought: nextThought,
   buildPlan: buildPlan, fieldAt: fieldAt,
   GRIPS: GRIPS,
-  griff: function () { return { light: GAMMA_LIGHT, base: GRIP_BASE }; },
+  griff: function () {
+    return { light: GAMMA_LIGHT, firm: GAMMA_FIRM, base: GRIP_BASE,
+             pressW: PRESS_W, slowW: SLOW_W };
+  },
   setGriff: function (id) {
     const g = GRIPS[id]; if (!g) return false;
-    GAMMA_LIGHT = g.light; GRIP_BASE = g.base; return true;
+    setGrip(g); return true;
   },
   WORLDS: WORLDS,
   makeSheet: function (seed, mode, world) {

@@ -739,20 +739,31 @@ async function run() {
     };
     const vor = B.griff();
     const werte = {};
-    ['jetzt', 'mittel', 'zart'].forEach(function (id) { werte[id] = messe(id); });
+    ['jetzt', 'mittel', 'zart', 'damals'].forEach(function (id) { werte[id] = messe(id); });
     B.setGriff('jetzt');
     return { vor: vor, werte: werte, namen: Object.keys(B.GRIPS) };
   });
 
-  ['jetzt', 'mittel', 'zart'].forEach(function (id) {
+  ['jetzt', 'mittel', 'zart', 'damals'].forEach(function (id) {
     const w = trenn.werte[id];
     console.log('  ' + pad(id, 24) + pad('Linie ' + w.linie.toFixed(3), 14) +
                 pad('Fläche ' + w.flaeche.toFixed(3), 16) +
                 (w.linie / w.flaeche).toFixed(1) + ':1');
   });
   prüfe('ohne Angabe bleibt alles, wie es ist',
-        trenn.vor.light === 2.0 && trenn.vor.base === 0.18,
-        'GAMMA_LIGHT ' + trenn.vor.light + ', GRIP_BASE ' + trenn.vor.base);
+        trenn.vor.light === 2.0 && trenn.vor.firm === 0.30 &&
+        trenn.vor.base === 0.18 && trenn.vor.pressW === 0.55 && trenn.vor.slowW === 0.40,
+        'GAMMA_LIGHT ' + trenn.vor.light + ', GAMMA_FIRM ' + trenn.vor.firm +
+        ', GRIP_BASE ' + trenn.vor.base);
+
+  /* „damals“ ist die Griffkurve bis v1-3, vollständig – und sie muss die
+     schärfste von allen sein. Sie ist der Grund für diesen ganzen Vergleich:
+     Von ihr gibt es ein Bildschirmfoto, auf dem das ganze Mandala als
+     Zeichnung dasteht und die Felder weiß geblieben sind. */
+  const vDamals = trenn.werte.damals.linie / trenn.werte.damals.flaeche;
+  const vZart2  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
+  prüfe('damals trennt am schärfsten', vDamals > vZart2,
+        vDamals.toFixed(1) + ':1 gegen zart ' + vZart2.toFixed(1) + ':1');
   const vJetzt = trenn.werte.jetzt.linie / trenn.werte.jetzt.flaeche;
   const vZart  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
   prüfe('zart hält die Fläche zurück', vZart > vJetzt * 2.5,
@@ -762,6 +773,8 @@ async function run() {
         trenn.werte.jetzt.linie * 0.12,
         trenn.werte.zart.linie.toFixed(3) + ' gegen ' +
         trenn.werte.jetzt.linie.toFixed(3));
+  prüfe('vier Griffe stehen zur Wahl', trenn.namen.length === 4,
+        trenn.namen.join(' · '));
 
   const ladeAuf = await page.evaluate(async function () {
     const B = window.Blatt;

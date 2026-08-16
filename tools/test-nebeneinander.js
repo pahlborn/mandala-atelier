@@ -252,10 +252,11 @@ async function run() {
       : 0;
     prüfe('die Einstiegsseite führt zu beiden Apps',
           !!seite.atelier && !!seite.blatt);
-    prüfe('sie führt zu beiden Fassungen des Auftrags',
-          seite.proben.length === 2 &&
-          seite.proben.some(function (h) { return h.indexOf('griff=zart') !== -1; }) &&
-          seite.proben.some(function (h) { return h.indexOf('griff=jetzt') !== -1; }),
+    prüfe('sie führt zu allen vier Fassungen des Auftrags',
+          seite.proben.length === 4 &&
+          ['damals', 'zart', 'mittel', 'jetzt'].every(function (n) {
+            return seite.proben.some(function (h) { return h.indexOf('griff=' + n) !== -1; });
+          }),
           seite.proben.join(' · '));
     prüfe('sie ragt nicht seitlich heraus', !seite.breiter);
     /* Ohne apple-touch-icon legt iOS ein Bildschirmfoto auf den Homescreen.
@@ -274,7 +275,8 @@ async function run() {
       await page.goto(server.url + '/' + href.replace(/^\.\//, ''));
       await page.waitForFunction('window.Blatt');
       const g = await page.evaluate(function () { return window.Blatt.griff(); });
-      fassungen[href.indexOf('zart') !== -1 ? 'zart' : 'jetzt'] = g;
+      const name = (href.match(/griff=(\w+)/) || [])[1] || 'jetzt';
+      fassungen[name] = g;
     }
     /* Die Werkstattseite gehört keinem Release an: Wer sie ändert, erhöht
        keine Cache-Version. Sie muss deshalb beim nächsten Öffnen neu da
@@ -289,12 +291,23 @@ async function run() {
     prüfe('eine geänderte Werkstattseite kommt sofort an', sofort,
           sofort ? 'erst Netz, dann Vorrat' : 'sie kam aus dem Vorrat');
 
-    prüfe('hinter den Aufrufen stehen zwei Fassungen',
-          fassungen.zart && fassungen.jetzt &&
-          fassungen.zart.light > fassungen.jetzt.light &&
-          fassungen.zart.base < fassungen.jetzt.base,
-          'zart ' + fassungen.zart.light + '/' + fassungen.zart.base +
-          ', jetzt ' + fassungen.jetzt.light + '/' + fassungen.jetzt.base);
+    /* Jeder Aufruf muss wirklich eine eigene Fassung liefern, und sie müssen
+       in der richtigen Reihenfolge stehen: Je weiter vorn, desto schärfer
+       trennt die leichte Hand. Ein Anhängsel, das niemand liest, wäre
+       schlimmer als keines – es sähe nach einem Vergleich aus, ohne einer
+       zu sein. */
+    const reihe = ['damals', 'zart', 'mittel', 'jetzt'];
+    const alleDa = reihe.every(function (n) { return fassungen[n]; });
+    let geordnet = alleDa;
+    for (let i = 1; alleDa && i < reihe.length; i++) {
+      const a = fassungen[reihe[i - 1]], b = fassungen[reihe[i]];
+      if (!(a.light > b.light && a.base < b.base)) geordnet = false;
+    }
+    prüfe('hinter jedem Aufruf steht eine eigene Fassung', geordnet,
+          reihe.map(function (n) {
+            return fassungen[n] ? n + ' ' + fassungen[n].light + '/' +
+                   fassungen[n].base : n + ' fehlt';
+          }).join(', '));
 
   } finally {
     await browser.close();
