@@ -186,8 +186,28 @@ es zulässt, wird echtes Vollbild angefordert. Safari auf dem iPad kennt die
 Vollbild-Schnittstelle nicht überall – dann bleibt es beim ruhigen Modus, und
 der bringt schon fast den ganzen Gewinn.
 
-**Farbwelten.** Fünf Sätze zu je 14 gedeckten Pigmenten: Erdpigmente,
-Nordlicht, Färbergarten, Rauchglas und eine selbst gemischte. Die eigene
+**Farbwelten.** Sechs Sätze zu je 14 gedeckten Pigmenten: Erdpigmente,
+Nordlicht, Färbergarten, Rauchglas, **Goldgrund** und eine selbst gemischte.
+
+**Goldgrund** ist als einzige keine Sammlung von Tönen, sondern **Leitern**:
+Gold in fünf Stufen, Indigo in vier, Purpur in drei, dazu Grund und Kalk als
+Extreme. Der Anlass war eine Kuppel. Was ein Gewölbe prächtig macht, ist nicht
+Sättigung, sondern das Licht, das über die Wölbung läuft — und ein flaches
+Füllwerkzeug kann keinen Verlauf. Ein Mensch aber kann Ring für Ring eine Stufe
+heller wählen, und dann wölbt sich das Bild von selbst. Dafür braucht es Reihen
+desselben Tons.
+
+Gemessen ist sie mit 0,45 mittlerer Buntheit **genauso gedeckt** wie die
+Erdpigmente (0,44); die Stufen liegen 14 bis 22 L\* auseinander, die Spanne
+reicht von L\* 14 bis 92 (mehr als 81 ist zwischen Linie und Papier überhaupt
+nicht zu holen). Sie ist nicht bunter, nur sortiert. Gold selbst braucht dabei
+kein Metall: Ein blasser Ocker auf dunklem Grund liest sich als Gold — so haben
+Buchmaler es vor dem Blattgold gemacht.
+
+Ein Nachteil gehört dazu: Für die **Zähl- und Rechenmandalas taugt Goldgrund
+nicht.** Deren Legende vergibt die ersten Einträge der Reihe nach, und
+benachbarte Stufen einer Leiter sind einander zu ähnlich, um sie zu zählen.
+Dafür sind die anderen vier Welten da. Die eigene
 Farbwelt gehört dem Haushalt, nicht einer Person – sie ist Material wie der
 Motivkatalog. Die Reihenfolge innerhalb eines Satzes ist
 nicht beliebig – die Farblegende der Zählmandalas vergibt die ersten Einträge

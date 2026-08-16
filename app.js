@@ -129,10 +129,51 @@ const PALETTES = [
       { name: 'Perle',      hex: '#d7d3cb' },
       { name: 'Kalk',       hex: '#ece8e0' }
     ]
+  },
+
+  /* Goldgrund – als einzige Welt keine Sammlung von Tönen, sondern **Leitern**.
+
+     Der Anlass war eine Kuppel: Was ein Gewölbe prächtig macht, ist nicht
+     Sättigung, sondern das Licht, das über die Wölbung läuft. Ein flaches
+     Füllwerkzeug kann keinen Verlauf – aber ein Mensch kann Ring für Ring
+     eine Stufe heller wählen, und dann wölbt sich das Bild von selbst.
+
+     Dafür braucht es Reihen desselben Tons, nicht vierzehn verschiedene.
+     Hier stehen vier: Gold in fünf Stufen, Indigo in vier, Purpur in drei,
+     dazu Grund und Kalk als Extreme. Die Stufen liegen 14 bis 22 L*
+     auseinander – gleichmäßig genug, dass eine Folge als Verlauf liest.
+
+     Gemessen ist sie mit 0,45 mittlerer Buntheit **genauso gedeckt** wie die
+     Erdpigmente (0,44). Sie ist nicht bunter, nur sortiert. Und Gold selbst
+     braucht kein Metall: Ein blasser Ocker auf dunklem Grund liest sich als
+     Gold – so haben Buchmaler es vor dem Blattgold gemacht.
+
+     Ein Nachteil, der dazugehört: Für die Zähl- und Rechenmandalas taugt sie
+     nicht. Deren Legende vergibt die ersten Einträge der Reihe nach, und
+     benachbarte Stufen einer Leiter sind einander zu ähnlich, um sie zu
+     zählen. Dafür sind die anderen vier Welten da. */
+  {
+    id: 'gold', name: 'Goldgrund',
+    colors: [
+      { name: 'Bronze',     hex: '#463619' },
+      { name: 'Messing',    hex: '#6f5626' },
+      { name: 'Ocker',      hex: '#9b7c38' },
+      { name: 'Gold',       hex: '#c5a662' },
+      { name: 'Lichtgold',  hex: '#e6d5a6' },
+      { name: 'Nachtblau',  hex: '#1d2740' },
+      { name: 'Indigo',     hex: '#354670' },
+      { name: 'Kobalt',     hex: '#5c78a6' },
+      { name: 'Himmel',     hex: '#93aac9' },
+      { name: 'Ochsenblut', hex: '#4b2026' },
+      { name: 'Purpur',     hex: '#803c41' },
+      { name: 'Altrosa',    hex: '#b47673' },
+      { name: 'Grund',      hex: '#26231d' },
+      { name: 'Kalk',       hex: '#f1e8d3' }
+    ]
   }
 ];
 
-/* Die fünfte Farbwelt gehört dem Haushalt und wird selbst gemischt.
+/* Die sechste Farbwelt gehört dem Haushalt und wird selbst gemischt.
    Sie ist Material wie der Motivkatalog – deshalb gilt sie für alle
    Personen, nicht nur für eine. */
 const OWN_DEFAULT = PALETTES[0].colors.map(function (c) {
