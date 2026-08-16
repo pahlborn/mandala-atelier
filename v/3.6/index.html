@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Blatt</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Ein Blatt. Streiche darüber, und ein Mandala kommt hervor. Offline, ohne Konto, ohne Werbung.">
+<meta name="theme-color" content="#e6dfd1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111013" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Blatt">
+<link rel="apple-touch-icon" href="../../atelier3/icon-180.png">
+<link rel="icon" href="../../atelier3/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="position:fixed;left:0;right:0;top:0;z-index:9999;padding:3px 10px;font:11px/1.4 system-ui,sans-serif;text-align:center;color:#5b5245;background:rgba(226,214,190,.94);padding-top:calc(3px + env(safe-area-inset-top))">Blatt 3.6 &middot; Fassung aus dem Regal, nur zum Vergleichen &middot; <a href="../../beide.html" style="color:inherit">zurück</a></div>
+
+
+<!-- ---------------------------------------------------------------
+     Das Blatt. Mehr ist die App nicht.
+     --------------------------------------------------------------- -->
+<main class="room">
+  <div class="sheet-wrap">
+    <canvas id="sheet" role="img"
+            aria-label="Ein Blatt Papier. Streiche mit dem Finger darüber – darunter liegt ein Mandala."></canvas>
+    <p class="hint" id="hint" hidden>Streiche über das Blatt.</p>
+  </div>
+</main>
+
+<!-- ---------------------------------------------------------------
+     Die Pigmente liegen am Rand wie Stifte auf einem Tisch.
+     Sie fragen nichts – sie liegen einfach da.
+     --------------------------------------------------------------- -->
+<div class="strip" id="pigments" role="group" aria-label="Pigment wählen"></div>
+
+<!-- Das einzige stille Zeichen für alles Übrige. -->
+<button type="button" class="mark" id="mark" aria-expanded="false" aria-controls="tray"
+        aria-label="Blätter und Ton"></button>
+
+<div class="tray" id="tray" hidden>
+  <button type="button" id="tray-new">Neues Blatt</button>
+  <button type="button" id="tray-stack">Blätter</button>
+  <button type="button" id="tray-sound">Ton aus</button>
+  <p class="tray-note" id="tray-note" hidden>Dieses Gerät behält nichts.</p>
+</div>
+
+<!-- ---------------------------------------------------------------
+     Die Blattlade. Sie erscheint nur, wenn man ein neues Blatt nimmt –
+     nie während der Arbeit. Man wählt mit den Augen: welche Pigmente
+     heute auf dem Tisch liegen sollen, und welches Blatt.
+
+     Von jedem Blatt ist nur ein Ausschnitt zu sehen. Genug, um den
+     Charakter zu erkennen, zu wenig, um das Mandala schon zu kennen.
+     --------------------------------------------------------------- -->
+<section class="lade" id="lade" aria-label="Ein neues Blatt nehmen" hidden>
+  <div class="lade-inner">
+    <div class="lade-kinds" id="lade-kinds" role="group" aria-label="Wonach ist dir heute"></div>
+    <div class="lade-papers" id="lade-papers" role="group" aria-label="Helles oder dunkles Papier"></div>
+    <div class="lade-worlds" id="lade-worlds" role="group" aria-label="Welche Pigmente"></div>
+    <div class="lade-sheets" id="lade-sheets" role="group" aria-label="Welches Blatt"></div>
+    <div class="lade-bar">
+      <button type="button" id="lade-more">Andere zeigen</button>
+      <button type="button" id="lade-close">Zurück</button>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------
+     Der Stapel: ein Blatt nach dem anderen, nie nebeneinander.
+     --------------------------------------------------------------- -->
+<section class="stack" id="stack" aria-label="Blätter" hidden>
+  <figure class="stack-figure" id="stack-figure">
+    <img id="stack-image" alt="Ein früheres Blatt">
+  </figure>
+  <p class="stack-empty" id="stack-empty" hidden>Noch nichts weggelegt.</p>
+  <div class="stack-bar">
+    <button type="button" id="stack-prev" aria-label="Voriges Blatt">‹</button>
+    <button type="button" id="stack-take" class="is-first">Aufnehmen</button>
+    <button type="button" id="stack-remove">Verwerfen</button>
+    <button type="button" id="stack-close">Schließen</button>
+    <button type="button" id="stack-next" aria-label="Nächstes Blatt">›</button>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

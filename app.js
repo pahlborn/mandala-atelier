@@ -31,6 +31,17 @@
 const SIZE  = 900;              // logische Kantenlänge aller Ebenen
 const CX    = SIZE / 2;
 const CY    = SIZE / 2;
+/* Die Fassungsnummer.
+
+   Kein zweiter Zähler, sondern dieselbe wie in sw.js: `mandala-atelier-v1-18`
+   ist Atelier 2.18. Der Testlauf prüft, dass diese Zeile und der Cache-Name
+   übereinstimmen — zwei Zähler liefen sonst garantiert auseinander.
+
+   Sie steht sichtbar im Fuß der Galerie. Das ist kein Schmuck: Als es darum
+   ging, ein Bildschirmfoto einzuordnen, mussten Pigmentstifte gezählt werden,
+   weil nirgends stand, welche Fassung läuft. */
+const FASSUNG = '2.19';
+
 const R_OUT = 410;              // Außenring des Rahmens
 const R_IN  = 46;               // Innenring (Nabe)
 const UP    = -Math.PI / 2;     // Bezugsrichtung aller Motive: nach oben
@@ -2580,6 +2591,8 @@ function cacheUi() {
   ui.mixColor     = document.getElementById('mix-color');
   ui.print        = document.getElementById('btn-print');
   ui.backupSave   = document.getElementById('btn-backup-save');
+  const fassungEl = document.getElementById('fassung');
+  if (fassungEl) fassungEl.textContent = 'Mandala Atelier ' + FASSUNG;
   ui.backupLoad   = document.getElementById('btn-backup-load');
   ui.backupFile   = document.getElementById('backup-file');
   ui.viewer       = document.getElementById('viewer');
@@ -3507,6 +3520,7 @@ function start() {
 
 /* Zugriff für die Testskripte in tools/ – die App selbst braucht ihn nicht. */
 window.MandalaAtelier = {
+  FASSUNG: FASSUNG,
   MOTIFS: MOTIFS,
   WORLDS: WORLDS,
   PALETTES: PALETTES,

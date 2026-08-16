@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Mandala Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Mandalas gestalten und kolorieren – ein Symmetrie-Werkzeug für ruhige Stunden. Offline, ohne Konto, ohne Werbung.">
+<meta name="theme-color" content="#f6f1e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mandala">
+<link rel="apple-touch-icon" href="../../icon-180.png">
+<link rel="icon" href="../../icon-192.png">
+<link rel="stylesheet" href="../../fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="position:fixed;left:0;right:0;top:0;z-index:9999;padding:3px 10px;font:11px/1.4 system-ui,sans-serif;text-align:center;color:#5b5245;background:rgba(226,214,190,.94);padding-top:calc(3px + env(safe-area-inset-top))">Mandala Atelier 2.4 &middot; Fassung aus dem Regal, nur zum Vergleichen &middot; <a href="../../beide.html" style="color:inherit">zurück</a></div>
+
+
+<!-- ---------------------------------------------------------------
+     Kopfzeile. Im Vollbild verschwindet sie, dafür erscheint die
+     schmale Leiste weiter unten.
+     --------------------------------------------------------------- -->
+<header class="topbar">
+  <div class="brand">
+    <h1>Mandala Atelier</h1>
+    <p class="claim">Zeichne ein Segment – der Rest entsteht von selbst.</p>
+  </div>
+  <div class="topbar-actions">
+    <button type="button" class="chip" data-drawer="library" aria-expanded="false" aria-controls="library">Motive</button>
+    <button type="button" class="chip" data-drawer="controls" aria-expanded="false" aria-controls="controls">Werkzeuge</button>
+    <button type="button" class="chip" id="btn-gallery">Galerie</button>
+    <button type="button" class="chip" id="btn-fullscreen">Vollbild</button>
+    <button type="button" class="chip" id="btn-theme" title="Hell / Dunkel umschalten">Dunkel</button>
+  </div>
+</header>
+
+<!-- Ersatz für die Kopfzeile im Vollbild: so wenig wie möglich. -->
+<div class="floatbar" id="floatbar" hidden>
+  <button type="button" class="chip" data-drawer="library">Motive</button>
+  <button type="button" class="chip" data-drawer="controls">Werkzeuge</button>
+  <button type="button" class="chip" id="btn-fullscreen-exit">Vollbild beenden</button>
+</div>
+
+<main class="atelier">
+
+  <!-- ---------------------------------------------------------------
+       Zeichenfläche: fünf übereinanderliegende Ebenen.
+       Sie bekommt allen Platz, den das Fenster hergibt.
+       --------------------------------------------------------------- -->
+  <section class="stage" aria-label="Zeichenfläche">
+    <div class="canvas-stack" id="stack">
+      <canvas id="guideCanvas" aria-hidden="true"></canvas>
+      <canvas id="fillCanvas" aria-hidden="true"></canvas>
+      <canvas id="motifCanvas" aria-hidden="true"></canvas>
+      <canvas id="drawCanvas" role="img" aria-label="Mandala – hier zeichnen und füllen"></canvas>
+      <canvas id="labelCanvas" aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------
+       Schnellzugriff: was beim Malen ständig gebraucht wird.
+       Bleibt sichtbar, auch im Vollbild.
+       --------------------------------------------------------------- -->
+  <div class="quickbar" id="quickbar">
+    <div class="quick-tools" role="group" aria-label="Werkzeug">
+      <button type="button" class="tool is-active" data-tool="pen" title="Stift (1)">
+        <span class="glyph" aria-hidden="true">✎</span><span class="tool-name">Stift</span>
+      </button>
+      <button type="button" class="tool" data-tool="fill" title="Füllen (2)">
+        <span class="glyph" aria-hidden="true">◑</span><span class="tool-name">Füllen</span>
+      </button>
+      <button type="button" class="tool" data-tool="eraser" title="Radierer (3)">
+        <span class="glyph" aria-hidden="true">⌫</span><span class="tool-name">Radierer</span>
+      </button>
+    </div>
+
+    <div class="quick-colors" id="quick-palette" role="group" aria-label="Pigment"></div>
+
+    <div class="quick-zoom" role="group" aria-label="Zeichenfläche vergrößern">
+      <button type="button" class="icon-button" id="btn-zoom-out" title="Verkleinern (−)" aria-label="Verkleinern">−</button>
+      <button type="button" class="zoom-level" id="zoom-level" title="Auf Anfang zurück (0)" aria-label="Vergrößerung zurücksetzen">100 %</button>
+      <button type="button" class="icon-button" id="btn-zoom-in" title="Vergrößern (+)" aria-label="Vergrößern">+</button>
+    </div>
+
+    <div class="quick-actions" role="group" aria-label="Schritte">
+      <button type="button" class="icon-button" id="btn-undo" title="Rückgängig (Cmd/Strg+Z)" aria-label="Rückgängig">↺</button>
+      <button type="button" class="icon-button" id="btn-redo" title="Wiederherstellen (Cmd/Strg+Umschalt+Z)" aria-label="Wiederherstellen">↻</button>
+      <button type="button" class="icon-button" id="btn-quick-collapse" title="Leiste einklappen" aria-label="Leiste einklappen">▾</button>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------------------
+       Schublade links: Motivwelten
+       --------------------------------------------------------------- -->
+  <aside id="library" class="drawer drawer-left" aria-label="Motivwelten" aria-hidden="true">
+    <div class="drawer-head">
+      <h2>Motive</h2>
+      <button type="button" class="drawer-close" data-close="library" aria-label="Motive schließen">✕</button>
+    </div>
+    <div class="drawer-body">
+      <button type="button" class="motif blank" data-motif="">
+        <span class="motif-name">Leeres Blatt</span>
+        <span class="motif-note">Nur Symmetrie, keine Vorlage</span>
+      </button>
+      <div id="worlds"></div>
+      <p class="drawer-foot">
+        19 Vorlagen in 5 Welten. Ein Motiv setzt die Achsenzahl passend –
+        du kannst sie danach jederzeit ändern.
+      </p>
+    </div>
+  </aside>
+
+  <!-- ---------------------------------------------------------------
+       Schublade rechts: Werkzeuge
+       --------------------------------------------------------------- -->
+  <aside id="controls" class="drawer drawer-right" aria-label="Werkzeuge" aria-hidden="true">
+    <div class="drawer-head">
+      <h2>Werkzeuge</h2>
+      <button type="button" class="drawer-close" data-close="controls" aria-label="Werkzeuge schließen">✕</button>
+    </div>
+    <div class="drawer-body">
+
+      <section class="panel">
+        <h3>Werkzeug</h3>
+        <div class="tools" role="group" aria-label="Werkzeug wählen">
+          <button type="button" class="tool is-active" data-tool="pen">Stift</button>
+          <button type="button" class="tool" data-tool="fill">Füllen</button>
+          <button type="button" class="tool" data-tool="eraser">Radierer</button>
+        </div>
+        <label class="field">
+          <span>Strichstärke</span>
+          <input type="range" id="width" min="1" max="14" step="1" value="4">
+        </label>
+      </section>
+
+      <section class="panel">
+        <h3>Farbwelt</h3>
+        <div class="palette-sets" id="palette-sets" role="group" aria-label="Farbwelt wählen"></div>
+        <div class="palette" id="palette" role="group" aria-label="Pigment wählen"></div>
+        <label class="field mixer" id="mixer" hidden>
+          <span>Gewähltes Pigment mischen</span>
+          <input type="color" id="mix-color">
+        </label>
+      </section>
+
+      <section class="panel" id="legend-panel" hidden>
+        <h3 id="legend-title">Farblegende</h3>
+        <ul class="legend" id="legend"></ul>
+      </section>
+
+      <section class="panel">
+        <h3>Symmetrie</h3>
+        <div class="axes" id="axes" role="group" aria-label="Achsenzahl"></div>
+        <label class="switch">
+          <input type="checkbox" id="mirror">
+          <span>Spiegelung</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="guides" checked>
+          <span>Hilfsraster</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="fill-all" checked>
+          <span>Füllen wirkt auf alle Achsen</span>
+        </label>
+        <p class="switch-note" id="fill-all-note"></p>
+      </section>
+
+      <section class="panel">
+        <h3>Blatt</h3>
+        <button type="button" id="btn-clear" class="action">Zurücksetzen</button>
+        <button type="button" id="btn-keep" class="action primary">In die Galerie legen</button>
+        <button type="button" id="btn-save" class="action">Als Bild speichern</button>
+        <button type="button" id="btn-print" class="action">Druckbogen (A4)</button>
+      </section>
+
+      <p class="drawer-foot" id="stage-hint">Wähle ein Motiv oder beginne auf dem leeren Blatt.</p>
+
+    </div>
+  </aside>
+</main>
+
+<!-- ---------------------------------------------------------------
+     Galerie: fertige Bilder, mittelgroße Kacheln
+     --------------------------------------------------------------- -->
+<section id="gallery" class="overlay" aria-label="Galerie" hidden>
+  <header class="overlay-head">
+    <div class="overlay-ident">
+      <h2 id="gallery-title">Galerie</h2>
+      <p class="overlay-note" id="gallery-count"></p>
+    </div>
+    <div class="owner">
+      <label>
+        <span>Galerie von</span>
+        <select id="person-select" aria-label="Person wählen"></select>
+      </label>
+      <input type="text" id="gallery-owner" maxlength="28" placeholder="Name" aria-label="Person umbenennen">
+    </div>
+    <button type="button" class="drawer-close" id="btn-gallery-close" aria-label="Galerie schließen">✕</button>
+  </header>
+  <div class="overlay-body">
+    <p class="empty" id="gallery-empty" hidden>
+      Noch nichts abgelegt. Leg ein fertiges Bild über
+      „In die Galerie legen“ hierher.
+    </p>
+    <div class="works" id="works"></div>
+    <footer class="overlay-foot">
+      <p>
+        Werke liegen nur auf diesem Gerät. Eine Sicherung ist zugleich der Weg
+        auf ein zweites Gerät – sie enthält alle Personen, deren Werke und die
+        eigene Farbwelt.
+      </p>
+      <div class="overlay-actions">
+        <button type="button" class="action" id="btn-backup-save">Sicherung speichern</button>
+        <button type="button" class="action" id="btn-backup-load">Sicherung einlesen</button>
+        <input type="file" id="backup-file" accept="application/json,.json" hidden>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- Vergrößerte Ansicht eines Werks -->
+<div id="viewer" class="viewer" hidden>
+  <div class="viewer-card" role="dialog" aria-modal="true" aria-label="Werk ansehen">
+    <img id="viewer-image" alt="">
+    <div class="viewer-side">
+      <label class="field">
+        <span>Titel</span>
+        <input type="text" id="viewer-title" maxlength="60">
+      </label>
+      <p class="viewer-meta" id="viewer-meta"></p>
+      <button type="button" class="action" id="viewer-download">Als Bild speichern</button>
+      <button type="button" class="action" id="viewer-delete">Aus der Galerie nehmen</button>
+      <button type="button" class="action primary" id="viewer-close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

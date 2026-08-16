@@ -58,15 +58,49 @@ sich mit dem Finger erledigen lassen.
   unter. Neue Wahlmöglichkeiten dürfen den Zufallsstrom nicht verschieben, und
   was ein altes Blatt nicht bei sich trägt, muss einen festen Vorgabewert haben.
 
+## Fassungen und das Regal
+
+Jede Fassung hat eine **Nummer**, und es ist dieselbe wie im Cache-Namen:
+`atelier3-v1-13` ist **Blatt 3.13**, `mandala-atelier-v1-19` ist
+**Atelier 2.19**. Kein zweiter Zähler — zwei liefen garantiert auseinander.
+Sie steht sichtbar in der App (Blatt: im Fach; Atelier: im Fuß der Galerie),
+und `npm run test:nebeneinander` prüft, dass beide Stellen übereinstimmen.
+
+**Beim Veröffentlichen, in dieser Reihenfolge:**
+
+1. Cache-Version **und** `FASSUNG` erhöhen — beide, in beiden Dateien.
+2. `npm run einfrieren` — stellt die Fassung nach `v/<nummer>/`.
+3. `npm run fassungen` — schreibt `docs/fassungen.html` neu.
+4. Testläufe, dann committen und pushen.
+
+Eingefrorene Fassungen bleiben **für immer** erreichbar. Damit ist „zurück auf
+3.7" ein Link statt eines Auftrags. Zwei Dinge daran sind nicht verhandelbar,
+sonst richtet das Regal Schaden an:
+
+- **Kein Service Worker.** Sein `activate` löscht alles, was mit `atelier3-`
+  bzw. `mandala-atelier-` anfängt — also den Offline-Vorrat der laufenden App.
+- **Eigener Speicher.** Sonst überschriebe eine alte Fassung das laufende
+  Blatt und schöbe ihm einen fremden Grundriss unter.
+
+`tools/einfrieren.js` erledigt beides; `npm run test:regal` prüft es im echten
+Browser.
+
+**Eine Änderung je Fassung, mit Messwert.** Das ist die Lehre aus `v1-4`: Dort
+wurden vier Dinge auf einmal geändert, nur eines war durch einen Befund
+gedeckt, und es hat zwölf Fassungen gedauert, bis auffiel, was verlorenging.
+Was sich nicht messen lässt, gehört in einen eigenen Commit.
+
 ## Testläufe
 
     npm test                  Mandala Atelier
     npm run test:atelier3     Blatt
     npm run test:nebeneinander  beide Apps an einem Origin
     npm run test:druck        die Prüfseite docs/druck.html (Sekunden)
+    npm run test:regal        das Fassungsregal unter v/ (Sekunden)
 
-Sie laufen gegen einen echten Browser und dauern je ein paar Minuten. Vor jedem
-Push die ersten drei; der vierte nur, wenn `docs/druck.html` angefasst wurde.
+Sie laufen gegen einen echten Browser. Die ersten drei dauern je ein paar
+Minuten und gehören vor jeden Push; die letzten beiden sind in Sekunden durch
+und nur nötig, wenn `docs/druck.html` bzw. das Regal angefasst wurde.
 
 ## Git
 

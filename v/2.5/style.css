@@ -1,0 +1,775 @@
+/* ============================================================
+   Mandala Atelier – Gestaltung
+   Ruhig, erwachsen, gedeckt. Keine Spielsymbolik, keine Signalfarben.
+
+   Grundgedanke des Layouts: Die Zeichenfläche bekommt allen Platz,
+   den das Fenster hergibt. Alles zur Steuerung liegt in zwei
+   Schubladen, die darüber ein- und ausfahren.
+   ============================================================ */
+
+/* ---- Design-Tokens: Hell ---------------------------------- */
+:root {
+  /* Papier und Linien wechseln mit dem Modus mit. Dieselben Werte stehen
+     in app.js (THEMES) – die Vorlage wird auf Canvas gezeichnet und kann
+     keine CSS-Variable lesen. Beide Stellen zusammen ändern. */
+  --paper:        #f6f1e7;
+  --ink:          #242424;
+
+  --bg:           #f3ece1;
+  --surface:      #fbf7ef;
+  --surface-2:    #f0e8da;
+  --edge:         #ddd2bf;
+  --text:         #2f2b26;
+  --text-soft:    #6d6559;
+  --accent:       #2e6b6b;
+  --accent-ink:   #ffffff;
+  --focus:        #b5654a;
+  --veil:         rgba(40, 33, 22, .28);
+
+  --radius:       14px;
+  --radius-sm:    9px;
+  --shadow:       0 1px 2px rgba(40, 33, 22, .06), 0 8px 24px rgba(40, 33, 22, .10);
+  --shadow-lift:  0 2px 6px rgba(40, 33, 22, .10), 0 18px 48px rgba(40, 33, 22, .20);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-text:    "Work Sans", system-ui, -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
+
+  --gap:          14px;
+  --drawer:       288px;
+}
+
+/* ---- Design-Tokens: Dunkel -------------------------------- */
+:root[data-theme="dunkel"] {
+  --paper:        #1c1d20;
+  --ink:          #d8d2c6;
+
+  --bg:           #17181a;
+  --surface:      #202225;
+  --surface-2:    #2a2d31;
+  --edge:         #3a3e44;
+  --text:         #e8e2d6;
+  --text-soft:    #a49c8e;
+  --accent:       #7fb0ab;
+  --accent-ink:   #17181a;
+  --focus:        #d08a6c;
+  --veil:         rgba(0, 0, 0, .48);
+  --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow-lift:  0 2px 6px rgba(0, 0, 0, .5), 0 18px 48px rgba(0, 0, 0, .55);
+}
+
+* { box-sizing: border-box; }
+
+/* Ein eigenes display: beat sonst das hidden-Attribut – die schwebende
+   Leiste blieb unsichtbar sichtbar und fing Klicks ab. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; }
+
+button, input { font: inherit; color: inherit; }
+
+:where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---- Kopfzeile -------------------------------------------- */
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--surface);
+}
+
+.brand h1 { margin: 0; font-size: 20px; letter-spacing: .01em; }
+
+.claim { margin: 1px 0 0; font-size: 12.5px; color: var(--text-soft); }
+
+.topbar-actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+
+.chip {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 7px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chip:hover { border-color: var(--accent); }
+
+.chip.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Ersatzleiste im Vollbild – schwebt über der Zeichenfläche. */
+.floatbar {
+  position: fixed;
+  z-index: 40;
+  top: calc(10px + env(safe-area-inset-top));
+  right: calc(10px + env(safe-area-inset-right));
+  display: flex;
+  gap: 7px;
+  opacity: .45;
+  transition: opacity .2s ease;
+}
+
+.floatbar:hover, .floatbar:focus-within { opacity: 1; }
+
+.floatbar .chip { box-shadow: var(--shadow); background: var(--surface); }
+
+body.is-quiet .topbar { display: none; }
+
+/* ---- Bühne ------------------------------------------------ */
+.atelier {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: var(--gap);
+  /* Zwingend: beim Vergrößern ragt das Blatt über die Bühne hinaus und
+     würde sonst über die Schnellzugriffsleiste gemalt. */
+  overflow: hidden;
+}
+
+/* ---- Schnellzugriff ---------------------------------------
+   Farben, Werkzeuge und Schritte werden beim Malen ständig
+   gebraucht – sie dürfen nicht in einer Schublade liegen. */
+.quickbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--edge);
+  background: var(--surface);
+}
+
+.quick-tools { display: flex; gap: 5px; flex: none; }
+
+.quick-tools .tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+/* Zeichensatz-Symbole waren zu unklar – ⌫ liest sich als Rücktaste, nicht
+   als Radiergummi. Deshalb gezeichnete Symbole, und die Beschriftung bleibt
+   stehen: sie ist das verlässlichste Zeichen. */
+.quick-tools .glyph { width: 19px; height: 19px; flex: none; display: block; }
+
+/* Alle Pigmente der Farbwelt müssen sichtbar sein. Eine seitlich
+   scrollbare Reihe findet niemand – auf schmalen Geräten waren zwei von
+   vierzehn zu sehen. Deshalb umbrechen statt schieben. */
+.quick-colors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 3px 1px;
+}
+
+.quick-colors .pigment {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  aspect-ratio: auto;
+}
+
+.quick-actions { display: flex; gap: 5px; flex: none; }
+
+.quick-zoom { display: flex; align-items: center; gap: 5px; flex: none; }
+
+.zoom-level {
+  min-width: 62px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.zoom-level:hover { border-color: var(--accent); color: var(--text); }
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.icon-button:hover { border-color: var(--accent); }
+.icon-button:disabled { opacity: .35; cursor: default; }
+
+/* Eingeklappt: nur noch der Aufklapp-Knopf bleibt stehen. */
+body.quick-collapsed .quick-tools,
+body.quick-collapsed .quick-colors,
+body.quick-collapsed #btn-undo,
+body.quick-collapsed #btn-redo,
+body.quick-collapsed .quick-zoom { display: none; }
+
+body.quick-collapsed .quickbar { justify-content: flex-end; padding-top: 4px; padding-bottom: 4px; }
+body.quick-collapsed #btn-quick-collapse { transform: rotate(180deg); }
+
+/* Unterhalb dieser Breite reicht eine Zeile nicht mehr für alles:
+   Werkzeuge und Schritte teilen sich die erste, die Farben bekommen
+   die zweite in voller Breite. */
+@media (max-width: 900px) {
+  .quick-tools { flex: none; }
+  .quick-zoom { margin-left: auto; }
+  .quick-actions { margin-left: auto; }
+  .quick-colors { order: 3; flex-basis: 100%; }
+}
+
+@media (max-width: 700px) {
+  .quick-tools .tool { padding: 8px 10px; gap: 5px; }
+  .quick-colors .pigment { width: 30px; height: 30px; }
+  .zoom-level { min-width: 54px; }
+}
+
+body.is-quiet .stage { padding: 6px; }
+
+/* Größtes Quadrat, das in die Bühne passt. Die genaue Kantenlänge setzt
+   fitStage() in app.js: aspect-ratio verliert hier gegen die Prozentangaben
+   und das Mandala würde zur Ellipse. Die Angaben hier gelten nur, bis das
+   Skript einmal gelaufen ist. */
+.canvas-stack {
+  position: relative;
+  transform-origin: center center;
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
+  background: var(--paper);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.canvas-stack canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Nur die Zeichenebene nimmt Zeigerereignisse entgegen. */
+#guideCanvas, #fillCanvas, #motifCanvas, #labelCanvas { pointer-events: none; }
+
+#drawCanvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: crosshair;
+}
+
+/* ---- Schubladen ------------------------------------------- */
+.drawer {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  bottom: 0;
+  width: min(var(--drawer), 88vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
+  transition: transform .22s ease;
+  visibility: hidden;
+}
+
+.drawer-left  { left: 0;  border-right: 1px solid var(--edge); transform: translateX(-101%); }
+.drawer-right { right: 0; border-left: 1px solid var(--edge);  transform: translateX(101%); }
+
+.drawer.is-open { transform: none; visibility: visible; }
+
+.drawer-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--edge);
+}
+
+.drawer-head h2 { margin: 0; font-size: 17px; }
+
+.drawer-close {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-soft);
+}
+
+.drawer-close:hover { border-color: var(--accent); color: var(--text); }
+
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drawer-foot {
+  font-size: 12px;
+  color: var(--text-soft);
+  border-top: 1px solid var(--edge);
+  padding-top: 10px;
+  margin: 0;
+}
+
+/* ---- Motivwelten ------------------------------------------ */
+.world { margin-bottom: 12px; }
+
+.world > h3, .panel > h3 {
+  margin: 0 0 7px;
+  font-size: 12px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-family: var(--font-text);
+  font-weight: 600;
+}
+
+.motif {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin-bottom: 3px;
+  cursor: pointer;
+}
+
+.motif:hover { background: var(--surface-2); }
+
+.motif.is-active { background: var(--surface-2); border-color: var(--accent); }
+
+.motif-name { display: block; font-weight: 500; }
+
+.motif-note { display: block; font-size: 12px; color: var(--text-soft); }
+
+.motif.blank { border: 1px dashed var(--edge); margin-bottom: 14px; }
+
+/* ---- Werkzeug-Tafeln -------------------------------------- */
+.panel {
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: var(--surface);
+}
+
+.tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+
+.tool {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 9px 4px;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+
+.tool.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.field { display: block; margin-top: 11px; font-size: 12.5px; color: var(--text-soft); }
+.field input[type="range"] { width: 100%; margin-top: 4px; accent-color: var(--accent); }
+
+/* ---- Farbwelten und Pigmente ------------------------------ */
+.palette-sets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.pset {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 7px 4px;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+
+.pset.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.palette { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+
+.pigment {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+  cursor: pointer;
+  padding: 0;
+}
+
+.pigment.is-active { border-color: var(--text); transform: scale(1.08); }
+
+/* ---- Farblegende ------------------------------------------ */
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+.legend button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+
+.legend button:hover { background: var(--surface-2); }
+
+.legend .dot {
+  width: 17px; height: 17px; flex: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+}
+
+.legend .val { font-family: var(--font-mono); }
+
+/* ---- Achsen und Schalter ---------------------------------- */
+.axes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+
+.axis {
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 2px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.axis.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+
+.switch input { accent-color: var(--accent); width: 17px; height: 17px; flex: none; }
+
+.switch-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
+
+/* ---- Aktionen --------------------------------------------- */
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+.action {
+  width: 100%;
+  border: 1px solid var(--edge);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+
+.action + .action { margin-top: 5px; }
+.row .action + .action { margin-top: 0; }
+.action:hover { border-color: var(--accent); }
+.action:disabled { opacity: .45; cursor: default; }
+.action.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+/* ---- Galerie ----------------------------------------------- */
+.overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.overlay-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--surface);
+}
+
+.overlay-head h2 { margin: 0; font-size: 20px; }
+
+.overlay-note { margin: 1px 0 0; font-size: 12.5px; color: var(--text-soft); }
+
+.overlay-ident { min-width: 0; }
+
+.owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
+.owner input {
+  width: 11em;
+  padding: 7px 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+@media (max-width: 560px) {
+  .overlay-head { flex-wrap: wrap; }
+  .owner { width: 100%; margin-left: 0; }
+  .owner select {
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 11em;
+}
+
+.owner label { display: flex; align-items: center; gap: 8px; }
+
+.owner input { flex: 1; width: auto; }
+}
+
+.overlay-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px;
+}
+
+.empty {
+  max-width: 34em;
+  margin: 12vh auto;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.overlay-foot {
+  margin-top: 26px;
+  border-top: 1px solid var(--edge);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  flex-wrap: wrap;
+}
+
+.overlay-foot p { margin: 0; max-width: 46em; font-size: 12.5px; color: var(--text-soft); }
+
+.overlay-actions { display: flex; gap: 8px; }
+.overlay-actions .action { width: auto; margin: 0; white-space: nowrap; }
+
+.mixer input[type="color"] {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  padding: 2px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.works {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 16px;
+}
+
+.work {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--edge);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 9px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.work:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+
+.work img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.work-title {
+  display: block;
+  margin-top: 8px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-meta { display: block; font-size: 12px; color: var(--text-soft); }
+
+/* ---- Vergrößerte Ansicht ----------------------------------- */
+.viewer {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: var(--veil);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.viewer-card {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  max-width: min(1000px, 100%);
+  max-height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  padding: 16px;
+  overflow: auto;
+}
+
+.viewer-card img {
+  display: block;
+  width: min(62vh, 100%);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.viewer-side {
+  flex: 1;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewer-side .field input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.viewer-meta { margin: 0 0 4px; font-size: 12.5px; color: var(--text-soft); }
+
+@media (max-width: 720px) {
+  .viewer-card { flex-direction: column; }
+  .viewer-card img { width: 100%; }
+}
+
+/* ---- Schmale Geräte --------------------------------------- */
+@media (max-width: 560px) {
+  .claim { display: none; }
+  .brand h1 { font-size: 17px; }
+  .chip { padding: 6px 11px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer, .floatbar { transition: none; }
+}

@@ -252,6 +252,30 @@ async function run() {
       : 0;
     prüfe('die Einstiegsseite führt zu beiden Apps',
           !!seite.atelier && !!seite.blatt);
+
+    /* Die Fassungsnummer ist kein zweiter Zähler, sondern dieselbe wie im
+       Cache-Namen. Genau deshalb muss jemand nachsehen, dass sie es auch
+       bleibt: Zwei Zähler, die von Hand gepflegt werden, laufen garantiert
+       irgendwann auseinander — und dann steht auf dem Schirm eine Nummer,
+       die nichts mehr bedeutet. Sie ist aber die einzige Auskunft darüber,
+       welche Fassung auf einem Gerät wirklich läuft. */
+    const nummern = await page.evaluate(async function () {
+      const lies = async function (pfad, muster) {
+        const txt = await (await fetch(pfad, { cache: 'reload' })).text();
+        return (txt.match(muster) || [])[1];
+      };
+      return {
+        atelierCache: await lies('/sw.js', /mandala-atelier-v1-(\d+)/),
+        blattCache:   await lies('/atelier3/sw.js', /atelier3-v1-(\d+)/),
+        atelierApp:   await lies('/app.js', /const FASSUNG = '2\.(\d+)'/),
+        blattApp:     await lies('/atelier3/app.js', /const FASSUNG = '3\.(\d+)'/)
+      };
+    });
+    prüfe('die Fassungsnummer stimmt mit dem Cache überein',
+          nummern.atelierCache === nummern.atelierApp &&
+          nummern.blattCache === nummern.blattApp,
+          'Atelier 2.' + nummern.atelierApp + ' / v1-' + nummern.atelierCache +
+          ', Blatt 3.' + nummern.blattApp + ' / v1-' + nummern.blattCache);
     prüfe('sie führt zu allen vier Fassungen des Auftrags',
           seite.proben.length === 4 &&
           ['zeichnend', 'zart', 'mittel', 'flaechig'].every(function (n) {

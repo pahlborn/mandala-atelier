@@ -41,6 +41,17 @@
    Handtest am iPad nachgezogen werden will. Sie stehen bewusst zusammen.
    ------------------------------------------------------------------------- */
 
+/* Die Fassungsnummer.
+
+   Sie ist kein zweiter Zähler, sondern dieselbe wie in sw.js: `atelier3-v1-12`
+   ist Blatt 3.12. Zwei Zähler liefen garantiert irgendwann auseinander, also
+   prüft der Testlauf, dass diese Zeile und der Cache-Name übereinstimmen.
+
+   Sie steht sichtbar im Fach, und das ist kein Schmuck: Als es darum ging,
+   ein Bildschirmfoto einzuordnen, mussten Pigmentstifte gezählt werden, weil
+   nirgends stand, welche Fassung läuft. */
+const FASSUNG = '3.13';
+
 const SIZE   = 1280;                 // innere Kantenlänge des Blattes
 const HALF   = SIZE / 2;
 const R_DISC = HALF * 0.92;          // Außenrand des Mandalas in Pixeln
@@ -3430,6 +3441,7 @@ function cacheUi() {
   ui.trayStack   = document.getElementById('tray-stack');
   ui.traySound   = document.getElementById('tray-sound');
   ui.trayNote    = document.getElementById('tray-note');
+  ui.trayFassung = document.getElementById('tray-fassung');
   ui.stack       = document.getElementById('stack');
   ui.stackImage  = document.getElementById('stack-image');
   ui.stackFigure = document.getElementById('stack-figure');
@@ -3550,7 +3562,7 @@ function syncSoundLabel() {
 async function start() {
   /* Vor allem anderen: eine etwaige Griffkurve aus der Adresse übernehmen.
      Sie muss stehen, bevor der erste Strich eine Nachschlagetabelle baut. */
-  applyGrip();
+  const griff = applyGrip();
 
   canvas = document.getElementById('sheet');
   canvas.width = SIZE;
@@ -3564,6 +3576,11 @@ async function start() {
 
   const stored = await Speicher.open();
   ui.trayNote.hidden = stored;
+
+  /* Welche Fassung läuft hier – und, falls vom Regelfall abgewichen wird,
+     welcher Griff. Ohne Abweichung steht nur die Nummer da. */
+  ui.trayFassung.textContent = 'Blatt ' + FASSUNG +
+    (griff === GRIFF_VOREINSTELLUNG ? '' : ' · Griff: ' + griff);
 
   /* Ein begonnenes Blatt liegt da, wo man es verlassen hat. */
   let resumed = null;
@@ -3625,6 +3642,7 @@ async function start() {
 /* Für den Testlauf in tools/test-atelier3.js. Die App selbst benutzt nichts
    davon – es ist ein Fenster, kein Bedienelement. */
 window.Blatt = {
+  FASSUNG: FASSUNG,
   SIZE: SIZE, R_DISC: R_DISC, VIEW_MAX: VIEW_MAX,
   sheet: sheet, hand: hand, view: view,
   contactRadius: contactRadius,

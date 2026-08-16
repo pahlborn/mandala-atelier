@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Fassungen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Jede Fassung beider Apps, zum Nachsehen und zum Ausprobieren.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Erzeugt von tools/gen-fassungen.js — nicht von Hand ändern.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5); }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 { font-size: 17px; margin: 2.2rem 0 .6rem; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  table.fassungen { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  table.fassungen th, table.fassungen td {
+    padding: 7px 12px 7px 0; text-align: left;
+    border-bottom: 1px solid var(--edge); vertical-align: top;
+  }
+  table.fassungen th { font-weight: 600; font-size: 13px;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--quiet); }
+  td.nr { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  td.nr a { color: inherit; }
+  td.tag { font-variant-numeric: tabular-nums; color: var(--quiet); white-space: nowrap; }
+  .fehlt { color: var(--quiet); opacity: .5; }
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.6rem 0;
+  }
+  a { color: inherit; }
+  footer { margin-top: 2.4rem; font-size: 13.5px; color: var(--quiet); }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Fassungen</h1>
+  <p class="lede">Jede Fassung beider Apps steht hier — und lässt sich
+     antippen. Die Nummer ist ein Link: Sie öffnet genau diese Fassung, so wie
+     sie damals war.</p>
+
+  <p class="note">
+    <strong>Was eine eingefrorene Fassung ist und was nicht.</strong> Sie ist
+    zum <em>Vergleichen</em> da. Sie läuft nur online, lässt sich nicht auf den
+    Homescreen legen, und sie hat ihren eigenen Speicher — was dort entsteht,
+    berührt die laufende App nicht, und umgekehrt. Beides ist Absicht: Eine
+    alte Fassung baut für dieselbe Seed ein anderes Relief, und sie dürfte
+    einem längst bemalten Blatt keinen fremden Grundriss unterschieben.
+  </p>
+
+    <table class="fassungen">
+      <tr><th>Blatt</th><th>vom</th><th>was sich änderte</th></tr>
+      <tr><td class="nr"><a href="../v/3.12/index.html">3.12</a></td><td class="tag">2026-08-16</td><td>Die zeichnende Griffkurve wird wieder die Voreinstellung</td></tr>
+      <tr><td class="nr"><a href="../v/3.11/index.html">3.11</a></td><td class="tag">2026-08-16</td><td>Der Griff von damals als vierter Aufruf</td></tr>
+      <tr><td class="nr"><a href="../v/3.10/index.html">3.10</a></td><td class="tag">2026-08-16</td><td>Der Grund, warum auf dem iPad nichts ankam</td></tr>
+      <tr><td class="nr"><a href="../v/3.9/index.html">3.9</a></td><td class="tag">2026-08-16</td><td>Blatt zieht je Blatt eine der acht Anlagen-Grammatiken</td></tr>
+      <tr><td class="nr"><a href="../v/3.8/index.html">3.8</a></td><td class="tag">2026-08-16</td><td>Blatt bekommt dieselben Farbwelten wie das Atelier: vierzehn Pigmente</td></tr>
+      <tr><td class="nr"><a href="../v/3.7/index.html">3.7</a></td><td class="tag">2026-08-16</td><td>Goldgrund auch in Blatt</td></tr>
+      <tr><td class="nr"><a href="../v/3.6/index.html">3.6</a></td><td class="tag">2026-08-13</td><td>Blatt: die Trennschaerfe der leichten Hand vergleichbar machen</td></tr>
+      <tr><td class="nr"><a href="../v/3.5/index.html">3.5</a></td><td class="tag">2026-08-13</td><td>Blatt: eine Anlage, die man von aussen nach innen freireibt</td></tr>
+      <tr><td class="nr"><a href="../v/3.4/index.html">3.4</a></td><td class="tag">2026-08-10</td><td>Blatt: der Weg traegt auf, das Papier ist waehlbar, die Tischkante</td></tr>
+      <tr><td class="nr"><a href="../v/3.3/index.html">3.3</a></td><td class="tag">2026-08-10</td><td>Blatt: ein Satz an der Tuer</td></tr>
+      <tr><td class="nr"><a href="../v/3.2/index.html">3.2</a></td><td class="tag">2026-08-09</td><td>Blatt: die Farbe landet wieder unter dem Finger, und eine Blattlade</td></tr>
+      <tr><td class="nr"><a href="../v/3.1/index.html">3.1</a></td><td class="tag">2026-08-09</td><td>Blatt: Cache-Version erhoehen und den Vorrat selbstheilend machen</td></tr>
+      <tr><td class="nr"><a href="../v/3.0/index.html">3.0</a></td><td class="tag">2026-08-09</td><td>Atelier 3.0 „Blatt" bauen: Mandala durch Reiben hervorholen</td></tr>
+    </table>
+
+    <table class="fassungen">
+      <tr><th>Mandala Atelier</th><th>vom</th><th>was sich änderte</th></tr>
+      <tr><td class="nr"><a href="../v/2.18/index.html">2.18</a></td><td class="tag">2026-08-16</td><td>Der Grund, warum auf dem iPad nichts ankam</td></tr>
+      <tr><td class="nr"><a href="../v/2.17/index.html">2.17</a></td><td class="tag">2026-08-16</td><td>Die Kuppelanlage: ein Gewoelbe von unten</td></tr>
+      <tr><td class="nr"><a href="../v/2.16/index.html">2.16</a></td><td class="tag">2026-08-16</td><td>Goldgrund: eine Farbwelt aus Leitern statt aus Toenen</td></tr>
+      <tr><td class="nr"><a href="../v/2.15/index.html">2.15</a></td><td class="tag">2026-08-16</td><td>Das Atelier frischt seinen Vorrat auf - wie Blatt es laengst tut</td></tr>
+      <tr><td class="nr"><a href="../v/2.14/index.html">2.14</a></td><td class="tag">2026-08-16</td><td>Fuenf weitere Anlagen - und fuenf verschiedene Grammatiken</td></tr>
+      <tr><td class="nr"><a href="../v/2.13/index.html">2.13</a></td><td class="tag">2026-08-13</td><td>Die Ringanlage: vier Baender, vier Rhythmen</td></tr>
+      <tr><td class="nr"><a href="../v/2.12/index.html">2.12</a></td><td class="tag">2026-08-13</td><td>Werkstattseiten holen erst vom Netz</td></tr>
+      <tr><td class="nr"><a href="../v/2.11/index.html">2.11</a></td><td class="tag">2026-08-13</td><td>Die Einstiegsseite bekommt ein eigenes Symbol</td></tr>
+      <tr><td class="nr"><a href="../v/2.10/index.html">2.10</a></td><td class="tag">2026-08-13</td><td>Eine Schautafel: fuenfzehn Motivfamilien nebeneinander</td></tr>
+      <tr><td class="nr"><a href="../v/2.9/index.html">2.9</a></td><td class="tag">2026-08-13</td><td>Die Einstiegsseite bekommt die zwei Fassungen des Auftrags</td></tr>
+      <tr><td class="nr"><a href="../v/2.8/index.html">2.8</a></td><td class="tag">2026-08-13</td><td>Anlagen: das Mandala wird zum Grundriss, die Symmetrie folgt dem Ort</td></tr>
+      <tr><td class="nr"><a href="../v/2.7/index.html">2.7</a></td><td class="tag">2026-08-09</td><td>Werkzeug „Form“: Ring, Speiche, Blatt, Raute, Band</td></tr>
+      <tr><td class="nr"><a href="../v/2.6/index.html">2.6</a></td><td class="tag">2026-08-09</td><td>main in den Zweig holen und Cache-Version aufloesen</td></tr>
+      <tr><td class="nr"><a href="../v/2.5/index.html">2.5</a></td><td class="tag">2026-08-09</td><td>Gezeichnete Werkzeugsymbole statt Zeichensatz, Beschriftung bleibt</td></tr>
+      <tr><td class="nr"><a href="../v/2.4/index.html">2.4</a></td><td class="tag">2026-08-09</td><td>Füllmodus wählbar: alle Achsen oder Feld für Feld</td></tr>
+      <tr><td class="nr"><a href="../v/2.3/index.html">2.3</a></td><td class="tag">2026-08-09</td><td>Alle Pigmente sichtbar, Vergrößern mit Knöpfen und Gesten</td></tr>
+      <tr><td class="nr"><a href="../v/2.2/index.html">2.2</a></td><td class="tag">2026-08-09</td><td>Eigene Farbwelt, Personen, Sicherung, Druckbogen, sieben Vorlagen</td></tr>
+      <tr><td class="nr"><a href="../v/2.1/index.html">2.1</a></td><td class="tag">2026-08-08</td><td>Hell/Dunkel fürs Mandala, Farbwelten, Vollbild und Galerie</td></tr>
+      <tr><td class="nr"><a href="../v/2.0/index.html">2.0</a></td><td class="tag">2026-08-08</td><td>Mandala Atelier: Symmetrie-Werkzeug mit 19 Vorlagen</td></tr>
+    </table>
+
+  <p class="note">
+    <strong>Warum es dieses Regal gibt.</strong> Über zwölf Fassungen hinweg
+    hatte sich der Farbauftrag von Blatt still verändert, und aufgefallen ist
+    es nur, weil auf einem Gerät zufällig noch eine alte Fassung lief. Ohne
+    diesen Zufall wäre die Frage nicht zu beantworten gewesen. Zufälle sind
+    eine schlechte Grundlage, also steht jetzt jede Fassung da.
+  </p>
+
+  <footer>
+    Erzeugt aus der Versionsgeschichte. Zurück zur
+    <a href="../beide.html">Einstiegsseite</a>.
+  </footer>
+
+</main>
+</body>
+</html>
