@@ -73,6 +73,17 @@ bleiben sie erreichbar, nur in der Fassung von zuletzt. Für die App gilt
 weiter das Gegenteil (erst Vorrat, dann Netz), denn ihr Start soll sofort
 kommen und ihre Dateien hängen alle an der Cache-Version.
 
+**Die App frischt im Hintergrund auf.** Ausgeliefert wird der Vorrat – der
+Start bleibt sofort und offlinefähig –, und daneben läuft der Abruf vom Netz;
+die neue Fassung ist beim nächsten Öffnen da. Genau das fehlte hier lange, und
+es war der teuerste Fehler des Projekts: Ohne Auffrischen kommt eine Änderung
+nur an, wenn sich die Cache-Version ändert **und** das Gerät den Worker auch
+wirklich erneuert. Auf dem iPad ist das zweite nicht verlässlich. Blatt machte
+es von Anfang an richtig, das Atelier nicht – deshalb kamen dort Änderungen an
+und hier nicht. Fünf fertige Vorlagen lagen ausgeliefert auf dem Server und
+waren auf dem Gerät trotzdem nicht zu sehen. Der Testlauf prüft es jetzt für
+**beide** Apps.
+
 Das war ein echter Fehler, und er hat gekostet: `store()` legt **jede** je
 abgerufene Datei ab, nicht nur die aus `SHELL`. Damit landete `beide.html` im
 Vorrat und wurde von da an ewig von dort bedient – fünfmal öffnen half nicht.

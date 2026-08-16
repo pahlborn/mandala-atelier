@@ -60,6 +60,12 @@ async function run() {
     if (rel === 'atelier3/app.js' && frischeFassung) {
       return body + '\nwindow.__frischeFassung = true;\n';
     }
+    /* Eine neue Fassung des Ateliers, ebenfalls ohne Versionswechsel. Das
+       fehlte lange: Der Worker der App frischte nicht auf, und Änderungen
+       kamen auf dem iPad schlicht nie an. */
+    if (rel === 'app.js' && frischeFassung) {
+      return body + '\nwindow.__frischesAtelier = true;\n';
+    }
     /* Und eine geänderte Werkstattseite – sie muss sofort ankommen. */
     if (rel === 'beide.html' && frischeSeite) {
       return String(body).replace('</main>', '<p id="frisch">neu</p></main>');
@@ -118,8 +124,24 @@ async function run() {
     const jetztNeu = await page.evaluate(function () {
       return window.__frischeFassung === true;
     });
-    prüfe('neue Fassung kommt auch ohne Versionswechsel an', jetztNeu,
+    prüfe('neue Fassung von Blatt kommt ohne Versionswechsel an', jetztNeu,
           nochAlt ? 'schon beim ersten Neuladen' : 'beim zweiten Öffnen');
+
+    /* Dasselbe für das Atelier. Beide Worker müssen das können – dass es
+       nur einer konnte, hat gekostet: Fünf neue Vorlagen lagen ausgeliefert
+       auf dem Server und waren auf dem Gerät trotzdem nicht zu sehen. */
+    await page.goto(server.url + '/index.html');
+    await page.waitForFunction('window.MandalaAtelier');
+    await page.waitForTimeout(1200);
+    await page.goto(server.url + '/index.html');
+    await page.waitForFunction('window.MandalaAtelier');
+    const atelierNeu = await page.evaluate(function () {
+      return window.__frischesAtelier === true;
+    });
+    prüfe('neue Fassung des Ateliers kommt ohne Versionswechsel an', atelierNeu,
+          atelierNeu ? 'beim zweiten Öffnen' : 'sie kam nie an – siehe fetch in sw.js');
+    await page.goto(server.url + '/atelier3/index.html');
+    await page.waitForFunction('window.Blatt');
     prüfe('der Start bleibt sofort und offlinefähig', !nochAlt,
           nochAlt ? 'es wurde aufs Netz gewartet' : 'erst Vorrat, dann auffrischen');
 

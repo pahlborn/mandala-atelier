@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-14';
+const CACHE = 'mandala-atelier-v1-15';
 
 const SHELL = [
   './',
@@ -90,11 +90,28 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
+  /* Erst Vorrat, dann Netz – und **immer** im Hintergrund auffrischen.
+
+     Das Auffrischen fehlte hier, und das war der eigentliche Fehler: Ohne
+     es kommt eine neue Fassung nur an, wenn sich die Cache-Version ändert
+     *und* das Gerät den Worker auch wirklich erneuert. Auf dem iPad ist das
+     zweite nicht verlässlich – Safari sieht Monate später noch die alte App.
+     Blatt macht es seit seiner ersten Fassung richtig; hier stand es falsch,
+     und deshalb kamen dort Änderungen an und hier nicht.
+
+     Der Start bleibt trotzdem sofort und offlinefähig: Ausgeliefert wird der
+     Vorrat, das Netz läuft daneben. Die neue Fassung ist beim nächsten
+     Öffnen da. */
   event.respondWith(
     caches.match(request).then(function (hit) {
-      return hit || fetch(request).then(function (response) {
-        return store(request, response);
-      });
+      const frisch = fetch(request)
+        .then(function (response) { return store(request, response); })
+        .catch(function () { return hit; });
+
+      /* Das Nachladen muss den Worker am Leben halten, sonst bricht es ab,
+         sobald die Antwort aus dem Vorrat draußen ist. */
+      if (hit) { event.waitUntil(frisch.catch(function () {})); return hit; }
+      return frisch;
     })
   );
 });
