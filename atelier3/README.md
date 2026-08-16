@@ -216,18 +216,67 @@ Gewürfelt werden die Maße: Weite der Bereiche, Zahl der Mauerwerke im
 Schutzbereich (16, 20 oder 24), Größe der Torhäuser, Abstand der Binder. Zwei
 Anlagen sind so verschieden wie zwei Häuser desselben Baumeisters.
 
-**Eine Anlage hat immer n = 4.** Das ist keine Vorliebe, sondern Bedingung: Ein
-Quadrat ist vierzählig, und die Rasterung setzt exakte Drehsymmetrie um 2π/n
-voraus (siehe oben). Käme je ein anderes n heraus, zerfiele das Feld. Die
-Ornamente im Schutzbereich dürfen trotzdem 16-, 20- oder 24-zählig sein — alles
-Vielfache von vier.
+**Eine Anlage mit Quadrat im Grundriss hat n = 4.** Das ist keine Vorliebe,
+sondern Bedingung: Ein Quadrat ist vierzählig, und die Rasterung setzt exakte
+Drehsymmetrie um 2π/n voraus (siehe oben). Käme je ein anderes n heraus,
+zerfiele das Feld. Die Ornamente dürfen trotzdem 16-, 20-, 24- oder 32-zählig
+sein — alles Vielfache von vier. Einzig die Sternanlage, die kein Quadrat
+enthält, kommt auf n = 8.
 
-**Gerechnet wird in `per` und `lat`.** Die drei neuen Bauteile — `wall`,
-`yard`, `gate` — falten den Winkel auf eine der vier Himmelsrichtungen: `per`
-ist der Abstand vom Mittelpunkt senkrecht zur Mauer, `lat` die Lage längs der
-Mauer. Ein Quadrat ist in diesen Größen einfach `per = s`, und Binder sind
-Linien bei festem `lat`. Ohne diesen Kniff bräuchte es Kartesisches im
-Polarfeld, und die Nachschlagetabelle wäre hin.
+**Gerechnet wird in `per` und `lat`.** Die Bauteile `wall`, `yard`, `gate`,
+`tie`, `grid`, `quarters`, `cross` und `redent` falten den Winkel auf eine der
+vier Himmelsrichtungen: `per` ist der Abstand vom Mittelpunkt senkrecht zur
+Mauer, `lat` die Lage längs der Mauer. Ein Quadrat ist in diesen Größen einfach
+`per = s`, und Binder sind Linien bei festem `lat`. Ohne diesen Kniff bräuchte
+es Kartesisches im Polarfeld, und die Nachschlagetabelle wäre hin.
+
+Weil `angTo` den Winkel auf |a| ≤ π/4 faltet, gilt immer `|lat| ≤ per`. Das ist
+mehr als eine Nebenbemerkung: Ein Quadrat braucht deshalb **keine** Begrenzung
+längs der Seite — sie fällt aus der Faltung. Und wo im Feld `|lat|` steht statt
+`lat`, kommt zur Vierzähligkeit die Spiegelung dazu; zusammen ist das die volle
+Symmetrie des Quadrats. Deshalb genügt es beim Garten, jeden Baum **einmal**
+hinzuschreiben: Sein Partner jenseits der Diagonale entsteht von selbst.
+
+### Acht Grammatiken — was das Blatt zieht
+
+Blatt hat keinen Katalog, sondern würfelt. „Anlage“ zieht deshalb je Blatt eine
+von acht Ordnungen — dieselben acht, die im Mandala Atelier unter *Anlagen* zur
+Auswahl stehen: **Palast, Ringanlage, Garten, Stern, Raster, Stufen, Torstadt,
+Kuppel.** Dort wählt man, hier bekommt man.
+
+Übersetzt, nicht kopiert. Im Atelier ist ein Motiv eine Folge von Wegen; hier
+ist es eine Antwort auf die Frage *wie hoch liegt das Blatt an dieser Stelle*.
+Was dort eine Schleife über Punkte ist, muss hier eine Formel sein — und sie
+muss die Faltung aushalten. Ein Sternwall etwa ist im Atelier ein Polygonzug
+aus sechzehn Punkten; hier ist er **eine Gerade**, angegeben durch ihren
+Lotabstand von der Mitte und die Richtung des Lots.
+
+Drei Dinge sind dabei Bedingung, nicht Geschmack:
+
+- **Die Wahl der Grammatik verbraucht keinen Zufall.** Sie wird aus dem Seed
+  *gerechnet*, nicht gewürfelt. Würfeln würde den Zufallsstrom um einen Zug
+  verschieben, und jede Anlage von vor dieser Fassung bekäme andere Maße als
+  die, auf denen schon Farbe liegt.
+- **Ein gesichertes Blatt trägt seine Grammatik bei sich** — wie Welt und
+  Charakter. Käme später eine neunte dazu, bekäme ein längst bemaltes Blatt
+  sonst einen anderen Grundriss unter die Farbe geschoben. Blätter aus der
+  Zeit, als es nur den Palast gab, tragen nichts bei sich; für sie steht der
+  Palast fest.
+- **Das Feld bleibt exakt um 2π/n drehsymmetrisch.** Der Testlauf misst nicht
+  den Bauplan, sondern das Feld selbst: `fieldAt(rr, th)` gegen
+  `fieldAt(rr, th + 2π/n)` an sechshundert Stellen je Grammatik. Abweichung
+  null.
+
+![Die acht Grammatiken](../docs/anlage-blatt-acht.png)
+
+*Ein Seed, acht Grammatiken — so, wie eine leichte Hand sie fände.*
+
+Und eine vierte Zusage, die keine Bedingung ist, sondern das Gesetz dieser App:
+**In jeder der acht nimmt das Relief nach innen ab.** Das war leichter gesagt
+als gebaut. Ein Bauteil hat *eine* Höhe — also mussten die sechs Mauern der
+Torstadt sechs Bänder werden statt eines, die Beete des Gartens drei Reihen und
+das Raster drei konzentrische Zonen. Wer alle Mauern in ein Band legt, bekommt
+eine innerste Mauer, die so hoch dasteht wie die äußerste.
 
 ### Die Staffelung: nach innen gibt das Blatt weniger her
 

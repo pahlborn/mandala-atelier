@@ -489,7 +489,12 @@ const KINDS = [
      würfeln, nur bemessen. Gewürfelt werden hier die Maße, nicht die Ordnung.
 
      Das Wort bleibt trotzdem eine Stimmung, keine Formenkunde: „Anlage“ sagt,
-     dass hier etwas gebaut ist, in das man hineingehen kann. */
+     dass hier etwas gebaut ist, in das man hineingehen kann.
+
+     Und weil Blatt keinen Katalog hat, sondern würfelt, zieht die Stimmung je
+     Blatt eine von acht Grammatiken: heute ein Garten, morgen ein Stern,
+     übermorgen ein Gewölbe. Es sind dieselben acht, die im Mandala Atelier
+     unter „Anlagen“ zur Auswahl stehen – dort wählt man, hier bekommt man. */
   { id: 'anlage', name: 'Anlage', plan: 'anlage',
     axes: [4], bands: [8, 8], lw: [0.0050, 0.0064],
     wide: [], narrow: [] }
@@ -598,13 +603,13 @@ function nextThought() {
 /* Ohne Charakter verhält sich der Generator genau wie bisher. Das ist
    Absicht: Blätter, die vor den Kategorien entstanden sind, tragen keinen
    – und müssen beim Wiederaufnehmen dasselbe Relief bekommen wie damals. */
-function buildPlan(seed, kindId) {
+function buildPlan(seed, kindId, bauId) {
   const rng = mulberry32(seed);
   const pick = function (list) { return list[(rng() * list.length) | 0]; };
   const span = function (a, b) { return a + rng() * (b - a); };
 
   const art = kindById(kindId);
-  if (art && art.plan === 'anlage') return buildAnlage(seed, rng, span, pick, art);
+  if (art && art.plan === 'anlage') return buildAnlage(seed, rng, span, pick, art, bauId);
 
   const n  = pick(art ? art.axes : [8, 10, 12, 12, 12, 14, 16, 6, 18]);
   const lw = art ? span(art.lw[0], art.lw[1]) : span(0.0052, 0.0082);
@@ -687,9 +692,49 @@ function buildPlan(seed, kindId) {
    her. Beide Male wird das Innere mehr und mehr die eigene Arbeit.
    ------------------------------------------------------------------------- */
 
-function buildAnlage(seed, rng, span, pick, art) {
+/* Die acht Grammatiken. Blatt hat keinen Katalog – es würfelt. Die Stimmung
+   „Anlage“ zieht deshalb je Blatt eine Ordnung: heute ein Garten, morgen ein
+   Stern, übermorgen ein Gewölbe. Dieselben acht, die im Mandala Atelier unter
+   „Anlagen“ zur Auswahl stehen; dort wählt man, hier bekommt man.
+
+   Übersetzt, nicht kopiert. Dort ist ein Motiv eine Folge von Wegen, hier ist
+   es eine Antwort auf die Frage „wie hoch liegt das Blatt an dieser Stelle“.
+   Was dort eine Schleife über Punkte ist, muss hier eine Formel sein – und
+   sie muss die Faltung aushalten, mit der die Rasterung arbeitet. */
+const BAUTEN = ['palast', 'ringanlage', 'garten', 'stern',
+                'raster', 'stufen', 'torstadt', 'kuppel'];
+
+/* Welche Grammatik ein Seed zieht, wird **nicht** gewürfelt, sondern aus dem
+   Seed gerechnet. Das ist kein Geiz, sondern Notwendigkeit: Würfeln würde den
+   Zufallsstrom um einen Zug verschieben, und jede Anlage, die vor dieser
+   Fassung entstanden ist, bekäme andere Maße als die, auf denen schon Farbe
+   liegt. So bleibt der Strom unangetastet. */
+function bauFor(seed) {
+  let h = (seed ^ 0x9e3779b9) >>> 0;
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+  return BAUTEN[(h >>> 8) % BAUTEN.length];
+}
+
+/* Die Staffelung, jetzt als Regel statt als Tabelle: Was weiter außen liegt,
+   gibt mehr her. Die erste Anlage trägt ihre Werte noch von Hand ein – sie
+   dürfen sich nicht verschieben, sonst wäre jedes Blatt von gestern ein
+   anderes. Die sieben neuen rechnen sie aus. */
+function staffel(r) { return 0.52 + 0.48 * (r < 0 ? 0 : (r > 1 ? 1 : r)); }
+function strich(r)  { return 0.72 + 0.28 * (r < 0 ? 0 : (r > 1 ? 1 : r)); }
+
+function buildAnlage(seed, rng, span, pick, art, bauId) {
+  /* Der erste Zug bleibt der erste Zug. */
   const lw = span(art.lw[0], art.lw[1]);
 
+  const bau = BAUTEN.indexOf(bauId) >= 0 ? bauId : bauFor(seed);
+  const teile = BAUTEN_BAU[bau](rng, span, pick, lw);
+
+  return { n: teile.n, lw: lw, bands: teile.bands, rules: teile.rules,
+           seed: seed, bau: bau };
+}
+
+function bauPalast(rng, span, pick, lw) {
   const rRing  = span(0.760, 0.795);        // Grenze des Schutzbereichs
   const sOut   = rRing / Math.SQRT2;        // die Mauerecken berühren den Ring
   const sIn    = sOut * span(0.895, 0.925);
@@ -750,8 +795,470 @@ function buildAnlage(seed, rng, span, pick, art) {
     { r: rRing, style: 'double' }
   ];
 
-  return { n: 4, lw: lw, bands: bands, rules: rules, seed: seed };
+  return { n: 4, bands: bands, rules: rules };
 }
+
+
+/* --- Die Ringanlage -------------------------------------------------------
+   Derselbe Palast, aber der Schutzbereich ist in vier Bänder mit je eigenem
+   Mittel geteilt: Speichen, Blätter, Wellen, Perlen. Im Atelier war die
+   Lehre, dass Breite die Anzahl schlägt – fünf schmale Bänder verweben sich,
+   vier breite lesen sich als vier Rhythmen. Hier gilt sie genauso. */
+function bauRinganlage(rng, span, pick, lw) {
+  const rArc = span(0.665, 0.700);
+  const gap  = 1 - rArc;
+  const b1 = rArc + gap * 0.27, b2 = rArc + gap * 0.54, b3 = rArc + gap * 0.80;
+
+  /* Die Mauerecken müssen den Ring **durchstoßen**, nicht ihn berühren:
+     Genau auf dem Ring hängen die vier Vorhöfe an den Ecken zusammen. */
+  const sOut   = rArc / Math.SQRT2 + 0.006;
+  const sIn    = sOut * span(0.900, 0.930);
+  const sCourt = sOut * span(0.58, 0.65);
+  const sKam   = sOut * span(0.35, 0.42);
+  const rHeart = sOut * span(0.22, 0.28);
+
+  const gateHalf = sOut * span(0.15, 0.19);
+  const t1 = sOut * span(0.070, 0.085);
+  const t2 = sOut * span(0.055, 0.068);
+  const t3 = sOut * span(0.045, 0.056);
+  const wallTie  = sOut * span(0.16, 0.22);
+  const courtTie = sOut * span(0.22, 0.30);
+
+  const bands = [
+    { kind: 'beads', r1: b3,   r2: 1.0, m: 32, rho: span(0.42, 0.52),
+      filled: false, off: 0, gain: staffel(b3), lws: strich(b3) },
+
+    /* Die Welle bleibt **innerhalb** ihres Bandes. Durchstößt sie ihre
+       Randlinien, entstehen Linsen – und Linsen macht auch ein Blattkranz.
+       Zwei Bänder, dieselbe Bildsprache. Die Querwände teilen sie stattdessen. */
+    { kind: 'waves', r1: b2, r2: b3, m: 20, count: 1, amp: span(0.30, 0.40),
+      phase: 0, gain: staffel(b2), lws: strich(b2) },
+    { kind: 'rays', r1: b2, r2: b3, m: 20, off: Math.PI / 20, taper: false,
+      gain: staffel(b2), lws: strich(b2) },
+
+    { kind: 'petals', r1: b1, r2: b2, m: 24, fill: span(0.80, 0.92),
+      bias: span(0.90, 1.10), vein: false, inner: false, plateau: 0, off: 0,
+      gain: staffel(b1), lws: strich(b1) },
+
+    { kind: 'rays', r1: rArc, r2: b1, m: 24, off: 0, taper: false,
+      gain: staffel(rArc), lws: strich(rArc) },
+
+    { kind: 'yard', r1: sOut, r2: rArc, s: sOut, rOut: rArc,
+      tie: courtTie, gain: staffel(sOut), lws: strich(sOut) },
+
+    { kind: 'gate', r1: sOut, r2: sOut + t1 + t2 + t3 + lw * 4,
+      gain: staffel(sOut) - 0.04, lws: strich(sOut),
+      tiers: [
+        { half: gateHalf * 1.45, from: sOut,           to: sOut + t1 },
+        { half: gateHalf * 1.05, from: sOut + t1,      to: sOut + t1 + t2 },
+        { half: gateHalf * 0.62, from: sOut + t1 + t2, to: sOut + t1 + t2 + t3 }
+      ] },
+
+    { kind: 'wall', r1: sIn, r2: sOut * Math.SQRT2, s1: sIn, s2: sOut,
+      tie: wallTie, gate: gateHalf * 1.7,
+      gain: staffel(sIn), lws: strich(sIn) },
+    { kind: 'wall', r1: sCourt, r2: sIn * Math.SQRT2, s1: sCourt, s2: sIn,
+      tie: courtTie, gate: courtTie * 0.5,
+      gain: staffel(sCourt), lws: strich(sCourt) },
+    { kind: 'wall', r1: sKam, r2: sCourt * Math.SQRT2, s1: sKam, s2: sCourt,
+      tie: courtTie * 0.8, gate: 0,
+      gain: staffel(sKam), lws: strich(sKam) },
+
+    { kind: 'heart', r1: 0, r2: rHeart, plateau: span(0.42, 0.47),
+      gain: staffel(rHeart), lws: strich(rHeart) }
+  ];
+
+  const rules = [
+    { r: 1.0,  style: 'double' },
+    { r: b3,   style: 'single', gain: staffel(b3) },
+    { r: b2,   style: 'single', gain: staffel(b2) },
+    { r: b1,   style: 'single', gain: staffel(b1) },
+    { r: rArc, style: 'double', gain: staffel(rArc) }
+  ];
+
+  return { n: 4, bands: bands, rules: rules };
+}
+
+
+/* --- Der Garten -----------------------------------------------------------
+   Das Chahar Bagh: vier Wasserläufe, ein Becken in der Mitte, sechsunddreißig
+   Beete mit je einem Baum. Die Schwelle am Becken ist die eine Stelle, an der
+   es kippt – ohne sie sind die vier Arme und das Becken ein Feld. */
+function bauGarten(rng, span, pick, lw) {
+  const rRing = span(0.945, 0.975);
+  const S     = span(0.665, 0.700);
+  const sIn   = S * span(0.925, 0.945);
+  const kanal = S * span(0.085, 0.105);
+  const beck  = S * span(0.185, 0.225);
+
+  const schritt = (sIn - kanal) / 3;
+  const marks = [kanal, kanal + schritt, kanal + 2 * schritt, sIn];
+  const mitte = [kanal + schritt * 0.5, kanal + schritt * 1.5, kanal + schritt * 2.5];
+
+  const rho = schritt * span(0.26, 0.32);
+
+  const bands = [
+    { kind: 'rays', r1: rRing, r2: 1.0, m: 24, off: 0, taper: false,
+      gain: 1, lws: 1 },
+    { kind: 'yard', r1: S, r2: rRing, s: S, rOut: rRing,
+      tie: S * span(0.30, 0.40), gain: staffel(S), lws: strich(S) },
+    { kind: 'wall', r1: sIn, r2: S * Math.SQRT2, s1: sIn, s2: S,
+      tie: S * span(0.22, 0.30), gate: 0,
+      gain: staffel(sIn), lws: strich(sIn) },
+    /* Drei Beetreihen, drei Höhen. Dieselbe Beetkante liegt außen höher als
+       innen – das ist die Staffelung, in der Sprache eines Gartens. */
+    { kind: 'quarters', r1: marks[2], r2: sIn * Math.SQRT2,
+      kanal: kanal, inner: marks[2], s: sIn, marks: marks,
+      trees: baeume(mitte, 2), rho: rho,
+      gain: staffel(marks[2]), lws: strich(marks[2]) },
+    { kind: 'quarters', r1: marks[1], r2: marks[2] * Math.SQRT2,
+      kanal: kanal, inner: marks[1], s: marks[2], marks: marks,
+      trees: baeume(mitte, 1), rho: rho,
+      gain: staffel(marks[1]), lws: strich(marks[1]) },
+    { kind: 'quarters', r1: kanal, r2: marks[1] * Math.SQRT2,
+      kanal: kanal, inner: kanal, s: marks[1], marks: marks,
+      trees: baeume(mitte, 0), rho: rho,
+      gain: staffel(marks[0]), lws: strich(marks[0]) },
+    { kind: 'cross', r1: beck, r2: sIn, half: kanal, r0: beck, s: sIn,
+      gain: staffel(beck), lws: strich(beck) },
+    { kind: 'heart', r1: 0, r2: beck, m: 8, off: 0,
+      plateau: span(0.42, 0.47), gain: staffel(beck) - 0.04, lws: strich(beck) }
+  ];
+
+  const rules = [
+    { r: 1.0,   style: 'double' },
+    { r: rRing, style: 'single', gain: staffel(rRing) }
+  ];
+
+  return { n: 4, bands: bands, rules: rules };
+}
+
+
+/* --- Der Stern ------------------------------------------------------------
+   Die Sternfestung: acht Bastionen, dahinter Ringstraßen, in der Mitte eine
+   achteckige Piazza. Ein Sternwall ist **keine** geschlossene Außengrenze –
+   zwischen den Spitzen fällt er zurück, und was dort außen liegt, läuft ins
+   Blatt. Deshalb der Ring ganz außen und die Binder von den Spitzen dorthin. */
+/* Die Bäume einer Beetreihe. Nur die mit lat ≤ per stehen in der Liste – den
+   Rest legt die Symmetrie des Quadrats dazu, siehe den Fall 'quarters'. Die
+   Reihe eines Baums ist die größere seiner beiden Koordinaten; sein Partner
+   jenseits der Diagonale gehört damit von selbst in dieselbe. */
+function baeume(mitte, reihe) {
+  const liste = [];
+  for (let i = 0; i <= reihe; i++) liste.push([mitte[i], mitte[reihe]]);
+  return liste;
+}
+
+function bauStern(rng, span, pick, lw) {
+  const aT = span(0.975, 0.995);
+  const aC = aT * span(0.785, 0.815);
+  const bT = aT - span(0.070, 0.085);
+  const bC = aC - span(0.062, 0.075);
+  const innen = bC * span(0.94, 0.97);
+
+  const r1 = innen * span(0.86, 0.89);
+  const r2 = r1 * span(0.84, 0.87);
+  const r3 = r2 * span(0.79, 0.82);
+  const r4 = r3 * span(0.75, 0.79);
+  const nabe = r4 * span(0.46, 0.50);
+  const piaz = nabe * span(0.98, 1.02);
+
+  const bands = [
+    kante(aC, aT, 8, staffel(aT), strich(aT)),
+    kante(bC, bT, 8, staffel(bT), strich(bT)),
+
+    /* Von der Innenstadt über die Mauerwerke bis auf die Spitze – einmal auf
+       der Bastionsachse, einmal auf der Kurtinenecke. */
+    { kind: 'rays', r1: innen, r2: aT, m: 8, off: 0, taper: false,
+      gain: staffel(aT), lws: strich(aT) },
+    { kind: 'rays', r1: innen, r2: aC, m: 8, off: Math.PI / 8, taper: false,
+      gain: staffel(aC), lws: strich(aC) },
+    { kind: 'rays', r1: aT, r2: 1.0, m: 8, off: 0, taper: false,
+      gain: 1, lws: 1 },
+
+    { kind: 'rays', r1: r1, r2: innen, m: 16, off: Math.PI / 16, taper: false,
+      gain: staffel(r1), lws: strich(r1) },
+    { kind: 'rays', r1: r2, r2: r1, m: 16, off: 0, taper: false,
+      gain: staffel(r2), lws: strich(r2) },
+    { kind: 'rays', r1: r3, r2: r2, m: 8, off: Math.PI / 8, taper: false,
+      gain: staffel(r3), lws: strich(r3) },
+    { kind: 'rays', r1: r4, r2: r3, m: 8, off: 0, taper: false,
+      gain: staffel(r4), lws: strich(r4) },
+    /* Die Binder müssen bis *unter* die Achteckkante reichen: An der
+       Kantenmitte liegt sie näher an der Mitte als an der Ecke. Enden sie zu
+       früh, bleibt rundum ein Spalt und das ganze Band ist ein Feld. */
+    { kind: 'rays', r1: nabe, r2: r4, m: 8, off: 0, taper: false,
+      gain: staffel(nabe), lws: strich(nabe) },
+
+    { kind: 'heart', r1: 0, r2: piaz * Math.cos(Math.PI / 8), m: 8, off: 0,
+      plateau: span(0.42, 0.47), gain: staffel(piaz), lws: strich(piaz) }
+  ];
+
+  const rules = [
+    { r: 1.0,  style: 'double' },
+    { r: innen, style: 'double', gain: staffel(innen) },
+    { r: r1,   style: 'single', gain: staffel(r1) },
+    { r: r2,   style: 'single', gain: staffel(r2) },
+    { r: r3,   style: 'single', gain: staffel(r3) },
+    { r: r4,   style: 'single', gain: staffel(r4) }
+  ];
+
+  return { n: 8, bands: bands, rules: rules };
+}
+
+/* Eine Sternkante als Gerade. Im Keil um eine Spitze läuft sie von der Spitze
+   zur Kurtinenecke; gebraucht werden ihr Lotabstand von der Mitte und die
+   Richtung des Lots – dann ist die ganze Kante eine Zeile Feldfunktion. */
+function kante(rIn, rOut, m, gain, lws) {
+  const beta = Math.PI / m;
+  const phi  = Math.atan2(rOut - rIn * Math.cos(beta), rIn * Math.sin(beta));
+  return { kind: 'star', r1: rIn * Math.cos(beta), r2: rOut, m: m, off: 0,
+           phi: phi, p: rOut * Math.cos(phi), gain: gain, lws: lws };
+}
+
+
+/* --- Das Raster -----------------------------------------------------------
+   Vastu Purusha Mandala: neun mal neun Felder, kein Kranz. Als einzige Anlage
+   ohne Ringe im Inneren – die Ordnung liegt allein im Feld. */
+function bauRaster(rng, span, pick, lw) {
+  const rRing = span(0.945, 0.975);
+  const S     = span(0.660, 0.700);
+  const step  = (S * 2) / 9;
+
+  const bands = [
+    { kind: 'rays', r1: rRing, r2: 1.0, m: 24, off: 0, taper: false,
+      gain: 1, lws: 1 },
+    { kind: 'yard', r1: S, r2: rRing, s: S, rOut: rRing,
+      tie: S * span(0.36, 0.46), gain: staffel(S), lws: strich(S) },
+    { kind: 'poly', r1: 0, r2: S * Math.SQRT2, m: 4, off: 0, halves: [S],
+      gain: staffel(S), lws: strich(S) },
+    { kind: 'grid', r1: step * 3.5, r2: S * Math.SQRT2,
+      s0: step * 3.5, s: S, step: step, phase: 0.5,
+      gain: staffel(step * 4), lws: strich(step * 4) },
+    { kind: 'grid', r1: step * 1.5, r2: step * 3.5 * Math.SQRT2,
+      s0: step * 1.5, s: step * 3.5, step: step, phase: 0.5,
+      gain: staffel(step * 2.5), lws: strich(step * 2.5) },
+    { kind: 'grid', r1: 0, r2: step * 1.5 * Math.SQRT2,
+      s0: 0, s: step * 1.5, step: step, phase: 0.5, diag: step * 1.5,
+      gain: staffel(step), lws: strich(step) },
+    /* Das Brahmasthana: die neun Felder in der Mitte, die zusammengehören.
+
+       Im Atelier ist es **stärker** umrandet – dort geht das, dort ist Stärke
+       nur Strichbreite. Hier ginge es gegen das Gesetz dieser App, nach innen
+       gibt das Blatt weniger her. Es wird deshalb nicht durch mehr Linie
+       kenntlich, sondern durch weniger: Die neun Felder liegen als eine
+       einzige ruhige Fläche da, und die Diagonalen spannen sie. */
+    { kind: 'heart', r1: 0, r2: step * 1.5, m: 4, off: 0,
+      plateau: span(0.42, 0.47),
+      gain: staffel(step * 1.5), lws: strich(step * 1.5) }
+  ];
+
+  const rules = [
+    { r: 1.0,   style: 'double' },
+    { r: rRing, style: 'single', gain: staffel(rRing) }
+  ];
+
+  return { n: 4, bands: bands, rules: rules };
+}
+
+
+/* --- Die Stufen -----------------------------------------------------------
+   Borobudur: außen eckig, innen rund. Vier Umgänge mit vorspringender Mitte,
+   dann drei Rundterrassen mit Stupas. Der Übergang vom Quadrat zum Kreis ist
+   die Sache selbst – deshalb liegt er genau in der Mitte des Blattes. */
+function bauStufen(rng, span, pick, lw) {
+  const rRing = span(0.830, 0.870);
+  const h0 = span(0.595, 0.625);
+  const h1 = h0 * span(0.84, 0.87);
+  const h2 = h1 * span(0.82, 0.85);
+  const h3 = h2 * span(0.78, 0.81);
+  const halb = [h0, h1, h2, h3];
+  const spring = span(0.075, 0.10);
+
+  /* Die drei Rundterrassen. Im Atelier liegen sie enger beieinander und die
+     Stupas greifen über beide Randlinien – dort teilt das ihr Band. Im Relief
+     tut es das nicht: Drei Kreisreihen, die sich radial überlappen, laufen zu
+     einem Klumpen zusammen, aus dem keine Hand mehr einzelne Stupas
+     herausreibt. Hier stehen sie deshalb weiter auseinander und die Stupas
+     bleiben in ihrem Band. */
+  const t0 = span(0.325, 0.340);            // untere Terrasse
+  const t1 = t0 * span(0.76, 0.79);
+  const t2 = t1 * span(0.69, 0.72);
+  const kuppe = t2 * span(0.48, 0.52);
+
+  const bands = [
+    { kind: 'rays', r1: rRing, r2: 1.0, m: 24, off: 0, taper: false,
+      gain: 1, lws: 1 },
+    { kind: 'yard', r1: h0, r2: rRing, s: h0, rOut: rRing,
+      tie: h0 * span(0.30, 0.40), gain: staffel(h0), lws: strich(h0) }
+  ];
+
+  halb.forEach(function (h) {
+    bands.push({ kind: 'redent', r1: h, r2: h * Math.SQRT2,
+                 half: h, spring: h * spring, k: h * 0.44,
+                 gain: staffel(h), lws: strich(h) });
+  });
+  for (let i = 1; i < halb.length; i++) {
+    bands.push({ kind: 'tie', r1: halb[i], r2: halb[i - 1] * Math.SQRT2,
+                 s1: halb[i], s2: halb[i - 1], tie: halb[i] * span(0.30, 0.42),
+                 gate: 0, gain: staffel(halb[i]), lws: strich(halb[i]) });
+  }
+
+  /* Die Stupas greifen über beide Randlinien ihrer Terrasse und teilen ihr
+     Band damit selbst. */
+  bands.push(
+    { kind: 'rays', r1: t0, r2: h3, m: 8, off: 0, taper: false,
+      gain: staffel(t0), lws: strich(t0) },
+    stupas((t0 + t1) * 0.5, 20, span(0.021, 0.026), staffel(t0), strich(t0)),
+    stupas((t1 + t2) * 0.5, 16, span(0.021, 0.026), staffel(t1), strich(t1)),
+    stupas((t2 + kuppe) * 0.5, 8, span(0.021, 0.026), staffel(t2), strich(t2)),
+    { kind: 'heart', r1: 0, r2: kuppe, plateau: span(0.42, 0.47),
+      gain: staffel(kuppe), lws: strich(kuppe) }
+  );
+
+  const rules = [
+    { r: 1.0,   style: 'double' },
+    { r: rRing, style: 'single', gain: staffel(rRing) },
+    { r: t0,    style: 'single', gain: staffel(t0) },
+    { r: t1,    style: 'single', gain: staffel(t1) },
+    { r: t2,    style: 'single', gain: staffel(t2) }
+  ];
+
+  return { n: 4, bands: bands, rules: rules };
+}
+
+function stupas(r, m, rho, gain, lws) {
+  return { kind: 'beads', r1: r - rho, r2: r + rho, m: m, rho: 0.5,
+           filled: false, off: 0, gain: gain, lws: lws };
+}
+
+
+/* --- Die Torstadt ---------------------------------------------------------
+   Srirangam: sechs Mauerringe, drei Tore je Seite. Die Tore werden nach innen
+   **kleiner** – wie dort, wo der höchste Turm außen steht. Bei uns ist es
+   sonst überall umgekehrt, und genau deshalb steht sie hier. */
+function bauTorstadt(rng, span, pick, lw) {
+  const mauern = [];
+  let h = span(0.700, 0.730);
+  mauern.push(h);
+  for (let i = 1; i < 6; i++) {
+    h = h - span(0.098, 0.112);
+    mauern.push(h);
+  }
+
+  const bands = [
+    { kind: 'yard', r1: mauern[0], r2: 1.0, s: mauern[0], rOut: 1.0,
+      tie: mauern[0] * span(0.26, 0.34),
+      gain: staffel(mauern[0] * 1.2), lws: 1 },
+  ];
+
+  /* Jede Mauer ein eigenes Band. Alle sechs in eines zu legen wäre kürzer
+     gewesen und falsch: Ein Band hat **eine** Höhe, und dann stünde die
+     innerste Mauer so hoch da wie die äußerste. */
+  mauern.forEach(function (m) {
+    bands.push({ kind: 'poly', r1: m, r2: m * Math.SQRT2, m: 4, off: 0,
+                 halves: [m], gain: staffel(m), lws: strich(m) });
+  });
+
+  for (let i = 1; i < mauern.length; i++) {
+    bands.push({ kind: 'tie', r1: mauern[i], r2: mauern[i - 1] * Math.SQRT2,
+                 s1: mauern[i], s2: mauern[i - 1],
+                 tie: mauern[i] * span(0.32, 0.44), gate: 0,
+                 gain: staffel(mauern[i]), lws: strich(mauern[i]) });
+  }
+
+  mauern.forEach(function (m, i) {
+    const w = (0.065 - i * 0.0085) * span(0.92, 1.08);
+    const t = (0.037 - i * 0.0045) * span(0.92, 1.08);
+    bands.push({ kind: 'gate', r1: m, r2: m + t + lw * 4,
+                 at: [0, m * 0.55],
+                 tiers: [{ half: w, from: m, to: m + t }],
+                 gain: staffel(m), lws: strich(m) });
+  });
+
+  const rHeart = mauern[5] * span(0.50, 0.58);
+  bands.push({ kind: 'heart', r1: 0, r2: rHeart, plateau: span(0.42, 0.47),
+               gain: staffel(rHeart), lws: strich(rHeart) });
+
+  return { n: 4, bands: bands, rules: [{ r: 1.0, style: 'double' }] };
+}
+
+
+/* --- Die Kuppel -----------------------------------------------------------
+   Kein Grundriss, sondern ein Gewölbe von unten. Sie beantwortet zwei Dinge
+   auf einmal.
+
+   Erstens die Feldgröße: Eine Kassettenkuppel besteht aus lauter kleinen
+   Feldern, und jedes hat noch eine eingerückte Platte. Auf einer großen
+   Fläche wird Farbe von Hand streifig; hier gibt es keine große Fläche.
+
+   Zweitens die Staffelung: Nach innen hat eine Kuppel von selbst weniger
+   Kassetten – 32, 28, 24, 20, 16, 12, dann acht in der Laterne, dann das
+   Auge. Zum ersten Mal ist die Reihe **monoton**, ohne dass sie erfunden
+   werden musste; sie fällt aus der Bauform.
+
+   `bow` ist das, was der Seed hier ändert: wie steil das Gewölbe steht. Ein
+   Exponent auf den Radius lässt den Rand, wo er ist, und staucht die Reihen
+   zur Öffnung hin mehr oder weniger. Genau das sieht das Auge in einem
+   echten Gewölbe. */
+function bauKuppel(rng, span, pick, lw) {
+  const bow = span(0.88, 1.14);
+  const beuge = function (r) { return Math.pow(r, bow); };
+
+  const gesims = beuge(0.980);
+  const reihen = [
+    { r1: beuge(0.850), r2: gesims,       m: 32, inset: 0.0175 },
+    { r1: beuge(0.730), r2: beuge(0.850), m: 28, inset: 0.0175 },
+    { r1: beuge(0.620), r2: beuge(0.730), m: 24, inset: 0.0150 },
+    { r1: beuge(0.520), r2: beuge(0.620), m: 20, inset: 0.0150 },
+    { r1: beuge(0.430), r2: beuge(0.520), m: 16, inset: 0.0150 },
+    { r1: beuge(0.350), r2: beuge(0.430), m: 12, inset: 0.0125 }
+  ];
+  const laterne = beuge(0.195);
+  const auge    = beuge(0.150);
+
+  const bands = [
+    { kind: 'rays', r1: gesims, r2: 1.0, m: 32, off: 0, taper: false,
+      gain: 1, lws: 1 }
+  ];
+
+  reihen.forEach(function (z) {
+    bands.push({ kind: 'coffer', r1: z.r1, r2: z.r2, m: z.m, off: 0,
+                 inset: z.inset, plateau: 0.50,
+                 gain: staffel(z.r2), lws: strich(z.r2) });
+  });
+
+  bands.push(
+    { kind: 'rays', r1: laterne, r2: reihen[5].r1, m: 8, off: Math.PI / 8,
+      taper: false, gain: staffel(laterne), lws: strich(laterne) },
+    { kind: 'rays', r1: auge, r2: laterne, m: 8, off: 0, taper: false,
+      gain: staffel(auge), lws: strich(auge) },
+    /* Das Auge bleibt leer. Es ist die Öffnung, durch die das Licht fällt –
+       und wie bei jeder Anlage kein Ziel, sondern ein Ort. */
+    { kind: 'heart', r1: 0, r2: auge, plateau: span(0.42, 0.47),
+      gain: staffel(auge), lws: strich(auge) }
+  );
+
+  const rules = [{ r: 1.0, style: 'double' },
+                 { r: gesims, style: 'single', gain: staffel(gesims) }];
+  reihen.forEach(function (z) {
+    rules.push({ r: z.r1, style: 'single', gain: staffel(z.r2) });
+  });
+  rules.push({ r: laterne, style: 'single', gain: staffel(laterne) });
+
+  return { n: 4, bands: bands, rules: rules };
+}
+
+const BAUTEN_BAU = {
+  palast:     bauPalast,
+  ringanlage: bauRinganlage,
+  garten:     bauGarten,
+  stern:      bauStern,
+  raster:     bauRaster,
+  stufen:     bauStufen,
+  torstadt:   bauTorstadt,
+  kuppel:     bauKuppel
+};
 
 function bandParams(kind, r1, r2, n, rng, span, pick) {
   const b = { kind: kind, r1: r1, r2: r2, m: rng() < 0.32 ? n * 2 : n };
@@ -836,6 +1343,10 @@ function angTo(th, m, off) {
 function frac(x) { return x - Math.floor(x); }
 function distInt(x) { const f = frac(x); return f < 0.5 ? f : 1 - f; }
 
+/* Ein einzelnes Tor in der Mitte der Seite – der Regelfall. Als Konstante,
+   damit die Feldfunktion nicht bei jedem Punkt ein Feld anlegt. */
+const ZERO = [0];
+
 function fieldAt(plan, rr, th) {
   const lw = plan.lw;
   const bands = plan.bands;
@@ -849,11 +1360,20 @@ function fieldAt(plan, rr, th) {
     const h = b.r2 - b.r1;
     const u = h > 0 ? (rr - b.r1) / h : 0;
 
+    /* Zwei Stellschrauben, die jedes Bauteil haben darf: `gain` senkt seine
+       Höhe, `lws` verschmälert seinen Strich. Beide fehlen bei den alten
+       Ornamentbändern – dann sind sie 1, und die Rechnung ist Bit für Bit
+       dieselbe wie vorher. Ein Blatt von gestern bleibt das Blatt von
+       gestern. */
+    const gain = b.gain === undefined ? 1 : b.gain;
+    const w    = b.lws  === undefined ? lw : lw * b.lws;
+    let e = 0;
+
     switch (b.kind) {
 
       case 'hub': {
         if (rr < b.r2) plate = Math.max(plate, 0.64);
-        if (b.ring) ridge = Math.max(ridge, gauss(rr - b.r2 * 0.55, lw));
+        if (b.ring) e = gauss(rr - b.r2 * 0.55, w);
         break;
       }
 
@@ -862,13 +1382,13 @@ function fieldAt(plan, rr, th) {
         const a = angTo(th, b.m, b.off);
         const shape = Math.pow(Math.sin(Math.PI * Math.pow(u, b.bias)), 0.72);
         const half  = (Math.PI / b.m) * b.fill * shape;
-        ridge = Math.max(ridge, gauss((Math.abs(a) - half) * rr, lw));
+        e = gauss((Math.abs(a) - half) * rr, w);
         if (b.inner) {
-          ridge = Math.max(ridge, gauss((Math.abs(a) - half * 0.52) * rr, lw * 0.85));
+          e = Math.max(e, gauss((Math.abs(a) - half * 0.52) * rr, w * 0.85));
         }
         if (b.vein) {
           const fade = Math.min(1, Math.min(u, 1 - u) * 8);
-          ridge = Math.max(ridge, gauss(a * rr, lw) * fade);
+          e = Math.max(e, gauss(a * rr, w) * fade);
         }
         if (b.plateau && Math.abs(a) < half) plate = Math.max(plate, b.plateau);
         break;
@@ -880,7 +1400,7 @@ function fieldAt(plan, rr, th) {
         const arc = (TAU * rr) / b.m;
         const d1  = distInt(t + u * b.k) * arc;
         const d2  = distInt(t - u * b.k) * arc;
-        ridge = Math.max(ridge, gauss(Math.min(d1, d2), lw * 1.15));
+        e = gauss(Math.min(d1, d2), w * 1.15);
         break;
       }
 
@@ -889,7 +1409,7 @@ function fieldAt(plan, rr, th) {
         const rho = Math.min(h * 0.5, (TAU * rm) / b.m * 0.5) * b.rho * 2;
         const a   = angTo(th, b.m, b.off);
         const d   = Math.sqrt(Math.max(0, rr * rr + rm * rm - 2 * rr * rm * Math.cos(a)));
-        ridge = Math.max(ridge, gauss(d - rho, lw));
+        e = gauss(d - rho, w);
         if (b.filled && d < rho) plate = Math.max(plate, 0.60);
         break;
       }
@@ -900,7 +1420,7 @@ function fieldAt(plan, rr, th) {
           const amp = (h / b.count) * b.amp;
           const ph  = b.phase * k;
           const target = rc + amp * Math.cos(b.m * th + ph);
-          ridge = Math.max(ridge, gauss(rr - target, lw));
+          e = Math.max(e, gauss(rr - target, w));
         }
         break;
       }
@@ -909,8 +1429,8 @@ function fieldAt(plan, rr, th) {
         if (u < 0 || u > 1) break;
         const a = angTo(th, b.m, b.off);
         const fade = Math.min(1, Math.min(u, 1 - u) * 10);
-        const w = b.taper ? lw * (0.5 + u) : lw;
-        ridge = Math.max(ridge, gauss(a * rr, w) * fade);
+        const wr = b.taper ? w * (0.5 + u) : w;
+        e = gauss(a * rr, wr) * fade;
         break;
       }
 
@@ -920,7 +1440,7 @@ function fieldAt(plan, rr, th) {
         const a   = angTo(th, b.m, b.off);
         const d   = Math.sqrt(Math.max(0, rr * rr + rm * rm - 2 * rr * rm * Math.cos(a)));
         const outer = Math.min(1, Math.max(0, (rr - rm) / (h * 0.18)));
-        ridge = Math.max(ridge, gauss(d - rho, lw) * outer);
+        e = gauss(d - rho, w) * outer;
         break;
       }
 
@@ -931,7 +1451,8 @@ function fieldAt(plan, rr, th) {
          `lat` die Lage längs der Mauer. Ein Quadrat ist in diesen Größen
          einfach `per = s` – und weil die Faltung vierzählig ist, bleibt das
          Feld exakt um 2π/4 drehsymmetrisch, so wie die Rasterung es verlangt.
-         Deshalb hat eine Anlage immer n = 4.
+         Jede Anlage mit einem Quadrat im Grundriss hat deshalb n = 4; nur der
+         Stern, der keines hat, kommt auf n = 8.
 
          `gain` senkt die Höhe des Bauteils. Das ist bei den Anlagen kein
          Detail, sondern die ganze Idee: Nach innen gibt das Blatt immer
@@ -941,15 +1462,13 @@ function fieldAt(plan, rr, th) {
         const a   = angTo(th, 4, 0);
         const per = rr * Math.cos(a);
         const lat = rr * Math.sin(a);
-        const w   = lw * b.lws;
-        let e = Math.max(gauss(per - b.s1, w), gauss(per - b.s2, w));
+        e = Math.max(gauss(per - b.s1, w), gauss(per - b.s2, w));
         /* Binder zwischen den Fluchten – ohne sie ist die Mauer ein Band
            ohne Maß, und im Relief verschwindet sie zur bloßen Doppellinie.
            Am Tor bleiben sie weg, dort steht das Torhaus. */
         if (per > b.s1 - lw && per < b.s2 + lw && Math.abs(lat) > b.gate) {
           e = Math.max(e, gauss(distInt(lat / b.tie) * b.tie, w * 0.9));
         }
-        ridge = Math.max(ridge, e * b.gain);
         break;
       }
 
@@ -962,8 +1481,7 @@ function fieldAt(plan, rr, th) {
            weich auslaufend, damit nichts ins Nichts stößt. */
         const fade = Math.min(1, (per - b.s) / (lw * 6)) *
                      Math.min(1, (b.rOut - rr) / (lw * 6));
-        const e = gauss(distInt(lat / b.tie) * b.tie, lw * b.lws * 0.9) * Math.max(0, fade);
-        ridge = Math.max(ridge, e * b.gain);
+        e = gauss(distInt(lat / b.tie) * b.tie, w * 0.9) * Math.max(0, fade);
         break;
       }
 
@@ -971,29 +1489,180 @@ function fieldAt(plan, rr, th) {
         const a   = angTo(th, 4, 0);
         const per = rr * Math.cos(a);
         const lat = Math.abs(rr * Math.sin(a));
-        let e = 0;
-        for (let k = 0; k < b.tiers.length; k++) {
-          const t = b.tiers[k];
-          if (per >= t.from && per <= t.to) {
-            e = Math.max(e, gauss(lat - t.half, lw * b.lws));   // die Wangen
-          }
-          if (lat <= t.half) {
-            e = Math.max(e, gauss(per - t.to, lw * b.lws));     // die Deckplatte
+        /* `at` sind die Torachsen längs der Mauer. Ohne Angabe steht ein
+           einziges Tor in der Mitte der Seite – so war es, als es nur die
+           eine Anlage gab. Die Torstadt hat drei je Seite. */
+        const at = b.at || ZERO;
+        for (let j = 0; j < at.length; j++) {
+          const d = Math.abs(lat - at[j]);
+          for (let k = 0; k < b.tiers.length; k++) {
+            const t = b.tiers[k];
+            if (per >= t.from && per <= t.to) {
+              e = Math.max(e, gauss(d - t.half, w));            // die Wangen
+            }
+            if (d <= t.half) {
+              e = Math.max(e, gauss(per - t.to, w));            // die Deckplatte
+            }
           }
         }
-        ridge = Math.max(ridge, e * b.gain);
         break;
       }
 
       case 'heart': {
         /* Die Mitte. Das flachste Stück des ganzen Blattes und das einzige
            ohne Ornament – sie kommt nur unter einer geduldigen Hand hoch,
-           und was dort entsteht, gehört niemandem sonst. */
-        if (rr < b.r2) plate = Math.max(plate, b.plateau);
-        ridge = Math.max(ridge, gauss(rr - b.r2, lw * b.lws) * b.gain);
+           und was dort entsteht, gehört niemandem sonst.
+
+           Mit `m` ist ihre Grenze ein Vieleck statt eines Kreises; r2 ist
+           dann der Abstand zur Kantenmitte. Das Becken im Garten und die
+           Piazza der Sternanlage sind achteckig. */
+        const d = b.m ? rr * Math.cos(angTo(th, b.m, b.off || 0)) - b.r2
+                      : rr - b.r2;
+        if (d < 0) plate = Math.max(plate, b.plateau);
+        e = gauss(d, w);
+        break;
+      }
+
+      /* --- Sieben weitere Grammatiken -----------------------------------
+         Ab hier sind es Bauteile, die es im Mandala Atelier als Motiv gibt
+         und die hier als Höhenfeld noch einmal geschrieben werden mussten.
+         Übersetzt, nicht kopiert: Dort wird ein Weg gezogen, hier eine Höhe
+         an einem Punkt beantwortet. Was dort eine Schleife über Punkte ist,
+         ist hier eine Formel – und sie muss die Faltung aushalten. */
+
+      case 'tie': {
+        /* Nur die Binder zwischen zwei Fluchten, ohne die Fluchten selbst.
+           Die Stufenanlage braucht das: Ihre Umgänge sind keine geraden
+           Quadrate, die Querwände dazwischen aber schon. */
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = rr * Math.sin(a);
+        if (per < b.s1 - lw || per > b.s2 + lw) break;
+        if (Math.abs(lat) < (b.gate || 0)) break;
+        e = gauss(distInt(lat / b.tie) * b.tie, w * 0.9);
+        break;
+      }
+
+      case 'poly': {
+        /* Ein regelmäßiges Vieleck, oder mehrere ineinander. `halves` sind
+           die Abstände zur Kantenmitte – bei m = 4 also die halbe
+           Quadratseite. Weil die Faltung auf |a| ≤ π/m bringt, genügt eine
+           einzige Kante: rr·cos a ist der Lotabstand auf sie. */
+        const c = rr * Math.cos(angTo(th, b.m, b.off || 0));
+        for (let k = 0; k < b.halves.length; k++) {
+          e = Math.max(e, gauss(c - b.halves[k], w));
+        }
+        break;
+      }
+
+      case 'star': {
+        /* Der Sternwall. In jedem Keil läuft eine gerade Kante von der
+           Bastionsspitze zur Kurtinenecke; `p` ist ihr Lotabstand von der
+           Mitte, `phi` die Richtung des Lots. Beides wird beim Bau
+           ausgerechnet, hier steht nur noch die Gerade. */
+        const a = Math.abs(angTo(th, b.m, b.off || 0));
+        e = gauss(rr * Math.cos(a - b.phi) - b.p, w);
+        break;
+      }
+
+      case 'grid': {
+        /* Das Vastu-Raster: gleiche Teilung längs und quer. In der Faltung
+           ist `per` die eine Richtung und `lat` die andere – ein Raster ist
+           vierzählig, also fällt beides zusammen. */
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = rr * Math.sin(a);
+        /* `s0` schneidet nach innen ab. Damit lässt sich dasselbe Raster in
+           konzentrische Zonen legen, jede mit eigener Höhe – im Vastu sind
+           die Ringe um das Brahmasthana ohnehin die Ordnung, und hier tragen
+           sie zugleich die Staffelung: Dieselbe Linie liegt weiter außen
+           höher als weiter innen. */
+        if (per > b.s + lw || per < (b.s0 || 0) - lw) break;
+        const ph = b.phase || 0;
+        e = Math.max(gauss(distInt(per / b.step + ph) * b.step, w),
+                     gauss(distInt(lat / b.step + ph) * b.step, w));
+        /* Das Brahmasthana in der Mitte ist über die Ecken verspannt –
+           und die Diagonale liegt genau auf der Faltkante. */
+        if (b.diag && per < b.diag) {
+          e = Math.max(e, gauss((per - Math.abs(lat)) * Math.SQRT1_2, w));
+        }
+        break;
+      }
+
+      case 'quarters': {
+        /* Die Beete des Paradiesgartens: ein Feld zwischen `inner` und `s`,
+           von den Marken geteilt, in jedem Feld ein Baum.
+
+           Die Bäume stehen nur mit lat ≤ per in der Liste. Den Rest macht
+           die Faltung: |lat| spiegelt an der Seitenachse, die Vierzähligkeit
+           dreht – zusammen ist das die volle Symmetrie des Quadrats, und
+           die legt zu jedem Baum seinen Partner jenseits der Diagonale. */
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = Math.abs(rr * Math.sin(a));
+        if (per > b.s || per < b.inner || lat < b.kanal) break;
+        for (let k = 0; k < b.marks.length; k++) {
+          e = Math.max(e, gauss(per - b.marks[k], w), gauss(lat - b.marks[k], w));
+        }
+        for (let k = 0; k < b.trees.length; k++) {
+          const t  = b.trees[k];
+          const dx = lat - t[0], dy = per - t[1];
+          e = Math.max(e, gauss(Math.sqrt(dx * dx + dy * dy) - b.rho, w));
+        }
+        break;
+      }
+
+      case 'cross': {
+        /* Die vier Wasserläufe. Die Schwelle am Becken ist keine Zierde:
+           Ohne sie sind die vier Arme und das Becken ein einziges Feld –
+           dieselbe Falle wie im Atelier, nur in anderer Sprache. */
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = Math.abs(rr * Math.sin(a));
+        if (per >= b.r0 && per <= b.s) e = gauss(lat - b.half, w);
+        if (lat <= b.half) e = Math.max(e, gauss(per - b.r0, w));
+        break;
+      }
+
+      case 'redent': {
+        /* Der Umgang mit vorspringender Mitte – Borobudur. Drei Stücke je
+           Seite: die beiden Flanken auf `half`, der Vorsprung auf
+           `half + spring`, und die zwei Wangen dazwischen. */
+        const a   = angTo(th, 4, 0);
+        const per = rr * Math.cos(a);
+        const lat = Math.abs(rr * Math.sin(a));
+        const out = b.half + b.spring;
+        if (lat >= b.k) e = gauss(per - b.half, w);
+        else            e = gauss(per - out, w);
+        if (per > b.half - lw && per < out + lw) {
+          e = Math.max(e, gauss(lat - b.k, w));
+        }
+        break;
+      }
+
+      case 'coffer': {
+        /* Eine Reihe Kassetten. Erst die Rippen zwischen den Feldern, dann
+           in jedem Feld die eingerückte Platte: zwei Bögen und zwei
+           Seitenkanten. Die Faltung bringt auf eine *halbe* Kassette – die
+           Platte steht deshalb nur einmal da, bei |a| = da. */
+        const a = Math.abs(angTo(th, b.m, b.off || 0));
+        e = gauss(a * rr, w) * Math.min(1, Math.min(u, 1 - u) * 10);
+        const da = b.inset / ((b.r1 + b.r2) * 0.5);
+        if (a > da) {
+          e = Math.max(e, gauss(rr - (b.r1 + b.inset), w),
+                          gauss(rr - (b.r2 - b.inset), w));
+        }
+        if (rr > b.r1 + b.inset && rr < b.r2 - b.inset) {
+          e = Math.max(e, gauss((a - da) * rr, w));
+        }
+        if (a > da && rr > b.r1 + b.inset && rr < b.r2 - b.inset) {
+          plate = Math.max(plate, b.plateau || 0);
+        }
         break;
       }
     }
+
+    if (e > 0) ridge = Math.max(ridge, e * gain);
   }
 
   /* Randlinien. Der Abstandstest davor spart die teure Exponentialfunktion
@@ -1215,6 +1884,7 @@ const sheet = {
   plan: null,
   world: null,
   kind: null,
+  bau: null,
   pigments: null,
   relief: null,
   dens: null,
@@ -2006,7 +2676,7 @@ async function saveCurrent() {
     if (!blob) return;
     await Speicher.put('kv', {
       blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
-      kind: sheet.kind && sheet.kind.id,
+      kind: sheet.kind && sheet.kind.id, bau: sheet.bau,
       pigment: pigmentIndex, zeit: Date.now()
     }, 'blatt');
     savedAt = performance.now();
@@ -2024,7 +2694,7 @@ async function shelveCurrent() {
   await Speicher.put('blaetter', {
     id: String(Date.now()) + '-' + Math.floor(Math.random() * 1e6),
     blob: blob, seed: sheet.seed, mode: sheet.mode, world: sheet.world.id,
-    kind: sheet.kind && sheet.kind.id, zeit: Date.now()
+    kind: sheet.kind && sheet.kind.id, bau: sheet.bau, zeit: Date.now()
   });
   return true;
 }
@@ -2032,7 +2702,10 @@ async function shelveCurrent() {
 /* Ein gesichertes Blatt wird wieder das laufende – beim Start und beim
    Aufnehmen vom Stapel derselbe Weg. */
 async function adoptSheet(rec) {
-  makeSheet(rec.seed, rec.mode, rec.world, rec.kind);
+  /* Ein Blatt aus der Zeit vor den sieben Grammatiken trägt kein `bau` bei
+     sich. Es war damals der Palast, und es bleibt der Palast – sonst läge
+     die Farbe von damals auf einem fremden Grundriss. */
+  makeSheet(rec.seed, rec.mode, rec.world, rec.kind, rec.bau || 'palast');
   buildPigments();
   setPigment(rec.pigment || 0);
 
@@ -2626,7 +3299,7 @@ function hintStrength() {
 }
 
 /* Baut Relief, Papier und Puffer für ein Blatt. */
-function makeSheet(seed, mode, worldId, kindId) {
+function makeSheet(seed, mode, worldId, kindId, bauId) {
   sheet.seed   = seed >>> 0;
   sheet.mode   = SHEETS[mode] ? mode : 'tag';
   sheet.look   = SHEETS[sheet.mode];
@@ -2643,7 +3316,14 @@ function makeSheet(seed, mode, worldId, kindId) {
      ein anderes Relief als das, auf dem schon Farbe liegt. */
   sheet.kind = kindById(kindId);
 
-  sheet.plan   = buildPlan(sheet.seed, sheet.kind && sheet.kind.id);
+  /* Und die Grammatik ebenso. Die Stimmung „Anlage“ zieht je Blatt eine der
+     acht – gerechnet aus dem Seed, also für ein frisches Blatt von selbst
+     richtig. Ein gesichertes Blatt bringt sie trotzdem mit: Käme später eine
+     neunte dazu, bekäme ein längst bemaltes Blatt sonst einen anderen
+     Grundriss unter die Farbe geschoben. Blätter aus der Zeit, als es nur den
+     Palast gab, tragen nichts bei sich – für sie steht der Palast fest. */
+  sheet.plan   = buildPlan(sheet.seed, sheet.kind && sheet.kind.id, bauId);
+  sheet.bau    = sheet.plan.bau || null;
   sheet.relief = rasterRelief(sheet.plan);
 
   if (!sheet.pix) {
@@ -2900,6 +3580,7 @@ window.Blatt = {
   openLade: openLade,
   lade: lade,
   KINDS: KINDS,
+  BAUTEN: BAUTEN, bauFor: bauFor,
   THOUGHTS: THOUGHTS,
   nextThought: nextThought,
   buildPlan: buildPlan, fieldAt: fieldAt,
@@ -2913,8 +3594,9 @@ window.Blatt = {
   makeSheet: function (seed, mode, world) {
     makeSheet(seed, mode, world); buildPigments(); setPigment(0); paint();
   },
-  makeSheetFull: function (seed, mode, world, kind) {
-    makeSheet(seed, mode, world, kind); buildPigments(); setPigment(0); paint();
+  makeSheetFull: function (seed, mode, world, kind, bau) {
+    makeSheet(seed, mode, world, kind, bau);
+    buildPigments(); setPigment(0); paint();
   },
   setPigment: setPigment,
   /* Ein Zug über einen Pfad, wie ihn die Hand führen würde. Der Griff ist

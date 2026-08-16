@@ -496,7 +496,7 @@ async function run() {
        voraus. Käme hier je ein anderes n heraus, zerfiele das Feld. */
     let vier = true, teile = true;
     for (let i = 0; i < 40; i++) {
-      const plan = B.buildPlan(3000 + i * 911, 'anlage');
+      const plan = B.buildPlan(3000 + i * 911, 'anlage', 'palast');
       if (plan.n !== 4) vier = false;
       const arten = plan.bands.map(function (b) { return b.kind; });
       ['yard', 'gate', 'wall', 'heart'].forEach(function (k) {
@@ -505,7 +505,7 @@ async function run() {
     }
 
     /* Die Staffelung: von außen nach innen muss das Relief abnehmen. */
-    const plan = B.buildPlan(20250813, 'anlage');
+    const plan = B.buildPlan(20250813, 'anlage', 'palast');
     const wall = plan.bands.filter(function (b) { return b.kind === 'wall'; });
     const yard = plan.bands.filter(function (b) { return b.kind === 'yard'; })[0];
     const herz = plan.bands.filter(function (b) { return b.kind === 'heart'; })[0];
@@ -548,14 +548,164 @@ async function run() {
     console.log('  ' + pad(s.ort, 24) + pad('Relief ' + s.h.toFixed(2), 14) +
                 'nach zwei leichten Zügen ' + s.dichte.toFixed(2));
   });
-  prüfe('eine Anlage ist immer vierzählig', anlage.vier, '40 Seeds');
-  prüfe('jede Anlage hat Vorhof, Tore, Mauern, Mitte', anlage.teile);
+  prüfe('der Palast ist immer vierzählig', anlage.vier, '40 Seeds');
+  prüfe('jeder Palast hat Vorhof, Tore, Mauern, Mitte', anlage.teile);
   prüfe('das Relief nimmt nach innen ab', anlage.faellt,
         'außen ' + anlage.stufen[0].dichte.toFixed(2) + ' gegen innen ' +
         anlage.stufen[anlage.stufen.length - 1].dichte.toFixed(2) +
         ', Spanne ' + anlage.spanne.toFixed(1) + '-fach');
   prüfe('auch die Mitte bleibt auffindbar', anlage.verhaeltnis > 1.25,
         (anlage.verhaeltnis).toFixed(2) + '-fach über der blanken Fläche');
+
+  /* Die acht Grammatiken.
+
+     Blatt hat keinen Katalog, sondern würfelt – die Stimmung „Anlage“ zieht
+     je Blatt eine Ordnung. Vier Zusagen hängen daran, und drei davon sind
+     nicht Geschmack, sondern Bedingung:
+
+       * Die Rasterung rechnet das Feld über einen einzigen Keil und dreht es
+         n-mal. Ist das Feld nicht **exakt** um 2π/n symmetrisch, zerfällt es.
+         Das ist die schärfste Prüfung hier, und sie ersetzt jedes Zählen von
+         Ornamenten: Gemessen wird das Feld selbst, nicht der Bauplan.
+       * Die Wahl der Grammatik darf **keinen** Zufall verbrauchen. Täte sie
+         es, verschöbe sich der Strom um einen Zug, und jede Anlage von vor
+         dieser Fassung bekäme andere Maße als die, auf denen Farbe liegt.
+       * Ein gesichertes Blatt ohne Grammatik ist ein Palast – so hieß die
+         einzige Anlage, als es die anderen sieben noch nicht gab.
+
+     Und die vierte: In jeder von ihnen nimmt das Relief nach innen ab. Das
+     ist das Gesetz dieser App, und es gilt nicht nur für die eine Anlage,
+     mit der es eingeführt wurde. */
+  console.log('\nDie acht Grammatiken');
+  const bauten = await page.evaluate(function () {
+    const B = window.Blatt;
+    const namen = B.BAUTEN;
+
+    /* Kommen alle vor, und zieht ein Seed immer dieselbe? */
+    const zahl = {};
+    namen.forEach(function (b) { zahl[b] = 0; });
+    let fest = true;
+    for (let i = 0; i < 400; i++) {
+      const seed = (i * 2654435761) >>> 0;
+      const bau = B.buildPlan(seed, 'anlage').bau;
+      if (bau !== B.bauFor(seed)) fest = false;
+      zahl[bau]++;
+    }
+
+    /* Kostet die Wahl Zufall? Dann wäre lw je nach Grammatik verschieden. */
+    let ohneZufall = true, palastBleibt = true;
+    for (let i = 0; i < 60; i++) {
+      const seed = 7000 + i * 613;
+      const a = B.buildPlan(seed, 'anlage', 'palast');
+      const b = B.buildPlan(seed, 'anlage', 'kuppel');
+      if (a.lw !== b.lw) ohneZufall = false;
+      if (a.bau !== 'palast') palastBleibt = false;
+    }
+
+    /* Das Feld selbst: exakt drehsymmetrisch um 2π/n. */
+    let schief = 0;
+    namen.forEach(function (bau) {
+      const plan = B.buildPlan(4242, 'anlage', bau);
+      const dreh = (Math.PI * 2) / plan.n;
+      for (let i = 0; i < 600; i++) {
+        const rr = 0.02 + (i % 50) * 0.02;
+        const th = (i * 0.7351) % (Math.PI * 2);
+        const d = Math.abs(B.fieldAt(plan, rr, th) -
+                           B.fieldAt(plan, rr, th + dreh));
+        if (d > schief) schief = d;
+      }
+    });
+
+    /* Die Staffelung, je Grammatik. Gemessen wird der höchste Grat in einem
+       Ring – ein Flächenmittel wäre von der blanken Fläche beherrscht und
+       sagte nichts. */
+    const ringe = [0.90, 0.75, 0.60, 0.45, 0.30];
+    const profile = namen.map(function (bau) {
+      const plan = B.buildPlan(20250816, 'anlage', bau);
+      const hoehen = ringe.map(function (r) {
+        let top = 0;
+        for (let k = 0; k < 24; k++) {
+          const rr = r - 0.045 + k * 0.09 / 23;
+          for (let j = 0; j < 360; j++) {
+            const h = B.fieldAt(plan, rr, (j / 360) * Math.PI * 2);
+            if (h > top) top = h;
+          }
+        }
+        return top;
+      });
+      /* Verlangt wird nicht, dass jeder Ring niedriger ist als der davor –
+         ein Bauteil wie der Vorhof reicht über mehrere Ringe und ist dort
+         überall gleich hoch. Verlangt wird, dass es **nie hinaufgeht**, und
+         dass zwischen außen und innen eine spürbare Spanne liegt.
+
+         Die halbe Promille Spielraum ist kein Nachlass, sondern die Auflösung
+         der Messung selbst: Abgetastet wird ein Raster, und zwei Ringe treffen
+         denselben Grat verschieden genau. Beim Raster lagen zwei Werte um
+         6·10⁻⁶ auseinander und waren bei feiner Abtastung Bit für Bit gleich –
+         gemessen wurde die Abtastung, nicht das Relief. */
+      let faellt = true;
+      for (let i = 1; i < hoehen.length; i++) {
+        if (hoehen[i] > hoehen[i - 1] * 1.0005) faellt = false;
+      }
+      const spanne = hoehen[0] / hoehen[hoehen.length - 1];
+
+      /* Und die Mitte: flach, leer – aber auffindbar. Ihre Grenze ist mal
+         ein Kreis, mal ein Vieleck; abgetastet wird der ganze Streifen
+         zwischen Kantenmitte und Ecke. */
+      const herz = plan.bands.filter(function (b) { return b.kind === 'heart'; })[0];
+      const rEck = herz.m ? herz.r2 / Math.cos(Math.PI / herz.m) : herz.r2;
+      let mitte = 0, blank = 1;
+      for (let k = 0; k <= 20; k++) {
+        const rr = herz.r2 + (rEck - herz.r2) * (k / 20);
+        for (let j = 0; j < 360; j++) {
+          const h = B.fieldAt(plan, rr, (j / 360) * Math.PI * 2);
+          if (h > mitte) mitte = h;
+        }
+      }
+      /* Die blanke Fläche: das Niedrigste, was im Blatt überhaupt vorkommt. */
+      for (let k = 0; k <= 30; k++) {
+        for (let j = 0; j < 180; j++) {
+          const h = B.fieldAt(plan, 0.30 + k * 0.02, (j / 180) * Math.PI * 2);
+          if (h < blank) blank = h;
+        }
+      }
+      return { bau: bau, n: plan.n, hoehen: hoehen, faellt: faellt,
+               spanne: spanne, mitte: mitte, blank: blank };
+    });
+
+    return { zahl: zahl, fest: fest, ohneZufall: ohneZufall,
+             palastBleibt: palastBleibt, schief: schief, profile: profile };
+  });
+
+  bauten.profile.forEach(function (p) {
+    console.log('  ' + pad(p.bau, 14) + pad(p.n + '-zählig', 11) +
+                p.hoehen.map(function (h) { return h.toFixed(2); }).join('  ') +
+                '   Mitte ' + p.mitte.toFixed(2) +
+                '   Spanne ' + p.spanne.toFixed(2));
+  });
+
+  const fehlt = Object.keys(bauten.zahl).filter(function (b) { return !bauten.zahl[b]; });
+  prüfe('alle acht Grammatiken kommen vor', fehlt.length === 0,
+        Object.keys(bauten.zahl).map(function (b) {
+          return b + ' ' + bauten.zahl[b];
+        }).join(', '));
+  prüfe('der Seed bestimmt die Grammatik', bauten.fest, '400 Seeds');
+  prüfe('die Wahl verbraucht keinen Zufall', bauten.ohneZufall,
+        'gleiche Maße bei Palast und Kuppel');
+  prüfe('ein Blatt ohne Grammatik bleibt ein Palast', bauten.palastBleibt);
+  prüfe('jedes Feld ist exakt um 2π/n drehsymmetrisch', bauten.schief < 1e-9,
+        'größte Abweichung ' + bauten.schief.toExponential(1));
+  prüfe('in jeder Grammatik nimmt das Relief nach innen ab',
+        bauten.profile.every(function (p) { return p.faellt && p.spanne > 1.15; }),
+        bauten.profile.filter(function (p) { return !(p.faellt && p.spanne > 1.15); })
+              .map(function (p) { return p.bau; }).join(', ') ||
+        'alle acht, schwächste Spanne ' +
+        Math.min.apply(null, bauten.profile.map(function (p) { return p.spanne; })).toFixed(2));
+  prüfe('in jeder Grammatik bleibt die Mitte auffindbar',
+        bauten.profile.every(function (p) { return p.mitte / p.blank > 1.25; }),
+        'schwächste ' + Math.min.apply(null, bauten.profile.map(function (p) {
+          return p.mitte / p.blank;
+        })).toFixed(2) + '-fach');
 
   /* Die Trennschärfe der leichten Hand. Sie entscheidet, ob man ein Blatt
      erst zeichnen und danach ausmalen kann – und sie war beim Umstieg auf

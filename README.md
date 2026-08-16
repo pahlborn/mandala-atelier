@@ -312,6 +312,16 @@ selbst weniger Kassetten (32, 28, 24, 20, 16, 12, dann 8, dann das Auge). Zum
 ersten Mal ist die Reihe **monoton** — bei den anderen Anlagen musste die
 Staffelung erfunden werden, hier fällt sie aus der Bauform.
 
+**Dieselben acht in Blatt.** Farbwelten und Motive sollen zwischen den beiden
+Apps nicht auseinanderlaufen, deshalb stehen alle acht auch dort — nur eben in
+Blatts Grammatik: kein Katalog, sondern ein Wurf. Die Stimmung „Anlage“ zieht
+je Blatt eine der acht. Übersetzt, nicht kopiert: Hier ist ein Motiv eine Folge
+von Wegen, dort eine Antwort auf *wie hoch liegt das Blatt an dieser Stelle*.
+Der Sternwall ist hier ein Polygonzug aus sechzehn Punkten und dort **eine
+Gerade**, aus der die Faltung acht Bastionen macht. Näheres in
+[`atelier3/README.md`](atelier3/README.md) und
+[`docs/architektur.md`](docs/architektur.md) §11.
+
 Zwei Folgen, die dranhängen: Eine Anlage bringt ihren **eigenen Rahmen** mit
 (`frame: false`), weil `drawWedgeFrame()` ihr quer durch den Palast liefe. Und
 das **Hilfsraster steht still**, sobald eine Anlage geladen ist – vier Tore

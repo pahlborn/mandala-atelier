@@ -297,14 +297,59 @@ Rechts ist der Palast da — und die Mitte immer noch der ruhigste Ort.
 Drei Dinge, die beim Bauen in Blatt anders lagen:
 
 - **n = 4 ist dort Bedingung, nicht Wahl.** Die Rasterung setzt exakte
-  Drehsymmetrie um 2π/n voraus; ein Quadrat ist vierzählig. Die Ornamente im
-  Schutzbereich dürfen 16-, 20-, 24-zählig sein — Vielfache von vier.
+  Drehsymmetrie um 2π/n voraus; ein Quadrat ist vierzählig. Die Ornamente
+  dürfen 16-, 20-, 24-, 32-zählig sein — Vielfache von vier. Nur der Stern, der
+  kein Quadrat enthält, kommt auf n = 8.
 - **Der Grundriss wird bemessen, nicht gewürfelt.** Die vier anderen Charaktere
   biegen den Generator, die Anlage ersetzt ihn. Gewürfelt werden die Maße.
 - **Geduld, nicht Kraft.** Wer die Mitte mit fester Hand holen will, bekommt
   sie nicht: Fest greift bis in die Mulden, die Fläche füllt sich, und die
   Architektur ersäuft. Das ist Blatts Bauart, keine Eigenheit der Anlage — aber
   hier fällt es zum ersten Mal auf, weil es etwas zu ertränken gibt.
+
+### Die acht Grammatiken — dort ein Katalog, hier ein Wurf
+
+Farbwelten und Motive sollen zwischen den beiden Apps **nicht** auseinander­
+laufen. Deshalb stehen inzwischen alle acht Anlagen auch in Blatt — nur eben in
+Blatts Grammatik: Es gibt keinen Katalog, es wird gezogen. Die Stimmung
+„Anlage“ liefert heute einen Garten, morgen einen Stern, übermorgen ein
+Gewölbe.
+
+Übersetzt, nicht kopiert. Im Atelier ist ein Motiv eine Folge von Wegen; in
+Blatt ist es eine Antwort auf *wie hoch liegt das Blatt an dieser Stelle*. Der
+Sternwall etwa ist im Atelier ein Polygonzug aus sechzehn Punkten — in Blatt
+ist er **eine Gerade**, gegeben durch ihren Lotabstand von der Mitte und die
+Richtung des Lots; die Faltung macht daraus die acht Bastionen. Das Vastu-
+Raster braucht keine 81 Zellen, sondern zwei Abstandsfunktionen. Und die
+sechsunddreißig Bäume des Gartens sind sechs Einträge: Die volle Symmetrie des
+Quadrats legt zu jedem Baum seinen Partner jenseits der Diagonale.
+
+![Die acht Grammatiken in Blatt](anlage-blatt-acht.png)
+
+*Ein Seed, acht Grammatiken — so, wie eine leichte Hand sie fände. Man sieht in
+jedem Bild die Staffelung: außen kommt es fast von selbst, nach innen wird es
+immer mehr die eigene Arbeit.*
+
+Drei Zusagen hängen daran, und sie sind Bedingung, nicht Geschmack:
+
+1. **Die Wahl der Grammatik verbraucht keinen Zufall** — sie wird aus dem Seed
+   gerechnet. Würfeln würde den Zufallsstrom um einen Zug verschieben, und jede
+   Anlage von vor dieser Fassung bekäme andere Maße als die, auf denen schon
+   Farbe liegt.
+2. **Ein gesichertes Blatt trägt seine Grammatik bei sich**, wie Welt und
+   Charakter. Blätter aus der Zeit, als es nur den Palast gab, tragen nichts
+   bei sich; für sie steht der Palast fest.
+3. **Das Feld bleibt exakt um 2π/n drehsymmetrisch.** Geprüft wird nicht der
+   Bauplan, sondern das Feld: `fieldAt(rr, th)` gegen `fieldAt(rr, th + 2π/n)`,
+   sechshundert Stellen je Grammatik, Abweichung null.
+
+Und eine vierte, die keine Bedingung ist, sondern das Gesetz dieser App: **In
+jeder der acht nimmt das Relief nach innen ab.** Das war leichter gesagt als
+gebaut, denn ein Bauteil hat *eine* Höhe. Die sechs Mauern der Torstadt mussten
+sechs Bänder werden statt eines, die Beete des Gartens drei Reihen, das Raster
+drei konzentrische Zonen. Wer alle Mauern in ein Band legt, bekommt eine
+innerste Mauer, die so hoch dasteht wie die äußerste — der Testlauf hat genau
+das gemeldet.
 
 Damit steht dieselbe Frage jetzt zweimal im Raum, in zwei entgegengesetzten
 Wetten. Das ist kein Zufall, sondern genau das Vergleichsprotokoll aus
