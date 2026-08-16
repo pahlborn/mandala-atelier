@@ -10,9 +10,13 @@ Kurze Notiz an mich selbst für die nächste Sitzung. Das Ausführliche steht in
 
     https://pahlborn.github.io/mandala-atelier/beide.html
 
-Großflächig heißt: neue Motive oder Grammatiken, neue Farbwelten, alles mit
-Wechsel der Cache-Version — kurz, alles, was man ansehen möchte. Bei
+Großflächig heißt: neue Motive oder Grammatiken, neue Farbwelten, neue Seiten,
+alles mit Wechsel der Cache-Version — kurz, alles, was man ansehen möchte. Bei
 Zwischenfragen und Erklärungen nicht.
+
+**Der Link steht in der ersten Zeile der Antwort, nicht irgendwo im Text.**
+Wer etwas ansehen will, soll nicht danach suchen müssen. Wurde etwas Neues
+gebaut, kommt der unmittelbare Link dazu — und zwar auch in die erste Zeile.
 
 Getestet wird auf einem **iPad**, und geschrieben wird auf einem iPad. Also:
 keine Anweisungen, die eine Kommandozeile voraussetzen; was zu tun ist, muss
