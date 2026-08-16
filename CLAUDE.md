@@ -59,9 +59,10 @@ sich mit dem Finger erledigen lassen.
     npm test                  Mandala Atelier
     npm run test:atelier3     Blatt
     npm run test:nebeneinander  beide Apps an einem Origin
+    npm run test:druck        die Prüfseite docs/druck.html (Sekunden)
 
 Sie laufen gegen einen echten Browser und dauern je ein paar Minuten. Vor jedem
-Push alle drei.
+Push die ersten drei; der vierte nur, wenn `docs/druck.html` angefasst wurde.
 
 ## Git
 

@@ -8,7 +8,8 @@
     "test": "node tools/test-app.js",
     "test:atelier3": "node tools/test-atelier3.js",
     "test:nebeneinander": "node tools/test-nebeneinander.js",
-    "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js",
+    "test:druck": "node tools/test-druck.js",
+    "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js && node tools/test-druck.js",
     "icons": "node tools/gen-icons.js",
     "icons:atelier3": "node tools/gen-atelier3-icons.js"
   },

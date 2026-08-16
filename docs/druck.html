@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Meldet der Bildschirm Druck?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Prüfseite: Welche Signale liefert das Gerät beim Berühren?">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Eine Prüfseite, kein Werkzeug. Sie beantwortet genau eine Frage:
+
+      Liefert dieses Gerät beim Berühren irgendein Signal, das sich
+      unterscheidet, wenn man leicht oder fest aufdrückt?
+
+  Warum das zählt: In „Blatt“ entscheidet die Hand, wie tief der Kontakt in
+  das Relief greift. Beim Finger gibt es dafür bisher nur einen Hebel — die
+  Geschwindigkeit. Ein iPad hat keinen druckempfindlichen Bildschirm; es gab
+  dort nie 3D Touch. Was es vielleicht gibt, ist die **Kontaktfläche**: Eine
+  fest aufgedrückte Fingerkuppe wird breiter. Ob Safari davon etwas verrät
+  oder nur eine Konstante meldet, steht in keiner verlässlichen Quelle — also
+  wird es gemessen.
+
+  Alles bleibt auf dem Gerät. Die Seite lädt nichts nach und sendet nichts.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --room:  #efe9dd;
+    --card:  #f8f4ea;
+    --ink:   #2f2a22;
+    --quiet: #6d6355;
+    --edge:  rgba(60, 48, 32, 0.16);
+    --ja:    #4a6b45;
+    --nein:  #8a6a4a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --room:  #16151a;
+      --card:  #201f25;
+      --ink:   #e8e2d6;
+      --quiet: #9a9287;
+      --edge:  rgba(0, 0, 0, 0.5);
+      --ja:    #8fb089;
+      --nein:  #c2a179;
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 760px; margin: 0 auto; }
+
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 { font-size: 18px; margin: 2rem 0 .6rem; font-weight: 600; }
+  p  { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+
+  /* --- Die beiden Reibefelder ------------------------------------------ */
+  .felder {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 0 1.2rem;
+  }
+  @media (max-width: 520px) { .felder { grid-template-columns: 1fr; } }
+
+  .feld {
+    position: relative;
+    min-height: 190px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--edge);
+    background: var(--card);
+    /* Ohne das schiebt Safari beim Wischen die Seite statt zu messen. */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .feld.aktiv { border-color: var(--ink); }
+
+  .feld h3 {
+    margin: 0 0 .1rem;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .feld .wie { margin: 0 0 .8rem; font-size: 14px; color: var(--quiet); }
+
+  .feld dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .feld dt { color: var(--quiet); }
+  .feld dd { margin: 0; }
+
+  .zaehler {
+    position: absolute;
+    right: 14px;
+    bottom: 10px;
+    font-size: 13px;
+    color: var(--quiet);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Das Urteil ------------------------------------------------------ */
+  .urteil {
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid var(--edge);
+    background: var(--card);
+    margin: 0 0 1.2rem;
+  }
+  .urteil p { margin: 0 0 .5rem; }
+  .urteil p:last-child { margin-bottom: 0; }
+  .urteil b.ja   { color: var(--ja); }
+  .urteil b.nein { color: var(--nein); }
+
+  table.werte {
+    width: 100%;
+    margin: 0 0 1rem;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  table.werte th, table.werte td {
+    padding: 6px 10px 6px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--edge);
+    font-variant-numeric: tabular-nums;
+  }
+  table.werte th { font-weight: 600; }
+  table.werte td:first-child, table.werte th:first-child { font-variant-numeric: normal; }
+  table.werte .still { color: var(--quiet); }
+
+  button {
+    font: inherit;
+    color: inherit;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--edge);
+    background: var(--card);
+    -webkit-appearance: none;
+  }
+
+  .note {
+    font-size: 14.5px;
+    color: var(--quiet);
+    border-left: 2px solid var(--edge);
+    padding-left: 14px;
+  }
+
+  code { font-size: 14px; }
+  a { color: inherit; }
+  footer { margin-top: 2.4rem; font-size: 13.5px; color: var(--quiet); }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Meldet der Bildschirm Druck?</h1>
+  <p class="lede">Eine Prüfseite für „Blatt“. Sie stellt genau eine Frage:
+     Gibt dieses Gerät beim Berühren irgendetwas her, das sich unterscheidet,
+     wenn man <b>leicht</b> oder <b>fest</b> aufdrückt?</p>
+
+  <p>In beide Felder streichen — links so leicht wie möglich, rechts so fest,
+     wie du es beim Malen tun würdest. Ein paar Sekunden je Feld genügen.
+     Unten steht danach das Ergebnis.</p>
+
+  <div class="felder">
+    <div class="feld" id="leicht">
+      <h3>Leicht</h3>
+      <p class="wie">Kaum aufliegen, zügig streichen.</p>
+      <dl>
+        <dt>pressure</dt><dd data-w="pressure">—</dd>
+        <dt>Breite</dt>  <dd data-w="width">—</dd>
+        <dt>Höhe</dt>    <dd data-w="height">—</dd>
+        <dt>force</dt>   <dd data-w="force">—</dd>
+        <dt>radiusX</dt> <dd data-w="radiusX">—</dd>
+        <dt>radiusY</dt> <dd data-w="radiusY">—</dd>
+      </dl>
+      <span class="zaehler">0 Punkte</span>
+    </div>
+
+    <div class="feld" id="fest">
+      <h3>Fest</h3>
+      <p class="wie">Richtig aufdrücken, langsam streichen.</p>
+      <dl>
+        <dt>pressure</dt><dd data-w="pressure">—</dd>
+        <dt>Breite</dt>  <dd data-w="width">—</dd>
+        <dt>Höhe</dt>    <dd data-w="height">—</dd>
+        <dt>force</dt>   <dd data-w="force">—</dd>
+        <dt>radiusX</dt> <dd data-w="radiusX">—</dd>
+        <dt>radiusY</dt> <dd data-w="radiusY">—</dd>
+      </dl>
+      <span class="zaehler">0 Punkte</span>
+    </div>
+  </div>
+
+  <div class="urteil" id="urteil">
+    <p id="satz">Noch nichts gemessen.</p>
+  </div>
+
+  <h2>Die einzelnen Werte</h2>
+  <table class="werte" id="tabelle">
+    <tr><th>Signal</th><th>leicht</th><th>fest</th><th>Befund</th></tr>
+  </table>
+
+  <p class="note">
+    <strong>Wie das zu lesen ist.</strong> Ein Wert, der in beiden Feldern
+    gleich ist, meldet nichts — er steht nur als Platzhalter in der
+    Schnittstelle. Interessant ist allein ein Signal, das sich zwischen leicht
+    und fest <em>bewegt</em>, und zwar deutlich mehr, als es innerhalb eines
+    Feldes ohnehin schwankt. Genau das prüft die Spalte „Befund“.
+  </p>
+
+  <p><button type="button" id="neu">Noch einmal messen</button></p>
+
+  <h2>Was das Gerät sonst über sich sagt</h2>
+  <table class="werte" id="geraet"></table>
+
+  <footer>
+    Alles bleibt auf dem Gerät. Diese Seite lädt nichts nach und sendet nichts.
+    Zurück zur <a href="../beide.html">Einstiegsseite</a>.
+  </footer>
+
+</main>
+
+<script>
+'use strict';
+
+/* Für jedes Feld und jedes Signal wird mitgeschrieben: kleinster Wert,
+   größter Wert, Summe und Anzahl. Aus Summe und Anzahl kommt der Mittelwert,
+   aus klein und groß die Schwankung *innerhalb* des Feldes — und die ist der
+   Maßstab dafür, ob ein Unterschied *zwischen* den Feldern etwas bedeutet. */
+var SIGNALE = ['pressure', 'width', 'height', 'force', 'radiusX', 'radiusY'];
+
+var felder = {
+  leicht: leeresFeld(),
+  fest:   leeresFeld()
+};
+
+function leeresFeld() {
+  return leere({ werte: {} });
+}
+
+/* In dasselbe Objekt hinein leeren, nicht ein neues anlegen.
+
+   Beim ersten Anlauf legte „Noch einmal messen“ frische Objekte an – und die
+   Ereignisbehandlung schrieb weiter in die alten, die sie beim Anmelden
+   festgehalten hatte. Danach zählte die Seite stumm ins Leere. Der Testlauf
+   hat es gemeldet, das Auge hätte es nicht: Es sah aus wie ein Feld, das
+   einfach nichts empfängt. */
+function leere(f) {
+  f.punkte = 0;
+  f.zeigerArt = '';
+  for (var i = 0; i < SIGNALE.length; i++) {
+    f.werte[SIGNALE[i]] = { min: Infinity, max: -Infinity, summe: 0, n: 0 };
+  }
+  return f;
+}
+
+function merke(feld, name, wert) {
+  if (typeof wert !== 'number' || !isFinite(wert)) return;
+  var w = feld.werte[name];
+  if (wert < w.min) w.min = wert;
+  if (wert > w.max) w.max = wert;
+  w.summe += wert;
+  w.n++;
+}
+
+/* --- Die Ereignisse ------------------------------------------------------
+   Pointer- und Touch-Ereignisse werden beide abgehört. Safari schickt für
+   denselben Finger beides, und sie tragen verschiedene Angaben: pressure,
+   width und height stehen am Pointer-Ereignis, force, radiusX und radiusY am
+   Touch-Ereignis. Wer nur eines nimmt, verpasst womöglich genau das Signal,
+   nach dem hier gesucht wird. */
+
+function bindePointer(el, feld) {
+  var unten = false;
+
+  el.addEventListener('pointerdown', function (e) {
+    unten = true;
+    el.classList.add('aktiv');
+    if (el.setPointerCapture) { try { el.setPointerCapture(e.pointerId); } catch (err) {} }
+    feld.zeigerArt = e.pointerType || '';
+    nimm(e);
+    e.preventDefault();
+  });
+
+  el.addEventListener('pointermove', function (e) {
+    if (!unten) return;
+    nimm(e);
+    e.preventDefault();
+  });
+
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (art) {
+    el.addEventListener(art, function () {
+      unten = false;
+      el.classList.remove('aktiv');
+      zeichne();
+    });
+  });
+
+  function nimm(e) {
+    feld.punkte++;
+    merke(feld, 'pressure', e.pressure);
+    merke(feld, 'width',  e.width);
+    merke(feld, 'height', e.height);
+    if (feld.punkte % 4 === 0) zeichne();
+  }
+}
+
+function bindeTouch(el, feld) {
+  var nimm = function (e) {
+    var t = e.touches && e.touches[0];
+    if (!t) return;
+    merke(feld, 'force',   t.force);
+    merke(feld, 'radiusX', t.radiusX);
+    merke(feld, 'radiusY', t.radiusY);
+    e.preventDefault();
+  };
+  el.addEventListener('touchstart', nimm, { passive: false });
+  el.addEventListener('touchmove',  nimm, { passive: false });
+}
+
+/* --- Anzeige ----------------------------------------------------------- */
+
+function spanne(w) { return w.n ? w.max - w.min : 0; }
+function mittel(w)  { return w.n ? w.summe / w.n : NaN; }
+
+function zahl(x, stellen) {
+  if (typeof x !== 'number' || !isFinite(x)) return '—';
+  return x.toFixed(stellen === undefined ? 2 : stellen).replace('.', ',');
+}
+
+function zeichne() {
+  ['leicht', 'fest'].forEach(function (id) {
+    var el = document.getElementById(id);
+    var f  = felder[id];
+    el.querySelector('.zaehler').textContent = f.punkte + ' Punkte';
+    SIGNALE.forEach(function (name) {
+      var w = f.werte[name];
+      var feldEl = el.querySelector('[data-w="' + name + '"]');
+      if (!w.n) { feldEl.textContent = '—'; return; }
+      var m = mittel(w);
+      feldEl.textContent = spanne(w) < 1e-9
+        ? zahl(m) + '  (fest)'
+        : zahl(m) + '  (' + zahl(w.min) + '–' + zahl(w.max) + ')';
+    });
+  });
+
+  urteile();
+}
+
+/* Ein Signal taugt, wenn der Unterschied zwischen den Feldern größer ist als
+   das, was innerhalb der Felder ohnehin schwankt. Andernfalls misst man das
+   Rauschen der eigenen Hand und nicht den Druck. */
+function befund(name) {
+  var a = felder.leicht.werte[name];
+  var b = felder.fest.werte[name];
+  if (!a.n || !b.n) return { art: 'offen', text: 'noch nicht gemessen' };
+
+  if (spanne(a) < 1e-9 && spanne(b) < 1e-9 && Math.abs(mittel(a) - mittel(b)) < 1e-9) {
+    return { art: 'nein', text: 'immer ' + zahl(mittel(a)) + ' — meldet nichts' };
+  }
+
+  var unterschied = Math.abs(mittel(b) - mittel(a));
+  var rauschen = Math.max(spanne(a), spanne(b), 1e-6);
+  if (unterschied > rauschen * 0.75) {
+    return { art: 'ja', text: 'unterscheidet sich deutlich' };
+  }
+  if (unterschied > rauschen * 0.25) {
+    return { art: 'vielleicht', text: 'schwankt, aber undeutlich' };
+  }
+  return { art: 'nein', text: 'kein Unterschied über dem Rauschen' };
+}
+
+function urteile() {
+  var tab = document.getElementById('tabelle');
+  while (tab.rows.length > 1) tab.deleteRow(1);
+
+  var brauchbar = [];
+  SIGNALE.forEach(function (name) {
+    var b = befund(name);
+    var a = felder.leicht.werte[name];
+    var f = felder.fest.werte[name];
+    var zeile = tab.insertRow();
+    zeile.insertCell().textContent = name;
+    zeile.insertCell().textContent = a.n ? zahl(mittel(a)) : '—';
+    zeile.insertCell().textContent = f.n ? zahl(mittel(f)) : '—';
+    var c = zeile.insertCell();
+    c.textContent = b.text;
+    if (b.art !== 'ja') c.className = 'still';
+    if (b.art === 'ja') brauchbar.push(name);
+  });
+
+  var satz = document.getElementById('satz');
+  if (!felder.leicht.punkte || !felder.fest.punkte) {
+    satz.innerHTML = 'Noch nicht beide Felder gemessen.';
+    return;
+  }
+
+  var art = felder.fest.zeigerArt || felder.leicht.zeigerArt;
+  var womit = art === 'pen' ? 'Der <b>Stift</b>' : 'Der <b>Finger</b>';
+
+  if (brauchbar.length) {
+    satz.innerHTML = womit + ' liefert ein brauchbares Signal: <b class="ja">' +
+      brauchbar.join(', ') + '</b>. Damit ließe sich in Blatt zwischen leichtem ' +
+      'und festem Aufdrücken unterscheiden — zusätzlich zur Geschwindigkeit.';
+  } else {
+    satz.innerHTML = womit + ' liefert <b class="nein">kein brauchbares Signal</b>. ' +
+      'Kein Wert unterscheidet sich zwischen leicht und fest deutlicher, als er ' +
+      'ohnehin schwankt. In Blatt bleibt damit die <b>Geschwindigkeit</b> der ' +
+      'einzige Hebel — wer wischt, streift die Höhen; wer verweilt, greift in die Mulden.';
+  }
+}
+
+/* --- Was das Gerät von sich aus sagt ----------------------------------- */
+function geraet() {
+  var tab = document.getElementById('geraet');
+  var zeilen = [
+    ['Zeigerpunkte (maxTouchPoints)', String(navigator.maxTouchPoints)],
+    ['PointerEvent vorhanden', 'PointerEvent' in window ? 'ja' : 'nein'],
+    ['TouchEvent vorhanden', 'ontouchstart' in window ? 'ja' : 'nein'],
+    ['Bildschirm', window.screen.width + ' × ' + window.screen.height +
+                   ' bei ' + window.devicePixelRatio + '×'],
+    ['Kennung', navigator.userAgent]
+  ];
+  zeilen.forEach(function (z) {
+    var r = tab.insertRow();
+    var k = r.insertCell(); k.textContent = z[0];
+    var v = r.insertCell(); v.textContent = z[1]; v.className = 'still';
+  });
+}
+
+/* --- Start ------------------------------------------------------------- */
+['leicht', 'fest'].forEach(function (id) {
+  var el = document.getElementById(id);
+  bindePointer(el, felder[id]);
+  bindeTouch(el, felder[id]);
+});
+
+document.getElementById('neu').addEventListener('click', function () {
+  leere(felder.leicht);
+  leere(felder.fest);
+  zeichne();
+});
+
+geraet();
+zeichne();
+</script>
+</body>
+</html>
