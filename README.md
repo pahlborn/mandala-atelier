@@ -19,7 +19,7 @@ eigene Zielgruppe, eigene Gestaltung.
 
 Der Kern ist nicht das Ausmalbuch, sondern das **Symmetrie-Werkzeug**: Man
 zeichnet ein Segment, die App spiegelt den Rest. Dieses Gefühl ist das
-eigentliche Produkt. Die 33 fertigen Vorlagen sind die Ergänzung für alle, die
+eigentliche Produkt. Die 34 fertigen Vorlagen sind die Ergänzung für alle, die
 sofort losfärben wollen.
 
 Leitsatz: ruhig, erwachsen, entspannend. **Keine Gamification** – keine Sterne,
@@ -303,6 +303,15 @@ Tempelstadt (zwölf Tore, und sie werden nach innen kleiner). Die Vorbilder
 stehen in [`docs/motive.html`](docs/motive.html); übernommen ist jeweils die
 Ordnung, nicht die Bedeutung.
 
+**Die Kuppelanlage** ist die einzige, die kein Grundriss ist, sondern ein
+Gewölbe **von unten**. Sie löst zwei Dinge auf einmal. Erstens die Feldgröße:
+132 Kassetten mit je einer eingerückten Platte, also 264 Felder, keines größer
+als ein halbes Prozent — auf einer großen Fläche wird Farbe von Hand streifig,
+hier gibt es keine. Zweitens die Staffelung: Nach innen hat eine Kuppel von
+selbst weniger Kassetten (32, 28, 24, 20, 16, 12, dann 8, dann das Auge). Zum
+ersten Mal ist die Reihe **monoton** — bei den anderen Anlagen musste die
+Staffelung erfunden werden, hier fällt sie aus der Bauform.
+
 Zwei Folgen, die dranhängen: Eine Anlage bringt ihren **eigenen Rahmen** mit
 (`frame: false`), weil `drawWedgeFrame()` ihr quer durch den Palast liefe. Und
 das **Hilfsraster steht still**, sobald eine Anlage geladen ist – vier Tore
@@ -337,7 +346,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (33 Vorlagen, 6 Welten)
+## Motivkatalog (34 Vorlagen, 6 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose
@@ -346,7 +355,7 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
   Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
 - **Anlagen:** Anlage, Ringanlage, Gartenanlage, Sternanlage, Rasteranlage,
-  Stufenanlage, Torstadt
+  Stufenanlage, Torstadt, Kuppelanlage
 - **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
   Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
   Rechenmandala ZR 20

@@ -578,6 +578,30 @@ function redentPoints(half, spring) {
   return pts;
 }
 
+/* Eine Reihe Kassetten – ein Gewölbe von unten.
+
+   Jedes Feld bekommt eine eingerückte Platte: außen der Rahmen, innen die
+   Vertiefung. Damit hat eine Reihe doppelt so viele Felder wie Kassetten und
+   keines davon ist groß. Genau darum geht es hier – auf einer großen Fläche
+   wird Farbe von Hand streifig, auf einer kleinen nicht. */
+function drawCofferRow(ctx, rInner, rOuter, count, inset, lineWidth) {
+  const step = TAU / count;
+  const rMid = (rInner + rOuter) / 2;
+  const da = inset / rMid;                    // Winkelrand, so breit wie der radiale
+
+  ctx.lineWidth = lineWidth || 1.6;
+  for (let i = 0; i < count; i++) {
+    const a0 = UP + i * step;
+    tracePath(ctx, [pol(rInner, a0), pol(rOuter, a0)], false);
+
+    const from = a0 + da, to = a0 + step - da;
+    const pts = [];
+    for (let k = 0; k <= 8; k++) pts.push(pol(rInner + inset, from + (to - from) * (k / 8)));
+    for (let k = 8; k >= 0; k--) pts.push(pol(rOuter - inset, from + (to - from) * (k / 8)));
+    tracePath(ctx, pts, true);
+  }
+}
+
 /* Ein Sternwall: abwechselnd Kurtinenecke und Bastionsspitze. */
 function starPoints(rInner, rOuter, count) {
   const pts = [];
@@ -1390,6 +1414,70 @@ const MOTIFS = [
         tracePath(ctx, [[CX, CY - 76], [CX, CY - 40]], false);
         tracePath(ctx, [pol(40, UP + Math.PI / 4), [CX + 76, CY - 76]], false);
       });
+    }
+  },
+
+  /* Die Kuppel. Kein Grundriss, sondern ein **Gewölbe von unten** – die
+     Familie, die auf der Schautafel unter „Sternkuppel“ steht und die auf
+     dem Umschlag von van Hams Mandala-Buch das Titelbild stellt: In einem
+     Buch über Mandalas ist das mandalahafteste Bild eine Decke.
+
+     Sie beantwortet zwei Dinge auf einmal.
+
+     Erstens die Feldgröße: Eine Kassettenkuppel besteht aus lauter kleinen
+     Feldern, und jedes hat noch eine eingerückte Platte. 132 Kassetten,
+     also 264 Felder, keines größer als ein halbes Prozent der Fläche. Auf
+     einer großen Fläche wird Farbe von Hand streifig; hier gibt es keine.
+
+     Zweitens die Staffelung: Nach innen hat eine Kuppel von selbst weniger
+     Kassetten – 32, 28, 24, 20, 16, 12, dann acht in der Laterne, dann das
+     Auge. Zum ersten Mal ist die Reihe **monoton**. Bei den anderen Anlagen
+     musste die Staffelung erfunden werden; hier fällt sie aus der Bauform.
+
+     Und die Bänder werden nach innen flacher, während die Kassetten ihre
+     Breite behalten. Das ist keine Willkür, sondern das, was das Auge sieht,
+     wenn es in ein echtes Gewölbe schaut: Zur Öffnung hin stauchen sich die
+     Kassetten. */
+  {
+    id: 'kuppel', world: 'anlage', axes: 8, frame: false,
+    name: 'Kuppelanlage', note: 'Ein Gewölbe von unten, 132 Kassetten',
+    zones: [
+      { r: 60,    axes: 1,  name: 'Auge' },
+      { r: 78,    axes: 8,  name: 'Augenring' },
+      { r: 140,   axes: 8,  name: 'Laterne' },
+      { r: 172,   axes: 12, name: 'Reihe 12' },
+      { r: 208,   axes: 16, name: 'Reihe 16' },
+      { r: 248,   axes: 20, name: 'Reihe 20' },
+      { r: 292,   axes: 24, name: 'Reihe 24' },
+      { r: 340,   axes: 28, name: 'Reihe 28' },
+      { r: R_OUT, axes: 32, name: 'Reihe 32' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+
+      /* Die Randlinien: außen das Gesims, dann sechs Kassettenreihen, die
+         nach innen flacher werden. */
+      [R_OUT, 392, 340, 292, 248, 208, 172, 140, 78, 60].forEach(function (r, i) {
+        drawRing(p, r, i === 0 ? 2.6 : 1.8);
+      });
+
+      /* Das Gesims – schmal, feinteilig, ohne Platte. */
+      drawRingWalls(ctx, 392, R_OUT, 32, 0, 1.6);
+
+      /* Die Kassetten. */
+      drawCofferRow(ctx, 340, 392, 32, 7, 1.6);
+      drawCofferRow(ctx, 292, 340, 28, 7, 1.6);
+      drawCofferRow(ctx, 248, 292, 24, 6, 1.6);
+      drawCofferRow(ctx, 208, 248, 20, 6, 1.6);
+      drawCofferRow(ctx, 172, 208, 16, 6, 1.6);
+      drawCofferRow(ctx, 140, 172, 12, 5, 1.6);
+
+      /* Laterne und Augenring – der Übergang zur Öffnung. */
+      drawRingWalls(ctx, 78, 140, 8, 0.5, 1.8);
+      drawRingWalls(ctx, 60, 78, 8, 0, 1.6);
+
+      /* Das Auge bleibt leer. Es ist die Öffnung, durch die das Licht
+         fällt – und wie bei jeder Anlage kein Ziel, sondern ein Ort. */
     }
   },
 
