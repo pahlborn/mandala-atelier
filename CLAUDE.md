@@ -21,8 +21,22 @@ sich mit dem Finger erledigen lassen.
 ## Beim Bauen
 
 - **Cache-Version bei jedem Release erhöhen** — `sw.js` (`mandala-atelier-v1-…`)
-  und `atelier3/sw.js` (`atelier3-v1-…`), jede für sich. Ohne das zeigt das
-  iPad monatelang die alte Fassung.
+  und `atelier3/sw.js` (`atelier3-v1-…`), jede für sich. Sie räumt auf; sich
+  auf sie **verlassen** darf man aber nicht:
+- **Der Service Worker erneuert sich nicht von selbst.** Nachgemessen mit
+  echtem Browser: Ein Gerät, auf dem schon ein Worker läuft, fragt `sw.js`
+  über fünf Öffnungen **null Mal** ab. Was eine neue Fassung trägt, ist allein
+  das Auffrischen von `app.js` im Worker. Zwei Folgen:
+  1. Verbesserungen, die *im* Worker stehen, erreichen ein eingerichtetes
+     Gerät womöglich nie. Alles, worauf es ankommt, gehört in `app.js`.
+  2. GitHub Pages liefert mit `Cache-Control: max-age=600`. Zehn Minuten lang
+     bekommt auch der Worker die alte Datei aus dem HTTP-Vorrat des Browsers
+     zurück — deshalb `fetch(…, { cache: 'reload' })` und
+     `register(…, { updateViaCache: 'none' })`.
+  3. Auf dem iPad muss die App **wirklich beendet** werden (App-Umschalter,
+     hochwischen). Nur Hervorholen bedient sich aus dem Arbeitsspeicher und
+     zeigt die alte Fassung selbst dann, wenn die neue längst im Vorrat liegt.
+     Danach: **zweimal** öffnen — einmal holt, einmal zeigt.
 - **Keine religiösen Symbole ohne ausdrückliche Rücksprache in der Familie.**
   Übernommen wird die Ordnung eines Vorbilds, nicht seine Bedeutung. Siehe
   [`docs/architektur.md`](docs/architektur.md) §5 — die Rücksprache steht aus.

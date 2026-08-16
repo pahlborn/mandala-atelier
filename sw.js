@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-17';
+const CACHE = 'mandala-atelier-v1-18';
 
 const SHELL = [
   './',
@@ -22,10 +22,31 @@ const SHELL = [
   './icon-512.png'
 ];
 
+/* Jeder Abruf am HTTP-Vorrat des Browsers vorbei.
+
+   GitHub Pages liefert alles mit `Cache-Control: max-age=600`. Ein schlichtes
+   fetch() aus dem Worker fragt zuerst den HTTP-Vorrat des Browsers und bekommt
+   zehn Minuten lang genau die alte Datei zurück, die gerade ersetzt werden
+   soll — das Auffrischen legte also die alte Fassung wieder in den Vorrat.
+   Zusammen mit dem HTTP-Vorrat für sw.js selbst (siehe `updateViaCache` in
+   app.js) ergab das ein Gerät, das nie wieder etwas Neues sah. Aufgefallen
+   ist es an Blatt; hier stand derselbe Fehler. */
+function vomNetz(request) {
+  return fetch(new Request(request, { cache: 'reload' }));
+}
+
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE)
-      .then(function (cache) { return cache.addAll(SHELL); })
+      .then(function (cache) {
+        return Promise.all(SHELL.map(function (pfad) {
+          const request = new Request(new URL(pfad, self.location.href).href,
+                                      { cache: 'reload' });
+          return fetch(request).then(function (response) {
+            if (response && response.status === 200) return cache.put(request, response);
+          });
+        }));
+      })
       .then(function () { return self.skipWaiting(); })
   );
 });
@@ -79,7 +100,7 @@ self.addEventListener('fetch', function (event) {
      erreichbar, nur eben in der Fassung von zuletzt. */
   if (istWerkstatt(url.pathname)) {
     event.respondWith(
-      fetch(request)
+      vomNetz(request)
         .then(function (response) { return store(request, response); })
         .catch(function () {
           return caches.match(request).then(function (hit) {
@@ -104,7 +125,7 @@ self.addEventListener('fetch', function (event) {
      Öffnen da. */
   event.respondWith(
     caches.match(request).then(function (hit) {
-      const frisch = fetch(request)
+      const frisch = vomNetz(request)
         .then(function (response) { return store(request, response); })
         .catch(function () { return hit; });
 

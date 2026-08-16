@@ -3486,10 +3486,22 @@ function start() {
   Gallery.open().then(refreshGallery);
   requestAnimationFrame(guideTick);
 
+  /* `updateViaCache: 'none'`: Ohne die Angabe holt der Browser auch sw.js
+     selbst aus seinem HTTP-Vorrat, und GitHub Pages liefert alles mit
+     `max-age=600`. Zehn Minuten lang sähe er die neue Fassung des Workers
+     also gar nicht. Siehe die Anmerkung in sw.js. */
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-    navigator.serviceWorker.register('sw.js').catch(function () {
-      /* Ohne Service Worker läuft die App weiterhin, nur nicht offline. */
-    });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(function (reg) {
+        /* Bei jedem Start ausdrücklich nachsehen. Ein Gerät, auf dem schon
+           ein Worker läuft, fragt sw.js von sich aus nie wieder ab – gemessen
+           mit echtem Browser, null Abrufe über fünf Öffnungen. Ohne diese
+           Zeile ist die Cache-Version wirkungslos. */
+        if (reg && reg.update) reg.update().catch(function () {});
+      })
+      .catch(function () {
+        /* Ohne Service Worker läuft die App weiterhin, nur nicht offline. */
+      });
   }
 }
 

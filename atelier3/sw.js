@@ -9,7 +9,7 @@
    WICHTIG: Bei jedem Release die Version erhöhen.
    ========================================================================== */
 
-const CACHE = 'atelier3-v1-9';
+const CACHE = 'atelier3-v1-10';
 
 const SHELL = [
   './',
@@ -25,10 +25,36 @@ const SHELL = [
   './icon-512.png'
 ];
 
+/* Jeder Abruf am HTTP-Vorrat des Browsers vorbei.
+
+   Das war der zweite, größere Teil des Fehlers, und er hat länger gebraucht
+   als er sollte. GitHub Pages liefert alles mit `Cache-Control: max-age=600`.
+   Ein schlichtes fetch() aus dem Worker fragt zuerst den HTTP-Vorrat des
+   Browsers — und bekommt zehn Minuten lang genau die alte Datei zurück, die
+   gerade ersetzt werden soll. Das Auffrischen legte also die alte Fassung
+   wieder in den Vorrat, und zwar bei jedem Öffnen aufs Neue. Zusammen mit
+   dem HTTP-Vorrat für sw.js selbst (siehe `updateViaCache` in app.js) ergab
+   das ein Gerät, das nie wieder etwas Neues sah.
+
+   Nachgespielt mit echtem Browser, echtem Worker und denselben Kopfzeilen,
+   die Pages schickt: viermal öffnen, viermal die alte Fassung. Mit
+   `cache: 'reload'` kommt sie beim zweiten Öffnen an. */
+function vomNetz(request) {
+  return fetch(new Request(request, { cache: 'reload' }));
+}
+
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE)
-      .then(function (cache) { return cache.addAll(SHELL); })
+      .then(function (cache) {
+        return Promise.all(SHELL.map(function (pfad) {
+          const request = new Request(new URL(pfad, self.location.href).href,
+                                      { cache: 'reload' });
+          return fetch(request).then(function (response) {
+            if (response && response.status === 200) return cache.put(request, response);
+          });
+        }));
+      })
       .then(function () { return self.skipWaiting(); })
   );
 });
@@ -74,7 +100,7 @@ self.addEventListener('fetch', function (event) {
 
   event.respondWith(
     caches.match(request).then(function (hit) {
-      const fresh = fetch(request)
+      const fresh = vomNetz(request)
         .then(function (response) { return store(request, response); })
         .catch(function () { return hit; });
 

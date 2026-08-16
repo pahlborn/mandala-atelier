@@ -38,6 +38,22 @@ const { launch } = require('./browser');
 const ROOT = path.join(__dirname, '..');
 const FREMD = 'atelier3-fremder-vorrat';
 
+/* Zehn Minuten vergehen lassen: den HTTP-Vorrat des Browsers leeren. Die
+   Sitzung hängt an einer Seite, also jedes Mal neu – die alte ist zu. */
+async function zehnMinuten(context, page) {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Network.clearBrowserCache');
+  await cdp.detach();
+}
+
+/* Die App wirklich schließen und wieder öffnen. */
+async function neuOeffnen(context, alt, url) {
+  await alt.close();
+  const neu = await context.newPage();
+  await neu.goto(url);
+  return neu;
+}
+
 const befunde = [];
 function prüfe(name, ok, notiz) {
   console.log((ok ? '  ok    ' : '  FEHLT ') + pad(name, 44) + (notiz || ''));
@@ -75,7 +91,7 @@ async function run() {
 
   const browser = await launch();
   const context = await browser.newContext({ viewport: { width: 1100, height: 900 } });
-  const page = await context.newPage();
+  let page = await context.newPage();
 
   console.log('Zwei Apps, ein Origin\n');
 
@@ -110,16 +126,26 @@ async function run() {
     /* ---- Kommt eine neue Fassung an, auch ohne Versionswechsel? --------- */
     frischeFassung = true;
 
-    await page.reload();
+    /* Zehn Minuten vergehen lassen: der HTTP-Vorrat des Browsers läuft ab.
+       Ohne diesen Schritt kommt überhaupt nichts an, und das ist kein Mangel
+       des Tests, sondern die Wirklichkeit — nachgemessen mit echtem Browser. */
+    await zehnMinuten(context, page);
+
+    /* Und wirklich **öffnen**, nicht neu laden. Ein reload() bekommt das
+       Skript aus dem Arbeitsspeicher des Renderers, noch vor dem Worker —
+       der Testlauf sähe die neue Fassung dann selbst dann nicht, wenn sie
+       längst im Vorrat liegt. Auf dem iPad entspricht das dem Unterschied
+       zwischen „App wieder hervorholen“ und „App wirklich beenden“. */
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
     await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
     const nochAlt = await page.evaluate(function () {
       return window.__frischeFassung === true;
     });
     /* Erwartet: noch die alte Fassung, sofort aus dem Vorrat. Im Hintergrund
        wird jetzt nachgeladen. */
-    await page.waitForTimeout(1200);
+    await page.waitForTimeout(1500);
 
-    await page.reload();
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
     await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
     const jetztNeu = await page.evaluate(function () {
       return window.__frischeFassung === true;
@@ -130,17 +156,18 @@ async function run() {
     /* Dasselbe für das Atelier. Beide Worker müssen das können – dass es
        nur einer konnte, hat gekostet: Fünf neue Vorlagen lagen ausgeliefert
        auf dem Server und waren auf dem Gerät trotzdem nicht zu sehen. */
-    await page.goto(server.url + '/index.html');
+    await zehnMinuten(context, page);
+    page = await neuOeffnen(context, page, server.url + '/index.html');
     await page.waitForFunction('window.MandalaAtelier');
-    await page.waitForTimeout(1200);
-    await page.goto(server.url + '/index.html');
+    await page.waitForTimeout(1500);
+    page = await neuOeffnen(context, page, server.url + '/index.html');
     await page.waitForFunction('window.MandalaAtelier');
     const atelierNeu = await page.evaluate(function () {
       return window.__frischesAtelier === true;
     });
     prüfe('neue Fassung des Ateliers kommt ohne Versionswechsel an', atelierNeu,
           atelierNeu ? 'beim zweiten Öffnen' : 'sie kam nie an – siehe fetch in sw.js');
-    await page.goto(server.url + '/atelier3/index.html');
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
     await page.waitForFunction('window.Blatt');
     prüfe('der Start bleibt sofort und offlinefähig', !nochAlt,
           nochAlt ? 'es wurde aufs Netz gewartet' : 'erst Vorrat, dann auffrischen');
@@ -302,7 +329,16 @@ function startServer(verändere) {
       const body = verändere(rel, fs.readFileSync(file));
       res.writeHead(200, {
         'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream',
-        'Cache-Control': 'no-store'
+        /* Genau die Kopfzeile, die GitHub Pages schickt.
+
+           Hier stand `no-store`, und das war der Grund, warum dieser Testlauf
+           grün blieb, während auf dem iPad tagelang die alte Fassung stand:
+           Ohne HTTP-Vorrat des Browsers holt jedes fetch() im Worker wirklich
+           vom Netz. Mit `max-age=600` bekommt es zehn Minuten lang genau die
+           alte Datei zurück, die ersetzt werden soll — und legt sie wieder in
+           den Vorrat. Ein Testlauf, der gutmütiger misst als die Wirklichkeit,
+           ist schlimmer als keiner. */
+        'Cache-Control': 'max-age=600'
       });
       res.end(body);
     });

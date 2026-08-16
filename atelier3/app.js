@@ -3564,8 +3564,30 @@ async function start() {
   lastTouch = performance.now();
   requestAnimationFrame(frame);
 
+  /* `updateViaCache: 'none'` ist der halbe Fehler von damals.
+
+     Ohne die Angabe holt der Browser auch sw.js selbst aus seinem
+     HTTP-Vorrat, und GitHub Pages liefert alles mit `max-age=600`. Zehn
+     Minuten lang sieht der Browser die neue Fassung des Workers also gar
+     nicht — und weil auch das Nachladen im Worker durch denselben Vorrat
+     ging, kam überhaupt nie etwas an. Nachgespielt mit echtem Browser und
+     echtem Worker: vier Mal öffnen, viermal die alte Fassung. */
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-    navigator.serviceWorker.register('./sw.js').catch(function () {});
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then(function (reg) {
+        /* Und bei jedem Start ausdrücklich nachsehen.
+
+           Das ist der Teil, der wirklich hilft, und er muss **hier** stehen,
+           nicht im Worker. Nachgemessen mit echtem Browser: Ein Gerät, auf dem
+           schon ein Worker läuft, fragt sw.js von sich aus **nie wieder** ab –
+           null Abrufe über fünf Öffnungen. Damit ist die Cache-Version
+           wirkungslos, und jede Verbesserung im Worker kommt niemals an.
+
+           Was ankommt, ist app.js: Die läuft über das Auffrischen des Workers
+           mit. Also gehört der Anstoß in die Datei, die sich erneuert. */
+        if (reg && reg.update) reg.update().catch(function () {});
+      })
+      .catch(function () {});
   }
 }
 
