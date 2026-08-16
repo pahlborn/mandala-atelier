@@ -19,7 +19,7 @@ eigene Zielgruppe, eigene Gestaltung.
 
 Der Kern ist nicht das Ausmalbuch, sondern das **Symmetrie-Werkzeug**: Man
 zeichnet ein Segment, die App spiegelt den Rest. Dieses Gefühl ist das
-eigentliche Produkt. Die 28 fertigen Vorlagen sind die Ergänzung für alle, die
+eigentliche Produkt. Die 33 fertigen Vorlagen sind die Ergänzung für alle, die
 sofort losfärben wollen.
 
 Leitsatz: ruhig, erwachsen, entspannend. **Keine Gamification** – keine Sterne,
@@ -263,6 +263,15 @@ Der Kniff, der das trägt: Jedes Band teilt sich **selbst** in Felder, mit einem
 je anderen Mittel. Die Perle greift über beide Randlinien, das Blatt stößt mit
 beiden Spitzen durch; nur Wellen- und Speichenband brauchen Querwände.
 
+**Sieben Anlagen, sieben Grammatiken.** Die weiteren fünf sind bewusst keine
+Abwandlungen derselben Ordnung, sondern verschiedene: der persische
+Paradiesgarten (Kreuz aus Wasserläufen statt Ringen), die Sternfestung der
+Renaissance (Zacken statt Kreis), das indische Vastu-Raster (9 × 9 Felder, gar
+kein Kranz), Borobudur (außen eckig, innen rund) und die südindische
+Tempelstadt (zwölf Tore, und sie werden nach innen kleiner). Die Vorbilder
+stehen in [`docs/motive.html`](docs/motive.html); übernommen ist jeweils die
+Ordnung, nicht die Bedeutung.
+
 Zwei Folgen, die dranhängen: Eine Anlage bringt ihren **eigenen Rahmen** mit
 (`frame: false`), weil `drawWedgeFrame()` ihr quer durch den Palast liefe. Und
 das **Hilfsraster steht still**, sobald eine Anlage geladen ist – vier Tore
@@ -297,7 +306,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (28 Vorlagen, 6 Welten)
+## Motivkatalog (33 Vorlagen, 6 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose
@@ -305,7 +314,8 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 - **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
   Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
-- **Anlagen:** Anlage, Ringanlage
+- **Anlagen:** Anlage, Ringanlage, Gartenanlage, Sternanlage, Rasteranlage,
+  Stufenanlage, Torstadt
 - **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
   Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
   Rechenmandala ZR 20
@@ -374,13 +384,21 @@ kommen dort dazu. Bausteine: `petalPoints`, `wedgeBandPoints`, `diamondPoints`,
    Blattkranz. Die Welle bleibt deshalb *innerhalb* ihres Bandes und bekommt
    Querwände.
 
-7. **Eine Mauerecke muss den Ring durchstoßen, nicht ihn berühren.** Liegt sie
+7. **Ein Sternwall ist keine geschlossene Außengrenze.** Zwischen den
+   Bastionsspitzen fällt er auf die Kurtinen zurück; was dort außen liegt,
+   läuft bis in die Ecken des Blattes. Es braucht den Ring bei `R_OUT` **und**
+   kurze Binder von den Spitzen dorthin, sonst hängen die Taschen dahinter
+   ringsum zusammen. Dasselbe gilt für Binder, die an einem **Achteck** enden:
+   Dessen Kantenmitte liegt um `cos(22,5°)` näher an der Mitte als die Ecke –
+   enden sie am Eckradius, bleibt rundum ein Spalt.
+
+8. **Eine Mauerecke muss den Ring durchstoßen, nicht ihn berühren.** Liegt sie
    exakt darauf, hängen die vier Vorhöfe an den Ecken zusammen und sind ein
    einziges Feld, das einmal rundherum läuft. Der Testlauf meldet das als
    „360° breit". Dasselbe gilt für den Ring zwischen Kammer und Mitte: ohne
    Quermauern umschließt er die Mitte als ein Feld.
 
-8. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
+9. **Das Blatt wird zur Ellipse.** Ein Flex-Container staucht die Höhe des
    Canvas-Stapels, `aspect-ratio` allein genügt nicht (`flex: none`). Im
    Hochformat kam dazu, dass die Rasterzeile schrumpfte, sobald die Legende die
    Bedienleiste wachsen ließ (`min-height: auto` statt `0`). Der Testlauf misst

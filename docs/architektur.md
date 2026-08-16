@@ -239,7 +239,35 @@ Drei Fallen, alle beim ersten Anlauf zugeschnappt:
 
 ---
 
-## 10. Dieselbe Idee in „Blatt“ — und warum sie dort anders heißt
+## 10. Sieben Anlagen, sieben Grammatiken
+
+Die weiteren fünf sind bewusst keine Abwandlungen derselben Ordnung. Jede folgt
+einer anderen Familie aus der Schautafel ([`motive.html`](motive.html)):
+
+| Vorlage | Vorbild | was daran anders ist |
+|---|---|---|
+| Gartenanlage | Chahar Bagh | ein Kreuz aus Wasserläufen statt Ringen; 36 Beete |
+| Sternanlage | Palmanova | Zacken statt Kreis; acht Bastionen, eine Piazza |
+| Rasteranlage | Vastu Purusha | 9 × 9 Felder, gar kein Kranz |
+| Stufenanlage | Borobudur | außen eckig, innen rund — bei uns sonst umgekehrt |
+| Torstadt | Srirangam | zwölf Tore, und sie werden nach innen **kleiner** |
+
+![Die sieben Anlagen](anlagen-uebersicht.png)
+
+Zwei Fallen kamen dabei neu dazu, beide vom Testlauf gefunden:
+
+- **Ein Sternwall ist keine geschlossene Außengrenze.** Zwischen den
+  Bastionsspitzen fällt er auf die Kurtinen zurück, und was dort außen liegt,
+  läuft bis in die Ecken des Blattes. Es braucht den Ring bei `R_OUT` *und*
+  kurze Binder von den Spitzen dorthin.
+- **Binder, die an einem Achteck enden, treffen es nicht.** Dessen Kantenmitte
+  liegt um `cos(22,5°)` näher an der Mitte als die Ecke. Enden sie am
+  Eckradius, bleibt rundum ein Spalt von fünf Punkten — und das ganze Band ist
+  ein Feld.
+
+---
+
+## 11. Dieselbe Idee in „Blatt“ — und warum sie dort anders heißt
 
 Blatt hat die Anlage inzwischen auch, als fünften Charakter in der Blattlade.
 Es ist aber **keine Übertragung**, sondern eine zweite Fassung derselben Idee:
@@ -285,12 +313,12 @@ Apps teilen.
 
 ---
 
-## 11. Was offen ist
+## 12. Was offen ist
 
 - **Aussehen der Tore.** Sie sind derzeit sehr technisch geraten; nach außen
   gesehen liest sich das Dach eher als Pfeil denn als Tor.
-- **Zwei Vorlagen im Atelier**, seit der Ringanlage. Eine dritte wäre eine mit
-  weniger, dafür größeren Feldern — die Ringanlage ist eher fein geraten.
+- **Sieben Vorlagen im Atelier.** Was fehlt, ist eher das Gegenteil von mehr:
+  eine mit wenigen, dafür großen Feldern. Alle sieben sind fein geraten.
   Naheliegend wären eine schlichtere Anlage mit nur zwei Bereichen und eine mit
   einem stärker gegliederten Innenhof.
 - **Detail beim Näherkommen.** Reizvoll wäre, dass der Zoom nicht nur

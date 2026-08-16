@@ -488,6 +488,64 @@ function drawRingWalls(ctx, rInner, rOuter, count, phase, lineWidth) {
   }
 }
 
+/* Binder zwischen zwei Quadraten. Ohne sie steht dort ein umlaufendes Feld.
+   xs sind die Binder längs der Nordseite; die Vierteldrehung setzt sie auf
+   alle vier Seiten, und der äußerste schließt zugleich die Ecke. */
+function drawSquareTies(pen, sInner, sOuter, xs, lineWidth) {
+  const ctx = pen.ctx;
+  ctx.lineWidth = lineWidth || 1.6;
+  makePen(ctx, 4).repeat(function () {
+    xs.forEach(function (x) {
+      tracePath(ctx, [[CX + x, CY - sOuter], [CX + x, CY - sInner]], false);
+    });
+  });
+}
+
+/* Vom Quadrat nach außen an einen Ring – die vier Zwickel.
+
+   Die Diagonalen sind Pflicht, nicht Zierde: Liegt die Quadratecke innerhalb
+   des Rings, bleibt dort ein schmaler Kanal, und die vier Zwickel hängen
+   ringsum zusammen. Ein Tipp färbt dann alles. Genau das hat der Testlauf
+   schon zweimal als „360° breit“ gemeldet. */
+function drawYardTies(pen, s, rOut, xs, lineWidth) {
+  const ctx = pen.ctx;
+  ctx.lineWidth = lineWidth || 1.6;
+  makePen(ctx, 4).repeat(function () {
+    xs.forEach(function (x) {
+      const y = Math.sqrt(Math.max(0, rOut * rOut - x * x));
+      tracePath(ctx, [[CX + x, CY - s], [CX + x, CY - y]], false);
+    });
+    tracePath(ctx, [[CX + s, CY - s], pol(rOut, -Math.PI / 4)], false);
+  });
+}
+
+/* Ein „redentierter“ Grundriss: jede Seite tritt in der Mitte vor – der
+   Umgang von Borobudur. Die letzte Ecke einer Seite muss die erste der
+   nächsten sein, sonst schneidet die Vierteldrehung die Ecken ab und aus
+   dem Quadrat wird ein Achteck. */
+function redentPoints(half, spring) {
+  const k = half * 0.44, v = half * (spring || 0.09);
+  const seite = [[-half, -half], [-k, -half], [-k, -half - v],
+                 [k, -half - v], [k, -half], [half, -half]];
+  const pts = [];
+  for (let q = 0; q < 4; q++) {
+    const c = Math.cos(q * Math.PI / 2), s = Math.sin(q * Math.PI / 2);
+    seite.forEach(function (pt) {
+      pts.push([CX + pt[0] * c - pt[1] * s, CY + pt[0] * s + pt[1] * c]);
+    });
+  }
+  return pts;
+}
+
+/* Ein Sternwall: abwechselnd Kurtinenecke und Bastionsspitze. */
+function starPoints(rInner, rOuter, count) {
+  const pts = [];
+  for (let i = 0; i < count * 2; i++) {
+    pts.push(pol(i % 2 ? rOuter : rInner, UP + (i / (count * 2)) * TAU));
+  }
+  return pts;
+}
+
 /* Ende eines Seitenastes – für die Schneeflocke. */
 function branchTip(r, length, direction) {
   const base = pol(r, UP);
@@ -1043,6 +1101,254 @@ const MOTIFS = [
       });
 
       /* Die Mitte bleibt auch hier leer. */
+    }
+  },
+
+  /* Fünf weitere Anlagen – und zwar bewusst fünf **verschiedene
+     Grammatiken**, nicht fünf Abwandlungen derselben. Die Vorbilder stehen
+     in der Schautafel docs/motive.html: der persische Paradiesgarten, die
+     Sternfestung der Renaissance, das indische Vastu-Raster, Borobudur und
+     die südindische Tempelstadt. Übernommen ist jeweils die Ordnung, nicht
+     die Bedeutung. */
+
+  {
+    id: 'garten', world: 'anlage', axes: 4, frame: false,
+    name: 'Gartenanlage', note: 'Vier Wasserläufe, sechsunddreißig Beete',
+    zones: [
+      { r: 60,    axes: 1,  name: 'Becken' },
+      { r: 386,   axes: 4,  name: 'Garten' },
+      { r: R_OUT, axes: 24, name: 'Mauer' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+      const RING = 386, S = 276, SIN = 258, KANAL = 26, BECKEN = 60;
+      const four = makePen(ctx, 4);
+
+      drawRing(p, R_OUT, 2.6);
+      drawRing(p, RING, 2.2);
+      drawRingWalls(ctx, RING, R_OUT, 24, 0, 1.6);
+
+      drawSquare(p, S, 2.4);
+      drawSquare(p, SIN, 2.0);
+      drawYardTies(p, S, RING, [-190, -100, 100, 190], 1.6);
+      drawSquareTies(p, SIN, S, [-200, -120, -40, 40, 120, 200], 1.6);
+
+      /* Das Kreuz der Kanäle. Die Schwelle am Becken ist keine Zierde:
+         ohne sie sind die vier Arme und das Becken ein einziges Feld. */
+      const beet = [KANAL, 103, 180, SIN];
+      four.repeat(function () {
+        ctx.lineWidth = 2;
+        tracePath(ctx, [[CX - KANAL, CY - SIN], [CX - KANAL, CY - BECKEN]], false);
+        tracePath(ctx, [[CX + KANAL, CY - SIN], [CX + KANAL, CY - BECKEN]], false);
+        tracePath(ctx, [[CX - KANAL, CY - BECKEN], [CX + KANAL, CY - BECKEN]], false);
+
+        /* Neun Beete je Viertel, in jedem ein Baum. */
+        ctx.lineWidth = 1.6;
+        beet.forEach(function (v) {
+          tracePath(ctx, [[CX + v, CY - KANAL], [CX + v, CY - SIN]], false);
+          tracePath(ctx, [[CX + KANAL, CY - v], [CX + SIN, CY - v]], false);
+        });
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            ctx.beginPath();
+            ctx.arc(CX + (beet[i] + beet[i + 1]) / 2,
+                    CY - (beet[j] + beet[j + 1]) / 2, 21, 0, TAU);
+            ctx.stroke();
+          }
+        }
+      });
+
+      /* Das achteckige Becken. */
+      ctx.lineWidth = 2.2;
+      const acht = [];
+      for (let i = 0; i < 8; i++) acht.push(pol(BECKEN, UP + (i + 0.5) * TAU / 8));
+      tracePath(ctx, acht, true);
+    }
+  },
+
+  {
+    id: 'stern', world: 'anlage', axes: 8, frame: false,
+    name: 'Sternanlage', note: 'Acht Bastionen, eine Piazza',
+    zones: [
+      { r: 70,    axes: 1,  name: 'Piazza' },
+      { r: 210,   axes: 8,  name: 'Innenstadt' },
+      { r: R_OUT, axes: 16, name: 'Wall' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+
+      /* Ein Sternwall ist **keine** geschlossene Außengrenze: Zwischen den
+         Bastionsspitzen fällt er bis auf die Kurtinen zurück, und was dort
+         außen liegt, läuft bis in die Ecken des Blattes. Deshalb der Ring
+         bei R_OUT – und acht kurze Binder von den Spitzen an den Ring,
+         sonst hängen die acht Taschen dahinter ringsum zusammen. */
+      const A_C = 318, A_T = 396, B_C = 292, B_T = 366, INNEN = 280;
+      drawRing(p, R_OUT, 2.6);
+
+      ctx.lineWidth = 2.4;
+      tracePath(ctx, starPoints(A_C, A_T, 8), true);
+      ctx.lineWidth = 2.0;
+      tracePath(ctx, starPoints(B_C, B_T, 8), true);
+
+      ctx.lineWidth = 1.6;
+      for (let i = 0; i < 16; i++) {
+        const a  = UP + (i / 16) * TAU;
+        const rA = i % 2 ? A_T : A_C;
+        const rB = i % 2 ? B_T : B_C;
+        tracePath(ctx, [pol(rB, a), pol(rA, a)], false);      // Mauerwerk
+        tracePath(ctx, [pol(INNEN, a), pol(rB, a)], false);   // Straße zur Mauer
+        if (i % 2) tracePath(ctx, [pol(A_T, a), pol(R_OUT, a)], false);
+      }
+
+      /* Innerhalb: Ringe und Radialstraßen bis zur Piazza. */
+      drawRing(p, INNEN, 2.2);
+      drawRing(p, 245, 1.6);
+      drawRing(p, 210, 1.8);
+      drawRing(p, 170, 1.6);
+      drawRing(p, 130, 1.8);
+      drawRingWalls(ctx, 245, INNEN, 16, 0.5, 1.6);
+      drawRingWalls(ctx, 210, 245, 16, 0, 1.6);
+      drawRingWalls(ctx, 170, 210, 8, 0.5, 1.8);
+      drawRingWalls(ctx, 130, 170, 8, 0, 1.6);
+      /* Die Binder müssen bis *unter* die Achteckkante reichen: Deren
+         Abstand von der Mitte ist an der Kantenmitte nur 70·cos(22,5°),
+         also gut fünf Punkt weniger als an der Ecke. Enden sie bei 70,
+         bleibt rundum ein Spalt und das ganze Band ist ein Feld. */
+      drawRingWalls(ctx, 62, 130, 8, 0, 1.6);
+
+      /* Die Piazza, achteckig wie der Wall. */
+      ctx.lineWidth = 2.2;
+      const acht = [];
+      for (let i = 0; i < 8; i++) acht.push(pol(70, UP + (i + 0.5) * TAU / 8));
+      tracePath(ctx, acht, true);
+    }
+  },
+
+  {
+    id: 'raster', world: 'anlage', axes: 4, frame: false,
+    name: 'Rasteranlage', note: 'Neun mal neun Felder, kein Kranz',
+    zones: [
+      { r: 31,    axes: 1,  name: 'Mittelfeld' },
+      { r: 384,   axes: 4,  name: 'Raster' },
+      { r: R_OUT, axes: 24, name: 'Mauer' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+      const RING = 384, S = 276, STEP = (S * 2) / 9;
+
+      drawRing(p, R_OUT, 2.6);
+      drawRing(p, RING, 2.2);
+      drawRingWalls(ctx, RING, R_OUT, 24, 0, 1.6);
+
+      /* Das Raster. Anders als bei allen anderen Anlagen gibt es hier keine
+         Ringe – die Ordnung liegt allein im Feld. */
+      drawSquare(p, S, 2.4);
+      drawYardTies(p, S, RING, [-184, -92, 92, 184], 1.6);
+
+      ctx.lineWidth = 1.6;
+      for (let i = 1; i < 9; i++) {
+        const v = -S + i * STEP;
+        tracePath(ctx, [[CX + v, CY - S], [CX + v, CY + S]], false);
+        tracePath(ctx, [[CX - S, CY + v], [CX + S, CY + v]], false);
+      }
+
+      /* Das Brahmasthana in der Mitte: neun Felder, die zusammengehören –
+         stärker umrandet und über die Ecken verspannt. */
+      drawSquare(p, STEP * 1.5, 2.6);
+      ctx.lineWidth = 1.4;
+      const d = STEP * 1.5;
+      tracePath(ctx, [[CX - d, CY - d], [CX + d, CY + d]], false);
+      tracePath(ctx, [[CX + d, CY - d], [CX - d, CY + d]], false);
+    }
+  },
+
+  {
+    id: 'stufen', world: 'anlage', axes: 4, frame: false,
+    name: 'Stufenanlage', note: 'Außen eckig, innen rund',
+    zones: [
+      { r: 34,    axes: 1,  name: 'Kuppe' },
+      { r: 66,    axes: 12, name: 'obere Terrasse' },
+      { r: 92,    axes: 16, name: 'mittlere Terrasse' },
+      { r: 118,   axes: 24, name: 'untere Terrasse' },
+      { r: 340,   axes: 4,  name: 'Umgänge' },
+      { r: R_OUT, axes: 24, name: 'Mauer' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+      const RING = 340;
+
+      drawRing(p, R_OUT, 2.6);
+      drawRing(p, RING, 2.2);
+      drawRingWalls(ctx, RING, R_OUT, 24, 0, 1.6);
+
+      /* Vier Umgänge mit vorspringender Mitte. Die Ecke des äußersten
+         durchstößt den Ring – dadurch sind die vier Zwickel getrennt. */
+      const halb = [244, 208, 172, 136];
+      halb.forEach(function (h, i) {
+        ctx.lineWidth = i ? 2.0 : 2.4;
+        tracePath(ctx, redentPoints(h), true);
+      });
+      drawYardTies(p, 244, RING, [-160, -90, 90, 160], 1.6);
+      drawSquareTies(p, 208, 244, [-208, -140, -60, 60, 140, 208], 1.6);
+      drawSquareTies(p, 172, 208, [-172, -108, -40, 40, 108, 172], 1.6);
+      drawSquareTies(p, 136, 172, [-136, -80, 80, 136], 1.6);
+
+      /* Drei Rundterrassen mit Stupas. Die Stupas greifen über beide
+         Randlinien und teilen ihr Band damit selbst. */
+      drawRing(p, 118, 2.0);
+      drawRing(p, 92, 1.8);
+      drawRing(p, 66, 1.8);
+      drawRing(p, 34, 2.0);
+      makePen(ctx, 8).repeat(function () {
+        tracePath(ctx, [pol(118, UP), [CX, CY - 136]], false);
+      });
+      drawDotAccent(makePen(ctx, 24), 105, 15, 1.6);
+      drawDotAccent(makePen(ctx, 16), 79, 15, 1.6);
+      drawDotAccent(makePen(ctx, 12), 50, 15, 1.6);
+    }
+  },
+
+  {
+    id: 'torstadt', world: 'anlage', axes: 4, frame: false,
+    name: 'Torstadt', note: 'Zwölf Tore, sechs Mauern',
+    zones: [
+      { r: 40,    axes: 1,  name: 'Mitte' },
+      { r: 286,   axes: 4,  name: 'Stadt' },
+      { r: R_OUT, axes: 12, name: 'Vorfeld' }
+    ],
+    build: function (p) {
+      const ctx = p.ctx;
+      const mauern = [286, 244, 202, 160, 118, 76];
+      const four = makePen(ctx, 4);
+
+      drawRing(p, R_OUT, 2.6);
+      mauern.forEach(function (h, i) {
+        drawSquare(p, h, i ? 2.0 : 2.4);
+      });
+      drawRing(p, 40, 2.2);
+
+      drawYardTies(p, 286, R_OUT, [-250, -180, -90, 90, 180, 250], 1.6);
+      drawSquareTies(p, 244, 286, [-244, -160, -80, 80, 160, 244], 1.6);
+      drawSquareTies(p, 202, 244, [-202, -130, -60, 60, 130, 202], 1.6);
+      drawSquareTies(p, 160, 202, [-160, -100, -40, 40, 100, 160], 1.6);
+      drawSquareTies(p, 118, 160, [-118, -70, 70, 118], 1.6);
+      drawSquareTies(p, 76, 118, [-76, -40, 40, 76], 1.6);
+
+      /* Drei Tore je Seite, und sie werden nach innen kleiner – so wie in
+         Srirangam, wo der höchste Turm außen steht und der niedrigste
+         innen. Bei uns ist es sonst überall umgekehrt. */
+      four.repeat(function () {
+        mauern.forEach(function (h, i) {
+          const w = 26 - i * 3.4, t = 15 - i * 1.8;
+          [0, -h * 0.55, h * 0.55].forEach(function (x) {
+            tracePath(ctx, [[CX + x - w, CY - h], [CX + x - w, CY - h - t],
+                            [CX + x + w, CY - h - t], [CX + x + w, CY - h]], false);
+          });
+        });
+        /* Von der innersten Mauer an die Mitte. */
+        tracePath(ctx, [[CX, CY - 76], [CX, CY - 40]], false);
+        tracePath(ctx, [pol(40, UP + Math.PI / 4), [CX + 76, CY - 76]], false);
+      });
     }
   },
 
