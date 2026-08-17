@@ -1,5 +1,12 @@
 'use strict';
 
+/* Im Regal ohne Service Worker – siehe tools/einfrieren.js.
+   Eine eingefrorene Fassung darf keinen anmelden: Ihr `activate` löschte
+   den Offline-Vorrat der laufenden App. */
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.register = function () { return new Promise(function () {}); };
+}
+
 /* ============================================================================
    Atelier 3.0 – „Blatt“
 
@@ -623,7 +630,7 @@ const THOUGHT_MEMORY = 9;
 
 function nextThought() {
   let seen = [];
-  try { seen = JSON.parse(localStorage.getItem('atelier3-gedanken') || '[]'); } catch (err) {}
+  try { seen = JSON.parse(localStorage.getItem('atelier3-regal3-14-gedanken') || '[]'); } catch (err) {}
   if (!Array.isArray(seen)) seen = [];
 
   const frei = [];
@@ -637,7 +644,7 @@ function nextThought() {
   const wahl = frei[(Math.random() * frei.length) | 0];
   seen.push(wahl);
   while (seen.length > THOUGHT_MEMORY) seen.shift();
-  try { localStorage.setItem('atelier3-gedanken', JSON.stringify(seen)); } catch (err) {}
+  try { localStorage.setItem('atelier3-regal3-14-gedanken', JSON.stringify(seen)); } catch (err) {}
 
   return THOUGHTS[wahl];
 }
@@ -2607,7 +2614,7 @@ const Speicher = {
     return new Promise(function (resolve) {
       let request;
       try {
-        request = indexedDB.open('atelier3', 1);
+        request = indexedDB.open('atelier3-regal3-14', 1);
       } catch (err) {
         resolve(false);
         return;
@@ -3315,7 +3322,7 @@ function tickStillness(now) {
    Papier bleiben will, obwohl das Gerät hell steht, soll das nicht am
    Betriebssystem umstellen müssen, sondern in der Lade, im Blick auf die
    Papiere selbst. */
-const PAPER_KEY = 'atelier3-papier';
+const PAPER_KEY = 'atelier3-regal3-14-papier';
 
 function systemMode() {
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -3503,7 +3510,7 @@ function bindUi() {
   ui.traySound.addEventListener('click', function () {
     Klang.wake();
     Klang.setMuted(!Klang.muted);
-    try { localStorage.setItem('atelier3-ton', Klang.muted ? 'aus' : 'an'); } catch (err) {}
+    try { localStorage.setItem('atelier3-regal3-14-ton', Klang.muted ? 'aus' : 'an'); } catch (err) {}
     syncSoundLabel();
   });
 
@@ -3571,7 +3578,7 @@ async function start() {
 
   cacheUi();
 
-  try { Klang.muted = localStorage.getItem('atelier3-ton') === 'aus'; } catch (err) {}
+  try { Klang.muted = localStorage.getItem('atelier3-regal3-14-ton') === 'aus'; } catch (err) {}
   syncSoundLabel();
 
   const stored = await Speicher.open();
@@ -3602,10 +3609,10 @@ async function start() {
   /* Beim allerersten Mal steht dort das Einzige, was diese App je erklärt.
      Danach nie wieder – ab dann gehört die Stelle den Gedanken. */
   let seen = false;
-  try { seen = localStorage.getItem('atelier3-gesehen') === 'ja'; } catch (err) {}
+  try { seen = localStorage.getItem('atelier3-regal3-14-gesehen') === 'ja'; } catch (err) {}
   if (!seen && !sheet.touched) {
     showHint('Streiche über das Blatt.', 9000);
-    try { localStorage.setItem('atelier3-gesehen', 'ja'); } catch (err) {}
+    try { localStorage.setItem('atelier3-regal3-14-gesehen', 'ja'); } catch (err) {}
   }
 
   document.body.classList.add('is-ready');

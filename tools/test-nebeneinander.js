@@ -271,6 +271,29 @@ async function run() {
         blattApp:     await lies('/atelier3/app.js', /const FASSUNG = '3\.(\d+)'/)
       };
     });
+    /* Und sie muss **ohne Tippen** dastehen. Zuerst stand sie im Fach bzw. im
+       Fuß der Galerie – also genau dann nicht da, wenn man sie braucht: beim
+       Öffnen. Geprüft wird deshalb, was ohne jede Bedienung sichtbar ist. */
+    const sichtbar = {};
+    for (const ort of [['blatt', '/atelier3/index.html'], ['atelier', '/index.html']]) {
+      await page.goto(server.url + ort[1]);
+      await page.waitForFunction(ort[0] === 'blatt' ? 'window.Blatt' : 'window.MandalaAtelier');
+      await page.waitForTimeout(300);
+      sichtbar[ort[0]] = await page.evaluate(function () {
+        const el = document.getElementById('fassung');
+        if (!el) return '(fehlt)';
+        const kasten = el.getBoundingClientRect();
+        const stil = getComputedStyle(el);
+        const da = kasten.width > 0 && kasten.height > 0 &&
+                   stil.visibility !== 'hidden' && Number(stil.opacity) > 0.1 &&
+                   kasten.top >= 0 && kasten.bottom <= window.innerHeight;
+        return da ? el.textContent.trim() : '(verdeckt) ' + el.textContent.trim();
+      });
+    }
+    prüfe('beide Apps zeigen ihre Fassung beim Öffnen',
+          /^Blatt 3\./.test(sichtbar.blatt) && /^2\./.test(sichtbar.atelier),
+          'Blatt: „' + sichtbar.blatt + '“ · Atelier: „' + sichtbar.atelier + '“');
+
     prüfe('die Fassungsnummer stimmt mit dem Cache überein',
           nummern.atelierCache === nummern.atelierApp &&
           nummern.blattCache === nummern.blattApp,

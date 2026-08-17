@@ -9,7 +9,7 @@
    WICHTIG: Bei jedem Release die Version erhöhen.
    ========================================================================== */
 
-const CACHE = 'atelier3-v1-13';
+const CACHE = 'atelier3-v1-14';
 
 const SHELL = [
   './',
