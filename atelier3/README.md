@@ -178,10 +178,10 @@ das vergleichen, ohne dass die Oberfläche etwas davon zeigt:
 
 | `?griff=` | Werte | Linie | Fläche | Verhältnis |
 |---|---|---|---|---|
-| *ohne Angabe* (`zeichnend`) | 3,6 / 0,70 / 0,00 | 0,428 | 0,019 | **23,0 : 1** |
+| `zeichnend` | 3,6 / 0,70 / 0,00 | 0,428 | 0,019 | 23,0 : 1 |
 | `zart` | 3,4 / 0,30 / 0,07 | 0,431 | 0,023 | 18,5 : 1 |
 | `mittel` | 2,8 / 0,30 / 0,10 | 0,438 | 0,043 | 10,2 : 1 |
-| `flaechig` | 2,0 / 0,30 / 0,18 | 0,448 | 0,092 | 4,8 : 1 |
+| *ohne Angabe* (`flaechig`) | 2,0 / 0,30 / 0,18 | 0,448 | 0,092 | **4,8 : 1** |
 
 Gemessen mit echtem Reiben, leichte zügige Hand über ein ganzes Blatt. Die
 Zahlen zeigen das Entscheidende: **Die Linie kommt in allen vier Fassungen
@@ -189,20 +189,29 @@ gleich schnell** — nur die Fläche hält sich zurück. Der Wegauftrag bleibt i
 allen unangetastet; es geht allein um die Griffkurve. Ohne Angabe bleibt
 alles, wie es ist.
 
-**`zeichnend` ist seit `v1-12` die Voreinstellung** — die Griffkurve bis
-`v1-3`, vollständig zurückgeholt, mitsamt `GAMMA_FIRM` 0,7 und den Gewichten
-0,62 / 0,44, die damals ebenfalls andere waren.
+**Die Voreinstellung ist `flaechig`** — und dahin ist sie in zwei Schritten
+gekommen, beide von einem Handtest am iPad entschieden:
 
-Nicht aus Nostalgie. Von ihr gab es ein Bildschirmfoto, auf dem ein ganzes
-Mandala als **Zeichnung** dasteht — jeder Ring, jede Speiche, der Perlenkranz,
-die Rosette in der Mitte — und die Felder weiß geblieben sind, mit sauber
-hineingemalten Blättern in Rosa, Grün und Gelb. Danach der Handtest am iPad,
-die einzige Instanz, die das entscheiden kann. Das Urteil lautete: *„Blatt
-damals schenkt einem die beste Malfreude."*
+| | | |
+|---|---|---|
+| `v1-12` | auf `zeichnend` | *„Blatt damals schenkt einem die beste Malfreude."* |
+| `v1-15` | zurück auf `flaechig` | *„flächig erzeugt die größte Malfreude."* |
 
-Die Namen aus der Vergleichsphase, `?griff=damals` und `?griff=jetzt`, bleiben
-als Verweise gültig — sie führen auf `zeichnend` bzw. `flaechig`. Als Namen
-wären sie heute beide gelogen.
+Das ist kein Hin und Her. Der erste Satz galt einer **Erinnerung** an eine
+alte Fassung, die sich in vielem unterschied — Motive, neun statt vierzehn
+Pigmente, Auftrag nach Zeit statt nach Weg. Der zweite galt einem
+**Vergleich unter gleichen Bedingungen**, mit allen vier Griffen in derselben
+Fassung. Erst dafür gab es `?griff=` überhaupt.
+
+Der Befund ist unbequem und deshalb festhaltenswert: `zeichnend` trennt
+fünfmal schärfer, und **trotzdem** macht `flaechig` mehr Freude. Was sich hier
+rechnen lässt, ist die Trennschärfe. Was zählt, ist die Freude beim Malen, und
+die kann nur die Hand beantworten. Wer reibt, will offenbar, dass etwas kommt.
+
+**Alle vier bleiben stehen** — ausdrücklich für spätere Versuche mit anderen
+Geräten und anderen Menschen. Ein Finger ist nicht jeder Finger. Die Namen aus
+der Vergleichsphase, `?griff=damals` und `?griff=jetzt`, bleiben als Verweise
+gültig; als Namen wären sie beide gelogen.
 
 Für einen Finger gerechnet (ein iPad meldet keinen Druck, gemessen mit
 [`docs/druck.html`](../docs/druck.html) — Geschwindigkeit ist der einzige
@@ -217,9 +226,10 @@ Hebel) sieht die Spreizung so aus:
 
 Der schärfste Satz dazu: **Was `flaechig` mit der flüchtigsten Hand liefert
 (3,3 : 1), ist schlechter als das, was `zeichnend` beim Trödeln liefert
-(4,9 : 1).** Diese Trennschärfe war unter der alten Voreinstellung bei keiner
-Geschwindigkeit mehr zu erreichen — und sie ist der Grund, warum ein Blatt
-sich zwölf Fassungen lang nicht mehr erst zeichnen und dann ausmalen ließ.
+(4,9 : 1).** Unter der Voreinstellung ist diese Trennschärfe also bei keiner
+Geschwindigkeit zu erreichen — und ein Blatt lässt sich nicht erst zeichnen
+und dann ausmalen. Der Handtest hat es trotzdem so gewählt; wer es anders
+will, hängt `?griff=zeichnend` an die Adresse.
 
 **Der Abstand der Höhenstufen ist die eigentliche Gestaltungsentscheidung.**
 `OUTER 0.16 < BASE 0.38 < Plateaus 0.52…0.70 < Linien 1.0`. Zu weit

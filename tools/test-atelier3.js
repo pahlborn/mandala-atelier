@@ -758,27 +758,34 @@ async function run() {
                 pad('Fläche ' + w.flaeche.toFixed(3), 16) +
                 (w.linie / w.flaeche).toFixed(1) + ':1');
   });
-  /* Die Voreinstellung ist seit v1-12 die zeichnende Kurve — die von bis
-     v1-3, nach dem Handtest am iPad zurückgeholt. Wer sie wieder verstellt,
-     verstellt genau das, was ein Blatt erst zeichenbar und danach ausmalbar
-     macht; deshalb steht sie hier Wert für Wert. */
-  prüfe('ohne Angabe kommt die zeichnende Kurve',
-        trenn.vor.light === 3.6 && trenn.vor.firm === 0.70 &&
-        trenn.vor.base === 0.00 && trenn.vor.pressW === 0.62 && trenn.vor.slowW === 0.44,
+  /* Die Voreinstellung ist seit v1-15 wieder die flächige Kurve — nach dem
+     zweiten Handtest am iPad, bei dem alle vier Griffe in derselben Fassung
+     nebeneinander lagen. Sie steht hier Wert für Wert, weil sich an ihr
+     entscheidet, wie sich die App anfühlt, und weil sie schon zweimal
+     unbemerkt verrutscht ist. */
+  prüfe('ohne Angabe kommt die flächige Kurve',
+        trenn.vor.light === 2.0 && trenn.vor.firm === 0.30 &&
+        trenn.vor.base === 0.18 && trenn.vor.pressW === 0.55 && trenn.vor.slowW === 0.40,
         'GAMMA_LIGHT ' + trenn.vor.light + ', GAMMA_FIRM ' + trenn.vor.firm +
         ', GRIP_BASE ' + trenn.vor.base);
 
-  const vZeich = trenn.werte.zeichnend.linie / trenn.werte.zeichnend.flaeche;
-  const vZart2 = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
-  prüfe('die Voreinstellung trennt am schärfsten', vZeich > vZart2,
-        vZeich.toFixed(1) + ':1 gegen zart ' + vZart2.toFixed(1) + ':1');
+  /* Und die Reihenfolge muss stehen: Je weiter vorn, desto schärfer trennt
+     die leichte Hand. Welcher davon die Voreinstellung ist, entscheidet der
+     Handtest — dass sie sich unterscheiden, entscheidet die Rechnung. */
+  const reihe = ['zeichnend', 'zart', 'mittel', 'flaechig'].map(function (id) {
+    return trenn.werte[id].linie / trenn.werte[id].flaeche;
+  });
+  let geordnet = true;
+  for (let i = 1; i < reihe.length; i++) if (reihe[i] >= reihe[i - 1]) geordnet = false;
+  prüfe('die vier Griffe stehen in der Reihenfolge ihrer Trennschärfe', geordnet,
+        reihe.map(function (v) { return v.toFixed(1) + ':1'; }).join(' > '));
 
   /* Die Adressen aus der Vergleichsphase dürfen nicht ins Leere laufen. */
   prüfe('die alten Namen bleiben gültig', trenn.alias,
         'damals → zeichnend, jetzt → flaechig');
   const vFlach = trenn.werte.flaechig.linie / trenn.werte.flaechig.flaeche;
   const vZart  = trenn.werte.zart.linie / trenn.werte.zart.flaeche;
-  prüfe('flaechig nimmt die Fläche gleich mit', vZart > vFlach * 2.5,
+  prüfe('zart hält die Fläche zurück, flaechig nicht', vZart > vFlach * 2.5,
         'zart ' + vZart.toFixed(1) + ':1 gegen flaechig ' + vFlach.toFixed(1) + ':1');
   prüfe('die Linie kommt trotzdem gleich schnell',
         Math.abs(trenn.werte.zart.linie - trenn.werte.flaechig.linie) <
