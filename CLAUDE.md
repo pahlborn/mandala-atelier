@@ -71,7 +71,10 @@ und `npm run test:nebeneinander` prüft, dass beide Stellen übereinstimmen.
 1. Cache-Version **und** `FASSUNG` erhöhen — beide, in beiden Dateien.
 2. `npm run einfrieren` — stellt die Fassung nach `v/<nummer>/`.
 3. `npm run fassungen` — schreibt `docs/fassungen.html` neu.
-4. Testläufe, dann committen und pushen.
+4. `npm run katalog` — nur wenn sich Motive geändert haben; zeichnet
+   `docs/katalog.html` mit den Apps selbst neu. `npm test` meldet es, wenn
+   eine Vorlage im Katalog fehlt.
+5. Testläufe, dann committen und pushen.
 
 Eingefrorene Fassungen bleiben **für immer** erreichbar. Damit ist „zurück auf
 3.7" ein Link statt eines Auftrags. Zwei Dinge daran sind nicht verhandelbar,

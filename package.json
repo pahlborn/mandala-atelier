@@ -14,7 +14,8 @@
     "icons": "node tools/gen-icons.js",
     "icons:atelier3": "node tools/gen-atelier3-icons.js",
     "einfrieren": "node tools/einfrieren.js",
-    "fassungen": "node tools/gen-fassungen.js"
+    "fassungen": "node tools/gen-fassungen.js",
+    "katalog": "node tools/gen-katalog.js"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"

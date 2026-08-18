@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Katalog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Alle Vorlagen beider Apps, von den Apps selbst gezeichnet.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!-- Erzeugt von tools/gen-katalog.js — nicht von Hand ändern. -->
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --room:#efe9dd; --card:#f8f4ea; --ink:#2f2a22; --quiet:#6d6355;
+  --edge:rgba(60,48,32,0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --room:#16151a; --card:#201f25; --ink:#e8e2d6; --quiet:#9a9287;
+          --edge:rgba(0,0,0,0.5); }
+}
+html { -webkit-text-size-adjust:100%; }
+body {
+  margin:0; background:var(--room); color:var(--ink);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  padding: clamp(24px,6vw,64px) clamp(18px,5vw,40px)
+           calc(clamp(24px,6vw,64px) + env(safe-area-inset-bottom));
+}
+main { max-width:62rem; margin:0 auto; }
+h1 { margin:0 0 .15em; font-family:ui-serif,'Iowan Old Style',Georgia,serif;
+     font-weight:500; font-size:clamp(28px,6vw,40px); letter-spacing:-.01em; }
+.lede { margin:0 0 2.2rem; color:var(--quiet); max-width:44rem; }
+h2 { margin:2.8rem 0 .4rem; font-size:14px; font-weight:600; letter-spacing:.08em;
+     text-transform:uppercase; color:var(--quiet);
+     border-top:1px solid var(--edge); padding-top:1.2rem; }
+.wozu { margin:0 0 1.2rem; font-size:14.5px; color:var(--quiet); max-width:44rem; }
+.tafel { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); }
+.karte { background:var(--card); border-radius:16px; padding:16px;
+         box-shadow:0 1px 2px var(--edge), 0 10px 28px -16px var(--edge); }
+.karte img { display:block; width:100%; height:auto; border-radius:10px;
+             margin-bottom:12px; background:#fff; }
+.karte h3 { margin:0; font-size:16.5px; font-weight:600; }
+.karte .note { margin:0 0 .5rem; font-size:13.5px; color:var(--quiet); }
+.karte dl { margin:0; font-size:13px; color:var(--quiet); }
+.karte dt { float:left; clear:left; width:5.2em; font-weight:600; color:var(--ink); }
+.karte dd { margin:0 0 .2em 5.2em; }
+.hinweis { margin:2.6rem 0 0; padding:16px 18px; border-radius:14px;
+           border:1px solid var(--edge); font-size:14.5px; color:var(--quiet); }
+.hinweis strong { color:var(--ink); }
+.hinweis + .hinweis { margin-top:1rem; }
+footer { margin-top:2.4rem; font-size:13.5px; color:var(--quiet); }
+a { color:inherit; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Katalog</h1>
+  <p class="lede">Alle 34 Vorlagen des Mandala Ateliers
+     und die 5 Stimmungen von Blatt — nebeneinander, um sie
+     einmal ohne Durchtippen zu sehen.</p>
+
+  <p class="hinweis">
+    <strong>Diese Tafel ist nicht gezeichnet, sondern abfotografiert.</strong>
+    Auf den beiden Schwesterseiten — <a href="motive.html">Motivfamilien</a>
+    und <a href="moderne.html">Moderne</a> — stehen <em>mögliche</em> Ordnungen
+    als Schemata von Hand. Hier laufen die Apps selbst: Jedes Bild entsteht,
+    indem das Motiv wirklich geladen und die Zeichenfläche ausgelesen wird.
+    Eine nachgezeichnete Tafel wäre ab dem ersten geänderten Motiv gelogen, und
+    niemand merkte es. Weicht etwas ab, ist die App gemeint.
+  </p>
+
+  <p class="hinweis">
+    <strong>Was zu sehen ist, ist die leere Vorlage.</strong> Keine Farbe, kein
+    Füllstand — so liegt das Blatt da, bevor jemand anfängt. Die Zahlen darunter
+    stammen aus dem Datensatz des Motivs, nicht aus einer zweiten Liste: Achsen
+    ist die Zähligkeit, Zonen sind die Ringe der gestaffelten Symmetrie mit
+    ihrer je eigenen Achsenzahl.
+  </p>
+
+<h2>Geometrisch-klassisch · 5 Vorlagen</h2>
+<p class="wozu">Die Grundlage. Ring, Speiche, Blatt, Raute, Band — aus diesen Bausteinen besteht auch alles andere. Wer hier anfängt, lernt nebenbei, was das Symmetriewerkzeug tut.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/sternkranz.webp" alt="Sternkranz" width="300" height="300" loading="lazy" decoding="async"><h3>Sternkranz</h3><p class="note">Zwölf Spitzen, ruhiger Grundriss</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+<article class="karte"><img src="katalog/rautenkranz.webp" alt="Rautenkranz" width="300" height="300" loading="lazy" decoding="async"><h3>Rautenkranz</h3><p class="note">Rauten in drei Größen</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+<article class="karte"><img src="katalog/sternfein.webp" alt="Sternmandala fein" width="300" height="300" loading="lazy" decoding="async"><h3>Sternmandala fein</h3><p class="note">Sechzehn Achsen, viele kleine Felder</p><dl><dt>Achsen</dt><dd>16</dd></dl></article>
+<article class="karte"><img src="katalog/achteckstern.webp" alt="Achteckstern" width="300" height="300" loading="lazy" decoding="async"><h3>Achteckstern</h3><p class="note">Acht Achsen, klare Kanten</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/gitterrose.webp" alt="Gitterrose" width="300" height="300" loading="lazy" decoding="async"><h3>Gitterrose</h3><p class="note">Verschränkte Rauten, dichtes Netz</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+</div>
+<h2>Natur · 5 Vorlagen</h2>
+<p class="wozu">Gewachsene Ordnung: Blüten, Blätter, Spiralen, Samen. Weichere Kurven, unregelmäßigere Felder — und darum das, was am ehesten nach Zeichnung und am wenigsten nach Konstruktion aussieht.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/bluete.webp" alt="Blüte" width="300" height="300" loading="lazy" decoding="async"><h3>Blüte</h3><p class="note">Acht große Blätter, viel Fläche</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/blaetterkranz.webp" alt="Blätterkranz" width="300" height="300" loading="lazy" decoding="async"><h3>Blätterkranz</h3><p class="note">Blätter mit Mittelrippe, versetzt</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+<article class="karte"><img src="katalog/muschelspirale.webp" alt="Muschelspirale" width="300" height="300" loading="lazy" decoding="async"><h3>Muschelspirale</h3><p class="note">Sechs Arme, weite Bögen</p><dl><dt>Achsen</dt><dd>6</dd></dl></article>
+<article class="karte"><img src="katalog/farnkreis.webp" alt="Farnkreis" width="300" height="300" loading="lazy" decoding="async"><h3>Farnkreis</h3><p class="note">Wedel mit feinen Fiedern</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+<article class="karte"><img src="katalog/samenkranz.webp" alt="Samenkranz" width="300" height="300" loading="lazy" decoding="async"><h3>Samenkranz</h3><p class="note">Sechzehn Samen, feine Teilung</p><dl><dt>Achsen</dt><dd>16</dd></dl></article>
+</div>
+<h2>Zen &amp; Achtsamkeit · 5 Vorlagen</h2>
+<p class="wozu">Wenig, und das mit Ruhe. Große, klare Felder, wenige Achsen, keine Verflechtung. Gedacht für die Viertelstunde, in der man nichts entscheiden möchte.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/wellenkreis.webp" alt="Wellenkreis" width="300" height="300" loading="lazy" decoding="async"><h3>Wellenkreis</h3><p class="note">Fünf Wellenringe, gleichmäßiger Takt</p><dl><dt>Achsen</dt><dd>24</dd></dl></article>
+<article class="karte"><img src="katalog/tropfenkranz.webp" alt="Tropfenkranz" width="300" height="300" loading="lazy" decoding="async"><h3>Tropfenkranz</h3><p class="note">Tropfen in zwei Lagen, versetzt</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+<article class="karte"><img src="katalog/ruhefeld.webp" alt="Ruhefeld" width="300" height="300" loading="lazy" decoding="async"><h3>Ruhefeld</h3><p class="note">Wenige große Flächen, viel Raum</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/atemringe.webp" alt="Atemringe" width="300" height="300" loading="lazy" decoding="async"><h3>Atemringe</h3><p class="note">Ruhiger Takt, gleichmäßige Weite</p><dl><dt>Achsen</dt><dd>16</dd></dl></article>
+<article class="karte"><img src="katalog/steingarten.webp" alt="Steingarten" width="300" height="300" loading="lazy" decoding="async"><h3>Steingarten</h3><p class="note">Wenige Formen, geharkte Bahnen</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+</div>
+<h2>Jahreszeiten · 4 Vorlagen</h2>
+<p class="wozu">Vier Blätter mit einer Jahreszeit als Vorwand. Sie sind nicht strenger oder freier als die anderen — sie geben nur einen Anlass, zu einer bestimmten Farbwelt zu greifen.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/winter.webp" alt="Winter" width="300" height="300" loading="lazy" decoding="async"><h3>Winter</h3><p class="note">Schneekristall mit Seitenästen</p><dl><dt>Achsen</dt><dd>6</dd></dl></article>
+<article class="karte"><img src="katalog/fruehling.webp" alt="Frühling" width="300" height="300" loading="lazy" decoding="async"><h3>Frühling</h3><p class="note">Knospen in drei Lagen</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/sommer.webp" alt="Sommer" width="300" height="300" loading="lazy" decoding="async"><h3>Sommer</h3><p class="note">Strahlenkranz um eine offene Mitte</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+<article class="karte"><img src="katalog/herbst.webp" alt="Herbst" width="300" height="300" loading="lazy" decoding="async"><h3>Herbst</h3><p class="note">Geneigte Blätter, Eicheln als Punkte</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+</div>
+<h2>Anlagen · 8 Vorlagen</h2>
+<p class="wozu">Das Mandala als <b>Grundriss</b>, nicht als Muster. Von außen nach innen: Schutzbereich, Vorhöfe, Tore, Mauern, Kammer, Mitte. Dazu gehört die gestaffelte Symmetrie — die Achsenzahl hängt davon ab, <em>wo</em> die Hand aufsetzt, nicht nur davon, was eingestellt ist. Die Vorbilder stehen auf der <a href="motive.html">Schautafel der Motivfamilien</a>; übernommen ist jeweils die Ordnung, nicht die Bedeutung.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/anlage.webp" alt="Anlage" width="300" height="300" loading="lazy" decoding="async"><h3>Anlage</h3><p class="note">Vier Tore, drei Bereiche</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 4 · 24 — von innen nach außen</dd><dt>Vorbild</dt><dd>Tibetischer Palastgrundriss</dd></dl></article>
+<article class="karte"><img src="katalog/ringanlage.webp" alt="Ringanlage" width="300" height="300" loading="lazy" decoding="async"><h3>Ringanlage</h3><p class="note">Vier Tore, vier Ringbänder</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 4 · 24 · 24 · 20 · 32 — von innen nach außen</dd><dt>Vorbild</dt><dd>Kalachakra: die äußeren Ringe</dd></dl></article>
+<article class="karte"><img src="katalog/garten.webp" alt="Gartenanlage" width="300" height="300" loading="lazy" decoding="async"><h3>Gartenanlage</h3><p class="note">Vier Wasserläufe, sechsunddreißig Beete</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 4 · 24 — von innen nach außen</dd><dt>Vorbild</dt><dd>Chahar Bagh, persischer Paradiesgarten</dd></dl></article>
+<article class="karte"><img src="katalog/stern.webp" alt="Sternanlage" width="300" height="300" loading="lazy" decoding="async"><h3>Sternanlage</h3><p class="note">Acht Bastionen, eine Piazza</p><dl><dt>Achsen</dt><dd>8</dd><dt>Zonen</dt><dd>1 · 8 · 16 — von innen nach außen</dd><dt>Vorbild</dt><dd>Sternfestung der Renaissance, Palmanova</dd></dl></article>
+<article class="karte"><img src="katalog/raster.webp" alt="Rasteranlage" width="300" height="300" loading="lazy" decoding="async"><h3>Rasteranlage</h3><p class="note">Neun mal neun Felder, kein Kranz</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 4 · 24 — von innen nach außen</dd><dt>Vorbild</dt><dd>Vastu Purusha Mandala, Indien</dd></dl></article>
+<article class="karte"><img src="katalog/stufen.webp" alt="Stufenanlage" width="300" height="300" loading="lazy" decoding="async"><h3>Stufenanlage</h3><p class="note">Außen eckig, innen rund</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 12 · 16 · 24 · 4 · 24 — von innen nach außen</dd><dt>Vorbild</dt><dd>Borobudur, Java</dd></dl></article>
+<article class="karte"><img src="katalog/torstadt.webp" alt="Torstadt" width="300" height="300" loading="lazy" decoding="async"><h3>Torstadt</h3><p class="note">Zwölf Tore, sechs Mauern</p><dl><dt>Achsen</dt><dd>4</dd><dt>Zonen</dt><dd>1 · 4 · 12 — von innen nach außen</dd><dt>Vorbild</dt><dd>Srirangam, südindische Tempelstadt</dd></dl></article>
+<article class="karte"><img src="katalog/kuppel.webp" alt="Kuppelanlage" width="300" height="300" loading="lazy" decoding="async"><h3>Kuppelanlage</h3><p class="note">Ein Gewölbe von unten, 132 Kassetten</p><dl><dt>Achsen</dt><dd>8</dd><dt>Zonen</dt><dd>1 · 8 · 8 · 12 · 16 · 20 · 24 · 28 · 32 — von innen nach außen</dd><dt>Vorbild</dt><dd>Kassettenkuppel, von unten gesehen</dd></dl></article>
+</div>
+<h2>Kids-Corner · 7 Vorlagen</h2>
+<p class="wozu">Sehr große Felder und wenige Achsen für kleine Hände, dazu Zähl- und Rechenmandalas mit einer Aufgabe über dem Blatt. Bedient wird das von Eltern und Lehrkräften — deshalb kein Kinder-Look, sondern dieselbe ruhige Oberfläche wie sonst.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/ersteformen.webp" alt="Erste Formen" width="300" height="300" loading="lazy" decoding="async"><h3>Erste Formen</h3><p class="note">Kindergarten – sehr große Felder</p><dl><dt>Achsen</dt><dd>6</dd></dl></article>
+<article class="karte"><img src="katalog/mustertanz.webp" alt="Mustertanz" width="300" height="300" loading="lazy" decoding="async"><h3>Mustertanz</h3><p class="note">Grundschule – Bänder im Wechsel</p><dl><dt>Achsen</dt><dd>12</dd></dl></article>
+<article class="karte"><img src="katalog/formenreigen.webp" alt="Formenreigen" width="300" height="300" loading="lazy" decoding="async"><h3>Formenreigen</h3><p class="note">Kindergarten – runde und eckige Felder</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/zaehlen6.webp" alt="Zähl bis 6" width="300" height="300" loading="lazy" decoding="async"><h3>Zähl bis 6</h3><p class="note">Punkte zählen, nach Anzahl färben</p><dl><dt>Achsen</dt><dd>6</dd></dl></article>
+<article class="karte"><img src="katalog/zaehlen10.webp" alt="Zähl bis 10" width="300" height="300" loading="lazy" decoding="async"><h3>Zähl bis 10</h3><p class="note">Punkte zählen bis zehn</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+<article class="karte"><img src="katalog/rechnen10.webp" alt="Rechenmandala ZR 10" width="300" height="300" loading="lazy" decoding="async"><h3>Rechenmandala ZR 10</h3><p class="note">Plus und Minus im Zahlenraum 10</p><dl><dt>Achsen</dt><dd>8</dd></dl></article>
+<article class="karte"><img src="katalog/rechnen20.webp" alt="Rechenmandala ZR 20" width="300" height="300" loading="lazy" decoding="async"><h3>Rechenmandala ZR 20</h3><p class="note">Plus und Minus im Zahlenraum 20</p><dl><dt>Achsen</dt><dd>10</dd></dl></article>
+</div>
+<h2>Blatt · 5 Stimmungen</h2>
+<p class="wozu">Blatt hat <b>keinen Katalog</b>. Es gibt kein Motiv zum Auswählen — man nimmt eine Stimmung, und das Blatt wird gewürfelt. Was hier steht, ist also je ein Beispiel, nicht die Vorlage selbst: Beim nächsten Mal sieht es anders aus. Gezeigt ist das Relief so, wie es nach ein paar leichten Zügen aussähe. Die Stimmung „Anlage“ zieht dabei eine von 8 Grammatiken — die stehen auf der <a href="../docs/anlage-blatt-acht.png">eigenen Tafel</a>.</p>
+<div class="tafel">
+<article class="karte"><img src="katalog/blatt-ruhe.webp" alt="Ruhe" width="300" height="300" loading="lazy" decoding="async"><h3>Ruhe</h3><p class="note">ein gewürfeltes Beispiel</p><dl><dt>Achsen</dt><dd>12</dd><dt>Bänder</dt><dd>5</dd></dl></article>
+<article class="karte"><img src="katalog/blatt-bluete.webp" alt="Blüte" width="300" height="300" loading="lazy" decoding="async"><h3>Blüte</h3><p class="note">ein gewürfeltes Beispiel</p><dl><dt>Achsen</dt><dd>12</dd><dt>Bänder</dt><dd>6</dd></dl></article>
+<article class="karte"><img src="katalog/blatt-klarheit.webp" alt="Klarheit" width="300" height="300" loading="lazy" decoding="async"><h3>Klarheit</h3><p class="note">ein gewürfeltes Beispiel</p><dl><dt>Achsen</dt><dd>16</dd><dt>Bänder</dt><dd>7</dd></dl></article>
+<article class="karte"><img src="katalog/blatt-fuelle.webp" alt="Fülle" width="300" height="300" loading="lazy" decoding="async"><h3>Fülle</h3><p class="note">ein gewürfeltes Beispiel</p><dl><dt>Achsen</dt><dd>18</dd><dt>Bänder</dt><dd>7</dd></dl></article>
+<article class="karte"><img src="katalog/blatt-anlage.webp" alt="Anlage" width="300" height="300" loading="lazy" decoding="async"><h3>Anlage</h3><p class="note">ein gewürfeltes Beispiel</p><dl><dt>Achsen</dt><dd>4</dd><dt>Bänder</dt><dd>14</dd><dt>Grammatik</dt><dd>stufen (diesmal)</dd></dl></article>
+</div>
+
+  <p class="hinweis">
+    <strong>Stand:</strong> Mandala Atelier 2.20, Blatt
+    3.15. Frühere Fassungen stehen im
+    <a href="fassungen.html">Regal</a> und lassen sich dort öffnen.
+  </p>
+
+  <footer>
+    Zurück zur <a href="../beide.html">Einstiegsseite</a> ·
+    <a href="motive.html">Motivfamilien</a> ·
+    <a href="moderne.html">Moderne</a> ·
+    <a href="fassungen.html">Fassungen</a>
+  </footer>
+
+</main>
+</body>
+</html>

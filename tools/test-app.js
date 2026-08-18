@@ -950,6 +950,25 @@ async function run() {
     return ['600 21px Fraunces', '500 15px "Work Sans"', '500 20px "IBM Plex Mono"']
       .every(function (spec) { return document.fonts.check(spec); });
   });
+  /* Der Katalog unter docs/ zeigt jede Vorlage so, wie die App sie zeichnet.
+     Er wird erzeugt, nicht gepflegt (`npm run katalog`) — und genau deshalb
+     muss jemand nachsehen, ob er noch alle kennt. Wer ein Motiv hinzufügt und
+     das Erzeugen vergisst, bekommt sonst eine Tafel, die *fast* stimmt, und
+     das ist die schlechteste Sorte. */
+  const fsK = require('fs');
+  const pathK = require('path');
+  const ordner = pathK.join(__dirname, '..', 'docs', 'katalog');
+  const ids = await page.evaluate(function () {
+    return window.MandalaAtelier.MOTIFS.map(function (m) { return m.id; });
+  });
+  const fehlend = fsK.existsSync(ordner)
+    ? ids.filter(function (id) { return !fsK.existsSync(pathK.join(ordner, id + '.webp')); })
+    : ids;
+  console.log('\nKatalog: ' + (fehlend.length
+    ? 'FEHLT für ' + fehlend.join(', ') + ' — bitte `npm run katalog`'
+    : 'alle ' + ids.length + ' Vorlagen abgebildet'));
+  if (fehlend.length) broken.push('Katalog unvollständig');
+
   console.log('\nSchriften geladen: ' + (typeOk ? 'alle drei' : 'NICHT vollständig'));
   console.log('Abrufe nach außen: ' + (external.length ? external.length + ' ← ' + external[0] : 'keine'));
 
