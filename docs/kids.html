@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kids-Corner – Recherche und Konzept</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --room:#efe9dd; --card:#f8f4ea; --ink:#2f2a22; --quiet:#6d6355;
+  --edge:rgba(60,48,32,0.16); --mark:#8a5a3c;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --room:#16151a; --card:#201f25; --ink:#e8e2d6; --quiet:#9a9287;
+          --edge:rgba(0,0,0,0.5); --mark:#d0a184; }
+}
+html { -webkit-text-size-adjust:100%; }
+body {
+  margin:0; background:var(--room); color:var(--ink);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  padding: clamp(24px,6vw,64px) clamp(18px,5vw,40px)
+           calc(clamp(24px,6vw,64px) + env(safe-area-inset-bottom));
+}
+main { max-width:52rem; margin:0 auto; }
+h1 { margin:0 0 .15em; font-family:ui-serif,'Iowan Old Style',Georgia,serif;
+     font-weight:500; font-size:clamp(28px,6vw,40px); letter-spacing:-.01em; }
+.lede { margin:0 0 2.4rem; color:var(--quiet); max-width:42rem; }
+h2 { margin:2.8rem 0 .8rem; font-size:14px; font-weight:600; letter-spacing:.08em;
+     text-transform:uppercase; color:var(--quiet);
+     border-top:1px solid var(--edge); padding-top:1.2rem; }
+h3 { margin:1.8rem 0 .3rem; font-size:17px; font-weight:600;
+     font-family:ui-serif,'Iowan Old Style',Georgia,serif; }
+p { margin:0 0 1rem; }
+ul { margin:0 0 1rem; padding-left:1.2rem; }
+li { margin-bottom:.35rem; }
+.wrap { overflow-x:auto; margin:0 0 1.4rem; }
+table { border-collapse:collapse; font-size:14.5px; min-width:32rem; width:100%; }
+th, td { text-align:left; padding:7px 14px 7px 0; border-bottom:1px solid var(--edge);
+         vertical-align:top; }
+th { font-weight:600; font-size:13px; letter-spacing:.03em; color:var(--quiet); }
+td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.karte { background:var(--card); border-radius:16px; padding:18px 20px;
+         margin:0 0 14px;
+         box-shadow:0 1px 2px var(--edge), 0 10px 28px -16px var(--edge); }
+.karte h3 { margin-top:0; }
+.karte p:last-child { margin-bottom:0; }
+.fuer, .gegen { font-size:14.5px; margin:.4rem 0 0; }
+.fuer b, .gegen b { color:var(--mark); font-weight:600; }
+.merk { margin:1.6rem 0; padding:16px 18px; border-radius:14px;
+        border:1px solid var(--edge); font-size:15px; }
+.merk strong { color:var(--mark); }
+footer { margin-top:3rem; padding-top:1.2rem; border-top:1px solid var(--edge);
+         font-size:13.5px; color:var(--quiet); }
+footer a { color:inherit; }
+a { color:inherit; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Kids-Corner: Recherche und Konzept</h1>
+<p class="lede">Vier Entwürfe an einem Tag, vier Mal daneben. Diese Seite holt
+nach, was vorher hätte stehen sollen: was es auf dem Markt gibt, woran unsere
+Blätter gemessen scheitern, und drei Wege zur Auswahl. Entschieden wird vor dem
+nächsten Strich, nicht danach.</p>
+
+<h2>1 · Was es gibt</h2>
+
+<h3>Gedruckte Rechenmandalas</h3>
+<p>Das nächstliegende Vorbild, und es ist verbreitet: Mandala mit einer
+Rechenaufgabe je Feld, eine Farblegende am Rand, Zahlenraum 10 und 20, Klasse 1
+bis 4. Anbieter sind Grundschulmaterial.de, mandala-bilder.de, Worksheet
+Crafter und ein Dutzend weitere. Bemerkenswert ist ein Satz aus der
+Unterrichtspraxis: <em>im Unterricht kommt diese Art Arbeitsblatt eher weniger
+zum Einsatz, da das Ausmalen einiges an Zeit in Anspruch nimmt — für zuhause
+umso beliebter.</em> Das Ausmalen ist also nicht das Beiwerk der Aufgabe. Es ist
+der Grund, warum das Blatt zuhause auf dem Tisch liegt.</p>
+
+<h3>Malen-nach-Zahlen-Apps</h3>
+<p>Happy Color, Pigment, Colorfy, Lake — der große Markt. Drei Dinge daran sind
+für uns wichtig:</p>
+<ul>
+  <li>Es sind <b>keine Mandalas</b>. Es sind Bilder: Tiere, Blumen, Szenen.</li>
+  <li>Die Ziffer im Feld ist <b>winzig</b>. Man sucht sie nicht — beim Antippen
+      einer Farbe färben sich die zugehörigen Felder hellgrau ein. Die Zahl
+      steht da, aber sie ist nicht das, was man ansieht.</li>
+  <li>Werbung, Konten, Onlinezwang. Genau das, was hier nicht sein soll.</li>
+</ul>
+
+<h3>Lern-Apps</h3>
+<p>Anton, Zahlenzorro und die Malen-nach-Zahlen-Apps für Kinder im deutschen
+App Store. Dort ist das Rechnen die Hauptsache und das Bild die Belohnung; die
+Aufgabe steht als Text über einem Bild, das mit ihr nichts zu tun hat.</p>
+
+<h3>Kindermandalas, gedruckt</h3>
+<p>Das ist der Fund, der am meisten erklärt. Ein Mandala für Kinder besteht aus
+<b>wiedererkennbaren Dingen</b> — Blumen, Herzen, Sternen, Schmetterlingen,
+Sonnen, Fischen, Eulen, Gesichtern —, symmetrisch um eine Mitte gelegt. Abstrakte
+Geometrie, sich verschränkende Ornamentbänder, feine Rosetten: das ist das
+<em>Erwachsenen</em>mandala. Die Quellen unterscheiden das ausdrücklich.</p>
+
+<h2>2 · Fünf Maßzahlen, an denen man es messen kann</h2>
+<p>Aus der Herstellerliteratur für Ausmalbücher, nach Alter gestaffelt:</p>
+
+<div class="wrap">
+<table>
+  <tr><th>Alter</th><th>Linienstärke</th><th>Elemente je Seite</th><th>Was sonst gilt</th></tr>
+  <tr><td class="num">2–4</td><td class="num">≥ 2,5 pt</td><td class="num">5–10</td><td>große offene Formen, keine Innendetails</td></tr>
+  <tr><td class="num">3–5</td><td class="num">≈ 2 pt</td><td class="num">10–15</td><td>einfache Gegenstände</td></tr>
+  <tr><td class="num">5–7</td><td class="num">3–4 px</td><td class="num">15–25</td><td>Abstand zwischen Elementen ≥ 12 mm</td></tr>
+  <tr><td class="num">7–9</td><td class="num">2–3 px</td><td class="num">25–40</td><td>Hintergrund erlaubt</td></tr>
+  <tr><td class="num">9–12</td><td class="num">1–2 px</td><td class="num">40–60</td><td>feine Muster</td></tr>
+</table>
+</div>
+
+<h2>3 · Woran die verworfenen Entwürfe scheiterten</h2>
+<p>Dieselben Blätter, an diesen Zahlen gemessen — und zwar nachgezählt, nicht
+geschätzt:</p>
+
+<div class="wrap">
+<table>
+  <tr><th>Größe</th><th>Entwurf 2.21</th><th>Vorgabe für 5–7</th><th></th></tr>
+  <tr><td>Ausmalflächen</td><td class="num">≈ 50</td><td class="num">15–25</td><td>doppelt so viele</td></tr>
+  <tr><td>Linienstärke auf dem iPad</td><td class="num">1–2 px</td><td class="num">3–4 px</td><td>halb so dick</td></tr>
+  <tr><td>Wiedererkennbare Dinge</td><td class="num">0</td><td>Blume, Herz, Stern …</td><td>gar keine</td></tr>
+  <tr><td>Die Zahl im Feld</td><td>groß, mittig</td><td>klein, nebensächlich</td><td>umgekehrt</td></tr>
+</table>
+</div>
+
+<p>Das erklärt das Urteil vollständig, und es erklärt auch, warum jede weitere
+Runde daneben ging: Ich habe die Feinheit erhöht, wo sie hätte sinken müssen,
+und die Linien dünner gemacht, wo sie hätten dicker werden müssen. Gebaut wurde
+jedes Mal ein <em>Erwachsenenmandala mit Zahlen darin</em> — technisch sauber
+und für die Zielgruppe falsch.</p>
+
+<div class="merk">
+<strong>Der Satz, der bleibt:</strong> Ein Kindermandala ist ein Kranz aus
+Dingen, kein Ornament mit Feldern. Und das Ausmalen ist die Hauptsache, nicht
+die Aufgabe.
+</div>
+
+<h2>4 · Drei Wege</h2>
+
+<div class="karte">
+<h3>A · Das Dinge-Mandala</h3>
+<p>Ein Kranz aus acht bis zwölf wiedererkennbaren Dingen: Blume, Herz, Stern,
+Schmetterling, Sonne, Blatt, Fisch, Vogel. Dicke Linien, große Flächen, eine
+Mitte zum freien Bemalen. Die Zahl steht klein im Ding.</p>
+<p class="fuer"><b>Dafür:</b> Das ist, was der Markt macht, und was Kinder
+wiedererkennen. Trifft die Maßzahlen ohne Verrenkung.</p>
+<p class="gegen"><b>Dagegen:</b> Jedes Ding ist Handarbeit — es entsteht nicht
+aus einer Grammatik wie der Rest des Ateliers. Und es sprengt die Bildsprache:
+Neben Palastgrundriss und Sternfestung stünde plötzlich ein Schmetterling.</p>
+</div>
+
+<div class="karte">
+<h3>B · Dasselbe, nur nach Maß</h3>
+<p>Keine neue Bildsprache. Nur die Maßzahlen einhalten: 15 bis 20 Flächen statt
+50, Linien doppelt so dick, die Zahl klein und aus der Mitte gerückt.</p>
+<p class="fuer"><b>Dafür:</b> Klein, in einer Fassung machbar, jede Änderung
+einzeln nachmessbar. Nichts am übrigen Atelier ändert sich.</p>
+<p class="gegen"><b>Dagegen:</b> Es bleibt abstrakte Geometrie — genau das, was
+die Quellen als Erwachsenenmandala beschreiben. Es würde besser aussehen als
+2.21, aber es bliebe dieselbe Gattung.</p>
+</div>
+
+<div class="karte">
+<h3>C · Das Blüten-Mandala</h3>
+<p>Der Mittelweg. Keine Tiere, aber echte <b>Blüten</b> — die Grammatik des
+Ateliers kann Blütenblätter, und eine Blüte ist ein Ding, das ein Kind erkennt
+und benennt. Acht große Blüten im Kranz, jede mit fünf oder sechs Blättern; die
+Blütenblätter sind die Ausmalflächen, die Aufgabe steht im Blütenherz.</p>
+<p class="fuer"><b>Dafür:</b> Wiedererkennbar <em>und</em> aus dem, was schon da
+ist. Passt neben die anderen Motivfamilien, ohne sie zu stören. Die Zahl der
+Flächen stimmt fast von selbst: 8 Blüten × 5 Blätter + Mitte ≈ 45 kleine, oder
+8 Blüten als je eine Fläche ≈ 9 große — beide Altersstufen aus einer Form.</p>
+<p class="gegen"><b>Dagegen:</b> Eine Blüte bleibt eine Blüte. Der Reichtum von
+A entsteht nicht.</p>
+</div>
+
+<h2>5 · Eine Frage quer zu allen dreien</h2>
+<p>Der Markt gibt einen Hinweis, den ein gedrucktes Arbeitsblatt nicht nutzen
+kann: <b>Die Aufgabe muss nicht im Blatt stehen.</b> Auf Papier muss sie es,
+sonst weiß niemand, was zu tun ist. In einer App nicht.</p>
+<p>Denkbar wäre: Das Blatt ist ein reines Mandala, ohne eine einzige Ziffer.
+Ein Tipp auf ein Feld zeigt die Aufgabe groß in der Zeile über dem Blatt; wer
+sie gelöst hat, greift zur Farbe und tippt noch einmal. Das Blatt bleibt bis
+zum Schluss ein Bild — und beim Aufhängen steht keine Rechenaufgabe darauf.</p>
+<p>Das ist die eine Sache, die wir können und ein Arbeitsblatt nicht. Sie
+gehört meines Erachtens in jeden der drei Wege, ist aber eine eigene
+Entscheidung.</p>
+
+<h2>6 · Was zu entscheiden ist</h2>
+<ul>
+  <li><b>Welcher Weg</b> — A, B oder C.</li>
+  <li><b>Welches Alter zuerst.</b> Zwischen 5–7 und 7–9 liegen Faktor zwei bei
+      der Flächenzahl und Faktor zwei bei der Linienstärke; ein Blatt für beide
+      gibt es nicht.</li>
+  <li><b>Aufgabe im Blatt oder in der Zeile darüber</b> (Abschnitt 5).</li>
+</ul>
+<p>Danach kommen Entwürfe — gezeichnet, nicht beschrieben —, und erst nach
+deiner Entscheidung die Umsetzung.</p>
+
+<footer>
+<p>Quellen: <a href="https://www.kdpeasy.com/blog/coloring-book-age-groups">KDP
+Easy, Coloring Books for Different Age Groups</a> ·
+<a href="https://www.alibaba.com/product-insights/how-to-choose-kids-coloring-books-expert-buying-guide-2026.html">Alibaba
+Product Insights, Kids Coloring Books</a> ·
+<a href="https://www.mandala-bilder.de/rechen-mandalas.html">mandala-bilder.de,
+Rechenmandalas</a> ·
+<a href="https://www.grundschulmaterial.de/medien/t/Arbeitsblatt/k/Malen%20nach%20Zahlen/p/1/">Grundschulmaterial.de,
+Malen nach Zahlen</a> ·
+<a href="https://worksheetcrafter.com/de/2014-04-material-vertretungsstunden-mathematik">Worksheet
+Crafter, Rechenmandalas</a> ·
+<a href="https://www.mandala-bilder.de/mandala-symbole.html">mandala-bilder.de,
+Mandalas mit Symbolen</a> ·
+<a href="https://www.basteln-gestalten.de/mandalas-kinder">Basteln &amp;
+Gestalten, Mandalas für Kinder</a> ·
+<a href="https://apps.apple.com/us/app/happy-color-coloring-games/id1407852246">Happy
+Color im App Store</a> ·
+<a href="https://www.itechguides.com/5-of-our-favorite-coloring-apps-for-adults-in-2026/">iTechGuides,
+Coloring Apps 2026</a></p>
+<p><a href="../beide.html">← zurück zur Werkstatt</a></p>
+</footer>
+
+</main>
+</body>
+</html>
