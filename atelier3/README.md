@@ -368,9 +368,14 @@ einzige keine Sammlung von Tönen, sondern Leitern: vier Stufen Gold, drei Blau,
 dazu Purpur und der dunkle Grund. Sie entstand im Atelier für eine
 Kassettenkuppel, hat hier aber womöglich noch mehr Sinn – in Blatt entsteht ein
 Verlauf ohnehin unter der Hand, und wer Stufe für Stufe heller wählt, bekommt
-ihn zweimal. Ihre Stimmung ist das
-eigentliche Kapital. Neun je Welt statt vierzehn: Der Griff soll aus dem
-Handgelenk kommen, nicht aus einer Abwägung.
+ihn zweimal. Ihre Stimmung ist das eigentliche Kapital.
+
+Zehn bis vierzehn Töne je Welt, und diese Zahl ist **gemessen**. Hier wird
+Farbe durchgerieben, nicht deckend aufgetragen: Bei 70 % Deckung auf dem
+Papierton schrumpft jeder Abstand auf etwa sieben Zehntel, und was in der
+Leiste noch zwei Töne sind, ist auf dem Blatt einer. Sieben Töne sind deshalb
+ausgelesen worden — Perle und Kalk lagen bei ΔE00 2.9 auseinander. Jetzt liegt
+in keiner Welt ein Paar unter ΔE00 7.
 
 **Gewählt wird die Welt nicht.** Sie gehört zum Blatt, so wie das Relief, und
 steckt im Seed. Man setzt sich an einen Tisch, auf dem heute die Erdpigmente

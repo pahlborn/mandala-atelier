@@ -1110,13 +1110,16 @@ async function run() {
     return {
       knöpfe: document.querySelectorAll('button').length,
       pigmente: document.querySelectorAll('.pigment').length,
+      töne: window.Blatt.sheet.pigments.length,
       zurück: /rückgängig|undo|radier|löschen/.test(text),
       verwerfen: (document.getElementById('stack-remove') || {}).textContent,
       zahl: /\d+\s*%/.test(text),
       speichern: /speichern|sichern/.test(text)
     };
   });
-  prüfe('vierzehn Pigmente', bedienung.pigmente === 14, bedienung.pigmente + ' Stück');
+  prüfe('so viele Stifte wie die Welt Töne hat',
+        bedienung.pigmente === bedienung.töne,
+        bedienung.pigmente + ' Stifte, ' + bedienung.töne + ' Töne');
   prüfe('kein Rückgängig, kein Radierer', !bedienung.zurück);
   prüfe('keine Prozentanzeige', !bedienung.zahl);
   prüfe('kein Speichern-Knopf', !bedienung.speichern);

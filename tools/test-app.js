@@ -969,6 +969,86 @@ async function run() {
     : 'alle ' + ids.length + ' Vorlagen abgebildet'));
   if (fehlend.length) broken.push('Katalog unvollständig');
 
+  /* ---- Farbabstände in den Welten --------------------------------------
+     Zwei Töne, die man beim Malen nicht auseinanderhalten kann, sind kein
+     Reichtum, sondern eine Falle. Gemessen wird als CIEDE2000 **bei 70 %
+     Deckung auf dem Papierton** — nicht am reinen Pigment: Blatt reibt die
+     Farbe durch, und dabei schrumpft jeder Abstand auf etwa sieben Zehntel.
+     Was hier bestanden wird, gilt dort erst recht.
+
+     Die Zahl der Töne je Welt wird bewusst *nicht* geprüft. Sie ist das
+     Ergebnis dieser Regel und darf sich ändern; die Regel darf es nicht. */
+  const abstände = await page.evaluate(function () {
+    const PAPIER = [0xf6, 0xf1, 0xe7], DECKUNG = 0.7;
+    function lab(hex) {
+      const n = parseInt(hex.slice(1), 16);
+      const roh = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      let [r, g, b] = roh.map(function (v, i) {
+        return (PAPIER[i] + (v - PAPIER[i]) * DECKUNG) / 255;
+      });
+      const f = function (c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+      r = f(r); g = f(g); b = f(b);
+      let X = (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) / 0.95047;
+      let Y = (r * 0.2126729 + g * 0.7151522 + b * 0.0721750);
+      let Z = (r * 0.0193339 + g * 0.1191920 + b * 0.9503041) / 1.08883;
+      const h = function (t) { return t > 0.008856 ? Math.cbrt(t) : (7.787 * t + 16 / 116); };
+      X = h(X); Y = h(Y); Z = h(Z);
+      return [116 * Y - 16, 500 * (X - Y), 200 * (Y - Z)];
+    }
+    function dE(h1, h2) {
+      const [L1, a1, b1] = lab(h1), [L2, a2, b2] = lab(h2);
+      const rad = Math.PI / 180, deg = 180 / Math.PI;
+      const C1 = Math.hypot(a1, b1), C2 = Math.hypot(a2, b2), Cb = (C1 + C2) / 2;
+      const G = 0.5 * (1 - Math.sqrt(Math.pow(Cb, 7) / (Math.pow(Cb, 7) + Math.pow(25, 7))));
+      const ap1 = (1 + G) * a1, ap2 = (1 + G) * a2;
+      const Cp1 = Math.hypot(ap1, b1), Cp2 = Math.hypot(ap2, b2);
+      let hp1 = Math.atan2(b1, ap1) * deg; if (hp1 < 0) hp1 += 360;
+      let hp2 = Math.atan2(b2, ap2) * deg; if (hp2 < 0) hp2 += 360;
+      const dL = L2 - L1, dC = Cp2 - Cp1;
+      let dhp = 0;
+      if (Cp1 * Cp2 !== 0) {
+        dhp = hp2 - hp1;
+        if (dhp > 180) dhp -= 360; else if (dhp < -180) dhp += 360;
+      }
+      const dH = 2 * Math.sqrt(Cp1 * Cp2) * Math.sin((dhp * rad) / 2);
+      const Lb = (L1 + L2) / 2, Cpb = (Cp1 + Cp2) / 2;
+      let hpb;
+      if (Cp1 * Cp2 === 0) hpb = hp1 + hp2;
+      else {
+        hpb = (hp1 + hp2) / 2;
+        if (Math.abs(hp1 - hp2) > 180) hpb += (hp1 + hp2 < 360) ? 180 : -180;
+      }
+      const T = 1 - 0.17 * Math.cos((hpb - 30) * rad) + 0.24 * Math.cos(2 * hpb * rad)
+                + 0.32 * Math.cos((3 * hpb + 6) * rad) - 0.20 * Math.cos((4 * hpb - 63) * rad);
+      const dTh = 30 * Math.exp(-Math.pow((hpb - 275) / 25, 2));
+      const Rc = 2 * Math.sqrt(Math.pow(Cpb, 7) / (Math.pow(Cpb, 7) + Math.pow(25, 7)));
+      const Sl = 1 + (0.015 * Math.pow(Lb - 50, 2)) / Math.sqrt(20 + Math.pow(Lb - 50, 2));
+      const Sc = 1 + 0.045 * Cpb, Sh = 1 + 0.015 * Cpb * T;
+      const Rt = -Math.sin(2 * dTh * rad) * Rc;
+      return Math.sqrt(Math.pow(dL / Sl, 2) + Math.pow(dC / Sc, 2) + Math.pow(dH / Sh, 2)
+                       + Rt * (dC / Sc) * (dH / Sh));
+    }
+    return window.MandalaAtelier.PALETTES.filter(function (p) { return !p.custom; })
+      .map(function (p) {
+        let min = 999, paar = '';
+        for (let i = 0; i < p.colors.length; i++)
+          for (let j = i + 1; j < p.colors.length; j++) {
+            const d = dE(p.colors[i].hex, p.colors[j].hex);
+            if (d < min) { min = d; paar = p.colors[i].name + '/' + p.colors[j].name; }
+          }
+        return { name: p.name, töne: p.colors.length, min: min, paar: paar };
+      });
+  });
+  const GRENZE = 7;
+  console.log('\nEngste Farbpaare je Welt (ΔE00 bei 70 % Deckung, Grenze ' + GRENZE + ')');
+  const zuNah = [];
+  abstände.forEach(function (w) {
+    const gut = w.min >= GRENZE;
+    if (!gut) zuNah.push(w.name);
+    console.log('  ' + (gut ? 'ok   ' : 'ZU NAH ') + w.name.padEnd(15) +
+      String(w.töne).padStart(2) + ' Töne   ΔE ' + w.min.toFixed(1) + '   ' + w.paar);
+  });
+
   console.log('\nSchriften geladen: ' + (typeOk ? 'alle drei' : 'NICHT vollständig'));
   console.log('Abrufe nach außen: ' + (external.length ? external.length + ' ← ' + external[0] : 'keine'));
 
@@ -993,6 +1073,7 @@ async function run() {
   if (!shapeOk) broken.push('Grundformen');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
+  broken.push.apply(broken, zuNah.map(function (n) { return 'Farbwelt ' + n; }));
 
   if (noise.length) {
     console.log('\nMeldungen des Browsers (bei file:// erwartbar):');
