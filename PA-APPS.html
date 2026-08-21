@@ -829,10 +829,11 @@
     <h3>App-Datenschutz und Bedienungshilfen</h3>
     <div class="kachel">
       <div>
-        <b>Keine Daten erfasst</b>
-        <span>Der Vorname des Kindes und seine Bilder bleiben auf dem Gerät und
-        werden nirgends hingeschickt. Für die Altersfreigabe ist das der
-        entscheidende Punkt.</span>
+        <b>Keine Daten erfasst – mit einem Aber</b>
+        <span>Der Vorname des Kindes und seine Bilder bleiben auf dem Gerät.
+        Aber: Die App lädt ihre <b>Schriften von Google</b> und gibt dabei die
+        IP-Adresse preis. Als einzige der drei ist sie damit nicht restlos
+        offline. Siehe <a href="./datenschutz.html">Datenschutzerklärung</a>.</span>
       </div>
       <div>
         <b>Bedienungshilfen: teilweise</b>
@@ -866,6 +867,13 @@
         <li>Das Malstudio liegt in einem <strong>eigenen Repo</strong>
             (<code>pahlborn/malstudio</code>) und wäre eine dritte, getrennte
             Einreichung mit eigener Bundle-ID.</li>
+        <li><strong>Die Google-Schriften abstellen.</strong> Sie sind der
+            einzige Grund, warum die Datenschutzerklärung überhaupt eine
+            Übermittlung an einen Dritten nennen muss – bei einer Kinder-App
+            der unnötigste aller Streitpunkte. Das Mandala Atelier zeigt mit
+            <code>tools/gen-fonts.js</code>, wie es ohne geht: Schriften als
+            Daten-URI einbetten. Danach sind alle drei Apps ausnahmslos
+            offline.</li>
         <li>Die Beispielbilder oben zeigen ein frisch angelegtes Profil „Mia“.
             Für den Store sollten es Aufnahmen mit gefüllter Galerie sein.</li>
       </ul>
@@ -889,8 +897,11 @@
           Privatperson ist das der unangenehmste Punkt und sollte zuerst
           entschieden werden.</li>
       <li><strong>Datenschutzerklärung als eigene Adresse.</strong> Pflicht für
-          jede App, auch wenn nichts erhoben wird. Eine schlichte Seite auf
-          GitHub Pages genügt – gibt es bisher für keine der drei.</li>
+          jede App, auch wenn nichts erhoben wird. Liegt jetzt vor:
+          <a href="./datenschutz.html">datenschutz.html</a>, eine Erklärung für
+          alle drei Apps. Vor dem Einreichen sind darin noch die gelb
+          hinterlegten Stellen zu füllen – Name, Anschrift, Kontakt,
+          Aufsichtsbehörde.</li>
       <li><strong>Support-Adresse</strong>, ebenfalls Pflicht.</li>
       <li><strong>Nativer Rahmen.</strong> Alle drei sind Web-Apps und lassen
           sich nicht direkt einreichen; sie brauchen ein Xcode-Projekt, das die

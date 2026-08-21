@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-8';
+const CACHE = 'mandala-atelier-v1-9';
 
 const SHELL = [
   './',
@@ -70,6 +70,11 @@ self.addEventListener('fetch', function (event) {
      Netz laufen. */
   if (url.pathname.indexOf('/PA-APPS.html') !== -1) return;
   if (url.pathname.indexOf('/pa-apps/') !== -1) return;
+
+  /* Die Datenschutzerklärung erst recht nicht. Sie ist die Adresse, die im
+     App Store hinterlegt ist; eine veraltete Fassung wäre dort nicht bloß
+     unschön, sondern falsch. */
+  if (url.pathname.indexOf('/datenschutz.html') !== -1) return;
 
   event.respondWith(
     caches.match(request).then(function (hit) {

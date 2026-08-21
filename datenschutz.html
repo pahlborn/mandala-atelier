@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Datenschutzerklärung – Mandala Atelier, Das ruhige Blatt, Malstudio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Datenschutzerklärung für die Apps Mandala Atelier, Mandala Atelier II – Das ruhige Blatt und Sommer am Meer – Malstudio.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon-192.png">
+
+<!--
+  Datenschutzerklärung – die Adresse, die App Store Connect für jede App
+  verlangt, auch wenn nichts erhoben wird.
+
+  Eine Erklärung für alle drei Apps. Das ist zulässig, solange jede App
+  namentlich vorkommt und erkennbar ist, was für welche gilt – deshalb die
+  Tabelle in Abschnitt 2 und die getrennte Behandlung in Abschnitt 3.
+
+  Zwei Dinge sind hier nicht Zierrat, sondern nachgeprüft:
+
+  * Die beiden Ateliers greifen zur Laufzeit nirgends ins Netz. Der
+    Testlauf des Projekts prüft das ausdrücklich, und die Schriften stecken
+    als Daten-URI in fonts.css.
+  * Das Malstudio tut es doch – es lädt Schriften von Google. Das steht
+    unten so drin, weil es stimmt. Besser wäre, es abzustellen; siehe den
+    Hinweis am Ende.
+
+  Was in eckigen Klammern steht, muss vor der Veröffentlichung ersetzt
+  werden. Ohne diese Angaben ist die Erklärung unvollständig.
+
+  Die Seite wird vom Service Worker absichtlich nicht zwischengespeichert
+  (siehe sw.js) – eine rechtlich wirksame Erklärung darf nicht in einer
+  alten Fassung hängenbleiben.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --room:  #efe9dd;
+    --card:  #f8f4ea;
+    --sunk:  #ece5d7;
+    --ink:   #2f2a22;
+    --quiet: #6d6355;
+    --line:  rgba(60, 48, 32, 0.14);
+    --blau:  #0a6c8f;
+    --merk:   #8a6d1f;
+    --merk-w: #f7eecf;
+    --merk-r: rgba(138, 109, 31, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --room:  #16151a;
+      --card:  #201f25;
+      --sunk:  #191920;
+      --ink:   #e8e2d6;
+      --quiet: #9a9287;
+      --line:  rgba(255, 255, 255, 0.12);
+      --blau:  #5fb8d8;
+      --merk:   #dcc078;
+      --merk-w: #2b2618;
+      --merk-r: rgba(220, 192, 120, 0.32);
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px)
+             calc(clamp(40px, 8vw, 80px) + env(safe-area-inset-bottom));
+    background: var(--room);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 44rem; margin: 0 auto; }
+
+  h1 {
+    margin: 0 0 0.2em;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(28px, 5.5vw, 38px);
+    line-height: 1.15;
+  }
+
+  h2 {
+    margin: 2.3rem 0 0.6rem;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(20px, 3.4vw, 24px);
+  }
+
+  h3 { margin: 1.5rem 0 0.4rem; font-size: 16px; }
+
+  .stand { margin: 0 0 1.8rem; color: var(--quiet); font-size: 14.5px; }
+
+  p, li { font-size: 16px; }
+  a { color: var(--blau); }
+
+  .kurz {
+    margin: 0 0 1rem;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .kurz p:last-child { margin-bottom: 0; }
+
+  .rollt { overflow-x: auto; margin: 1rem 0 1.4rem; }
+
+  table { width: 100%; min-width: 26rem; border-collapse: collapse; font-size: 15px; }
+
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  thead th {
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+
+  tbody th { font-weight: 600; width: 14rem; }
+
+  /* Was vor der Veröffentlichung ersetzt werden muss – sichtbar, nicht
+     versteckt. Eine Erklärung mit Platzhaltern ist keine Erklärung. */
+  .luecke {
+    background: var(--merk-w);
+    border-bottom: 1px solid var(--merk-r);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-style: normal;
+  }
+
+  .merk {
+    margin: 2.4rem 0 0;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--merk-r);
+    background: var(--merk-w);
+    font-size: 15px;
+  }
+
+  .merk b {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--merk);
+    font-size: 12.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  footer {
+    margin-top: 2.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    color: var(--quiet);
+    font-size: 14px;
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; }
+    .merk, .kurz { border: 1px solid #999; background: #fff; }
+    .luecke { background: #fff; border-bottom: 1px solid #000; }
+  }
+
+  @media (max-width: 560px) {
+    tbody th { width: auto; display: block; padding-bottom: 0; border: 0; }
+    tbody td { display: block; padding-top: 2px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Datenschutzerklärung</h1>
+  <p class="stand">
+    Gilt für die Apps <b>Mandala Atelier</b>, <b>Mandala Atelier II – Das
+    ruhige Blatt</b> und <b>Sommer am Meer – Malstudio</b>.<br>
+    Stand: <span class="luecke">[Monat Jahr des Erscheinens]</span>
+  </p>
+
+  <div class="kurz">
+    <p><b>Kurz gefasst:</b> Diese Apps haben keine Konten, keine Werbung, keine
+       Analyse und kein Tracking. Was Sie zeichnen, malen und benennen, bleibt
+       auf Ihrem Gerät und wird nirgendwohin geschickt. Wir bekommen davon
+       nichts zu sehen.</p>
+    <p>Zwei Ausnahmen gibt es, und beide stehen unten ausdrücklich: Das
+       Malstudio lädt seine Schriften von Google, und es kann auf Wunsch der
+       Eltern einen Ort in Apple Karten öffnen.</p>
+  </div>
+
+  <h2>1. Verantwortlicher</h2>
+  <p>Verantwortlich im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:</p>
+  <p>
+    <span class="luecke">[Vor- und Nachname oder Firma]</span><br>
+    <span class="luecke">[Straße und Hausnummer]</span><br>
+    <span class="luecke">[PLZ und Ort]</span><br>
+    <span class="luecke">[Land]</span><br>
+    E-Mail: <span class="luecke">[Kontaktadresse]</span>
+  </p>
+  <p>Eine Datenschutzbeauftragte oder einen Datenschutzbeauftragten gibt es
+     nicht; die Voraussetzungen dafür liegen nicht vor.</p>
+
+  <h2>2. Was die Apps auf Ihrem Gerät speichern</h2>
+  <p>Alle drei Apps legen Daten <b>ausschließlich lokal auf dem Gerät</b> ab –
+     im Speicher der App selbst. Diese Daten werden nicht übertragen, nicht
+     ausgewertet und sind für uns nicht einsehbar.</p>
+
+  <div class="rollt">
+  <table>
+    <thead>
+      <tr><th scope="col">App</th><th scope="col">Was gespeichert wird</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Mandala Atelier</th>
+        <td>Fertige Werke samt Titel, die Namen der Personen, die auf dem Gerät
+            malen, die selbst gemischte Farbwelt sowie Einstellungen wie Hell
+            oder Dunkel und das zuletzt gewählte Werkzeug.</td>
+      </tr>
+      <tr>
+        <th scope="row">Mandala Atelier II –<br>Das ruhige Blatt</th>
+        <td>Das Blatt, an dem gerade gearbeitet wird, weggelegte Blätter und
+            Einstellungen wie Ton an oder aus.</td>
+      </tr>
+      <tr>
+        <th scope="row">Sommer am Meer –<br>Malstudio</th>
+        <td>Für jedes Kind ein <b>Vorname</b> und ein gewähltes Symbol, die
+            gemalten Bilder, selbst erstellte Motive, gesammelte Sticker sowie
+            Einstellungen wie Sprache, Stimme und Ton. Zusätzlich – nur wenn
+            Eltern sie im Einstellungsbereich eintragen – ein <b>Fundort als
+            Koordinaten</b> und ein <b>Foto</b> für die Schatzsuche.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Diese Speicherung ist für den Zweck der Apps erforderlich – ohne sie wäre
+     ein begonnenes Bild nach dem Schließen verloren. Rechtsgrundlage für das
+     Ablegen und Auslesen dieser Informationen auf Ihrem Gerät ist § 25 Abs. 2
+     Nr. 2 TDDDG (unbedingt erforderliche Speicherung); eine Einwilligung ist
+     dafür nicht nötig.</p>
+
+  <h3>Löschen</h3>
+  <p>Innerhalb der Apps lassen sich einzelne Werke, Blätter, Bilder und
+     Personen jederzeit entfernen. Wer die App löscht, entfernt damit auch
+     alle zugehörigen Daten vom Gerät. Wir können daran nichts löschen, weil
+     bei uns nichts liegt.</p>
+
+  <h3>Sicherungsdateien</h3>
+  <p>Das Mandala Atelier kann eine Sicherungsdatei mit allen Werken und
+     Personen ausgeben. Diese Datei entsteht auf Ihrem Gerät, und wohin sie
+     danach gelangt, bestimmen allein Sie. Wenn Sie sie weitergeben oder in
+     einen Cloud-Dienst legen, gelten die Bedingungen des jeweiligen
+     Anbieters.</p>
+
+  <h2>3. Verbindungen nach außen</h2>
+
+  <h3>Mandala Atelier und Das ruhige Blatt</h3>
+  <p><b>Keine.</b> Diese beiden Apps stellen im Betrieb keinerlei Verbindung
+     ins Internet her. Auch die Schriften sind in der App enthalten und werden
+     nicht nachgeladen. Sie funktionieren vollständig ohne Netz.</p>
+
+  <h3>Sommer am Meer – Malstudio</h3>
+  <p>Diese App stellt zwei Verbindungen her:</p>
+  <ul>
+    <li><b>Schriftarten von Google.</b> Beim Start lädt die App ihre
+        Schriftarten von <code>fonts.googleapis.com</code> und
+        <code>fonts.gstatic.com</code>. Dabei erfährt Google die IP-Adresse
+        des Geräts sowie technische Angaben wie Gerätetyp und Browserfassung
+        und kann diese in die USA übermitteln. Anbieter ist Google Ireland
+        Limited, Gordon House, Barrow Street, Dublin 4, Irland. Rechtsgrundlage
+        ist unser berechtigtes Interesse an einer einheitlichen Darstellung
+        (Art. 6 Abs. 1 lit. f DSGVO).
+        <span class="luecke">[Vor der Veröffentlichung prüfen – siehe Hinweis
+        am Ende dieser Seite.]</span></li>
+    <li><b>Apple Karten.</b> Wenn Eltern im Einstellungsbereich einen Fundort
+        für die Schatzsuche eintragen, erscheint ein Link „Ich zeige dir den
+        Weg“. Erst wenn dieser Link angetippt wird, öffnet sich Apple Karten
+        mit diesen Koordinaten. Ohne Eintrag durch die Eltern gibt es diesen
+        Link nicht, und ohne Antippen wird nichts übertragen. Für Apple Karten
+        gilt dann die Datenschutzerklärung von Apple.</li>
+  </ul>
+
+  <h3>Der App Store</h3>
+  <p>Der Kauf und die Installation laufen über den App Store. Welche Daten
+     Apple dabei erhebt – etwa zum Kauf, zu Abstürzen oder zur Nutzung –
+     bestimmt Apple, nicht wir. Wir erhalten von Apple lediglich anonyme,
+     zusammengefasste Verkaufs- und Absturzstatistiken, aus denen sich einzelne
+     Personen nicht erkennen lassen. Näheres in der
+     <a href="https://www.apple.com/legal/privacy/de-ww/">Datenschutzrichtlinie
+     von Apple</a>.</p>
+
+  <h2>4. Was diese Apps <em>nicht</em> tun</h2>
+  <ul>
+    <li>Keine Benutzerkonten, keine Anmeldung, keine Registrierung.</li>
+    <li>Keine Werbung und keine Werbenetzwerke.</li>
+    <li>Keine Analyse-, Statistik- oder Absturzdienste Dritter.</li>
+    <li>Kein Tracking, keine Profilbildung, keine Weitergabe oder Verkauf von
+        Daten.</li>
+    <li>Kein Zugriff auf Kamera, Mikrofon, Standort, Kontakte oder Kalender.
+        <em>(Im Malstudio können Eltern ein Foto aus der Fotomediathek
+        auswählen; die App greift dabei nur auf das eine gewählte Bild zu und
+        legt es lokal ab.)</em></li>
+    <li>Keine Käufe innerhalb der App, keine Abonnements.</li>
+    <li>Keine Chat-, Kommentar- oder sonstigen Austauschfunktionen.</li>
+  </ul>
+
+  <h2>5. Kinder</h2>
+  <p>Das <b>Malstudio</b> richtet sich an Kinder. Es speichert den Vornamen des
+     Kindes und seine Bilder – beides bleibt auf dem Gerät und wird nirgendwohin
+     übertragen. Es gibt in der App keine Werbung, keine Analyse durch Dritte,
+     keine Käufe, keinen Chat und keine Möglichkeit, mit Fremden in Kontakt zu
+     treten.</p>
+  <p>Der Vorname wird nur gebraucht, damit mehrere Kinder auf einem Gerät ihre
+     Bilder auseinanderhalten können. Er darf frei gewählt werden – ein
+     Spitzname genügt vollkommen.</p>
+  <p>Die beiden Ateliers richten sich an Erwachsene, sind aber inhaltlich für
+     Kinder unbedenklich.</p>
+
+  <h2>6. Ihre Rechte</h2>
+  <p>Ihnen stehen nach der DSGVO die Rechte auf Auskunft (Art. 15),
+     Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung
+     (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21) zu.</p>
+  <p>In der Sache gilt dabei: Da wir keine personenbezogenen Daten von Ihnen
+     erhalten, können wir Ihnen zu Ihren Inhalten weder Auskunft geben noch sie
+     löschen – sie liegen ausschließlich auf Ihrem Gerät und stehen dort unter
+     Ihrer Kontrolle. Für die eine Verarbeitung, die außerhalb Ihres Geräts
+     stattfindet – die Schriftarten im Malstudio –, wenden Sie sich bitte an
+     die oben genannte Adresse.</p>
+  <p>Außerdem haben Sie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde
+     zu beschweren. Zuständig ist die Behörde Ihres Wohnorts oder die des
+     Verantwortlichen: <span class="luecke">[zuständige Aufsichtsbehörde des
+     Bundeslandes eintragen]</span></p>
+
+  <h2>7. Speicherdauer</h2>
+  <p>Da bei uns keine Daten anfallen, gibt es auch keine Löschfristen. Die
+     Daten auf Ihrem Gerät bleiben so lange erhalten, wie Sie sie behalten
+     möchten – längstens bis zur Deinstallation der App.</p>
+
+  <h2>8. Änderungen dieser Erklärung</h2>
+  <p>Ändert sich an den Apps etwas, das den Datenschutz betrifft, wird diese
+     Erklärung angepasst. Maßgeblich ist die jeweils hier abrufbare Fassung mit
+     dem oben genannten Stand.</p>
+
+  <div class="merk">
+    <b>Anmerkung für den Anbieter – vor der Veröffentlichung entfernen</b>
+    <p style="margin-top:0">Drei Dinge sind noch zu erledigen:</p>
+    <ol style="margin-bottom:0">
+      <li>Alle <span class="luecke">gelb hinterlegten Stellen</span> ausfüllen.
+          Ohne Name, Anschrift und Kontakt ist die Erklärung unwirksam.</li>
+      <li><b>Die Google-Schriften im Malstudio besser abstellen.</b> Sie sind
+          der einzige Grund, warum diese Erklärung überhaupt eine Übermittlung
+          an einen Dritten nennen muss. Das Mandala Atelier zeigt, wie es ohne
+          geht: <code>tools/gen-fonts.js</code> bettet die Schriften als
+          Daten-URI ein. Danach kann der ganze Absatz zu Google entfallen – und
+          die Apps sind ausnahmslos offline. Für eine Kinder-App ist das nicht
+          nur sauberer, es erspart auch die Diskussion um Auftragsverarbeitung
+          und Drittlandübermittlung.</li>
+      <li><b>Diese Seite ersetzt keine Rechtsberatung.</b> Sie beschreibt das
+          Verhalten der Apps genau so, wie es im Quelltext steht, und ist als
+          belastbare Grundlage gedacht. Wer auf Nummer sicher gehen will, lässt
+          sie vor dem Einreichen einmal juristisch durchsehen – besonders die
+          Angaben zum Malstudio, weil dort Daten von Kindern verarbeitet
+          werden.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <p><a href="./PA-APPS.html">Zurück zur Übersicht der Apps</a></p>
+  </footer>
+
+</main>
+</body>
+</html>
