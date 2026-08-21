@@ -505,8 +505,15 @@ dem Finger, Dunkelmodus.
 - **Keine religiösen Symbole** (Om, Chakren, Dharmarad). Geometrische Ornamentik
   ja, religiös aufgeladene Zeichen nur nach ausdrücklicher Rücksprache mit der
   Familie.
-- **Datei-Download ist hier in Ordnung.** Anders als bei der Kinder-App auf dem
-  iPad ist „Als Bild speichern“ ein legitimer Hauptweg.
+- **Herausgeben geht über das Teilen-Blatt, nicht über den Download.** Der Satz
+  stand hier lange andersherum – „Datei-Download ist in Ordnung“ –, und er war
+  falsch. Auf dem iPad tut `<a download>` samt `click()` schlicht nichts: kein
+  Fehler, keine Meldung, kein Bild. In einer vom Homebildschirm gestarteten App
+  gibt es nicht einmal eine Adresszeile, in der ein Blob-Ziel landen könnte.
+  „Als Bild speichern“ und „Sicherung speichern“ rufen deshalb
+  `navigator.share()` mit einer echten Datei auf; dort stehen „Sichern in
+  Fotos“ und „In Dateien sichern“. Der Download bleibt als Rückfall für den
+  Rechner. Der Testlauf stellt beide Wege nach.
 - **Gedeckte Palette** (je zehn Pigmente in fünf Welten: Terrakotta, Ocker,
   Petrol, Indigo …) statt Buntstift-Knallfarben. Trägt die erwachsene Anmutung
   wesentlich. Welche zehn, ist gerechnet: aus vierzehn die Teilmenge, deren

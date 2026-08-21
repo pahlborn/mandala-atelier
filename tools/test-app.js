@@ -954,6 +954,77 @@ async function run() {
   console.log('  Sicherung einlesen ohne Dopplung: ' +
     (atelier.nachEinlesen === atelier.werkeA ? 'wie erwartet' : '← ' + atelier.nachEinlesen + ' statt ' + atelier.werkeA));
 
+  /* ---- Herausgeben: Bild und Sicherung ---------------------------------
+     Der Grund für diese Prüfung ist ein Fehler, der monatelang unbemerkt
+     blieb, weil er **still** war: `<a download>` samt link.click() tut auf
+     dem iPad nichts. Kein Fehler, keine Meldung, kein Bild — und getestet
+     wurde bis dahin nur, dass der Knopf da ist.
+
+     Geprüft wird deshalb, was tatsächlich hinausgeht: dass das Teilen-Blatt
+     mit einer echten Datei aufgerufen wird (der einzige Weg, der auf dem
+     iPad in Fotos oder Dateien landet), dass die Datei einen Namen und einen
+     Inhalt hat, und dass ohne Teilen-Blatt der Download-Weg gegangen wird. */
+  const ausgabe = await page.evaluate(function () {
+    const app = window.MandalaAtelier;
+    const ergebnis = { geteilt: [], geladen: [] };
+
+    /* Ein iPad nachstellen: Teilen kann Dateien, Download tut nichts. */
+    const echteShare = navigator.share, echteCanShare = navigator.canShare;
+    navigator.canShare = function (d) { return !!(d && d.files && d.files.length); };
+    navigator.share = function (d) {
+      ergebnis.geteilt.push({
+        name: d.files[0].name, typ: d.files[0].type, groesse: d.files[0].size
+      });
+      return Promise.resolve();
+    };
+    /* Klicks auf ein <a download> mitschreiben, statt sie auszuführen. */
+    const echterKlick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (this.download) ergebnis.geladen.push(this.download);
+    };
+
+    app.loadMotif('bluete');
+    app.exportImage();
+
+    return app.Gallery.all().then(function (works) {
+      app.saveBackup();
+      return new Promise(function (r) { setTimeout(r, 400); });
+    }).then(function () {
+      /* Und ohne Teilen-Blatt: dann muss der Download-Weg greifen. */
+      navigator.canShare = undefined;
+      navigator.share = undefined;
+      app.exportImage();
+      navigator.share = echteShare;
+      navigator.canShare = echteCanShare;
+      HTMLAnchorElement.prototype.click = echterKlick;
+      return ergebnis;
+    });
+  });
+
+  const bild = ausgabe.geteilt.filter(function (d) { return d.typ === 'image/png'; })[0];
+  const sicherung = ausgabe.geteilt.filter(function (d) { return d.typ === 'application/json'; })[0];
+  const ausgabeOk = !!bild && bild.groesse > 1000 && /\.png$/.test(bild.name) &&
+                    !!sicherung && sicherung.groesse > 20 && /\.json$/.test(sicherung.name) &&
+                    ausgabe.geladen.length === 1 && /\.png$/.test(ausgabe.geladen[0]);
+
+  console.log('\nHerausgeben');
+  console.log('  Als Bild speichern → Teilen-Blatt: ' +
+    (bild ? bild.name + ', ' + Math.round(bild.groesse / 1024) + ' kB' : '← NICHTS ANGEKOMMEN'));
+  console.log('  Sicherung speichern → Teilen-Blatt: ' +
+    (sicherung ? sicherung.name + ', ' + Math.round(sicherung.groesse / 1024) + ' kB'
+               : '← NICHTS ANGEKOMMEN'));
+  console.log('  ohne Teilen-Blatt der Download-Weg: ' +
+    (ausgabe.geladen.length === 1 ? ausgabe.geladen[0] : '← ' + ausgabe.geladen.length + ' statt 1'));
+
+  /* Das Dateifeld der Sicherung darf nicht display:none sein – sonst öffnet
+     es sich auf dem iPad nicht, wenn ein Knopf es anklickt. */
+  const feldOk = await page.evaluate(function () {
+    const el = document.getElementById('backup-file');
+    const st = getComputedStyle(el);
+    return !!el && st.display !== 'none' && st.visibility !== 'hidden' && !el.hidden;
+  });
+  console.log('  Dateifeld lässt sich öffnen: ' + (feldOk ? 'ja' : '← es ist display:none'));
+
   /* Schriften: eingebettet, nicht nachgeladen. */
   const typeOk = await page.evaluate(async function () {
     await document.fonts.load('500 20px "IBM Plex Mono"');
@@ -1133,6 +1204,8 @@ async function run() {
   if (!shapeOk) broken.push('Grundformen');
   if (!typeOk) broken.push('Schriften');
   if (external.length) broken.push('externe Abrufe');
+  if (!ausgabeOk) broken.push('Herausgeben');
+  if (!feldOk) broken.push('Dateifeld der Sicherung');
   broken.push.apply(broken, zuNah.map(function (n) { return 'Farbwelt ' + n; }));
 
   if (noise.length) {

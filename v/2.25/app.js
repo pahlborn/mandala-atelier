@@ -1,5 +1,12 @@
 'use strict';
 
+/* Im Regal ohne Service Worker – siehe tools/einfrieren.js.
+   Eine eingefrorene Fassung darf keinen anmelden: Ihr `activate` löschte
+   den Offline-Vorrat der laufenden App. */
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.register = function () { return new Promise(function () {}); };
+}
+
 /* ============================================================================
    Mandala Atelier – gesamte Logik
 
@@ -223,7 +230,7 @@ const WALL_ALPHA = 60;
    ------------------------------------------------------------------------- */
 
 const Store = {
-  prefix: 'mandala-atelier.',
+  prefix: 'mandala-atelier-regal2-25.',
   get(key, fallback) {
     try {
       const raw = localStorage.getItem(this.prefix + key);
@@ -2210,7 +2217,7 @@ const Gallery = {
       if (!window.indexedDB) return resolve();
       let request;
       try {
-        request = indexedDB.open('mandala-atelier', 1);
+        request = indexedDB.open('mandala-atelier-regal2-25', 1);
       } catch (err) {
         return resolve();
       }
