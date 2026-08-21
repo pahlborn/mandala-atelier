@@ -3,35 +3,73 @@
 /* ============================================================================
    Erzeugt fonts.css neu.
 
-     node tools/gen-fonts.js
+     node tools/gen-fonts.js              → für diese App
+     node tools/gen-fonts.js malstudio    → für die Schwester-App
 
-   Holt die drei Schriften einmalig von Google Fonts und legt sie als
-   Daten-URI in fonts.css ab. Danach braucht die App keinen externen Abruf
-   mehr – das ist der einzige Zweck dieses Skripts. Es läuft nicht beim
-   Ausliefern, sondern nur, wenn die Schriften ausgetauscht werden sollen.
+   Holt die Schriften einmalig von Google Fonts und legt sie als Daten-URI
+   in fonts.css ab. Danach braucht die App keinen externen Abruf mehr – das
+   ist der einzige Zweck dieses Skripts. Es läuft nicht beim Ausliefern,
+   sondern nur, wenn die Schriften ausgetauscht werden sollen.
 
    Eingebettet wird ausschließlich der Schnitt „latin“. Er deckt Deutsch
    samt Umlauten und ß ab; die übrigen Schnitte würden die Datei ohne
    Nutzen vervielfachen.
+
+   Warum hier auch das Malstudio steht, obwohl es in einem eigenen Repo
+   liegt: Es holt seine Schriften bislang bei jedem Start von Google. Das
+   ist der einzige Abruf nach außen in allen drei Apps – er bricht den
+   Offline-Betrieb (die Schriften stehen in keinem Service-Worker-Vorrat)
+   und zwingt der Datenschutzerklärung einen Absatz über einen
+   Drittanbieter auf. Das Werkzeug lag hier schon; es doppelt zu schreiben
+   wäre die schlechtere Lösung gewesen.
+
+   Das Ziel liegt dann außerhalb dieses Repos. Wo, sagt MALSTUDIO=…,
+   sonst wird ../malstudio angenommen.
    ========================================================================== */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const SOURCE = 'https://fonts.googleapis.com/css2' +
-  '?family=Fraunces:opsz,wght@9..144,400;9..144,600' +
-  '&family=Work+Sans:wght@400;500;600' +
-  '&family=IBM+Plex+Mono:wght@400;500' +
-  '&display=swap';
+const WURZEL = path.join(__dirname, '..');
+
+const SAETZE = {
+  mandala: {
+    quelle: 'https://fonts.googleapis.com/css2' +
+      '?family=Fraunces:opsz,wght@9..144,400;9..144,600' +
+      '&family=Work+Sans:wght@400;500;600' +
+      '&family=IBM+Plex+Mono:wght@400;500' +
+      '&display=swap',
+    ziel: path.join(WURZEL, 'fonts.css')
+  },
+  malstudio: {
+    quelle: 'https://fonts.googleapis.com/css2' +
+      '?family=Baloo+2:wght@500;700;800' +
+      '&family=Caveat:wght@600;700' +
+      '&family=Grandstander:wght@700;800' +
+      '&family=Nunito:wght@600;700;800;900' +
+      '&display=swap',
+    ziel: path.join(process.env.MALSTUDIO || path.join(WURZEL, '..', 'malstudio'),
+                    'fonts.css')
+  }
+};
+
+const WAHL = process.argv[2] || 'mandala';
+const SATZ = SAETZE[WAHL];
+
+if (!SATZ) {
+  console.error('Unbekannt: ' + WAHL + '. Möglich sind: ' + Object.keys(SAETZE).join(', '));
+  process.exit(1);
+}
+
+const SOURCE = SATZ.quelle;
+const TARGET = SATZ.ziel;
 
 /* Ohne Browser-Kennung liefert Google eine Fassung ohne woff2. */
 const HEADERS = {
   'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ' +
                 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36'
 };
-
-const TARGET = path.join(__dirname, '..', 'fonts.css');
 
 function fetch(url) {
   return new Promise(function (resolve, reject) {
@@ -78,7 +116,7 @@ function fetch(url) {
   }
 
   fs.writeFileSync(TARGET, out);
-  console.log('\ngeschrieben: fonts.css  (' + Math.round(out.length / 1024) + ' kB)');
+  console.log('\ngeschrieben: ' + TARGET + '  (' + Math.round(out.length / 1024) + ' kB)');
 })().catch(function (err) {
   console.error(err.message || err);
   process.exit(1);

@@ -898,13 +898,16 @@
         <li>Das Malstudio liegt in einem <strong>eigenen Repo</strong>
             (<code>pahlborn/malstudio</code>) und wäre eine dritte, getrennte
             Einreichung mit eigener Bundle-ID.</li>
-        <li><strong>Die Google-Schriften abstellen.</strong> Sie sind der
-            einzige Grund, warum die Datenschutzerklärung überhaupt eine
-            Übermittlung an einen Dritten nennen muss – bei einer Kinder-App
-            der unnötigste aller Streitpunkte. Das Mandala Atelier zeigt mit
-            <code>tools/gen-fonts.js</code>, wie es ohne geht: Schriften als
-            Daten-URI einbetten. Danach sind alle drei Apps ausnahmslos
-            offline.</li>
+        <li><strong>Die Google-Schriften sind abgestellt – aber noch nicht
+            eingespielt.</strong> <code>tools/gen-fonts.js malstudio</code>
+            erzeugt jetzt auch für die Schwester-App eine lokale
+            <code>fonts.css</code> (642 kB, elf Schnitte, nur „latin“). Die
+            Änderung ist erzeugt und geprüft: bei blockiertem Netz lädt die App
+            ihre Schriften vollständig und ruft <em>nichts</em> mehr nach außen.
+            Sie liegt aber im anderen Repo und muss dort noch eingespielt
+            werden. Erst danach darf der Google-Absatz aus der
+            <a href="./datenschutz.html">Datenschutzerklärung</a>
+            verschwinden.</li>
         <li>Die Beispielbilder oben zeigen ein frisch angelegtes Profil „Mia“.
             Für den Store sollten es Aufnahmen mit gefüllter Galerie sein.</li>
       </ul>

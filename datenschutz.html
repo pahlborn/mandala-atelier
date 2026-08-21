@@ -359,14 +359,15 @@
     <ol style="margin-bottom:0">
       <li>Alle <span class="luecke">gelb hinterlegten Stellen</span> ausfüllen.
           Ohne Name, Anschrift und Kontakt ist die Erklärung unwirksam.</li>
-      <li><b>Die Google-Schriften im Malstudio besser abstellen.</b> Sie sind
-          der einzige Grund, warum diese Erklärung überhaupt eine Übermittlung
-          an einen Dritten nennen muss. Das Mandala Atelier zeigt, wie es ohne
-          geht: <code>tools/gen-fonts.js</code> bettet die Schriften als
-          Daten-URI ein. Danach kann der ganze Absatz zu Google entfallen – und
-          die Apps sind ausnahmslos offline. Für eine Kinder-App ist das nicht
-          nur sauberer, es erspart auch die Diskussion um Auftragsverarbeitung
-          und Drittlandübermittlung.</li>
+      <li><b>Der Google-Absatz kann bald weg.</b> Die Schrifteinbettung fürs
+          Malstudio ist erzeugt und geprüft (<code>tools/gen-fonts.js
+          malstudio</code> im Mandala-Repo), aber noch nicht in die
+          ausgelieferte App eingespielt. <b>Solange sie es nicht ist, muss der
+          Absatz stehen bleiben</b> – diese Erklärung beschreibt die App, wie
+          sie ausgeliefert wird, nicht wie sie gemeint ist. Sobald die neue
+          Fassung online ist: Absatz löschen, Stand hochsetzen. Danach sind
+          alle drei Apps ausnahmslos offline, und die Diskussion um
+          Drittlandübermittlung entfällt.</li>
       <li><b>Diese Seite ersetzt keine Rechtsberatung.</b> Sie beschreibt das
           Verhalten der Apps genau so, wie es im Quelltext steht, und ist als
           belastbare Grundlage gedacht. Wer auf Nummer sicher gehen will, lässt
