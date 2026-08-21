@@ -775,12 +775,21 @@
         Vorlage. Ihre Symbolwerkzeuge (<code>tools/gen-icons.js</code>) können
         1024 mit erzeugen.</small></span></li>
     <li><span class="zeichen fehlt">✗</span><span>
-      <b>Bildschirmfotos im verlangten Maß.</b>
-      <small>Die neun oben sind 1791 × 1251 – das Maß, in dem entwickelt wird,
-        nicht das, das der Store verlangt. Gefordert sind Fotos für ein
-        iPad 13" (2064 × 2752) und, wenn die App auch aufs iPhone soll, für ein
-        iPhone 6.9". Zu ändern ist dafür eine Zeile in
-        <code>tools/gen-store.js</code> – das Maß steht dort oben.</small></span></li>
+      <b>Bildschirmfotos im verlangten Maß – ein Satz, nicht einer je Gerät.</b>
+      <small>Das war die naheliegende Sorge, und sie ist unbegründet: Apple
+        verlangt <b>einen</b> Satz iPad-Bilder und rechnet ihn für alle anderen
+        iPads herunter. Es braucht also nichts Eigenes für mini, Air und Pro.
+        Bevorzugt ist das größte Maß, iPad 13": <b>2752 × 2064</b> quer
+        (2064 × 2752 hoch); wer nur kleinere liefert, dessen Bilder werden
+        hochgerechnet, was schlechter aussieht. Nachgesehen bei Apple im
+        August 2026 – die Maße ändern sich mit den Geräten, vor dem Einreichen
+        also erneut nachsehen. Angenommen werden JPEG und PNG, kein WebP, und
+        kein Alphakanal. Die neun Bilder oben sind 1791 × 1251 und WebP: das
+        gehört dieser Seite, nicht dem Store.
+        <b>Erledigt ist beides trotzdem</b> – <code>node tools/gen-store.js
+        --einreichen</code> nimmt dieselben neun Ansichten in 2752 × 2064 als
+        JPEG auf. Sie wiegen zusammen 4,6 MB und liegen deshalb nicht im
+        Repository, sondern entstehen, wenn sie gebraucht werden.</small></span></li>
     <li><span class="zeichen da">✓</span><span>
       <b>Das Material trägt – bei Blatt mit einer Einschränkung.</b>
       <small>Die eigentliche Frage bei Bildschirmfotos ist, ob eine App auf
@@ -790,6 +799,19 @@
         als Briefmarke neben bunten Kacheln schwach aus. Für den Store müsste
         entweder ein weiter herausgearbeitetes Blatt zuerst stehen oder der
         Ausschnitt enger sitzen, ohne den leeren Rand ringsum.</small></span></li>
+    <li><span class="zeichen da">✓</span><span>
+      <b>Die Apps selbst halten jede iPad-Größe.</b>
+      <small>Die zweite Hälfte derselben Frage, und die ist nachgemessen: alle
+        drei Apps auf mini (1024 × 744), Air 11" (1180 × 820) und Pro 13"
+        (1366 × 1024), jeweils quer und hoch – nirgends läuft etwas seitlich
+        heraus, nirgends wird das Malfeld abgeschnitten, keine Fehlermeldung.
+        Das Blatt wächst einfach mit: im Atelier von 540 auf 994 Punkte
+        Kantenlänge. Eine Stelle ist trotzdem eng, und sie betrifft Malstudio:
+        Auf einem mini im Hochformat bleibt für das Malfeld 506 × 344 – ein
+        Viertel der Fläche, die dieselbe App auf einem 13" quer hat, weil
+        Vorlage und Werkzeugleiste den Rest nehmen. Kein Fehler, aber der
+        Grund, warum die Bildschirmfotos das Querformat zeigen sollten.</small></span></li>
+
     <li><span class="zeichen fehlt">✗</span><span>
       <b>App-Vorschau (Video), freiwillig.</b>
       <small>Bei Blatt wäre es fast Pflicht: Der Reiz ist eine Bewegung, und

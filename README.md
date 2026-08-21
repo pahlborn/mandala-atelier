@@ -138,6 +138,7 @@ Dateien unverändert ausliefert.
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/gen-motive.js     Erzeugt docs/motive.html
     tools/gen-store.js      Fotografiert die drei Apps für docs/store.html
+                            (--einreichen: dieselben Ansichten in 2752 × 2064)
     tools/gen-beide-icons.js  Icons der Einstiegsseite
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     tools/gen-atelier3-icons.js  Icons für „Blatt“

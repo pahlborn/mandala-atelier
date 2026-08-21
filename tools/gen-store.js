@@ -16,10 +16,11 @@
    beiden hiesigen trotzdem erneuert; der fehlende Teil wird gemeldet, nicht
    geraten.
 
-   Format: 1194 × 834 – ein iPad 11" im Querformat, in CSS-Pixeln. Das ist
-   *nicht* das Maß, das App Store Connect verlangt (siehe docs/store.html,
-   Abschnitt „Was noch fehlt"); es ist das Maß, auf dem die Apps entwickelt
-   werden. Für eine Attrappe ist das richtige Maß das ehrliche.
+     node tools/gen-store.js --einreichen
+
+   Ohne Zusatz entstehen die Bilder für die Attrappe, mit `--einreichen` die
+   für App Store Connect. Was das eine vom anderen unterscheidet, steht bei
+   den Maßen weiter unten.
    ========================================================================== */
 
 const fs = require('fs');
@@ -31,10 +32,28 @@ const BILDER = path.join(ROOT, 'docs', 'store');
 const MALSTUDIO = process.env.MALSTUDIO ||
   path.join(ROOT, '..', 'malstudio');
 
-const BREITE = 1194;
-const HOEHE = 834;
-const SKALA = 1.5;          // schärfer als 1, leichter als 2
+/* Zwei Maße, und nur eines davon liegt im Repository.
+
+   Ohne Zusatz entstehen die Bilder für docs/store.html: 1194 × 834 bei 1,5 –
+   das Maß, auf dem entwickelt wird, als WebP und leicht genug für eine Seite,
+   die der Worker bei jedem Öffnen frisch holt.
+
+   Mit `--einreichen` entsteht das, was App Store Connect annimmt: 2752 × 2064,
+   also ein iPad 13" quer, als JPEG. Ein Satz genügt für alle iPads – Apple
+   rechnet ihn für mini und Air herunter, es braucht kein Bild je Gerät. WebP
+   nimmt der Store nicht, und ein Alphakanal ist verboten; JPEG hat von Haus
+   aus keinen. Diese Bilder landen in docs/store/einreichen/ und bleiben
+   ungespeichert (.gitignore): Sie wiegen ein Vielfaches und werden erst
+   gebraucht, wenn wirklich eingereicht wird. */
+const EINREICHEN = process.argv.indexOf('--einreichen') > -1;
+
+const BREITE = EINREICHEN ? 1376 : 1194;
+const HOEHE  = EINREICHEN ? 1032 : 834;
+const SKALA  = EINREICHEN ? 2 : 1.5;
 const GUETE = 0.82;
+
+const ZIEL = EINREICHEN ? path.join(BILDER, 'einreichen') : BILDER;
+const ENDUNG = EINREICHEN ? '.jpg' : '.webp';
 
 /* Ein Bildschirmfoto kommt als PNG aus dem Browser und wiegt bei diesem Maß
    ein halbes Megabyte. Die Seite holt der Worker bei jedem Öffnen frisch aus
@@ -60,7 +79,7 @@ async function alsWebp(ctx, png) {
 }
 
 function ablegen(name, buffer) {
-  fs.writeFileSync(path.join(BILDER, name), buffer);
+  fs.writeFileSync(path.join(ZIEL, name.replace(/\.webp$/, ENDUNG)), buffer);
   return Math.round(buffer.length / 1024);
 }
 
@@ -69,7 +88,7 @@ function warte(seite, ms) {
 }
 
 (async function () {
-  fs.mkdirSync(BILDER, { recursive: true });
+  fs.mkdirSync(ZIEL, { recursive: true });
 
   const browser = await launch();
   const ctx = await browser.newContext({
@@ -82,9 +101,11 @@ function warte(seite, ms) {
   const bericht = [];
 
   async function schuss(seite, name) {
-    const png = await seite.screenshot({ type: 'png' });
-    const kb = ablegen(name, await alsWebp(ctx, png));
-    bericht.push(name + '  ' + kb + ' kB');
+    const bild = EINREICHEN
+      ? await seite.screenshot({ type: 'jpeg', quality: 92 })
+      : await alsWebp(ctx, await seite.screenshot({ type: 'png' }));
+    const kb = ablegen(name, bild);
+    bericht.push(name.replace(/\.webp$/, ENDUNG) + '  ' + kb + ' kB');
   }
 
   /* ---- Mandala Atelier -------------------------------------------------- */
@@ -321,6 +342,7 @@ function warte(seite, ms) {
 
   await browser.close();
 
-  console.log('Bildschirmfotos in docs/store/');
+  console.log('Bildschirmfotos in ' + path.relative(ROOT, ZIEL) + '/  (' +
+              (BREITE * SKALA) + ' × ' + (HOEHE * SKALA) + ')');
   bericht.forEach(function (z) { console.log('  ' + z); });
 })();
