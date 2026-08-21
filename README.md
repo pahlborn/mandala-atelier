@@ -507,11 +507,11 @@ dem Finger, Dunkelmodus.
   Familie.
 - **Datei-Download ist hier in Ordnung.** Anders als bei der Kinder-App auf dem
   iPad ist „Als Bild speichern“ ein legitimer Hauptweg.
-- **Gedeckte Palette** (zehn bis vierzehn Pigmente je Welt: Terrakotta, Ocker,
+- **Gedeckte Palette** (je zehn Pigmente in fünf Welten: Terrakotta, Ocker,
   Petrol, Indigo …) statt Buntstift-Knallfarben. Trägt die erwachsene Anmutung
-  wesentlich. Die Zahl ist gemessen: In keiner Welt liegen zwei Töne näher als
-  ΔE00 7, gerechnet bei 70 % Deckung auf dem Papierton — so, wie Blatt die
-  Farbe wirklich aufträgt.
+  wesentlich. Welche zehn, ist gerechnet: aus vierzehn die Teilmenge, deren
+  engstes Paar am weitesten auseinanderliegt — bei 70 % Deckung und in beiden
+  Modi von Blatt, also auch als Kreide auf dunklem Papier.
 - **Kein Kinder-Look, obwohl es eine Kids-Corner gibt.** Die Kids-Corner ist
   eine Motivwelt innerhalb der ruhigen Erwachsenen-Oberfläche – Eltern und
   Lehrkräfte sind die Bedienenden.

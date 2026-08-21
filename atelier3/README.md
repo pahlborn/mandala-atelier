@@ -370,12 +370,16 @@ Kassettenkuppel, hat hier aber womöglich noch mehr Sinn – in Blatt entsteht e
 Verlauf ohnehin unter der Hand, und wer Stufe für Stufe heller wählt, bekommt
 ihn zweimal. Ihre Stimmung ist das eigentliche Kapital.
 
-Zehn bis vierzehn Töne je Welt, und diese Zahl ist **gemessen**. Hier wird
-Farbe durchgerieben, nicht deckend aufgetragen: Bei 70 % Deckung auf dem
-Papierton schrumpft jeder Abstand auf etwa sieben Zehntel, und was in der
-Leiste noch zwei Töne sind, ist auf dem Blatt einer. Sieben Töne sind deshalb
-ausgelesen worden — Perle und Kalk lagen bei ΔE00 2.9 auseinander. Jetzt liegt
-in keiner Welt ein Paar unter ΔE00 7.
+**Zehn Töne je Welt**, überall gleich viele — und welche zehn ist gerechnet,
+nicht ausgesucht. Hier wird Farbe durchgerieben, nicht deckend aufgetragen, und
+bei Nacht zusätzlich in Kreide umgerechnet; beides schiebt die Töne zusammen.
+
+Der schwerere der beiden Fehler saß in der Kreide. `asChalk()` setzte alle
+Stifte auf dieselbe Helligkeit — und wovon sich zwei gedeckte Pigmente
+hauptsächlich unterscheiden, ist die Helligkeit. Rauch und Asche waren als
+Kreide **ΔE00 0.0**: derselbe Ton, Zeichen für Zeichen. Jetzt wird die
+Helligkeit abgebildet statt gesetzt, und die Auswahl misst in beiden Modi.
+Engstes Paar über alle Welten: ΔE00 5.1 statt 0.0.
 
 **Gewählt wird die Welt nicht.** Sie gehört zum Blatt, so wie das Relief, und
 steckt im Seed. Man setzt sich an einen Tisch, auf dem heute die Erdpigmente

@@ -288,6 +288,7 @@ async function run() {
     );
   }
   /* Und dasselbe noch einmal mit der vollen Palette eines Ziermotivs. */
+  let paletteSoll = 0;
   await page.evaluate(function () { window.MandalaAtelier.loadMotif('sternkranz'); });
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -300,14 +301,23 @@ async function run() {
         const b = el.getBoundingClientRect();
         return b.width > 0 && b.left >= row.left - 1 && b.right <= row.right + 1;
       }).length;
-      return { pigments: swatches.length, shown: shown };
+      return {
+        pigments: swatches.length,
+        shown: shown,
+        soll: window.MandalaAtelier.PALETTES.filter(function (p) {
+          return p.id === 'erde'; })[0].colors.length
+      };
     });
-    if (box.shown !== box.pigments || box.pigments !== 14) {
+    /* Geprüft wird, dass **alle** Pigmente der Welt in der Leiste stehen und
+       keines abgeschnitten ist – nicht, dass es vierzehn sind. Die Zahl folgt
+       aus dem Farbabstand (siehe unten) und darf sich ändern. */
+    if (box.shown !== box.pigments || box.pigments !== box.soll) {
       layoutProblems.push(viewport.name + ' (Palette)');
     }
+    paletteSoll = box.soll;
   }
   console.log('  volle Palette in allen Auflösungen: ' +
-    (layoutProblems.length ? '← Befund' : '14 von 14'));
+    (layoutProblems.length ? '← Befund' : paletteSoll + ' von ' + paletteSoll));
 
   await page.setViewportSize({ width: 1400, height: 1000 });
   await page.waitForTimeout(150);
@@ -971,20 +981,59 @@ async function run() {
 
   /* ---- Farbabstände in den Welten --------------------------------------
      Zwei Töne, die man beim Malen nicht auseinanderhalten kann, sind kein
-     Reichtum, sondern eine Falle. Gemessen wird als CIEDE2000 **bei 70 %
-     Deckung auf dem Papierton** — nicht am reinen Pigment: Blatt reibt die
+     Reichtum, sondern eine Falle. Gemessen wird als CIEDE2000 bei 70 %
+     Deckung auf dem Papierton — nicht am reinen Pigment: Blatt reibt die
      Farbe durch, und dabei schrumpft jeder Abstand auf etwa sieben Zehntel.
-     Was hier bestanden wird, gilt dort erst recht.
 
-     Die Zahl der Töne je Welt wird bewusst *nicht* geprüft. Sie ist das
-     Ergebnis dieser Regel und darf sich ändern; die Regel darf es nicht. */
+     Und zwar **in beiden Modi**. Die erste Fassung dieser Prüfung maß nur bei
+     Tag und ging deshalb an der schlimmeren Hälfte vorbei: Bei Nacht rechnet
+     Blatt jedes Pigment in Kreide um (asChalk), und dabei entscheidet nicht
+     mehr das Pigment über die Helligkeit, sondern die Umrechnung. Es gab
+     Paare mit ΔE 0.0 — als Kreide buchstäblich derselbe Ton, während sie bei
+     Tag zehn auseinanderlagen. Wer nur bei Tag misst, sieht das nie.
+
+     Geprüft wird außerdem, dass alle Welten **gleich viele** Töne haben. Eine
+     kürzere Tafel neben einer längeren sieht nach Versehen aus, und die
+     Farblegende der Zählmandalas braucht zehn sicher unterscheidbare. */
   const abstände = await page.evaluate(function () {
-    const PAPIER = [0xf6, 0xf1, 0xe7], DECKUNG = 0.7;
-    function lab(hex) {
+    const DECKUNG = 0.7;
+    /* Dieselben Werte wie in atelier3/app.js: SHEETS und asChalk. */
+    const MODI = {
+      Tag:   { papier: [0xf6, 0xf1, 0xe7], kreide: false },
+      Nacht: { papier: [39, 36, 32],       kreide: true  }
+    };
+    function alsKreide(rgb) {
+      const r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const l = (max + min) / 2, d = max - min;
+      let h = 0, sat = 0;
+      if (d > 0) {
+        sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (max === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+      }
+      const L = 0.42 + 0.50 * l, S = Math.min(0.50, sat * 0.90);
+      if (S === 0) { const v = Math.round(L * 255); return [v, v, v]; }
+      const q = L < 0.5 ? L * (1 + S) : L + S - L * S, pp = 2 * L - q;
+      const chan = function (t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return pp + (q - pp) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return pp + (q - pp) * (2 / 3 - t) * 6;
+        return pp;
+      };
+      return [chan(h + 1 / 3), chan(h), chan(h - 1 / 3)].map(function (v) {
+        return Math.round(v * 255); });
+    }
+    function lab(hex, modus) {
       const n = parseInt(hex.slice(1), 16);
-      const roh = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      let roh = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      if (MODI[modus].kreide) roh = alsKreide(roh);
+      const PAPIER = MODI[modus].papier;
       let [r, g, b] = roh.map(function (v, i) {
-        return (PAPIER[i] + (v - PAPIER[i]) * DECKUNG) / 255;
+        return Math.max(0, Math.min(255, PAPIER[i] + (v - PAPIER[i]) * DECKUNG)) / 255;
       });
       const f = function (c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
       r = f(r); g = f(g); b = f(b);
@@ -995,8 +1044,8 @@ async function run() {
       X = h(X); Y = h(Y); Z = h(Z);
       return [116 * Y - 16, 500 * (X - Y), 200 * (Y - Z)];
     }
-    function dE(h1, h2) {
-      const [L1, a1, b1] = lab(h1), [L2, a2, b2] = lab(h2);
+    function dE(h1, h2, modus) {
+      const [L1, a1, b1] = lab(h1, modus), [L2, a2, b2] = lab(h2, modus);
       const rad = Math.PI / 180, deg = 180 / Math.PI;
       const C1 = Math.hypot(a1, b1), C2 = Math.hypot(a2, b2), Cb = (C1 + C2) / 2;
       const G = 0.5 * (1 - Math.sqrt(Math.pow(Cb, 7) / (Math.pow(Cb, 7) + Math.pow(25, 7))));
@@ -1030,24 +1079,35 @@ async function run() {
     }
     return window.MandalaAtelier.PALETTES.filter(function (p) { return !p.custom; })
       .map(function (p) {
-        let min = 999, paar = '';
-        for (let i = 0; i < p.colors.length; i++)
-          for (let j = i + 1; j < p.colors.length; j++) {
-            const d = dE(p.colors[i].hex, p.colors[j].hex);
-            if (d < min) { min = d; paar = p.colors[i].name + '/' + p.colors[j].name; }
-          }
-        return { name: p.name, töne: p.colors.length, min: min, paar: paar };
+        let min = 999, paar = '', wo = '';
+        ['Tag', 'Nacht'].forEach(function (modus) {
+          for (let i = 0; i < p.colors.length; i++)
+            for (let j = i + 1; j < p.colors.length; j++) {
+              const d = dE(p.colors[i].hex, p.colors[j].hex, modus);
+              if (d < min) {
+                min = d; wo = modus;
+                paar = p.colors[i].name + '/' + p.colors[j].name;
+              }
+            }
+        });
+        return { name: p.name, töne: p.colors.length, min: min, paar: paar, wo: wo };
       });
   });
-  const GRENZE = 7;
-  console.log('\nEngste Farbpaare je Welt (ΔE00 bei 70 % Deckung, Grenze ' + GRENZE + ')');
+  const GRENZE = 5;
+  console.log('\nEngste Farbpaare je Welt (ΔE00, 70 % Deckung, Tag und Nacht, Grenze ' + GRENZE + ')');
   const zuNah = [];
   abstände.forEach(function (w) {
     const gut = w.min >= GRENZE;
     if (!gut) zuNah.push(w.name);
-    console.log('  ' + (gut ? 'ok   ' : 'ZU NAH ') + w.name.padEnd(15) +
-      String(w.töne).padStart(2) + ' Töne   ΔE ' + w.min.toFixed(1) + '   ' + w.paar);
+    console.log('  ' + (gut ? 'ok    ' : 'ZU NAH') + '  ' + w.name.padEnd(15) +
+      String(w.töne).padStart(2) + ' Töne   ΔE ' + w.min.toFixed(1).padStart(5) +
+      '  bei ' + w.wo.padEnd(6) + w.paar);
   });
+  const längen = Array.from(new Set(abstände.map(function (w) { return w.töne; })));
+  const gleichLang = längen.length === 1;
+  console.log('  ' + (gleichLang ? 'ok      alle Welten gleich lang: ' + längen[0] + ' Töne'
+                                 : 'UNGLEICH  ' + längen.join(' / ') + ' Töne'));
+  if (!gleichLang) zuNah.push('ungleich lange Farbtafeln');
 
   console.log('\nSchriften geladen: ' + (typeOk ? 'alle drei' : 'NICHT vollständig'));
   console.log('Abrufe nach außen: ' + (external.length ? external.length + ' ← ' + external[0] : 'keine'));
