@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wie es im App Store aussähe – Attrappe</title>
+<meta name="description" content="Die drei Apps als Store-Seiten nachgebaut, mit echten Bildschirmfotos – und daneben, was zum Einreichen fehlt.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Eine Attrappe. Hier wird nichts eingereicht und nichts veröffentlicht.
+
+  Zwei Dinge sind daran echt und sollen es bleiben:
+
+  1. Die Bildschirmfotos. Sie sind nicht gezeichnet, sondern von den Apps
+     selbst aufgenommen (tools/gen-store.js). Sieht ein Foto mager aus, ist
+     die App gemeint, nicht das Foto.
+  2. Alles, was gemessen werden kann – Fassungsnummer, Gewicht, Bildmaße,
+     Zeichenzahl der Namen, Alphakanal der Symbole. Das steht so in den
+     Dateien.
+
+  Alles andere ist Entwurf: Untertitel, Beschreibungen, Kategorie,
+  Altersfreigabe, Preis. Es ist als Entwurf **markiert** und nicht als
+  Tatsache getarnt – dafür ist der Schalter oben da. Wer das ändert, nimmt
+  der Seite ihren einzigen Zweck.
+
+  Die Seite gehört zu keiner der Apps, liegt unter docs/ und gehört damit zu
+  keinem Release: Wer sie ändert, erhöht keine Cache-Version.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --room:  #efe9dd;
+    --card:  #f8f4ea;
+    --ink:   #2f2a22;
+    --quiet: #6d6355;
+    --edge:  rgba(60, 48, 32, 0.16);
+    --mark:  #8a5a3c;
+
+    /* Der Store selbst: nicht die Farben dieses Projekts, sondern die,
+       die ein iPad zeigt. Sonst prüft man die falsche Frage. */
+    --s-bg:    #ffffff;
+    --s-ink:   #1c1c1e;
+    --s-grau:  #8e8e93;
+    --s-linie: #d8d8dc;
+    --s-fach:  #f2f2f7;
+    --s-blau:  #007aff;
+    --s-lueck: rgba(255, 196, 61, 0.34);
+    --s-lueck-strich: #a9700a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --room:  #16151a;
+      --card:  #201f25;
+      --ink:   #e8e2d6;
+      --quiet: #9a9287;
+      --edge:  rgba(0, 0, 0, 0.5);
+      --mark:  #d0a184;
+
+      --s-bg:    #000000;
+      --s-ink:   #f2f2f7;
+      --s-grau:  #8e8e93;
+      --s-linie: #38383a;
+      --s-fach:  #1c1c1e;
+      --s-blau:  #0a84ff;
+      --s-lueck: rgba(255, 196, 61, 0.22);
+      --s-lueck-strich: #e0a93c;
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--room);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(24px, 6vw, 56px) clamp(16px, 4vw, 40px)
+             calc(clamp(24px, 6vw, 56px) + env(safe-area-inset-bottom));
+  }
+
+  main { max-width: 60rem; margin: 0 auto; }
+
+  h1 {
+    margin: 0 0 .15em;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(28px, 6vw, 40px);
+    letter-spacing: -.01em;
+  }
+
+  .lede { margin: 0 0 1.6rem; color: var(--quiet); max-width: 44rem; }
+
+  .werkstatt-h2 {
+    margin: 3rem 0 .8rem;
+    font-size: 14px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--quiet);
+    border-top: 1px solid var(--edge); padding-top: 1.2rem;
+  }
+
+  .hinweis {
+    margin: 0 0 1.4rem; padding: 16px 18px; border-radius: 14px;
+    border: 1px solid var(--edge); font-size: 14.5px; color: var(--quiet);
+  }
+  .hinweis strong { color: var(--ink); }
+
+  /* ---- Der Schalter ---------------------------------------------------- */
+
+  .schalter {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin: 0 0 1.6rem; padding: 14px 18px;
+    border-radius: 14px; background: var(--card);
+    box-shadow: 0 1px 2px var(--edge), 0 10px 28px -18px var(--edge);
+    font-size: 15px;
+  }
+  .schalter label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .schalter input { width: 22px; height: 22px; accent-color: var(--mark); }
+  .schalter .was { color: var(--quiet); font-size: 14px; }
+
+  /* ---- Der nachgebaute Store ------------------------------------------- */
+
+  .rahmen {
+    margin: 0 0 1rem;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--s-bg);
+    color: var(--s-ink);
+    box-shadow: 0 1px 3px var(--edge), 0 24px 60px -30px var(--edge);
+    font-family: -apple-system, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .rahmen-kopf {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 9px 16px;
+    background: var(--card); color: var(--quiet);
+    border-bottom: 1px solid var(--edge);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  .store { padding: 0 clamp(16px, 3.4vw, 28px) 8px; }
+
+  .store h2 {
+    margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.02em;
+    line-height: 1.25;
+  }
+
+  .balken {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; padding: 22px 0 10px;
+  }
+  .balken a { color: var(--s-blau); text-decoration: none; font-size: 16px; }
+
+  .trenner { height: 1px; background: var(--s-linie); border: 0; margin: 0; }
+
+  /* Trefferliste, wie nach einer Suche */
+  .treffer { display: grid; gap: 0; }
+  .treffer-zeile {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--s-linie);
+  }
+  .treffer-zeile:last-child { border-bottom: 0; }
+  .treffer-zeile img { width: 62px; height: 62px; border-radius: 14px; flex: 0 0 auto; }
+  .treffer-text { flex: 1 1 auto; min-width: 0; }
+  .treffer-text b { display: block; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .treffer-text span { display: block; font-size: 13.5px; color: var(--s-grau); }
+
+  .laden {
+    flex: 0 0 auto;
+    display: inline-block; padding: 6px 20px; border-radius: 999px;
+    background: var(--s-fach); color: var(--s-blau);
+    font-size: 15px; font-weight: 700; letter-spacing: .02em;
+    text-decoration: none;
+  }
+
+  /* Die Produktseite */
+  .produkt { padding-top: 26px; }
+  .produkt + .produkt { border-top: 12px solid var(--s-fach); margin-top: 30px; }
+
+  .kopf { display: flex; gap: 18px; align-items: flex-start; }
+  .kopf img {
+    width: clamp(84px, 16vw, 118px); height: clamp(84px, 16vw, 118px);
+    border-radius: 23%; flex: 0 0 auto;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .kopf-text { flex: 1 1 auto; min-width: 0; }
+  .kopf-text h3 {
+    margin: 0 0 2px; font-size: clamp(20px, 4.4vw, 26px); font-weight: 700;
+    letter-spacing: -.02em; line-height: 1.15;
+  }
+  .kopf-text .unter { margin: 0 0 4px; font-size: 15px; color: var(--s-grau); }
+  .kopf-text .anbieter { margin: 0 0 14px; font-size: 14px; color: var(--s-blau); }
+  .kopf-reihe { display: flex; align-items: center; gap: 16px; }
+  .teilen { color: var(--s-blau); flex: 0 0 auto; }
+
+  .werte {
+    display: flex; gap: 0; overflow-x: auto; margin: 22px -4px 0;
+    padding-bottom: 4px; -webkit-overflow-scrolling: touch;
+  }
+  .wert {
+    flex: 0 0 auto; padding: 0 18px; text-align: center;
+    border-right: 1px solid var(--s-linie); min-width: 96px;
+  }
+  .wert:last-child { border-right: 0; }
+  .wert small {
+    display: block; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--s-grau); margin-bottom: 4px;
+  }
+  .wert b {
+    display: block; font-size: 17px; font-weight: 600; color: var(--s-grau);
+    line-height: 1.25;
+  }
+  .wert b em { font-style: normal; font-size: 13px; display: block; font-weight: 500; }
+
+  .fotos {
+    display: flex; gap: 12px; overflow-x: auto; margin: 22px -4px 0; padding: 0 4px 6px;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  }
+  .fotos img {
+    flex: 0 0 auto; width: min(420px, 78vw); height: auto;
+    border-radius: 14px; border: 1px solid var(--s-linie);
+    scroll-snap-align: start; background: var(--s-fach);
+  }
+
+  .abschnitt { padding: 22px 0 0; }
+  .abschnitt p { margin: 0 0 .9rem; font-size: 15px; line-height: 1.55; }
+  .abschnitt p:last-child { margin-bottom: 0; }
+
+  .neu-kopf {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  }
+  .neu-zeile {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin: 6px 0 12px; font-size: 14px; color: var(--s-grau);
+  }
+
+  .leer {
+    margin: 10px 0 0; padding: 18px; border-radius: 14px;
+    background: var(--s-fach); font-size: 15px; color: var(--s-grau);
+  }
+
+  .datenschutz {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin: 12px 0 0; padding: 16px 18px; border-radius: 14px; background: var(--s-fach);
+  }
+  .datenschutz .schild { font-size: 22px; line-height: 1.2; }
+  .datenschutz b { display: block; font-size: 16px; }
+  .datenschutz span { font-size: 14px; color: var(--s-grau); }
+
+  table.info { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+  table.info th, table.info td {
+    text-align: left; padding: 11px 0; border-bottom: 1px solid var(--s-linie);
+    vertical-align: top;
+  }
+  table.info th { font-weight: 400; color: var(--s-grau); width: 40%; }
+  table.info td { text-align: right; }
+  table.info tr:last-child th, table.info tr:last-child td { border-bottom: 0; }
+
+  .tabs {
+    display: flex; justify-content: space-around; gap: 4px;
+    padding: 10px 8px 12px; border-top: 1px solid var(--s-linie);
+    background: var(--s-bg); margin-top: 26px;
+  }
+  .tab { text-align: center; font-size: 10.5px; color: var(--s-grau); }
+  .tab svg { display: block; width: 24px; height: 24px; margin: 0 auto 2px; }
+  .tab.an { color: var(--s-blau); }
+
+  /* ---- Die Markierung der Lücken --------------------------------------- */
+
+  .l { border-radius: 3px; padding: 0 2px; }
+  .treffer-text .l, .neu-zeile .l { display: inline-block; }
+  .neu-zeile span { flex: 0 0 auto; }
+  body.zeigen .l {
+    background: var(--s-lueck);
+    box-shadow: inset 0 -1.5px 0 var(--s-lueck-strich);
+  }
+  body.zeigen .l::after {
+    content: '·' attr(data-was);
+    font-size: 10.5px; letter-spacing: .02em; color: var(--s-lueck-strich);
+    vertical-align: super; margin-left: 2px; white-space: nowrap;
+  }
+
+  /* ---- Was noch fehlt --------------------------------------------------- */
+
+  .liste { margin: 0 0 1.6rem; padding: 0; list-style: none; }
+  .liste li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--edge); font-size: 15px;
+  }
+  .liste li:last-child { border-bottom: 0; }
+  .liste .zeichen { flex: 0 0 1.5em; font-size: 15px; line-height: 1.6; }
+  .liste .da     { color: #4a7c59; }
+  .liste .fehlt  { color: var(--mark); }
+  .liste b { font-weight: 600; }
+  .liste small { display: block; color: var(--quiet); font-size: 13.5px; }
+
+  .wrap { overflow-x: auto; margin: 0 0 1.6rem; }
+  table.pflicht { border-collapse: collapse; font-size: 14.5px; min-width: 34rem; width: 100%; }
+  table.pflicht th, table.pflicht td {
+    text-align: left; padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--edge); vertical-align: top;
+  }
+  table.pflicht th {
+    font-weight: 600; font-size: 13px; letter-spacing: .03em; color: var(--quiet);
+  }
+  table.pflicht td.ja   { color: #4a7c59; }
+  table.pflicht td.nein { color: var(--mark); }
+
+  h3.frage {
+    margin: 1.8rem 0 .3rem; font-size: 18px; font-weight: 600;
+    font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  }
+
+  footer {
+    margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--edge);
+    font-size: 13.5px; color: var(--quiet);
+  }
+  footer a, main a { color: inherit; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .92em;
+  }
+</style>
+</head>
+<body class="zeigen">
+<main>
+
+  <h1>Wie es im App Store aussähe</h1>
+  <p class="lede">Die drei Apps als Store-Seiten nachgebaut – mit den echten
+     Symbolen, den echten Fassungsnummern und Bildschirmfotos, die die Apps
+     selbst aufgenommen haben. Erfunden ist nur, was es noch nicht gibt:
+     Untertitel, Beschreibungen, Kategorie, Preis. Genau das ist markiert.</p>
+
+  <div class="schalter">
+    <label>
+      <input type="checkbox" id="zeigen" checked>
+      <span>Lücken zeigen</span>
+    </label>
+    <span class="was">Gelb hinterlegt ist alles, was hier <b>erfunden</b> ist
+      und vor dem Einreichen von Ihnen entschieden werden müsste. Alles
+      Übrige steht so in den Dateien.</span>
+  </div>
+
+  <p class="hinweis">
+    <strong>Das hier ist eine Attrappe.</strong> Sie liegt in Ihrem eigenen
+    Projekt, ist nicht mit Apple verbunden und reicht nichts ein. Ob die drei
+    Apps in dieser Form überhaupt in den Store dürfen, ist eine eigene Frage –
+    sie steht unten unter <a href="#huerde">Die eine große Hürde</a> und ist
+    unbeantwortet.
+  </p>
+
+  <!-- ==================================================================== -->
+
+  <div class="rahmen">
+    <div class="rahmen-kopf">
+      <span>App Store · nachgebaut</span>
+      <span>kein echter Store</span>
+    </div>
+
+    <div class="store">
+
+      <div class="balken">
+        <h2>Von Ihnen</h2>
+        <a href="#huerde">Alle ansehen</a>
+      </div>
+      <hr class="trenner">
+
+      <div class="treffer">
+        <div class="treffer-zeile">
+          <img src="../icon-192.png" alt="Symbol von Mandala Atelier">
+          <span class="treffer-text">
+            <b>Mandala Atelier</b>
+            <span class="l" data-was="Entwurf">Zeichnen mit Symmetrie</span>
+          </span>
+          <span class="laden">LADEN</span>
+        </div>
+        <div class="treffer-zeile">
+          <img src="../atelier3/icon-192.png" alt="Symbol von Blatt">
+          <span class="treffer-text">
+            <b>Blatt</b>
+            <span class="l" data-was="Entwurf">Streichen, bis etwas kommt</span>
+          </span>
+          <span class="laden">LADEN</span>
+        </div>
+        <div class="treffer-zeile">
+          <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
+          <span class="treffer-text">
+            <b>Malstudio</b>
+            <span class="l" data-was="Entwurf">Zeichnen lernen durch Spielen</span>
+          </span>
+          <span class="laden">LADEN</span>
+        </div>
+      </div>
+
+      <!-- ---- 1. Mandala Atelier ---------------------------------------- -->
+
+      <section class="produkt">
+        <div class="kopf">
+          <img src="../icon-512.png" alt="Symbol von Mandala Atelier">
+          <div class="kopf-text">
+            <h3>Mandala Atelier</h3>
+            <p class="unter"><span class="l" data-was="Entwurf">Zeichnen mit Symmetrie</span></p>
+            <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
+            <div class="kopf-reihe">
+              <span class="laden">LADEN</span>
+              <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="werte">
+          <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
+          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">🎨<em>Grafik&nbsp;&amp;&nbsp;Design</em></b></div>
+          <div class="wert"><small>Sprache</small><b>DE<em>Deutsch</em></b></div>
+          <div class="wert"><small>Größe</small><b>694<em>kB</em></b></div>
+        </div>
+
+        <div class="fotos">
+          <img src="store/atelier-1.webp" alt="Ein ausgemaltes Mandala im Atelier" loading="lazy">
+          <img src="store/atelier-2.webp" alt="Die Kuppel-Vorlage, ringweise gefärbt" loading="lazy">
+          <img src="store/atelier-3.webp" alt="Dieselbe App im dunklen Erscheinungsbild" loading="lazy">
+        </div>
+
+        <div class="abschnitt">
+          <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
+          <p class="neu-zeile"><span>Version 2.24</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
+          <p class="l" data-was="Entwurf">Jede Farbwelt hat jetzt zehn Töne,
+            und keiner liegt einem anderen mehr so nahe, dass man sie auf dem
+            Blatt verwechselt. Die Kreide legt sich darüber, ohne sie zu
+            zerstören.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Beschreibung</h2>
+          <p class="l" data-was="Entwurf">Eine Handbewegung, achtundvierzigfach.
+            Sie zeichnen ein einziges Segment, und das Atelier spiegelt den
+            Rest – daraus entsteht in Sekunden eine Ordnung, für die man von
+            Hand einen Abend bräuchte.</p>
+          <p class="l" data-was="Entwurf">34 Vorlagen liegen bereit, von der
+            strengen Rosette bis zum Grundriss mit Vorhöfen und Kammern. Wer
+            lieber selbst anfängt, nimmt das leere Blatt und stellt die
+            Achsenzahl ein. Gefärbt wird mit gedeckten Pigmenten in sechs
+            Farbwelten; ein Tippen füllt ein Feld, ein zweites das ganze
+            Muster.</p>
+          <p class="l" data-was="Entwurf">Keine Sterne, keine Pokale, keine
+            Serien. Wer hier malt, will abschalten – deshalb gibt es nichts zu
+            gewinnen und nichts zu verpassen.</p>
+          <p>Alles bleibt auf dem Gerät: keine Konten, keine Werbung, keine
+            Verbindung nach draußen. Die App arbeitet vollständig ohne Netz.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Bewertungen und Rezensionen</h2>
+          <p class="leer">Noch keine Bewertungen. Sie entstehen erst nach der
+            Veröffentlichung – vorher lässt sich hier nichts vorbereiten.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>App-Datenschutz</h2>
+          <div class="datenschutz">
+            <span class="schild">🛡️</span>
+            <span>
+              <b>Keine Daten erfasst</b>
+              <span>Der Entwickler erfasst keine Daten von dieser App. Das ist
+                keine Behauptung für den Store, sondern eine Bauweise: Die App
+                holt zur Laufzeit nichts von außen und schickt nichts hinaus.
+                Die Angabe muss trotzdem im Fragebogen gemacht werden.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Informationen</h2>
+          <table class="info">
+            <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
+            <tr><th>Größe</th><td>694 kB</td></tr>
+            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Grafik &amp; Design</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Sprachen</th><td>Deutsch</td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
+            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
+            <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+            <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ---- 2. Blatt --------------------------------------------------- -->
+
+      <section class="produkt">
+        <div class="kopf">
+          <img src="../atelier3/icon-512.png" alt="Symbol von Blatt">
+          <div class="kopf-text">
+            <h3>Blatt</h3>
+            <p class="unter"><span class="l" data-was="Entwurf">Streichen, bis etwas kommt</span></p>
+            <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
+            <div class="kopf-reihe">
+              <span class="laden">LADEN</span>
+              <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="werte">
+          <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
+          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">🌿<em>Lifestyle</em></b></div>
+          <div class="wert"><small>Sprache</small><b>DE<em>Deutsch</em></b></div>
+          <div class="wert"><small>Größe</small><b>741<em>kB</em></b></div>
+        </div>
+
+        <div class="fotos">
+          <img src="store/blatt-1.webp" alt="Ein Blatt, aus dem das Muster leicht hervorkommt" loading="lazy">
+          <img src="store/blatt-2.webp" alt="Dasselbe Blatt, weiter herausgearbeitet und farbig" loading="lazy">
+          <img src="store/blatt-3.webp" alt="Das Fach mit Stimmungen, Tag und Nacht und Farbwelten" loading="lazy">
+        </div>
+
+        <div class="abschnitt">
+          <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
+          <p class="neu-zeile"><span>Version 3.17</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
+          <p class="l" data-was="Entwurf">Auch hier zehn Töne je Farbwelt,
+            in Blatts Grammatik übersetzt: Was das Atelier bekommt, bekommt
+            Blatt auch.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Beschreibung</h2>
+          <p class="l" data-was="Entwurf">Ein leeres Blatt, unter dem etwas
+            liegt. Streichen Sie darüber, und ein Mandala kommt hervor –
+            nicht gezeichnet, sondern hervorgerieben, wie bei einer Frottage
+            über Papier.</p>
+          <p class="l" data-was="Entwurf">Die Hand entscheidet, wieviel kommt.
+            Eine leichte, zügige Bewegung streift nur die Grate und legt die
+            Linien frei; eine langsame, verweilende greift bis in die Mulden
+            und füllt die Flächen. Zwei Bewegungen, ein Werkzeug, kein Menü.</p>
+          <p class="l" data-was="Entwurf">Jedes Blatt ist neu und keines
+            wiederholt sich. Fünf Stimmungen geben den Grundton – von der
+            ruhigen, weiten Ordnung bis zum dicht bewachsenen Blatt.</p>
+          <p>Alles bleibt auf dem Gerät: keine Konten, keine Werbung, keine
+            Verbindung nach draußen. Die App arbeitet vollständig ohne Netz.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Bewertungen und Rezensionen</h2>
+          <p class="leer">Noch keine Bewertungen.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>App-Datenschutz</h2>
+          <div class="datenschutz">
+            <span class="schild">🛡️</span>
+            <span>
+              <b>Keine Daten erfasst</b>
+              <span>Gesicherte Blätter liegen im Speicher des Geräts und
+                nirgends sonst.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Informationen</h2>
+          <table class="info">
+            <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
+            <tr><th>Größe</th><td>741 kB</td></tr>
+            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Lifestyle</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Sprachen</th><td>Deutsch</td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
+            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
+            <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+            <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ---- 3. Malstudio ----------------------------------------------- -->
+
+      <section class="produkt">
+        <div class="kopf">
+          <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
+          <div class="kopf-text">
+            <h3>Malstudio</h3>
+            <p class="unter"><span class="l" data-was="Entwurf">Zeichnen lernen durch Spielen</span></p>
+            <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
+            <div class="kopf-reihe">
+              <span class="laden">LADEN</span>
+              <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="werte">
+          <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
+          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">📚<em>Bildung</em></b></div>
+          <div class="wert"><small>Sprachen</small><b>2<em>DE, EN</em></b></div>
+          <div class="wert"><small>Größe</small><b>1,6<em>MB</em></b></div>
+        </div>
+
+        <div class="fotos">
+          <img src="store/malstudio-1.webp" alt="Die Motivauswahl mit dreißig Motiven in drei Schwierigkeiten" loading="lazy">
+          <img src="store/malstudio-2.webp" alt="Ein Herz, Schritt für Schritt nachgemalt" loading="lazy">
+          <img src="store/malstudio-3.webp" alt="Ein Fisch im Ausmalen-Modus, farbig gefüllt" loading="lazy">
+        </div>
+
+        <div class="abschnitt">
+          <div class="neu-kopf"><h2>Neu</h2><a href="#huerde">Versionsverlauf</a></div>
+          <p class="neu-zeile"><span class="l" data-was="Umrechnung">Version 7.46</span><span class="l" data-was="Entwurf">Vor 3 Wochen</span></p>
+          <p class="l" data-was="Entwurf">Der Zauberpinsel erkennt jetzt auch
+            Bögen und zieht sie glatt. Dazu die Schatzinsel mit zwölf neuen
+            Fundstücken.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Beschreibung</h2>
+          <p class="l" data-was="Entwurf">Schritt für Schritt zum eigenen Bild.
+            Links steht die Vorlage, in der Mitte das weiße Blatt – und die App
+            sagt in einem Satz, welcher Strich als Nächstes dran ist.</p>
+          <p class="l" data-was="Entwurf">Dreißig Motive in drei Schwierigkeiten,
+            vom Herz bis zum Piratenschiff. Wer lieber färbt statt zeichnet,
+            schaltet auf Ausmalen: Dann liegt der ganze Umriss vor, und ein
+            Tippen füllt eine Fläche.</p>
+          <p class="l" data-was="Entwurf">Die Linie wird unter der Hand ruhig,
+            ohne dass das Kind es merkt – aus dem Zittern wird ein Bogen. Am
+            Ende soll dastehen: Das hat mein Kind gemalt?</p>
+          <p>Jedes Kind hat sein eigenes Fach mit seiner eigenen Galerie. Alles
+            bleibt auf dem Gerät: keine Konten, keine Werbung, keine
+            Verbindung nach draußen.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Bewertungen und Rezensionen</h2>
+          <p class="leer">Noch keine Bewertungen.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>App-Datenschutz</h2>
+          <div class="datenschutz">
+            <span class="schild">🛡️</span>
+            <span>
+              <b>Keine Daten erfasst</b>
+              <span>Namen, Bilder und Sticker der Kinder liegen im Speicher des
+                Geräts. Für eine App, die sich an Kinder richtet, prüft Apple
+                das besonders genau – siehe unten.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Informationen</h2>
+          <table class="info">
+            <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
+            <tr><th>Größe</th><td>1,6 MB</td></tr>
+            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Bildung · Kinder 6–8</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Sprachen</th><td>Deutsch, Englisch</td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
+            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
+            <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+            <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <div class="tabs">
+        <span class="tab">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 9h7M7 12.5h10M7 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Heute</span>
+        <span class="tab">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="19" height="10" rx="5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 10v4M5 12h4M15.5 11h.01M18 13h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          Spiele</span>
+        <span class="tab an">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+          Apps</span>
+        <span class="tab">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.5 5.3 5.6.8-4.1 4.1 1 5.8-5-2.8-5 2.8 1-5.8L3.9 9.7l5.6-.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          Arcade</span>
+        <span class="tab">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.2 15.2 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Suchen</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="hinweis">
+    <strong>Was an den Bildern echt ist:</strong> Alle neun Bildschirmfotos hat
+    <code>tools/gen-store.js</code> aufgenommen, indem es die drei Apps geöffnet
+    und bedient hat – das Mandala ist wirklich gefüllt, das Blatt wirklich
+    hervorgerieben, das Herz wirklich mit der Maus gezogen. Nichts davon ist
+    für diese Seite gezeichnet worden.
+  </p>
+
+  <!-- ==================================================================== -->
+
+  <h2 class="werkstatt-h2">Was noch fehlt</h2>
+
+  <p>Der Reihe nach, von dem, was man an einem Abend erledigt, bis zu dem, was
+     eine Entscheidung braucht. Die Maße und Zahlen stammen aus den Dateien
+     selbst; die Regeln des Stores ändern sich, deshalb vor dem Einreichen in
+     App Store Connect nachsehen statt hier.</p>
+
+  <h3 class="frage">1. Text – je App auszufüllen</h3>
+
+  <div class="wrap">
+    <table class="pflicht">
+      <tr>
+        <th>Feld</th><th>Grenze</th>
+        <th>Mandala Atelier</th><th>Blatt</th><th>Malstudio</th>
+      </tr>
+      <tr>
+        <td>Name im Store</td><td>30 Zeichen</td>
+        <td class="ja">„Mandala Atelier" · 15</td>
+        <td class="ja">„Blatt" · 5</td>
+        <td class="nein">„Malstudio" · 9 – oder „Sommer am Meer"?</td>
+      </tr>
+      <tr>
+        <td>Untertitel</td><td>30 Zeichen</td>
+        <td class="nein">Entwurf · 22</td>
+        <td class="nein">Entwurf · 26</td>
+        <td class="nein">Entwurf · 29</td>
+      </tr>
+      <tr>
+        <td>Werbetext</td><td>170 Zeichen</td>
+        <td class="nein">fehlt</td><td class="nein">fehlt</td><td class="nein">fehlt</td>
+      </tr>
+      <tr>
+        <td>Beschreibung</td><td>4000 Zeichen</td>
+        <td class="nein">Entwurf oben</td><td class="nein">Entwurf oben</td><td class="nein">Entwurf oben</td>
+      </tr>
+      <tr>
+        <td>Suchbegriffe</td><td>100 Zeichen</td>
+        <td class="nein">fehlt</td><td class="nein">fehlt</td><td class="nein">fehlt</td>
+      </tr>
+      <tr>
+        <td>Neu in dieser Version</td><td>4000 Zeichen</td>
+        <td class="ja">aus <code>docs/fassungen.html</code> ableitbar</td>
+        <td class="ja">aus <code>docs/fassungen.html</code> ableitbar</td>
+        <td class="nein">fehlt</td>
+      </tr>
+    </table>
+  </div>
+
+  <p>Der Name ist bei zweien schon entschieden, bei Malstudio nicht: Im
+     Manifest steht <code>Sommer am Meer – Malstudio</code>, auf dem
+     Homescreen steht <code>Malstudio</code>, und die Positionierung im
+     Projekt lautet „Zeichnen lernen durch Spielen". Drei Namen für eine App
+     sind einer zuviel – im Store steht am Ende einer.</p>
+
+  <p>Dasselbe bei Blatt: <code>Blatt – Atelier 3.0</code> ist ein Name für
+     innen. Wer den Store liest, kennt kein Atelier 2 und keine Gegenprobe.</p>
+
+  <h3 class="frage">2. Bilder – gemessen, nicht geschätzt</h3>
+
+  <ul class="liste">
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>App-Symbol 1024 × 1024, ohne Alphakanal.</b>
+      <small>Alle drei Symbole liegen als 512 × 512 vor und haben alle drei
+        einen Alphakanal (nachgemessen: Farbtyp 6, RGBA). Apple nimmt das
+        Store-Symbol nur als undurchsichtiges Quadrat an. Bei Atelier und
+        Blatt sind die Ecken schon deckend – da genügt Vergrößern auf 1024 und
+        das Entfernen des Alphakanals. Malstudios <code>icon-512.png</code> hat
+        durchsichtige Ecken und wäre so abgelehnt; das dazugehörige
+        <code>icon-mask-512.png</code> ist das quadratische und die richtige
+        Vorlage. Ihre Symbolwerkzeuge (<code>tools/gen-icons.js</code>) können
+        1024 mit erzeugen.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Bildschirmfotos im verlangten Maß – ein Satz, nicht einer je Gerät.</b>
+      <small>Das war die naheliegende Sorge, und sie ist unbegründet: Apple
+        verlangt <b>einen</b> Satz iPad-Bilder und rechnet ihn für alle anderen
+        iPads herunter. Es braucht also nichts Eigenes für mini, Air und Pro.
+        Bevorzugt ist das größte Maß, iPad 13": <b>2752 × 2064</b> quer
+        (2064 × 2752 hoch); wer nur kleinere liefert, dessen Bilder werden
+        hochgerechnet, was schlechter aussieht. Nachgesehen bei Apple im
+        August 2026 – die Maße ändern sich mit den Geräten, vor dem Einreichen
+        also erneut nachsehen. Angenommen werden JPEG und PNG, kein WebP, und
+        kein Alphakanal. Die neun Bilder oben sind 1791 × 1251 und WebP: das
+        gehört dieser Seite, nicht dem Store.
+        <b>Erledigt ist beides trotzdem</b> – <code>node tools/gen-store.js
+        --einreichen</code> nimmt dieselben neun Ansichten in 2752 × 2064 als
+        JPEG auf. Sie wiegen zusammen 4,6 MB und liegen deshalb nicht im
+        Repository, sondern entstehen, wenn sie gebraucht werden.</small></span></li>
+    <li><span class="zeichen da">✓</span><span>
+      <b>Das Material trägt – bei Blatt mit einer Einschränkung.</b>
+      <small>Die eigentliche Frage bei Bildschirmfotos ist, ob eine App auf
+        einem kleinen Bild überhaupt etwas hermacht. Sehen Sie oben nach: Beim
+        Atelier und bei Malstudio sofort. Blatts Blätter sind blass – die App
+        zeigt Bleistift auf Papier, und was in der Hand ruhig aussieht, sieht
+        als Briefmarke neben bunten Kacheln schwach aus. Für den Store müsste
+        entweder ein weiter herausgearbeitetes Blatt zuerst stehen oder der
+        Ausschnitt enger sitzen, ohne den leeren Rand ringsum.</small></span></li>
+    <li><span class="zeichen da">✓</span><span>
+      <b>Die Apps selbst halten jede iPad-Größe.</b>
+      <small>Die zweite Hälfte derselben Frage, und die ist nachgemessen: alle
+        drei Apps auf mini (1024 × 744), Air 11" (1180 × 820) und Pro 13"
+        (1366 × 1024), jeweils quer und hoch – nirgends läuft etwas seitlich
+        heraus, nirgends wird das Malfeld abgeschnitten, keine Fehlermeldung.
+        Das Blatt wächst einfach mit: im Atelier von 540 auf 994 Punkte
+        Kantenlänge. Eine Stelle ist trotzdem eng, und sie betrifft Malstudio:
+        Auf einem mini im Hochformat bleibt für das Malfeld 506 × 344 – ein
+        Viertel der Fläche, die dieselbe App auf einem 13" quer hat, weil
+        Vorlage und Werkzeugleiste den Rest nehmen. Kein Fehler, aber der
+        Grund, warum die Bildschirmfotos das Querformat zeigen sollten.</small></span></li>
+
+    <li><span class="zeichen fehlt">?</span><span>
+      <b>iPhone: ein zweiter Satz Bilder – oder gar keiner.</b>
+      <small>Bilder fürs iPhone verlangt der Store nur, wenn die App auch aufs
+        iPhone soll. Wird als reine iPad-App eingereicht, entfällt das ganze
+        Kapitel. Soll sie auch aufs Telefon, ist es ein <b>eigener</b> Satz –
+        zwischen den Familien rechnet Apple nicht um. Maß: 1320 × 2868 (6,9"
+        hoch); wer keines in 6,9" liefert, muss 6,5" liefern (1284 × 2778).
+        Innerhalb der Familie wird dann wieder heruntergerechnet.<br>
+        Nachgemessen, wie sich die drei auf einem Telefon schlagen – SE
+        (375 × 667), iPhone 16 (402 × 874), 16 Pro Max (440 × 956), hoch und
+        quer: <b>Kaputt geht nichts.</b> Kein Überlauf, kein abgeschnittenes
+        Feld, keine Fehlermeldung. Eng wird es trotzdem, und zwar sehr
+        verschieden:<br>
+        <b>Atelier und Blatt, hoch:</b> 331 bis 410 Punkte Blattkante. Klein,
+        aber man kann damit malen.<br>
+        <b>Atelier, quer:</b> 118 Punkte auf einem SE – die Leisten nehmen die
+        ganze Höhe, das Blatt wird zur Briefmarke.<br>
+        <b>Malstudio, überall:</b> 137 × 154 auf einem SE hoch. Das ist ein
+        Dreißigstel der Fläche, die dieselbe App auf einem 13" quer hat –
+        für eine App, in der ein Kind zeichnen lernen soll, keine Grundlage.<br>
+        Daraus folgt eine Entscheidung, keine Arbeit: als <b>iPad-App</b>
+        einreichen, dann ist das Thema erledigt – oder Hochformat-Layouts
+        fürs Telefon bauen. Bei Atelier und Blatt wäre das Feinschliff, bei
+        Malstudio ein zweiter Entwurf.</small></span></li>
+
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>App-Vorschau (Video), freiwillig.</b>
+      <small>Bei Blatt wäre es fast Pflicht: Der Reiz ist eine Bewegung, und
+        die zeigt kein Standbild.</small></span></li>
+  </ul>
+
+  <h3 class="frage">3. Konto, Recht, Fragebögen</h3>
+
+  <ul class="liste">
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Apple Developer Program.</b>
+      <small>Kostenpflichtig pro Jahr, und ohne Mitgliedschaft geht nichts in
+        den Store. Wer als Person eintritt, steht mit seinem Namen im Store;
+        wer als Firma eintritt, braucht eine.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Datenschutzerklärung als erreichbare Adresse.</b>
+      <small>Pflichtfeld, auch wenn nichts erhoben wird – dann steht eben das
+        darin. Kann eine schlichte Seite neben diesen hier sein; GitHub Pages
+        liefert sie ohnehin aus.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Support-Adresse.</b>
+      <small>Ebenfalls Pflicht, ebenfalls eine Seite oder eine
+        E-Mail-Adresse.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Fragebogen zur Altersfreigabe und zum App-Datenschutz.</b>
+      <small>Beide werden in App Store Connect beantwortet, nicht in der App.
+        Bei allen dreien lautet die Antwort „keine Daten erfasst" – das ist
+        selten und ein Verkaufsargument, das man in die Beschreibung nehmen
+        sollte.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Bei Malstudio: die Kinder-Kategorie.</b>
+      <small>Dort gelten strengere Regeln – keine Analysewerkzeuge, keine
+        Werbung Dritter, und Links nach draußen (etwa in Einstellungen) müssen
+        hinter einer Elternschranke liegen. Die App ist ohnehin so gebaut;
+        nachzusehen wäre, ob irgendwo ein Weg nach draußen führt. Die
+        Hausregel „keine geschützten Marken- oder Comicfiguren" steht schon in
+        deren Projektanweisung und gilt hier doppelt.</small></span></li>
+  </ul>
+
+  <h3 class="frage" id="huerde">4. Die eine große Hürde</h3>
+
+  <p>Alle drei sind <b>Web-Apps</b>. Sie liegen über Safari auf dem
+     Homescreen, laufen im Vollbild und ohne Netz – aber sie sind keine
+     iPad-Programme, und der App Store nimmt keine Web-Adressen an. Wer sie
+     dort haben will, muss sie in einen nativen Rahmen setzen. Und genau
+     dagegen steht Apples Richtlinie zur <b>Mindestfunktionalität (4.2)</b>:
+     Eine Anwendung, die nichts weiter tut, als eine Website anzuzeigen, wird
+     abgelehnt.</p>
+
+  <p>Das ist keine Formalie, die man mit einem besseren Antrag löst. Es sind
+     drei Wege, und sie kosten sehr Verschiedenes:</p>
+
+  <ul class="liste">
+    <li><span class="zeichen da">✓</span><span>
+      <b>So lassen.</b>
+      <small>Die Apps liegen bereits auf dem Homescreen, starten im Vollbild
+        und arbeiten ohne Netz. Für die Familie und für Testpersonen mit einem
+        Link ändert der Store gar nichts. Kostet nichts und ist heute schon
+        fertig.</small></span></li>
+    <li><span class="zeichen fehlt">?</span><span>
+      <b>Nativer Rahmen mit echten nativen Zutaten.</b>
+      <small>Ein kleines iPad-Programm, das die Web-App enthält und ihr etwas
+        gibt, das eine Website nicht kann: Apple-Pencil mit echtem Druck,
+        Sichern in die Fotos, Teilen, Drucken über AirPrint, Ablegen in
+        iCloud. Bei Blatt wäre der Pencil-Druck sogar mehr als eine Eintrittskarte
+        – dort trägt bisher allein die Geschwindigkeit die ganze Ausdruckskraft,
+        und ob der Bildschirm überhaupt etwas Druckähnliches meldet, ist eine
+        offene Frage dieses Projekts (siehe <a href="druck.html">die
+        Prüfseite</a>). Der Rahmen ist übersichtlich; die nativen Zutaten sind
+        die eigentliche Arbeit.</small></span></li>
+    <li><span class="zeichen fehlt">✗</span><span>
+      <b>Neu schreiben.</b>
+      <small>Als richtiges iPad-Programm. Am teuersten, und es würde alles
+        aufgeben, was diese Apps heute leicht macht – eine Datei ändern und
+        neu laden.</small></span></li>
+  </ul>
+
+  <p class="hinweis">
+    <strong>Der ehrliche Schluss:</strong> Was auf dieser Seite an Text und
+    Bildern fehlt, ist ein Abend Arbeit. Was fehlt, damit überhaupt eingereicht
+    werden <em>darf</em>, ist ein natives Programm mit eigenem Wert – und das
+    ist ein anderes Vorhaben als das hier. Diese Seite ist gebaut, damit man
+    das <em>sieht</em> und nicht erst nach der ersten Ablehnung erfährt.
+  </p>
+
+  <footer>
+    Attrappe, gebaut aus den Dateien der drei Apps. Die Bildschirmfotos
+    erneuert <code>node tools/gen-store.js</code>. Zurück zur
+    <a href="../beide.html">Einstiegsseite</a>, zum
+    <a href="katalog.html">Katalog</a> oder zu den
+    <a href="fassungen.html">Fassungen</a>.
+  </footer>
+
+</main>
+
+<script>
+  /* Der Schalter. Mehr Verhalten hat diese Seite nicht. */
+  var kasten = document.getElementById('zeigen');
+  kasten.addEventListener('change', function () {
+    document.body.classList.toggle('zeigen', kasten.checked);
+  });
+</script>
+</body>
+</html>
