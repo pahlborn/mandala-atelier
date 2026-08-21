@@ -5,7 +5,7 @@
    weiter die alte Fassung, auch wenn die Dateien längst neu sind.
    ========================================================================== */
 
-const CACHE = 'mandala-atelier-v1-9';
+const CACHE = 'mandala-atelier-v2-0';
 
 const SHELL = [
   './',
