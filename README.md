@@ -119,6 +119,8 @@ Dateien unverändert ausliefert.
     docs/atelier-3.md       Konzept und Vergleichsprotokoll für Atelier 3.0
     docs/architektur.md     Konzept der Anlagen (Stufe 4.0)
     docs/motive.html        Schautafel: 15 Motivfamilien (erzeugt)
+    docs/store.html         Attrappe: die drei Apps als Store-Seiten
+    docs/store/             Bildschirmfotos dafür (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
     beide-icon-*.png        6 Icons der Einstiegsseite (erzeugt)
@@ -135,6 +137,7 @@ Dateien unverändert ausliefert.
     tools/gen-fonts.js      Erzeugt fonts.css neu
     tools/gen-icons.js      Erzeugt die Icons neu
     tools/gen-motive.js     Erzeugt docs/motive.html
+    tools/gen-store.js      Fotografiert die drei Apps für docs/store.html
     tools/gen-beide-icons.js  Icons der Einstiegsseite
     tools/test-app.js       Automatischer Durchlauf durch alle Motive
     tools/gen-atelier3-icons.js  Icons für „Blatt“
