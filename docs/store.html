@@ -51,6 +51,8 @@
     --s-blau:  #007aff;
     --s-lueck: rgba(255, 196, 61, 0.34);
     --s-lueck-strich: #a9700a;
+    --s-echt: rgba(94, 168, 120, 0.28);
+    --s-echt-strich: #2f6b45;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -70,6 +72,8 @@
       --s-blau:  #0a84ff;
       --s-lueck: rgba(255, 196, 61, 0.22);
       --s-lueck-strich: #e0a93c;
+      --s-echt: rgba(94, 168, 120, 0.24);
+      --s-echt-strich: #6fbf8e;
     }
   }
 
@@ -254,6 +258,13 @@
   .datenschutz b { display: block; font-size: 16px; }
   .datenschutz span { font-size: 14px; color: var(--s-grau); }
 
+
+  .empfehlung {
+    margin: 12px 0 16px; padding: 14px 16px; border-radius: 12px;
+    background: var(--s-fach); font-size: 14.5px; line-height: 1.5;
+  }
+  .empfehlung b { display: block; margin-bottom: 2px; }
+
   table.info { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
   table.info th, table.info td {
     text-align: left; padding: 11px 0; border-bottom: 1px solid var(--s-linie);
@@ -274,7 +285,22 @@
 
   /* ---- Die Markierung der Lücken --------------------------------------- */
 
-  .l { border-radius: 3px; padding: 0 2px; }
+  .l, .q { border-radius: 3px; padding: 0 2px; }
+
+  /* Zwei Markierungen, nicht eine. Gelb heißt „hier steht ein Entwurf von
+     mir", grün heißt „das ist im Projekt vereinbart und steht so in einer
+     Datei" – mit der Datei dahinter. Ohne die zweite Farbe sieht die Seite
+     aus, als wäre alles erfunden; das war sie nie, und man fand es trotzdem
+     nicht wieder. */
+  body.zeigen .q {
+    background: var(--s-echt);
+    box-shadow: inset 0 -1.5px 0 var(--s-echt-strich);
+  }
+  body.zeigen .q::after {
+    content: '·' attr(data-was);
+    font-size: 10.5px; letter-spacing: .02em; color: var(--s-echt-strich);
+    vertical-align: super; margin-left: 2px; white-space: nowrap;
+  }
   .treffer-text .l, .neu-zeile .l { display: inline-block; }
   .neu-zeile span { flex: 0 0 auto; }
   body.zeigen .l {
@@ -343,9 +369,10 @@
       <input type="checkbox" id="zeigen" checked>
       <span>Lücken zeigen</span>
     </label>
-    <span class="was">Gelb hinterlegt ist alles, was hier <b>erfunden</b> ist
-      und vor dem Einreichen von Ihnen entschieden werden müsste. Alles
-      Übrige steht so in den Dateien.</span>
+    <span class="was"><b>Gelb</b> ist ein Entwurf von mir und müsste vor dem
+      Einreichen entschieden werden. <b>Grün</b> steht so im Projekt – die
+      Markierung nennt die Datei, aus der der Satz stammt. Unmarkiert ist,
+      was sich nachmessen lässt.</span>
   </div>
 
   <p class="hinweis">
@@ -393,7 +420,7 @@
           <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
           <span class="treffer-text">
             <b>Malstudio</b>
-            <span class="l" data-was="Entwurf">Zeichnen lernen durch Spielen</span>
+            <span class="q" data-was="Projektanweisung">Zeichnen lernen durch Spielen</span>
           </span>
           <span class="laden">LADEN</span>
         </div>
@@ -440,19 +467,30 @@
 
         <div class="abschnitt">
           <h2>Beschreibung</h2>
+          <p class="q" data-was="index.html">Mandalas gestalten und kolorieren –
+            ein Symmetrie-Werkzeug für ruhige Stunden. Offline, ohne Konto,
+            ohne Werbung.</p>
+          <p class="q" data-was="README">Der Kern ist nicht das Ausmalbuch,
+            sondern das Symmetrie-Werkzeug: Man zeichnet ein Segment, die App
+            spiegelt den Rest. Dieses Gefühl ist das eigentliche Produkt. Die
+            34 fertigen Vorlagen sind die Ergänzung für alle, die sofort
+            losfärben wollen.</p>
           <p class="l" data-was="Entwurf">Eine Handbewegung, achtundvierzigfach.
-            Sie zeichnen ein einziges Segment, und das Atelier spiegelt den
-            Rest – daraus entsteht in Sekunden eine Ordnung, für die man von
-            Hand einen Abend bräuchte.</p>
-          <p class="l" data-was="Entwurf">34 Vorlagen liegen bereit, von der
-            strengen Rosette bis zum Grundriss mit Vorhöfen und Kammern. Wer
-            lieber selbst anfängt, nimmt das leere Blatt und stellt die
-            Achsenzahl ein. Gefärbt wird mit gedeckten Pigmenten in sechs
-            Farbwelten; ein Tippen füllt ein Feld, ein zweites das ganze
-            Muster.</p>
-          <p class="l" data-was="Entwurf">Keine Sterne, keine Pokale, keine
-            Serien. Wer hier malt, will abschalten – deshalb gibt es nichts zu
-            gewinnen und nichts zu verpassen.</p>
+            Von der strengen Rosette bis zum Grundriss mit Vorhöfen und
+            Kammern; wer lieber selbst anfängt, nimmt das leere Blatt und
+            stellt die Achsenzahl ein. Gefärbt wird mit gedeckten Pigmenten in
+            sechs Farbwelten – ein Tippen füllt ein Feld, ein zweites das
+            ganze Muster.</p>
+          <p class="q" data-was="README">Ruhig, erwachsen, entspannend. Keine
+            Gamification – keine Sterne, keine Pokale, keine Streaks. Wer hier
+            malt, will abschalten.</p>
+          <p class="empfehlung">
+            <b class="q" data-was="von Ihnen">Am besten auf dem iPad.</b>
+            <span class="q" data-was="von Ihnen">Auf dem iPhone läuft alles –
+            geprüft auf einem iPhone 13 –, nur ist das Blatt dort klein.</span>
+            <span class="l" data-was="Entwurf">Ein Apple Pencil hilft beim
+            Zielen in kleine Felder; einen Stiftdruck wertet das Atelier nicht
+            aus.</span></p>
           <p>Alles bleibt auf dem Gerät: keine Konten, keine Werbung, keine
             Verbindung nach draußen. Die App arbeitet vollständig ohne Netz.</p>
         </div>
@@ -483,7 +521,10 @@
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
             <tr><th>Größe</th><td>694 kB</td></tr>
             <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Grafik &amp; Design</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
+                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
+                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
+            <tr><th>Name auf dem Homescreen</th><td>Mandala</td></tr>
             <tr><th>Sprachen</th><td>Deutsch</td></tr>
             <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
             <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
@@ -534,10 +575,11 @@
 
         <div class="abschnitt">
           <h2>Beschreibung</h2>
-          <p class="l" data-was="Entwurf">Ein leeres Blatt, unter dem etwas
-            liegt. Streichen Sie darüber, und ein Mandala kommt hervor –
-            nicht gezeichnet, sondern hervorgerieben, wie bei einer Frottage
-            über Papier.</p>
+          <p class="q" data-was="index.html">Ein Blatt. Streiche darüber, und
+            ein Mandala kommt hervor. Offline, ohne Konto, ohne Werbung.</p>
+          <p class="q" data-was="atelier3/README">Wie wenn man Papier über eine
+            Münze legt und mit dem Bleistift darüber reibt. Man malt nicht,
+            man reibt durch.</p>
           <p class="l" data-was="Entwurf">Die Hand entscheidet, wieviel kommt.
             Eine leichte, zügige Bewegung streift nur die Grate und legt die
             Linien frei; eine langsame, verweilende greift bis in die Mulden
@@ -545,6 +587,16 @@
           <p class="l" data-was="Entwurf">Jedes Blatt ist neu und keines
             wiederholt sich. Fünf Stimmungen geben den Grundton – von der
             ruhigen, weiten Ordnung bis zum dicht bewachsenen Blatt.</p>
+          <p class="empfehlung">
+            <b class="q" data-was="von Ihnen">Am besten auf dem iPad, mit
+            einem Apple Pencil, der Druck meldet.</b>
+            <span class="q" data-was="app.js">Blatt liest den Stiftdruck
+            wirklich aus und rechnet mit ihm; außerdem ist die Stiftspitze
+            schmaler angesetzt als eine Fingerkuppe (17 gegen 29 Punkte).</span>
+            <span class="l" data-was="Entwurf">Mit dem Finger – und mit dem
+            Apple Pencil (USB-C), der keinen Druck meldet – trägt allein die
+            Geschwindigkeit die Ausdruckskraft. Es geht, aber es ist ein
+            anderes Blatt.</span></p>
           <p>Alles bleibt auf dem Gerät: keine Konten, keine Werbung, keine
             Verbindung nach draußen. Die App arbeitet vollständig ohne Netz.</p>
         </div>
@@ -572,7 +624,10 @@
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
             <tr><th>Größe</th><td>741 kB</td></tr>
             <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Lifestyle</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
+                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
+                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
+            <tr><th>Name auf dem Homescreen</th><td>Blatt</td></tr>
             <tr><th>Sprachen</th><td>Deutsch</td></tr>
             <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
             <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
@@ -590,7 +645,7 @@
           <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
           <div class="kopf-text">
             <h3>Malstudio</h3>
-            <p class="unter"><span class="l" data-was="Entwurf">Zeichnen lernen durch Spielen</span></p>
+            <p class="unter"><span class="q" data-was="Projektanweisung">Zeichnen lernen durch Spielen</span></p>
             <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
             <div class="kopf-reihe">
               <span class="laden">LADEN</span>
@@ -623,16 +678,26 @@
 
         <div class="abschnitt">
           <h2>Beschreibung</h2>
-          <p class="l" data-was="Entwurf">Schritt für Schritt zum eigenen Bild.
-            Links steht die Vorlage, in der Mitte das weiße Blatt – und die App
-            sagt in einem Satz, welcher Strich als Nächstes dran ist.</p>
-          <p class="l" data-was="Entwurf">Dreißig Motive in drei Schwierigkeiten,
-            vom Herz bis zum Piratenschiff. Wer lieber färbt statt zeichnet,
+          <p class="q" data-was="manifest">Schritt-für-Schritt-Malen für Kinder
+            mit Vorlage, Farben und Galerie.</p>
+          <p class="q" data-was="Projektanweisung">Nicht noch eine Mal-App:
+            Malstudio – Zeichnen lernen durch Spielen. Die App soll das Kind
+            besser aussehen lassen, nicht umgekehrt. Am Ende sollen Eltern
+            sagen: Das hat mein Kind gemalt?</p>
+          <p class="l" data-was="Entwurf">Links steht die Vorlage, in der Mitte
+            das weiße Blatt – und die App sagt in einem Satz, welcher Strich
+            als Nächstes dran ist. Dreißig Motive in drei Schwierigkeiten, vom
+            Herz bis zum Piratenschiff. Wer lieber färbt statt zeichnet,
             schaltet auf Ausmalen: Dann liegt der ganze Umriss vor, und ein
             Tippen füllt eine Fläche.</p>
           <p class="l" data-was="Entwurf">Die Linie wird unter der Hand ruhig,
-            ohne dass das Kind es merkt – aus dem Zittern wird ein Bogen. Am
-            Ende soll dastehen: Das hat mein Kind gemalt?</p>
+            ohne dass das Kind es merkt – aus dem Zittern wird ein Bogen.</p>
+          <p class="empfehlung">
+            <b class="q" data-was="von Ihnen">Am besten auf dem iPad.</b>
+            <span class="l" data-was="Entwurf">Malstudio legt Vorlage, Blatt
+            und Werkzeuge nebeneinander; auf einem Telefon bleibt fürs Malen
+            zu wenig übrig. Ein Apple Pencil malt genauer als ein Finger,
+            Stiftdruck wertet die App nicht aus.</span></p>
           <p>Jedes Kind hat sein eigenes Fach mit seiner eigenen Galerie. Alles
             bleibt auf dem Gerät: keine Konten, keine Werbung, keine
             Verbindung nach draußen.</p>
@@ -662,7 +727,10 @@
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
             <tr><th>Größe</th><td>1,6 MB</td></tr>
             <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Bildung · Kinder 6–8</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="l" data-was="ungeprüft">iPad, iPadOS 16.0 oder neuer</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
+                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
+                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
+            <tr><th>Name auf dem Homescreen</th><td>Malstudio</td></tr>
             <tr><th>Sprachen</th><td>Deutsch, Englisch</td></tr>
             <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
             <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
@@ -728,7 +796,7 @@
         <td>Untertitel</td><td>30 Zeichen</td>
         <td class="nein">Entwurf · 22</td>
         <td class="nein">Entwurf · 26</td>
-        <td class="nein">Entwurf · 29</td>
+        <td class="ja">aus der Projektanweisung · 29</td>
       </tr>
       <tr>
         <td>Werbetext</td><td>170 Zeichen</td>
@@ -736,7 +804,9 @@
       </tr>
       <tr>
         <td>Beschreibung</td><td>4000 Zeichen</td>
-        <td class="nein">Entwurf oben</td><td class="nein">Entwurf oben</td><td class="nein">Entwurf oben</td>
+        <td class="ja">Projekttext + Entwurf</td>
+        <td class="ja">Projekttext + Entwurf</td>
+        <td class="ja">Projekttext + Entwurf</td>
       </tr>
       <tr>
         <td>Suchbegriffe</td><td>100 Zeichen</td>
@@ -750,6 +820,13 @@
       </tr>
     </table>
   </div>
+
+  <p>Grün markiert ist auf den Seiten oben, was <b>schon vereinbart</b> ist und
+     so in einer Datei steht – die Sätze aus den Manifests, aus
+     <code>index.html</code>, aus den READMEs und aus Malstudios
+     Projektanweisung. Gelb bleibt nur, wofür es noch keinen Satz gibt. Wer
+     die Beschreibungen weiterschreibt, fängt also nicht bei null an: Er
+     verlängert, was da ist.</p>
 
   <p>Der Name ist bei zweien schon entschieden, bei Malstudio nicht: Im
      Manifest steht <code>Sommer am Meer – Malstudio</code>, auf dem
@@ -813,29 +890,24 @@
         Grund, warum die Bildschirmfotos das Querformat zeigen sollten.</small></span></li>
 
     <li><span class="zeichen fehlt">?</span><span>
-      <b>iPhone: ein zweiter Satz Bilder – oder gar keiner.</b>
+      <b>iPhone: ein zweiter Satz Bilder – wenn es aufs iPhone soll.</b>
       <small>Bilder fürs iPhone verlangt der Store nur, wenn die App auch aufs
-        iPhone soll. Wird als reine iPad-App eingereicht, entfällt das ganze
-        Kapitel. Soll sie auch aufs Telefon, ist es ein <b>eigener</b> Satz –
-        zwischen den Familien rechnet Apple nicht um. Maß: 1320 × 2868 (6,9"
-        hoch); wer keines in 6,9" liefert, muss 6,5" liefern (1284 × 2778).
-        Innerhalb der Familie wird dann wieder heruntergerechnet.<br>
-        Nachgemessen, wie sich die drei auf einem Telefon schlagen – SE
-        (375 × 667), iPhone 16 (402 × 874), 16 Pro Max (440 × 956), hoch und
-        quer: <b>Kaputt geht nichts.</b> Kein Überlauf, kein abgeschnittenes
-        Feld, keine Fehlermeldung. Eng wird es trotzdem, und zwar sehr
-        verschieden:<br>
-        <b>Atelier und Blatt, hoch:</b> 331 bis 410 Punkte Blattkante. Klein,
-        aber man kann damit malen.<br>
-        <b>Atelier, quer:</b> 118 Punkte auf einem SE – die Leisten nehmen die
-        ganze Höhe, das Blatt wird zur Briefmarke.<br>
-        <b>Malstudio, überall:</b> 137 × 154 auf einem SE hoch. Das ist ein
-        Dreißigstel der Fläche, die dieselbe App auf einem 13" quer hat –
-        für eine App, in der ein Kind zeichnen lernen soll, keine Grundlage.<br>
-        Daraus folgt eine Entscheidung, keine Arbeit: als <b>iPad-App</b>
-        einreichen, dann ist das Thema erledigt – oder Hochformat-Layouts
-        fürs Telefon bauen. Bei Atelier und Blatt wäre das Feinschliff, bei
-        Malstudio ein zweiter Entwurf.</small></span></li>
+        iPhone geht; zwischen den Familien rechnet Apple nicht um. Maß:
+        1320 × 2868 (6,9" hoch), ersatzweise 6,5" mit 1284 × 2778 – innerhalb
+        der Familie wird dann wieder heruntergerechnet.<br>
+        <b>Auf einem iPhone 13 wirklich ausprobiert: es läuft.</b> Das deckt
+        sich mit der Messung – SE (375 × 667), iPhone 16 (402 × 874), 16 Pro
+        Max (440 × 956), hoch und quer: kein Überlauf, kein abgeschnittenes
+        Feld, keine Fehlermeldung. Eng wird es trotzdem, und sehr verschieden:
+        Atelier und Blatt hoch 331 bis 410 Punkte Blattkante – klein, aber man
+        kann malen; das Atelier quer nur 118 Punkte auf einem SE; Malstudio
+        137 × 154 auf einem SE hoch, ein Dreißigstel der Fläche eines 13"
+        quer.<br>
+        Daraus ist die Entscheidung inzwischen gefallen und steht oben in
+        jeder Beschreibung: <b>eingereicht wird für beide, empfohlen wird das
+        iPad.</b> Also braucht es beide Sätze Bilder – und die iPhone-Bilder
+        sollten zeigen, was auf einem Telefon wirklich gut aussieht: das
+        Hochformat von Atelier und Blatt, nicht Malstudio.</small></span></li>
 
     <li><span class="zeichen fehlt">✗</span><span>
       <b>App-Vorschau (Video), freiwillig.</b>
@@ -899,14 +971,19 @@
     <li><span class="zeichen fehlt">?</span><span>
       <b>Nativer Rahmen mit echten nativen Zutaten.</b>
       <small>Ein kleines iPad-Programm, das die Web-App enthält und ihr etwas
-        gibt, das eine Website nicht kann: Apple-Pencil mit echtem Druck,
-        Sichern in die Fotos, Teilen, Drucken über AirPrint, Ablegen in
-        iCloud. Bei Blatt wäre der Pencil-Druck sogar mehr als eine Eintrittskarte
-        – dort trägt bisher allein die Geschwindigkeit die ganze Ausdruckskraft,
-        und ob der Bildschirm überhaupt etwas Druckähnliches meldet, ist eine
-        offene Frage dieses Projekts (siehe <a href="druck.html">die
-        Prüfseite</a>). Der Rahmen ist übersichtlich; die nativen Zutaten sind
-        die eigentliche Arbeit.</small></span></li>
+        gibt, das eine Website nicht kann: Sichern in die Fotos, Teilen,
+        Drucken über AirPrint, Ablegen in iCloud – und die Eigenheiten des
+        Apple Pencil Pro, an die eine Web-App nicht herankommt: Zusammendrücken,
+        Rollen um die Achse, das kurze Klopfen in der Hand, das Schweben über
+        dem Blatt.<br>
+        <b>Nicht dazu gehört der Druck selbst</b> – der geht schon. Safari
+        meldet ihn bei einem Stift, und Blatt rechnet damit
+        (<code>pressureOf()</code> in <code>atelier3/app.js</code>); die offene
+        Frage der <a href="druck.html">Prüfseite</a> betrifft den
+        <em>Finger</em>, nicht den Stift. Eine frühere Fassung dieser Seite
+        hat beides in einen Topf geworfen; das war falsch und ist hier
+        berichtigt. Der Rahmen ist übersichtlich, die nativen Zutaten sind die
+        eigentliche Arbeit.</small></span></li>
     <li><span class="zeichen fehlt">✗</span><span>
       <b>Neu schreiben.</b>
       <small>Als richtiges iPad-Programm. Am teuersten, und es würde alles
