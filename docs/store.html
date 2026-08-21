@@ -447,7 +447,7 @@
           <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
           <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">🎨<em>Grafik&nbsp;&amp;&nbsp;Design</em></b></div>
           <div class="wert"><small>Sprache</small><b>DE<em>Deutsch</em></b></div>
-          <div class="wert"><small>Größe</small><b>694<em>kB</em></b></div>
+          <div class="wert"><small>Größe</small><b>698<em>kB</em></b></div>
         </div>
 
         <div class="fotos">
@@ -458,11 +458,11 @@
 
         <div class="abschnitt">
           <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
-          <p class="neu-zeile"><span>Version 2.24</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
-          <p class="l" data-was="Entwurf">Jede Farbwelt hat jetzt zehn Töne,
-            und keiner liegt einem anderen mehr so nahe, dass man sie auf dem
-            Blatt verwechselt. Die Kreide legt sich darüber, ohne sie zu
-            zerstören.</p>
+          <p class="neu-zeile"><span>Version 2.25</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
+          <p class="q" data-was="aus 2.25">„Als Bild speichern" geht jetzt
+            über das Teilen-Blatt: Dort stehen „Sichern in Fotos" und „In
+            Dateien sichern". Der alte Weg über den Download hat auf dem iPad
+            nie funktioniert, und zwar still – kein Fehler, kein Bild.</p>
         </div>
 
         <div class="abschnitt">
@@ -519,7 +519,7 @@
           <h2>Informationen</h2>
           <table class="info">
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
-            <tr><th>Größe</th><td>694 kB</td></tr>
+            <tr><th>Größe</th><td>698 kB</td></tr>
             <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Grafik &amp; Design</span></td></tr>
             <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
                 <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
@@ -971,19 +971,30 @@
     <li><span class="zeichen fehlt">?</span><span>
       <b>Nativer Rahmen mit echten nativen Zutaten.</b>
       <small>Ein kleines iPad-Programm, das die Web-App enthält und ihr etwas
-        gibt, das eine Website nicht kann: Sichern in die Fotos, Teilen,
-        Drucken über AirPrint, Ablegen in iCloud – und die Eigenheiten des
-        Apple Pencil Pro, an die eine Web-App nicht herankommt: Zusammendrücken,
-        Rollen um die Achse, das kurze Klopfen in der Hand, das Schweben über
-        dem Blatt.<br>
-        <b>Nicht dazu gehört der Druck selbst</b> – der geht schon. Safari
-        meldet ihn bei einem Stift, und Blatt rechnet damit
-        (<code>pressureOf()</code> in <code>atelier3/app.js</code>); die offene
-        Frage der <a href="druck.html">Prüfseite</a> betrifft den
-        <em>Finger</em>, nicht den Stift. Eine frühere Fassung dieser Seite
-        hat beides in einen Topf geworfen; das war falsch und ist hier
-        berichtigt. Der Rahmen ist übersichtlich, die nativen Zutaten sind die
-        eigentliche Arbeit.</small></span></li>
+        gibt, das eine Website nicht kann. Die Liste ist kürzer, als sie
+        aussieht – und sie ist zuletzt noch kürzer geworden:<br>
+        <b>Schon möglich, ohne jeden Rahmen:</b> Sichern in Fotos, Sichern in
+        Dateien und Weitergeben laufen seit 2.25 über
+        <code>navigator.share()</code>, also über dasselbe Teilen-Blatt, das
+        ein natives Programm auch benutzt. Der Druckbogen geht über
+        <code>frame.print()</code> und landet auf dem iPad in AirPrint. Und
+        der Stiftdruck ist da: Safari meldet ihn bei einem Stift, Blatt
+        rechnet damit (<code>pressureOf()</code> in
+        <code>atelier3/app.js</code>) und setzt die Spitze schmaler an als
+        eine Fingerkuppe. Die offene Frage der <a href="druck.html">Prüfseite</a>
+        betrifft den <em>Finger</em>, nicht den Stift – eine frühere Fassung
+        dieser Seite hat beides verwechselt.<br>
+        <b>Bliebe wirklich nur:</b> die Eigenheiten des Apple Pencil Pro, an
+        die eine Web-App nicht herankommt (Zusammendrücken, Rollen um die
+        Achse, Haptik, Schweben über dem Blatt), ein Abgleich über iCloud
+        zwischen zwei Geräten, und die Anschlüsse ans System – Kurzbefehle,
+        Widgets, die Dateien-App.<br>
+        Das ist die unangenehme Zuspitzung: Je besser die Web-Apps werden,
+        desto weniger bleibt für den nativen Rahmen übrig – und desto genauer
+        trifft die Richtlinie 4.2 zu. Wer diesen Weg gehen will, braucht
+        vorher eine Antwort darauf, was das Programm <em>zusätzlich</em>
+        kann, und nicht nur einen Rahmen um das, was schon
+        läuft.</small></span></li>
     <li><span class="zeichen fehlt">✗</span><span>
       <b>Neu schreiben.</b>
       <small>Als richtiges iPad-Programm. Am teuersten, und es würde alles
