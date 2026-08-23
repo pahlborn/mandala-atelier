@@ -14,6 +14,18 @@ Großflächig heißt: neue Motive oder Grammatiken, neue Farbwelten, neue Seiten
 alles mit Wechsel der Cache-Version — kurz, alles, was man ansehen möchte. Bei
 Zwischenfragen und Erklärungen nicht.
 
+**Texte gehören mir, nicht dir. Vor großen Änderungen fragen.**
+
+Wenn ein Text vorliegt — eine Beschreibung, ein Name, ein Werbesatz —, wird er
+**übernommen wie er ist**. Nicht „verbessert", nicht umgeschrieben, nicht durch
+eine eigene Fassung ersetzt. Wer eine Schwäche darin sieht, sagt sie **als
+Anmerkung daneben** und lässt den Text stehen, bis eine Antwort da ist.
+
+Dasselbe gilt für jede Änderung, die etwas Bestehendes umkrempelt statt es zu
+ergänzen: **erst sagen, was man vorhat, dann nachfragen, dann machen.** Ein
+eigenmächtiger Entwurf kostet mehr Zeit als eine Rückfrage — und trifft
+meistens nicht.
+
 **Der Link steht in der ersten Zeile der Antwort, nicht irgendwo im Text.**
 Wer etwas ansehen will, soll nicht danach suchen müssen. Wurde etwas Neues
 gebaut, kommt der unmittelbare Link dazu — und zwar auch in die erste Zeile.
