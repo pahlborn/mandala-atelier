@@ -21,10 +21,15 @@
      Zeichenzahl der Namen, Alphakanal der Symbole. Das steht so in den
      Dateien.
 
-  Alles andere ist Entwurf: Untertitel, Beschreibungen, Kategorie,
-  Altersfreigabe, Preis. Es ist als Entwurf **markiert** und nicht als
-  Tatsache getarnt – dafür ist der Schalter oben da. Wer das ändert, nimmt
-  der Seite ihren einzigen Zweck.
+  Die Texte – Namen, Untertitel, Werbetexte, Beschreibungen, Kategorien,
+  Preise – stammen aus docs/store-texte.md und stehen hier **Wort für Wort**
+  so, wie sie dort stehen. Sie sind grün markiert, mit der Datei dahinter.
+  Nicht hier ändern: Änderungen gehören in PA-APPS.html, sonst laufen die
+  Fassungen auseinander.
+
+  Gelb ist nur noch, was ein Konto oder eine Unterschrift braucht: der
+  Anbietername, das Copyright, die beiden Adressen. Wer das umfärbt, ohne
+  dass es entschieden ist, nimmt der Seite ihren einzigen Zweck.
 
   Die Seite gehört zu keiner der Apps, liegt unter docs/ und gehört damit zu
   keinem Release: Wer sie ändert, erhöht keine Cache-Version.
@@ -364,8 +369,10 @@
   <h1>Wie es im App Store aussähe</h1>
   <p class="lede">Die drei Apps als Store-Seiten nachgebaut – mit den echten
      Symbolen, den echten Fassungsnummern und Bildschirmfotos, die die Apps
-     selbst aufgenommen haben. Erfunden ist nur, was es noch nicht gibt:
-     Untertitel, Beschreibungen, Kategorie, Preis. Genau das ist markiert.</p>
+     selbst aufgenommen haben. Namen, Untertitel, Beschreibungen, Kategorien
+     und Preise stehen inzwischen fest; sie stammen aus
+     <code>docs/store-texte.md</code> und sind hier Wort für Wort übernommen.
+     Offen ist nur noch, was ein Konto und eine Unterschrift braucht.</p>
 
   <div class="schalter">
     <label>
@@ -407,39 +414,37 @@
           <img src="../icon-192.png" alt="Symbol von Mandala Atelier">
           <span class="treffer-text">
             <b>Mandala Atelier</b>
-            <span class="l" data-was="Entwurf">Zeichnen mit Symmetrie</span>
+            <span class="q" data-was="store-texte.md">Eine Linie, ein ganzer Kranz</span>
           </span>
-          <span class="laden">LADEN</span>
+          <span class="laden q" data-was="store-texte.md">4,99 €</span>
         </div>
         <div class="treffer-zeile">
-          <img src="../atelier3/icon-192.png" alt="Symbol von Blatt">
+          <img src="../atelier3/icon-192.png" alt="Symbol von Mandala Atelier 2">
           <span class="treffer-text">
-            <b>Blatt</b>
-            <span class="l" data-was="Entwurf">Streichen, bis etwas kommt</span>
+            <b>Mandala Atelier 2</b>
+            <span class="q" data-was="store-texte.md">Das ruhige Blatt</span>
           </span>
-          <span class="laden">LADEN</span>
+          <span class="laden q" data-was="store-texte.md">2,99 €</span>
         </div>
         <div class="treffer-zeile">
-          <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
+          <img src="store/malstudio-icon-512.png" alt="Symbol von Sommer am Meer – Malstudio">
           <span class="treffer-text">
-            <b>Malstudio</b>
-            <span class="q" data-was="Projektanweisung">Zeichnen lernen durch Spielen</span>
+            <b>Sommer am Meer – Malstudio</b>
+            <span class="q" data-was="store-texte.md">Schritt für Schritt malen</span>
           </span>
-          <span class="laden">LADEN</span>
+          <span class="laden q" data-was="store-texte.md">3,99 €</span>
         </div>
       </div>
-
-      <!-- ---- 1. Mandala Atelier ---------------------------------------- -->
 
       <section class="produkt">
         <div class="kopf">
           <img src="../icon-512.png" alt="Symbol von Mandala Atelier">
           <div class="kopf-text">
-            <h3>Mandala Atelier</h3>
-            <p class="unter"><span class="l" data-was="Entwurf">Zeichnen mit Symmetrie</span></p>
+            <h3 class="q" data-was="store-texte.md">Mandala Atelier</h3>
+            <p class="unter"><span class="q" data-was="store-texte.md">Eine Linie, ein ganzer Kranz</span></p>
             <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
             <div class="kopf-reihe">
-              <span class="laden">LADEN</span>
+              <span class="laden q" data-was="store-texte.md">4,99 €</span>
               <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
@@ -447,9 +452,9 @@
 
         <div class="werte">
           <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
-          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
-          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">🎨<em>Grafik&nbsp;&amp;&nbsp;Design</em></b></div>
-          <div class="wert"><small>Sprache</small><b>DE<em>Deutsch</em></b></div>
+          <div class="wert"><small>Alter</small><b class="q" data-was="store-texte.md">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="q" data-was="store-texte.md">Grafik &amp; Design</b></div>
+          <div class="wert"><small>Sprache</small><b class="q" data-was="store-texte.md">DE<em>Deutsch</em></b></div>
           <div class="wert"><small>Größe</small><b>698<em>kB</em></b></div>
         </div>
 
@@ -462,178 +467,66 @@
         <div class="abschnitt">
           <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
           <p class="neu-zeile"><span>Version 2.25</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
-          <p class="q" data-was="aus 2.25">„Als Bild speichern" geht jetzt
-            über das Teilen-Blatt: Dort stehen „Sichern in Fotos" und „In
-            Dateien sichern". Der alte Weg über den Download hat auf dem iPad
-            nie funktioniert, und zwar still – kein Fehler, kein Bild.</p>
+          <p class="q" data-was="aus 2.25">„Als Bild speichern" geht jetzt über das Teilen-Blatt: Dort stehen „Sichern in Fotos" und „In Dateien sichern". Der alte Weg über den Download hat auf dem iPad nie funktioniert, und zwar still – kein Fehler, kein Bild.</p>
         </div>
 
         <div class="abschnitt">
           <h2>Beschreibung</h2>
 
-          <!-- Ab hier: der Text des Hauses, Wort für Wort so übernommen, wie
-               er geliefert wurde. Nicht geglättet, nicht gekürzt, nichts
-               ergänzt. Wer hier etwas ändern will, fragt vorher. -->
+          <!-- Wort für Wort aus docs/store-texte.md. Nicht hier ändern:
+               Änderungen gehören in PA-APPS.html, sonst laufen die Fassungen
+               auseinander. -->
 
-          <p class="q" data-was="von Ihnen">Gestalte. Experimentiere. Erschaffe.</p>
+          <p class="q" data-was="Werbetext">Ein Strich, ringsum gespiegelt – und aus einer Handbewegung wird ein Kranz.</p>
 
-          <p class="q" data-was="von Ihnen">Mandala Atelier ist ein kreatives
-            Werkzeug für die Gestaltung außergewöhnlicher Mandalas.</p>
+          <p class="q" data-was="store-texte.md"><strong>Setz einen Punkt. Zieh eine Linie. Sieh, was daraus wird.</strong></p>
 
-          <p class="q" data-was="von Ihnen">Aus einer einzelnen Form, einer
-            Linie oder einem eigenen Motiv können komplexe, symmetrische Muster
-            entstehen. Dabei nutzt das Atelier die besonderen Eigenschaften
-            eines Mandalas: Wiederholung, Symmetrie und radiale Anordnung.</p>
+          <p class="q" data-was="store-texte.md">Das Mandala Atelier ist kein Ausmalbuch. Es ist ein Symmetriewerkzeug.</p>
 
-          <p class="q" data-was="von Ihnen">Du kannst vorhandene Mandalas
-            gestalten oder eigene Motive entwickeln. Zeichne mit dem Finger
-            oder Apple Pencil, wähle kräftige Farben und beobachte, wie sich
-            deine Gestaltung über die Achsen des Mandalas vervielfacht.</p>
+          <p class="q" data-was="store-texte.md">Du setzt einen Punkt, eine Linie oder eine Form – und das Atelier macht daraus ein Muster. Aus etwas Einfachem entsteht in wenigen Augenblicken etwas Vielteiliges. Du musst nichts können: Die Ordnung wird dir geschenkt.</p>
 
-          <h4 class="q" data-was="von Ihnen">Entdecke die Möglichkeiten</h4>
+          <p class="q" data-was="store-texte.md">Wie oft, bestimmst du. Sechs Achsen, acht, zehn, zwölf, sechzehn oder vierundzwanzig – dazu auf Wunsch eine Spiegelung, die jede Bewegung noch einmal verdoppelt. Ein einziger Strich kann achtundvierzigmal erscheinen.</p>
+
+          <p class="q" data-was="store-texte.md">Und du darfst verwerfen. Zwanzig Schritte weit lässt sich alles zurücknehmen und wieder herstellen – probieren kostet hier nichts.</p>
+
+          <p class="q" data-was="store-texte.md">Es geht nicht darum, schnell fertig zu werden. Es gibt kein Richtig und kein Falsch. Du zeichnest mit dem Finger oder dem Apple Pencil, langsam oder spontan, genau oder frei.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Oder du fängst mit einem leeren Blatt an.</strong> Nur Symmetrie, keine Vorlage – dann stammt jede Form von dir, und das Atelier vervielfacht sie. So entstehen eigene Motive von Grund auf.</p>
+
+          <p class="q" data-was="store-texte.md">Wer lieber färbt als zeichnet, nimmt eine der 26 Vorlagen. Ein Tippen setzt Farbe in ein Feld – und zugleich in alle übrigen Segmente. Die Motive liegen in fünf Welten: Geometrisch-klassisch, Natur, Zen &amp; Achtsamkeit, Jahreszeiten und eine Kids-Corner.</p>
+
+          <p class="q" data-was="store-texte.md">Krumme Kreise sind eine Frage der Sache, nicht des Könnens. Das Werkzeug <em>Form</em> setzt deshalb dieselben fünf Bausteine exakt, aus denen auch die Vorlagen bestehen: Ring, Speiche, Blatt, Raute, Band.</p>
+
+          <p class="q" data-was="store-texte.md">Die Farben sind gedeckt und tragen Namen: Terrakotta, Ocker, Petrol, Moos, Nebelblau, Sand, Rost. Fünf Farbwelten zu je vierzehn Pigmenten – Erdpigmente, Nordlicht, Färbergarten, Rauchglas – und eine, die du dir selbst mischst.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Keine Gamification.</strong> Keine Sterne, keine Pokale, keine Serien. Wer hier malt, will abschalten, nicht gewinnen.</p>
+
+          <p class="q" data-was="store-texte.md">Was fertig ist, bekommt einen Titel und bleibt in der Galerie auf deinem Gerät. Du kannst es als Bild sichern oder auf A4 drucken – wahlweise nur die Linien, zum Ausmalen mit echten Stiften.</p>
+
+          <p class="q" data-was="store-texte.md">Ohne Konto. Ohne Werbung. Ohne Netz. Nichts, was hier entsteht, verlässt dein Gerät.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Im Atelier</strong></p>
 
           <ul>
-            <li class="q" data-was="von Ihnen">Mandalas gestalten – mit Farbe,
-              Formen und eigenen Ideen</li>
-            <li class="q" data-was="von Ihnen">Eigene Motive erstellen –
-              zeichne deine eigenen Elemente und entwickle daraus Muster</li>
-            <li class="q" data-was="von Ihnen">Symmetrie erleben – eine
-              einzelne Gestaltung kann sich über mehrere Achsen wiederholen</li>
-            <li class="q" data-was="von Ihnen">Mehrfachachsen-Modus – gestalte
-              mehrere Bereiche gleichzeitig und erzeuge komplexe Muster in
-              einem einzigen Schritt</li>
-            <li class="q" data-was="von Ihnen">Finger oder Apple Pencil –
-              direkt, schnell und intuitiv</li>
-            <li class="q" data-was="von Ihnen">Kräftige Farben – für
-              ausdrucksstarke und lebendige Ergebnisse</li>
-            <li class="q" data-was="von Ihnen">Experimentieren – verändern,
-              kombinieren, verwerfen und neu beginnen</li>
+            <li class="q" data-was="store-texte.md"><strong>Leeres Blatt</strong> – nur Symmetrie, ohne Vorlage: eigene Motive von Grund auf</li>
+            <li class="q" data-was="store-texte.md">Achsenzahl frei wählbar: 6, 8, 10, 12, 16 oder 24</li>
+            <li class="q" data-was="store-texte.md">Spiegelung zuschaltbar – bis zu 48 Wiederholungen einer Bewegung</li>
+            <li class="q" data-was="store-texte.md">Füllen wirkt auf alle Achsen zugleich, oder nur auf eine</li>
+            <li class="q" data-was="store-texte.md">26 Vorlagen in fünf Welten</li>
+            <li class="q" data-was="store-texte.md">Zeichnen mit Finger oder Apple Pencil</li>
+            <li class="q" data-was="store-texte.md">Stift, Füllen, Formen (Ring, Speiche, Blatt, Raute, Band), Radierer</li>
+            <li class="q" data-was="store-texte.md">Rückgängig und Wiederherstellen, zwanzig Schritte weit</li>
+            <li class="q" data-was="store-texte.md">Fünf Farbwelten zu je 14 gedeckten Pigmenten, dazu eine eigene</li>
+            <li class="q" data-was="store-texte.md">Hell und Dunkel</li>
+            <li class="q" data-was="store-texte.md">Vergrößern und Schieben mit zwei Fingern</li>
+            <li class="q" data-was="store-texte.md">Galerie auf dem Gerät, jedes Werk mit Titel</li>
+            <li class="q" data-was="store-texte.md">Druckbogen in A4</li>
+            <li class="q" data-was="store-texte.md">Sicherung als Datei – zugleich der Weg auf ein zweites Gerät</li>
+            <li class="q" data-was="store-texte.md">Mehrere Personen auf einem iPad, jede mit eigenen Werken</li>
+            <li class="q" data-was="store-texte.md">Vollbild: die Bedienung tritt zurück</li>
           </ul>
 
-          <p class="q" data-was="von Ihnen">Das Besondere liegt im Zusammenspiel
-            von deiner Zeichnung und der mathematischen Ordnung des
-            Mandalas.</p>
-
-          <p class="q" data-was="von Ihnen">Du setzt einen Punkt, eine Linie
-            oder eine Form – und das Atelier macht daraus ein Muster.</p>
-
-          <p class="q" data-was="von Ihnen">Aus etwas Einfachem kann innerhalb
-            weniger Augenblicke etwas Komplexes entstehen.</p>
-
-          <p class="q" data-was="von Ihnen">Mandala Atelier ist kein Malbuch.
-            Es ist ein Werkzeug zum Erfinden.</p>
-
-          <p class="empfehlung">
-            <b class="q" data-was="von Ihnen">Am besten auf dem iPad.</b>
-            <span class="q" data-was="von Ihnen">Auf dem iPhone läuft alles –
-            geprüft auf einem iPhone 13 –, nur ist das Blatt dort klein.</span></p>
-
-        </div>
-
-        <div class="abschnitt">
-          <h2>Bewertungen und Rezensionen</h2>
-          <p class="leer">Noch keine Bewertungen. Sie entstehen erst nach der
-            Veröffentlichung – vorher lässt sich hier nichts vorbereiten.</p>
-        </div>
-
-        <div class="abschnitt">
-          <h2>App-Datenschutz</h2>
-          <div class="datenschutz">
-            <span class="schild">🛡️</span>
-            <span>
-              <b>Keine Daten erfasst</b>
-              <span>Der Entwickler erfasst keine Daten von dieser App. Das ist
-                keine Behauptung für den Store, sondern eine Bauweise: Die App
-                holt zur Laufzeit nichts von außen und schickt nichts hinaus.
-                Die Angabe muss trotzdem im Fragebogen gemacht werden.</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="abschnitt">
-          <h2>Informationen</h2>
-          <table class="info">
-            <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
-            <tr><th>Größe</th><td>698 kB</td></tr>
-            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Grafik &amp; Design</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
-                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
-                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
-            <tr><th>Name auf dem Homescreen</th><td>Mandala</td></tr>
-            <tr><th>Sprachen</th><td>Deutsch</td></tr>
-            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
-            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
-            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
-            <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
-            <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
-          </table>
-        </div>
-      </section>
-
-      <!-- ---- 2. Blatt --------------------------------------------------- -->
-
-      <section class="produkt">
-        <div class="kopf">
-          <img src="../atelier3/icon-512.png" alt="Symbol von Blatt">
-          <div class="kopf-text">
-            <h3>Blatt</h3>
-            <p class="unter"><span class="l" data-was="Entwurf">Streichen, bis etwas kommt</span></p>
-            <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
-            <div class="kopf-reihe">
-              <span class="laden">LADEN</span>
-              <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-          </div>
-        </div>
-
-        <div class="werte">
-          <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
-          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
-          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">🌿<em>Lifestyle</em></b></div>
-          <div class="wert"><small>Sprache</small><b>DE<em>Deutsch</em></b></div>
-          <div class="wert"><small>Größe</small><b>741<em>kB</em></b></div>
-        </div>
-
-        <div class="fotos">
-          <img src="store/blatt-1.webp" alt="Ein Blatt, aus dem das Muster leicht hervorkommt" loading="lazy">
-          <img src="store/blatt-2.webp" alt="Dasselbe Blatt, weiter herausgearbeitet und farbig" loading="lazy">
-          <img src="store/blatt-3.webp" alt="Das Fach mit Stimmungen, Tag und Nacht und Farbwelten" loading="lazy">
-        </div>
-
-        <div class="abschnitt">
-          <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
-          <p class="neu-zeile"><span>Version 3.17</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
-          <p class="l" data-was="Entwurf">Auch hier zehn Töne je Farbwelt,
-            in Blatts Grammatik übersetzt: Was das Atelier bekommt, bekommt
-            Blatt auch.</p>
-        </div>
-
-        <div class="abschnitt">
-          <h2>Beschreibung</h2>
-          <p class="q" data-was="index.html">Ein Blatt. Streiche darüber, und
-            ein Mandala kommt hervor. Offline, ohne Konto, ohne Werbung.</p>
-          <p class="q" data-was="atelier3/README">Wie wenn man Papier über eine
-            Münze legt und mit dem Bleistift darüber reibt. Man malt nicht,
-            man reibt durch.</p>
-          <p class="l" data-was="Entwurf">Die Hand entscheidet, wieviel kommt.
-            Eine leichte, zügige Bewegung streift nur die Grate und legt die
-            Linien frei; eine langsame, verweilende greift bis in die Mulden
-            und füllt die Flächen. Zwei Bewegungen, ein Werkzeug, kein Menü.</p>
-          <p class="l" data-was="Entwurf">Jedes Blatt ist neu und keines
-            wiederholt sich. Fünf Stimmungen geben den Grundton – von der
-            ruhigen, weiten Ordnung bis zum dicht bewachsenen Blatt.</p>
-          <p class="empfehlung">
-            <b class="q" data-was="von Ihnen">Am besten auf dem iPad, mit
-            einem Apple Pencil, der Druck meldet.</b>
-            <span class="q" data-was="app.js">Blatt liest den Stiftdruck
-            wirklich aus und rechnet mit ihm; außerdem ist die Stiftspitze
-            schmaler angesetzt als eine Fingerkuppe (17 gegen 29 Punkte).</span>
-            <span class="l" data-was="Entwurf">Mit dem Finger – und mit dem
-            Apple Pencil (USB-C), der keinen Druck meldet – trägt allein die
-            Geschwindigkeit die Ausdruckskraft. Es geht, aber es ist ein
-            anderes Blatt.</span></p>
-          <p>Alles bleibt auf dem Gerät: keine Konten, keine Werbung, keine
-            Verbindung nach draußen. Die App arbeitet vollständig ohne Netz.</p>
+          <p class="q" data-was="store-texte.md">Mach aus einer leeren Fläche deinen eigenen Raum.</p>
         </div>
 
         <div class="abschnitt">
@@ -647,8 +540,124 @@
             <span class="schild">🛡️</span>
             <span>
               <b>Keine Daten erfasst</b>
-              <span>Gesicherte Blätter liegen im Speicher des Geräts und
-                nirgends sonst.</span>
+              <span>Der Entwickler erfasst keine Daten von dieser App. Die Angabe
+                muss trotzdem im Fragebogen gemacht werden.</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Informationen</h2>
+          <table class="info">
+            <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
+            <tr><th>Größe</th><td>698 kB</td></tr>
+            <tr><th>Kategorie</th><td><span class="q" data-was="store-texte.md">Grafik &amp; Design (primär), Lifestyle (sekundär)</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="store-texte.md">iPad und iPhone, Quer- und Hochformat, Apple Pencil</span></td></tr>
+            <tr><th>Name auf dem Homescreen</th><td>Mandala</td></tr>
+            <tr><th>Sprachen</th><td><span class="q" data-was="store-texte.md">Deutsch</span></td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="q" data-was="store-texte.md">4+ – keine bedenklichen Inhalte, keine Links nach außen, kein Chat</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 Name des Anbieters – noch festzulegen</span></td></tr>
+            <tr><th>Preis</th><td><span class="q" data-was="store-texte.md">4,99 € einmalig – keine Käufe in der App, kein Abo</span></td></tr>
+            <tr><th>Schlüsselwörter</th><td><span class="q" data-was="store-texte.md">Mandala, Symmetrie, Ausmalen, Zeichnen, Meditation, Achtsamkeit, Muster, Offline</span></td></tr>
+            <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+            <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="produkt">
+        <div class="kopf">
+          <img src="../atelier3/icon-512.png" alt="Symbol von Mandala Atelier 2">
+          <div class="kopf-text">
+            <h3 class="q" data-was="store-texte.md">Mandala Atelier 2</h3>
+            <p class="unter"><span class="q" data-was="store-texte.md">Das ruhige Blatt</span></p>
+            <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
+            <div class="kopf-reihe">
+              <span class="laden q" data-was="store-texte.md">2,99 €</span>
+              <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="werte">
+          <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
+          <div class="wert"><small>Alter</small><b class="q" data-was="store-texte.md">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="q" data-was="store-texte.md">Grafik &amp; Design</b></div>
+          <div class="wert"><small>Sprache</small><b class="q" data-was="store-texte.md">DE<em>Deutsch</em></b></div>
+          <div class="wert"><small>Größe</small><b>741<em>kB</em></b></div>
+        </div>
+
+        <div class="fotos">
+          <img src="store/blatt-1.webp" alt="Ein Blatt, aus dem die Zeichnung hervorkommt" loading="lazy">
+          <img src="store/blatt-2.webp" alt="Dasselbe Blatt, weiter herausgearbeitet und farbig" loading="lazy">
+          <img src="store/blatt-3.webp" alt="Das Fach mit Stimmungen, Tag und Nacht und Farbwelten" loading="lazy">
+        </div>
+
+        <div class="abschnitt">
+          <div class="neu-kopf"><h2>Neu</h2><a href="fassungen.html">Versionsverlauf</a></div>
+          <p class="neu-zeile"><span>Version 3.17</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
+          <p class="l" data-was="Entwurf">Auch hier zehn Töne je Farbwelt, in der Grammatik dieser App übersetzt.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Beschreibung</h2>
+
+          <!-- Wort für Wort aus docs/store-texte.md. Nicht hier ändern:
+               Änderungen gehören in PA-APPS.html, sonst laufen die Fassungen
+               auseinander. -->
+
+          <p class="q" data-was="Werbetext">Ein Raum für Farbe und Ruhe.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Nimm dir Zeit. Streich über das Blatt. Lass etwas hervorkommen.</strong></p>
+
+          <p class="q" data-was="store-texte.md">Das zweite Atelier arbeitet umgekehrt zum ersten. Dort wird aus einer Handbewegung ein Kranz. Hier wird nichts vervielfältigt: Das Bild liegt schon im Blatt, und du holst es hervor.</p>
+
+          <p class="q" data-was="store-texte.md">Du bekommst einen leeren Bogen. Du streichst mit dem Finger darüber, und unter der Hand kommt eine Zeichnung zum Vorschein – so, wie man als Kind eine Münze unter Papier durchgerieben hat. Nicht schneller, wenn du drückst. Nur, wenn du bleibst.</p>
+
+          <p class="q" data-was="store-texte.md">Dabei geht es nicht darum, den Bogen möglichst rasch freizulegen. Es gibt kein Richtig und kein Falsch und kein „fertig“, das erreicht werden muss.</p>
+
+          <p class="q" data-was="store-texte.md">Die Bewegung ist die ganze Bedienung. Kein Stift, keine Werkzeugleiste, keine Entscheidung vorweg. Neun Pigmente liegen unter dem Bogen bereit, mehr braucht es nicht.</p>
+
+          <p class="q" data-was="store-texte.md">Das Blatt gibt dabei einen Rahmen vor: ein Zentrum, wiederkehrende Formen und eine Ordnung, innerhalb derer du dich frei bewegen kannst. Was darin liegt, hast du nicht ausgesucht – und genau das nimmt die Entscheidung vom Anfang weg.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Reiben klingt</strong>, und die App macht das hörbar: gefiltertes Rauschen, dessen Helligkeit und Lautstärke an der Geschwindigkeit deiner Hand hängen – der Klang von Graphit auf Papier. Es gibt keinen vorgegebenen Takt. Wer im Kreis geht, erzeugt eine Periode und hört sich selbst dabei zu. Abschaltbar.</p>
+
+          <p class="q" data-was="store-texte.md">Das Atelier ist kein Wettbewerb und keine Aufgabe.</p>
+
+          <p class="q" data-was="store-texte.md">Du musst nichts leisten. Du musst nichts erreichen. Du musst das Blatt nicht einmal fertig reiben.</p>
+
+          <p class="q" data-was="store-texte.md">Du kannst jederzeit aufhören und später zurückkehren. Das Blatt liegt dann noch so da, wie du es verlassen hast.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Im Atelier</strong></p>
+
+          <ul>
+            <li class="q" data-was="store-texte.md">Vier Arten, wonach dir heute ist: Ruhe, Blüte, Klarheit, Fülle</li>
+            <li class="q" data-was="store-texte.md">Jedes Blatt wird neu erzeugt – kein Katalog, keine Wiederholung</li>
+            <li class="q" data-was="store-texte.md">Vier Pigmentwelten zu je neun Farben: Erdpigmente, Nordlicht, Färbergarten, Rauchglas</li>
+            <li class="q" data-was="store-texte.md">Reiben mit Finger oder Apple Pencil</li>
+            <li class="q" data-was="store-texte.md">Klang, der an der Geschwindigkeit der Hand hängt – abschaltbar</li>
+            <li class="q" data-was="store-texte.md">Tag und Nacht: nachts getöntes Papier, auf dem helle Kreide liegt</li>
+            <li class="q" data-was="store-texte.md">Weglegen und wieder aufnehmen – der Stapel bleibt</li>
+            <li class="q" data-was="store-texte.md">Ruhige, zurücktretende Oberfläche: die Bedienung liegt hinter einer kleinen Marke in der Ecke</li>
+            <li class="q" data-was="store-texte.md">Ohne Konto, ohne Werbung, ohne Netz</li>
+          </ul>
+
+          <p class="q" data-was="store-texte.md">Mach aus einem leeren Bogen deinen eigenen Raum.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>Bewertungen und Rezensionen</h2>
+          <p class="leer">Noch keine Bewertungen.</p>
+        </div>
+
+        <div class="abschnitt">
+          <h2>App-Datenschutz</h2>
+          <div class="datenschutz">
+            <span class="schild">🛡️</span>
+            <span>
+              <b>Keine Daten erfasst</b>
+              <span>Der Entwickler erfasst keine Daten von dieser App. Die Angabe
+                muss trotzdem im Fragebogen gemacht werden.</span>
             </span>
           </div>
         </div>
@@ -658,32 +667,29 @@
           <table class="info">
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
             <tr><th>Größe</th><td>741 kB</td></tr>
-            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Lifestyle</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
-                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
-                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
+            <tr><th>Kategorie</th><td><span class="q" data-was="store-texte.md">Grafik &amp; Design (primär), Lifestyle (sekundär)</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="store-texte.md">iPad und iPhone, Quer- und Hochformat</span></td></tr>
             <tr><th>Name auf dem Homescreen</th><td>Blatt</td></tr>
-            <tr><th>Sprachen</th><td>Deutsch</td></tr>
-            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
-            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
-            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
+            <tr><th>Sprachen</th><td><span class="q" data-was="store-texte.md">Deutsch</span></td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="q" data-was="store-texte.md">4+</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 Name des Anbieters – noch festzulegen</span></td></tr>
+            <tr><th>Preis</th><td><span class="q" data-was="store-texte.md">2,99 € einmalig – kleiner als das Atelier, weil die App bewusst weniger tut</span></td></tr>
+            <tr><th>Schlüsselwörter</th><td><span class="q" data-was="store-texte.md">Frottage, Reiben, Relief, Achtsamkeit, ruhig, Muster, Papier, Offline</span></td></tr>
             <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
             <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
           </table>
         </div>
       </section>
 
-      <!-- ---- 3. Malstudio ----------------------------------------------- -->
-
       <section class="produkt">
         <div class="kopf">
-          <img src="store/malstudio-icon-512.png" alt="Symbol von Malstudio">
+          <img src="store/malstudio-icon-512.png" alt="Symbol von Sommer am Meer – Malstudio">
           <div class="kopf-text">
-            <h3>Malstudio</h3>
-            <p class="unter"><span class="q" data-was="Projektanweisung">Zeichnen lernen durch Spielen</span></p>
+            <h3 class="q" data-was="store-texte.md">Sommer am Meer – Malstudio</h3>
+            <p class="unter"><span class="q" data-was="store-texte.md">Schritt für Schritt malen</span></p>
             <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
             <div class="kopf-reihe">
-              <span class="laden">LADEN</span>
+              <span class="laden q" data-was="store-texte.md">3,99 €</span>
               <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
@@ -691,9 +697,9 @@
 
         <div class="werte">
           <div class="wert"><small>Bewertungen</small><b>—<em>keine</em></b></div>
-          <div class="wert"><small>Alter</small><b class="l" data-was="Vorschlag">4+<em>Jahre</em></b></div>
-          <div class="wert"><small>Kategorie</small><b class="l" data-was="Vorschlag">📚<em>Bildung</em></b></div>
-          <div class="wert"><small>Sprachen</small><b>2<em>DE, EN</em></b></div>
+          <div class="wert"><small>Alter</small><b class="q" data-was="store-texte.md">4+<em>Jahre</em></b></div>
+          <div class="wert"><small>Kategorie</small><b class="q" data-was="store-texte.md">Bildung</b></div>
+          <div class="wert"><small>Sprache</small><b class="q" data-was="store-texte.md">2<em>DE, EN</em></b></div>
           <div class="wert"><small>Größe</small><b>1,6<em>MB</em></b></div>
         </div>
 
@@ -705,37 +711,60 @@
 
         <div class="abschnitt">
           <div class="neu-kopf"><h2>Neu</h2><a href="#huerde">Versionsverlauf</a></div>
-          <p class="neu-zeile"><span class="l" data-was="Umrechnung">Version 7.46</span><span class="l" data-was="Entwurf">Vor 3 Wochen</span></p>
-          <p class="l" data-was="Entwurf">Der Zauberpinsel erkennt jetzt auch
-            Bögen und zieht sie glatt. Dazu die Schatzinsel mit zwölf neuen
-            Fundstücken.</p>
+          <p class="neu-zeile"><span>Version 7.46</span><span class="l" data-was="Entwurf">Vor 3 Tagen</span></p>
+          <p class="l" data-was="Entwurf">Der Zauberpinsel erkennt jetzt auch Bögen und zieht sie glatt. Dazu die Schatzinsel mit zwölf neuen Fundstücken.</p>
         </div>
 
         <div class="abschnitt">
           <h2>Beschreibung</h2>
-          <p class="q" data-was="manifest">Schritt-für-Schritt-Malen für Kinder
-            mit Vorlage, Farben und Galerie.</p>
-          <p class="q" data-was="Projektanweisung">Nicht noch eine Mal-App:
-            Malstudio – Zeichnen lernen durch Spielen. Die App soll das Kind
-            besser aussehen lassen, nicht umgekehrt. Am Ende sollen Eltern
-            sagen: Das hat mein Kind gemalt?</p>
-          <p class="l" data-was="Entwurf">Links steht die Vorlage, in der Mitte
-            das weiße Blatt – und die App sagt in einem Satz, welcher Strich
-            als Nächstes dran ist. Dreißig Motive in drei Schwierigkeiten, vom
-            Herz bis zum Piratenschiff. Wer lieber färbt statt zeichnet,
-            schaltet auf Ausmalen: Dann liegt der ganze Umriss vor, und ein
-            Tippen füllt eine Fläche.</p>
-          <p class="l" data-was="Entwurf">Die Linie wird unter der Hand ruhig,
-            ohne dass das Kind es merkt – aus dem Zittern wird ein Bogen.</p>
-          <p class="empfehlung">
-            <b class="q" data-was="von Ihnen">Am besten auf dem iPad.</b>
-            <span class="l" data-was="Entwurf">Malstudio legt Vorlage, Blatt
-            und Werkzeuge nebeneinander; auf einem Telefon bleibt fürs Malen
-            zu wenig übrig. Ein Apple Pencil malt genauer als ein Finger,
-            Stiftdruck wertet die App nicht aus.</span></p>
-          <p>Jedes Kind hat sein eigenes Fach mit seiner eigenen Galerie. Alles
-            bleibt auf dem Gerät: keine Konten, keine Werbung, keine
-            Verbindung nach draußen.</p>
+
+          <!-- Wort für Wort aus docs/store-texte.md. Nicht hier ändern:
+               Änderungen gehören in PA-APPS.html, sonst laufen die Fassungen
+               auseinander. -->
+
+          <p class="q" data-was="Werbetext">Zwanzig Motive gemalt – dann geht die Schatzkiste auf, und der Schatz liegt wirklich am Strand.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Ein Kind, ein iPad, ein Strandtag – und plötzlich ist eine Stunde vergangen.</strong></p>
+
+          <p class="q" data-was="store-texte.md">Im Malstudio lernt Ihr Kind zeichnen. Nicht nach einer Anleitung im Heft, sondern Strich für Strich: Links steht die Vorlage, und der Strich, der gerade dran ist, leuchtet rot. Rechts malt das Kind ihn nach. Fünf, sechs Schritte später ist aus nichts ein Delfin geworden – und das Kind hat ihn selbst gemalt.</p>
+
+          <p class="q" data-was="store-texte.md">Das ist der Moment, um den es geht.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>29 Motive, von leicht bis kniffelig.</strong> Herz, Muschel und Eis für den Anfang. Delfin, Leuchtturm und Seepferdchen, wenn es besser läuft. Piratenschiff, Krake und Rakete für die, die es schon können. Wer lieber ausmalt als nachmalt, schaltet um und bekommt dieselben Motive als fertige Umrisse.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Und dann ist da die Schatzsuche.</strong></p>
+
+          <p class="q" data-was="store-texte.md">Hier wird es ernst – im schönsten Sinn. Sie verstecken etwas Echtes: eine Muschel, einen Gutschein fürs Eis, eine kleine Überraschung. Im Elternbereich tragen Sie den Fundort ein, dazu ein Foto und einen Hinweis.</p>
+
+          <p class="q" data-was="store-texte.md">Hat Ihr Kind zwanzig verschiedene Motive gemalt, geht die Schatzkiste auf: mit Ihrem Foto, Ihrem Hinweis und einem Knopf – <em>„Ich zeige dir den Weg.“</em> Dann läuft ein Kind über den Strand und sucht einen Schatz, den es sich verdient hat. Das vergisst so schnell niemand.</p>
+
+          <p class="q" data-was="store-texte.md">Wer nicht warten will, schaltet die Karte im Elternbereich sofort frei.</p>
+
+          <p class="q" data-was="store-texte.md"><strong>Was Kinder außerdem lieben</strong></p>
+
+          <ul>
+            <li class="q" data-was="store-texte.md">Medaillen für fünf, zehn und zwanzig Motive – Bronze, Silber, Gold</li>
+            <li class="q" data-was="store-texte.md">Acht Stufen vom <em>Strandkind</em> bis zum <em>Ozeankind</em></li>
+            <li class="q" data-was="store-texte.md">Ein Sammelalbum mit Stickern</li>
+            <li class="q" data-was="store-texte.md">Eine freundliche Stimme, die jeden Schritt vorliest</li>
+            <li class="q" data-was="store-texte.md">Leise Musik und Meeresrauschen im Hintergrund</li>
+            <li class="q" data-was="store-texte.md">Ein eigenes Motiv erfinden und die Schritte selbst festlegen</li>
+            <li class="q" data-was="store-texte.md">Eine Galerie, in der jedes fertige Bild bleibt</li>
+          </ul>
+
+          <p class="q" data-was="store-texte.md"><strong>Und was Eltern beruhigt</strong></p>
+
+          <ul>
+            <li class="q" data-was="store-texte.md">Läuft ohne Netz – im Flugzeug, am Strand, im Auto</li>
+            <li class="q" data-was="store-texte.md">Keine Werbung. Keine Käufe in der App. Kein Chat. Kein Konto.</li>
+            <li class="q" data-was="store-texte.md">Nichts verlässt das Gerät – auch der Vorname des Kindes nicht</li>
+            <li class="q" data-was="store-texte.md">Mehrere Kinder, jedes mit eigenem Profil und eigener Galerie</li>
+            <li class="q" data-was="store-texte.md">Deutsch und Englisch, umschaltbar</li>
+          </ul>
+
+          <p class="q" data-was="store-texte.md"><strong>Woher die Motive kommen.</strong> Von Albarella, einer Insel im Po-Delta: Seepferdchen, Krabbe, Flamingo, Silberpappel. Dazu ein kleiner Wissensteil – warum die Insel so heißt, woher ihr Sand kommt. Wer dort Urlaub macht, findet sich wieder. Wer nicht, lernt eine Insel kennen.</p>
+
+          <p class="q" data-was="store-texte.md">Für Kinder ab etwa fünf Jahren.</p>
         </div>
 
         <div class="abschnitt">
@@ -749,9 +778,8 @@
             <span class="schild">🛡️</span>
             <span>
               <b>Keine Daten erfasst</b>
-              <span>Namen, Bilder und Sticker der Kinder liegen im Speicher des
-                Geräts. Für eine App, die sich an Kinder richtet, prüft Apple
-                das besonders genau – siehe unten.</span>
+              <span>Der Entwickler erfasst keine Daten von dieser App. Die Angabe
+                muss trotzdem im Fragebogen gemacht werden.</span>
             </span>
           </div>
         </div>
@@ -761,15 +789,14 @@
           <table class="info">
             <tr><th>Anbieter</th><td><span class="l" data-was="fehlt">Name, unter dem verkauft wird</span></td></tr>
             <tr><th>Größe</th><td>1,6 MB</td></tr>
-            <tr><th>Kategorie</th><td><span class="l" data-was="Vorschlag">Bildung · Kinder 6–8</span></td></tr>
-            <tr><th>Kompatibilität</th><td><span class="q" data-was="von Ihnen">iPad (empfohlen)</span>,
-                <span class="q" data-was="iPhone 13 geprüft">iPhone</span> ·
-                <span class="l" data-was="ungeprüft">ab iPadOS/iOS 16</span></td></tr>
+            <tr><th>Kategorie</th><td><span class="q" data-was="store-texte.md">Bildung (primär), Kinder / 6–8 Jahre (sekundär)</span></td></tr>
+            <tr><th>Kompatibilität</th><td><span class="q" data-was="store-texte.md">iPad zuerst, iPhone möglich; Quer- und Hochformat</span></td></tr>
             <tr><th>Name auf dem Homescreen</th><td>Malstudio</td></tr>
-            <tr><th>Sprachen</th><td>Deutsch, Englisch</td></tr>
-            <tr><th>Altersfreigabe</th><td><span class="l" data-was="Vorschlag">4+</span></td></tr>
-            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 …</span></td></tr>
-            <tr><th>Preis</th><td><span class="l" data-was="offen">Gratis</span></td></tr>
+            <tr><th>Sprachen</th><td><span class="q" data-was="store-texte.md">Deutsch, Englisch</span></td></tr>
+            <tr><th>Altersfreigabe</th><td><span class="q" data-was="store-texte.md">4+ – kein Chat, keine Links nach außen, keine Käufe</span></td></tr>
+            <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 Name des Anbieters – noch festzulegen</span></td></tr>
+            <tr><th>Preis</th><td><span class="q" data-was="store-texte.md">3,99 € einmalig – bei Kinder-Apps ist ein einmaliger Preis der ehrlichste Weg</span></td></tr>
+            <tr><th>Schlüsselwörter</th><td><span class="q" data-was="store-texte.md">Malen, Kinder, zeichnen lernen, Schritt für Schritt, Schatzsuche, Urlaub, Strand, Meer, Ausmalen, Sticker, Offline</span></td></tr>
             <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
             <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
           </table>
@@ -813,39 +840,48 @@
      selbst; die Regeln des Stores ändern sich, deshalb vor dem Einreichen in
      App Store Connect nachsehen statt hier.</p>
 
-  <h3 class="frage">1. Text – je App auszufüllen</h3>
+  <h3 class="frage">1. Text – steht, bis auf zwei Zeilen</h3>
+
+  <p>Dieser Abschnitt war eine Mängelliste. Er ist es nicht mehr: Die Texte
+     liegen fertig in <code>docs/store-texte.md</code>, erzeugt aus
+     <code>PA-APPS.html</code>. Oben sind sie Wort für Wort übernommen und
+     grün markiert.</p>
 
   <div class="wrap">
     <table class="pflicht">
       <tr>
         <th>Feld</th><th>Grenze</th>
-        <th>Mandala Atelier</th><th>Blatt</th><th>Malstudio</th>
+        <th>Mandala Atelier</th><th>Mandala Atelier 2</th><th>Malstudio</th>
       </tr>
       <tr>
         <td>Name im Store</td><td>30 Zeichen</td>
         <td class="ja">„Mandala Atelier" · 15</td>
-        <td class="ja">„Blatt" · 5</td>
-        <td class="nein">„Malstudio" · 9 – oder „Sommer am Meer"?</td>
+        <td class="ja">„Mandala Atelier 2" · 17</td>
+        <td class="ja">„Sommer am Meer – Malstudio" · 26</td>
       </tr>
       <tr>
         <td>Untertitel</td><td>30 Zeichen</td>
-        <td class="nein">Entwurf · 22</td>
-        <td class="nein">Entwurf · 26</td>
-        <td class="ja">aus der Projektanweisung · 29</td>
+        <td class="ja">„Eine Linie, ein ganzer Kranz" · 28</td>
+        <td class="ja">„Das ruhige Blatt" · 16</td>
+        <td class="ja">„Schritt für Schritt malen" · 25</td>
       </tr>
       <tr>
         <td>Werbetext</td><td>170 Zeichen</td>
-        <td class="nein">fehlt</td><td class="nein">fehlt</td><td class="nein">fehlt</td>
+        <td class="ja">74</td><td class="ja">28</td><td class="ja">95</td>
       </tr>
       <tr>
         <td>Beschreibung</td><td>4000 Zeichen</td>
-        <td class="ja">Projekttext + Entwurf</td>
-        <td class="ja">Projekttext + Entwurf</td>
-        <td class="ja">Projekttext + Entwurf</td>
+        <td class="ja">steht</td><td class="ja">steht</td><td class="ja">steht</td>
       </tr>
       <tr>
         <td>Suchbegriffe</td><td>100 Zeichen</td>
-        <td class="nein">fehlt</td><td class="nein">fehlt</td><td class="nein">fehlt</td>
+        <td class="ja">80 Zeichen</td>
+        <td class="ja">69 Zeichen</td>
+        <td class="nein">114 Zeichen – über der Grenze</td>
+      </tr>
+      <tr>
+        <td>Preis</td><td>–</td>
+        <td class="ja">4,99 €</td><td class="ja">2,99 €</td><td class="ja">3,99 €</td>
       </tr>
       <tr>
         <td>Neu in dieser Version</td><td>4000 Zeichen</td>
@@ -856,21 +892,17 @@
     </table>
   </div>
 
-  <p>Grün markiert ist auf den Seiten oben, was <b>schon vereinbart</b> ist und
-     so in einer Datei steht – die Sätze aus den Manifests, aus
-     <code>index.html</code>, aus den READMEs und aus Malstudios
-     Projektanweisung. Gelb bleibt nur, wofür es noch keinen Satz gibt. Wer
-     die Beschreibungen weiterschreibt, fängt also nicht bei null an: Er
-     verlängert, was da ist.</p>
+  <p><b>Die Namensfrage ist entschieden</b>, und zwar mit einem Befund, den man
+     nicht raten konnte: „Blatt" allein war im Store bereits vergeben. Aus der
+     zweiten App wurde deshalb <b>Mandala Atelier 2 – Das ruhige Blatt</b>,
+     aufgeteilt auf Name und Untertitel, weil beides zusammen 36 Zeichen hätte
+     und damit über der Grenze läge. Das Malstudio heißt im Store, was auch im
+     Manifest steht.</p>
 
-  <p>Der Name ist bei zweien schon entschieden, bei Malstudio nicht: Im
-     Manifest steht <code>Sommer am Meer – Malstudio</code>, auf dem
-     Homescreen steht <code>Malstudio</code>, und die Positionierung im
-     Projekt lautet „Zeichnen lernen durch Spielen". Drei Namen für eine App
-     sind einer zuviel – im Store steht am Ende einer.</p>
-
-  <p>Dasselbe bei Blatt: <code>Blatt – Atelier 3.0</code> ist ein Name für
-     innen. Wer den Store liest, kennt kein Atelier 2 und keine Gegenprobe.</p>
+  <p><b>Zwei Zeilen bleiben.</b> Malstudios Suchbegriffe sind nachgezählt
+     114 Zeichen lang und passen damit nicht in die erlaubten 100 – drei
+     Begriffe müssen weg. Und für Malstudio gibt es keinen „Neu"-Text; die
+     anderen beiden können ihn aus dem Fassungsregal ableiten.</p>
 
   <h3 class="frage">2. Bilder – gemessen, nicht geschätzt</h3>
 
