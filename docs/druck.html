@@ -196,6 +196,8 @@
         <dt>force</dt>   <dd data-w="force">—</dd>
         <dt>radiusX</dt> <dd data-w="radiusX">—</dd>
         <dt>radiusY</dt> <dd data-w="radiusY">—</dd>
+        <dt>Neigung</dt> <dd data-w="neigung">—</dd>
+        <dt>Drehung</dt> <dd data-w="drehung">—</dd>
       </dl>
       <span class="zaehler">0 Punkte</span>
     </div>
@@ -210,6 +212,8 @@
         <dt>force</dt>   <dd data-w="force">—</dd>
         <dt>radiusX</dt> <dd data-w="radiusX">—</dd>
         <dt>radiusY</dt> <dd data-w="radiusY">—</dd>
+        <dt>Neigung</dt> <dd data-w="neigung">—</dd>
+        <dt>Drehung</dt> <dd data-w="drehung">—</dd>
       </dl>
       <span class="zaehler">0 Punkte</span>
     </div>
@@ -251,7 +255,8 @@
    größter Wert, Summe und Anzahl. Aus Summe und Anzahl kommt der Mittelwert,
    aus klein und groß die Schwankung *innerhalb* des Feldes — und die ist der
    Maßstab dafür, ob ein Unterschied *zwischen* den Feldern etwas bedeutet. */
-var SIGNALE = ['pressure', 'width', 'height', 'force', 'radiusX', 'radiusY'];
+var SIGNALE = ['pressure', 'width', 'height', 'force', 'radiusX', 'radiusY',
+               'neigung', 'drehung'];
 
 var felder = {
   leicht: leeresFeld(),
@@ -325,6 +330,16 @@ function bindePointer(el, feld) {
     merke(feld, 'pressure', e.pressure);
     merke(feld, 'width',  e.width);
     merke(feld, 'height', e.height);
+    /* Neigung und Drehung stehen im Bogenmaß am Ereignis. Grad liest sich
+       für eine Hand besser: 90 heißt aufrecht, 0 hieße flach auf dem Glas.
+       Meldet das Gerät sie nicht, kommt undefined – merke() lässt das
+       liegen, und das Feld bleibt auf „—“. Genau das ist die Antwort. */
+    if (typeof e.altitudeAngle === 'number') {
+      merke(feld, 'neigung', e.altitudeAngle * 180 / Math.PI);
+    }
+    if (typeof e.azimuthAngle === 'number') {
+      merke(feld, 'drehung', e.azimuthAngle * 180 / Math.PI);
+    }
     if (feld.punkte % 4 === 0) zeichne();
   }
 }

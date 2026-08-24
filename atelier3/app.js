@@ -88,7 +88,27 @@ const REST_RATE = 1.0;    // wie viele Überstreichen eine Sekunde Stillstand wi
    Bei bildfüllender Ansicht ergeben diese Werte genau das, was vorher fest in
    Blatt-Koordinaten stand; sie ändern also nichts am gewohnten Gefühl. */
 const R_FINGER_CSS = 29;    // Kontaktradius Fingerkuppe, Bildschirmpunkte
-const R_PEN_CSS    = 17;    // Kontaktradius Stiftspitze
+
+/* Der Stift hatte einen festen Radius von 17 – und damit machte Blatt mit
+   dem einfachen Apple Pencil keine Freude: Eine Fläche, die durch Reibung
+   entsteht, braucht Fläche. Mit einer feinen Spitze kratzt man Linien,
+   statt etwas hervorzuholen.
+
+   Jetzt trägt die Neigung die Breite, so wie bei einem echten Bleistift:
+   aufrecht gehalten reibt er schmal, flach gelegt breit. Der Browser meldet
+   den Winkel als altitudeAngle – 90 Grad ist aufrecht, kleiner ist
+   schräger. Das ist kein Bedienelement, sondern eine Bewegung mehr, die die
+   App versteht.
+
+   Die Spanne ist bewusst weit: flach gelegt reibt der Stift breiter als ein
+   Finger, aufrecht feiner als bisher. Zwischen 25 und 90 Grad, weil ein
+   Stift in der Hand nie ganz flach liegt. */
+const R_PEN_NARROW = 14;    // aufrecht, zum Ausarbeiten
+const R_PEN_WIDE   = 34;    // flach gelegt, breiter als der Finger
+const R_PEN_PLAIN  = 24;    // wenn das Gerät keine Neigung meldet
+
+const PEN_ALT_STEIL = 90 * Math.PI / 180;
+const PEN_ALT_FLACH = 25 * Math.PI / 180;
 /* Die Griffkurve — und warum die Voreinstellung heute eine andere ist.
 
    Beim Umstieg auf den Wegauftrag (v1-4) wurden vier Dinge auf einmal
@@ -2366,8 +2386,33 @@ function toLocal(event) {
 /* Kontaktbreite: physisch gedacht, in Blatt-Einheiten umgerechnet. Holt man
    das Blatt näher, deckt dieselbe Fingerkuppe weniger Bildfläche ab – genau
    wie in Wirklichkeit. */
-function contactRadius(pen) {
-  return (pen ? R_PEN_CSS : R_FINGER_CSS) * view.perCss;
+/* Zum Vergleichen am Gerät, wie ?griff= bei den Griffkurven:
+     ?spitze=alt   die alten festen 17 – zum Danebenhalten
+     ?spitze=fest  feste 24, ohne Neigung
+   sonst: die Neigung trägt die Breite, mit 24 als Rückfall. */
+const SPITZEN = { alt: 17, fest: R_PEN_PLAIN };
+const spitzeFest = (function () {
+  const roh = new URLSearchParams(location.search).get('spitze');
+  const name = roh && roh.toLowerCase();
+  return (name && SPITZEN[name]) || 0;
+})();
+
+function penRadiusCss(event) {
+  if (spitzeFest) return spitzeFest;
+
+  /* Meldet das Gerät keine Neigung, kommt undefined – oder konstant 90
+     Grad, was dasselbe bedeutet: Es weiß nichts. Beides landet auf dem
+     Rückfall, und der ist großzügiger als die alten 17. */
+  const a = event && event.altitudeAngle;
+  if (typeof a !== 'number' || !isFinite(a)) return R_PEN_PLAIN;
+
+  const t = (PEN_ALT_STEIL - a) / (PEN_ALT_STEIL - PEN_ALT_FLACH);
+  const k = Math.max(0, Math.min(1, t));
+  return R_PEN_NARROW + (R_PEN_WIDE - R_PEN_NARROW) * k;
+}
+
+function contactRadius(pen, event) {
+  return (pen ? penRadiusCss(event) : R_FINGER_CSS) * view.perCss;
 }
 
 function pressureOf(event) {
@@ -2384,7 +2429,7 @@ function startStroke(event) {
   hand.id = event.pointerId;
   hand.down = true;
   hand.pen = event.pointerType === 'pen';
-  hand.radius = contactRadius(hand.pen);
+  hand.radius = contactRadius(hand.pen, event);
   hand.press = pressureOf(event);
   const p = toLocal(event);
   hand.x = p[0]; hand.y = p[1];
@@ -2475,6 +2520,12 @@ function bindHand() {
       hand.queue.push(p[0], p[1]);
     }
     hand.press = pressureOf(event);
+
+    /* Die Breite wandert mit. Sie beim Aufsetzen einmal festzulegen hätte
+       die Neigung wertlos gemacht – man hält den Stift ja nicht still,
+       sondern legt ihn im Zug flacher oder richtet ihn auf. Für den Finger
+       ändert sich dabei nichts: dort ist der Radius fest. */
+    if (hand.pen) hand.radius = contactRadius(true, event);
   });
 
   const lift = function (event) {
