@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Bis in den Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Was zu tun bleibt, bis die drei Apps einzeln im App Store stehen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Was noch zu tun ist, bis die drei Apps EINZELN im App Store stehen.
+
+  Der Aufbau folgt der Reihenfolge, in der es tatsächlich abläuft:
+
+    A  Einmal fürs Konto  – gilt für alle drei, muss zuerst stehen
+    B  Dreimal, je App    – jede App ist eine eigene Einreichung
+    C  Was je App noch offen ist – die Punkte, die nur diese App betreffen
+
+  Der Haken ist keine Zierde: Abgehakt wird nur, was nachgeprüft ist. Was
+  aussteht, steht offen da, auch wenn es unangenehm ist.
+
+  docs/store.html zeigt, wie die Produktseiten aussähen; hier steht, was
+  davor liegt. Die beiden gehören zusammen und sollen sich nicht doppeln:
+  Textfragen dort, Ablauf hier.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut:  #2f6b45;                 /* erledigt  */
+    --offen:#a9700a;                 /* steht aus */
+    --stop: #9a3b2f;                 /* blockiert */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 800px; margin: 0 auto; }
+
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  h3 { font-size: 17px; margin: 1.8rem 0 .5rem; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.8rem; }
+  a { color: inherit; }
+
+  /* ---------- Die Liste ------------------------------------------------ */
+
+  ul.tun { list-style: none; margin: 0 0 1.4rem; padding: 0; }
+
+  ul.tun li {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--edge);
+  }
+  ul.tun li:last-child { border-bottom: 0; }
+
+  /* Das Zeichen steht in der ersten Spalte und sagt den Zustand.
+     Drei Zustände, mehr braucht es nicht: getan, offen, blockiert. */
+  ul.tun li::before {
+    grid-row: 1 / span 2;
+    font-size: 15px; line-height: 1.5; text-align: center;
+  }
+  li.tut::before   { content: '✓'; color: var(--tut); font-weight: 700; }
+  li.offen::before { content: '○'; color: var(--offen); }
+  li.stop::before  { content: '!'; color: var(--stop); font-weight: 700; }
+
+  li.tut  b { font-weight: 600; }
+  li.tut  { color: var(--quiet); }
+  li.tut  b { color: var(--ink); }
+
+  ul.tun small {
+    grid-column: 2;
+    display: block; margin-top: 3px;
+    font-size: 14px; color: var(--quiet);
+  }
+
+  .karte {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 4px 18px;
+    margin-bottom: 1.4rem;
+  }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.4rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  .zeichen { font-size: 14px; color: var(--quiet); margin-bottom: 2rem; }
+  .zeichen span { white-space: nowrap; margin-right: 1.2rem; }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Bis in den Store</h1>
+  <p class="lede">Was zu tun bleibt, bis die drei Apps <b>einzeln</b> im App
+     Store stehen. Drei getrennte Einreichungen, drei eigene Produktseiten –
+     aber nur ein Konto, und das kommt zuerst.</p>
+
+  <p class="zeichen">
+    <span><b style="color:var(--tut)">✓</b> erledigt und nachgeprüft</span>
+    <span><b style="color:var(--offen)">○</b> steht aus</span>
+    <span><b style="color:var(--stop)">!</b> blockiert alles Weitere</span>
+  </p>
+
+  <p class="note"><strong>Wie es hier zugeht:</strong> Abgehakt wird nur, was
+     nachgeprüft ist – nicht, was geplant ist. Wie die Produktseiten aussähen,
+     steht in der <a href="store.html">Attrappe</a>; die Texte selbst liegen in
+     <a href="store-texte.md"><code>store-texte.md</code></a>. Hier steht, was
+     davor liegt.</p>
+
+  <!-- ==================== A. Einmal fürs Konto ==================== -->
+
+  <h2>A · Einmal fürs Konto — gilt für alle drei</h2>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="stop"><b>Händlerstatus nach dem DSA entscheiden</b>
+      <small>Wer in der EU anbietet, hinterlegt Name, Anschrift, Telefonnummer
+      und E-Mail – und die stehen danach <em>öffentlich</em> auf jeder
+      Produktseite. Ohne diese Angabe wird in der EU nichts ausgeliefert.
+      Für eine Privatperson ist das die eigentliche Entscheidung, und sie
+      hängt vor allem: alles Weitere kostet Geld und Zeit, das hier kostet
+      Privatsphäre.</small></li>
+
+    <li class="offen"><b>Apple Developer Program</b>
+      <small>99 € im Jahr. Anmeldung als Einzelperson geht sofort; als Firma
+      braucht es eine D-U-N-S-Nummer und dauert länger.</small></li>
+
+    <li class="offen"><b>Ein Mac mit Xcode</b>
+      <small>Lässt sich nicht umgehen. Signieren, archivieren und hochladen
+      gehen nur dort – vom iPad aus nicht.</small></li>
+
+    <li class="offen"><b>Verträge, Steuer- und Bankdaten</b>
+      <small>In App Store Connect unter <em>Agreements, Tax, and Banking</em>.
+      Auch für kostenlose Apps nötig.</small></li>
+
+    <li class="offen"><b>Support-Adresse</b>
+      <small>Eine Seite oder eine E-Mail-Adresse, an die sich Käufer wenden
+      können. Pflichtangabe je App, darf für alle drei dieselbe sein.</small></li>
+
+    <li class="tut"><b>Datenschutzerklärung</b>
+      <small>Liegt fertig vor und ist am Quelltext geprüft. Vor dem Einreichen
+      bleiben darin nur noch die gelb hinterlegten Stellen zu füllen – Name,
+      Anschrift, Kontakt, Aufsichtsbehörde. Sie braucht dann eine eigene
+      Adresse im Netz.</small></li>
+  </ul>
+  </div>
+
+  <!-- ==================== B. Dreimal, je App ==================== -->
+
+  <h2>B · Dreimal — für jede App einzeln</h2>
+
+  <p>Jede der drei Apps ist eine eigene Einreichung mit eigener Bundle-ID,
+     eigenem Xcode-Projekt und eigener Produktseite. Nichts davon lässt sich
+     teilen.</p>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="stop"><b>Ein nativer Rahmen je App</b>
+      <small>Alle drei sind Web-Apps und lassen sich nicht direkt einreichen.
+      Es braucht je ein Xcode-Projekt, das die Dateien lokal bündelt – der
+      Service Worker fällt dabei weg, im Bundle liegt ohnehin alles auf dem
+      Gerät.</small></li>
+
+    <li class="offen"><b>App-Symbol 1024 × 1024, ohne Alphakanal</b>
+      <small>Die vorhandenen Symbole sind alle RGBA. Apple lehnt Transparenz
+      im Store-Symbol ab – neu erzeugen, für jede App eines.</small></li>
+
+    <li class="offen"><b>Bildschirmfotos</b>
+      <small>iPhone 6,9″ und – da alle drei das iPad unterstützen – iPad 13″.
+      Was App Store Connect beim Hochladen verlangt, ist maßgeblich; die
+      Anforderungen ändern sich.</small></li>
+
+    <li class="tut"><b>Name, Untertitel, Werbetext, Beschreibung</b>
+      <small>Stehen für alle drei fest, mit geprüften Zeichenzahlen. Auch
+      Schlüsselwörter, Kategorie, Preis und Altersfreigabe.</small></li>
+
+    <li class="offen"><b>Fragebogen zur Altersfreigabe</b>
+      <small>Wird in App Store Connect ausgefüllt, je App einmal. Bei allen
+      dreien läuft er auf 4+ hinaus.</small></li>
+
+    <li class="offen"><b>Datenschutz-Kennzeichnung</b>
+      <small>Die „Nutrition Labels“. Bei allen dreien: <em>Keine Daten
+      erfasst.</em></small></li>
+
+    <li class="stop"><b>Richtlinie 4.2 überstehen</b>
+      <small>Apple lehnt Apps ab, die nur eine verpackte Website sind.
+      Offline-Betrieb, Apple Pencil und das Sichern in die Fotos-App sind die
+      Argumente dagegen – aber es bleibt das Risiko, das man erst bei der
+      Prüfung erfährt.</small></li>
+  </ul>
+  </div>
+
+  <!-- ==================== C. Je App offen ==================== -->
+
+  <h2>C · Was je App noch offensteht</h2>
+
+  <h3>Mandala Atelier</h3>
+  <div class="karte">
+  <ul class="tun">
+    <li class="offen"><b>Neigung des Apple Pencil</b>
+      <small>Steht als offener Punkt im Konzeptpapier. Gegenüber Richtlinie 4.2
+      wäre sie ein starkes Argument – etwas, das eine Website nicht kann.</small></li>
+    <li class="offen"><b>Kids-Corner: mitliefern oder herausnehmen?</b>
+      <small>Sieben von sechsundzwanzig Motiven, dazu die Zähl- und
+      Rechenmandalas. Das verträgt sich nicht bruchlos mit „für Erwachsene,
+      keine Aufgaben“. Zurückgestellt – aber vor dem Einreichen zu
+      entscheiden, weil es die Zielgruppe verschiebt.</small></li>
+    <li class="offen"><b>Englische Fassung?</b>
+      <small>Ohne sie bleibt der Store faktisch auf den deutschsprachigen Raum
+      beschränkt.</small></li>
+  </ul>
+  </div>
+
+  <h3>Mandala Atelier 2 – Das ruhige Blatt</h3>
+  <div class="karte">
+  <ul class="tun">
+    <li class="tut"><b>Der Name ist entschieden und im Store frei</b>
+      <small>„Blatt“ allein <em>war</em> vergeben – an eine aktive App gleichen
+      Namens. „Mandala Atelier 2“ ist frei, geprüft im deutschen Store.</small></li>
+    <li class="stop"><b>Von den dreien am stärksten durch 4.2 gefährdet</b>
+      <small>Sie ist die schmalste: eine Wischbewegung, keine Werkzeuge. Genau
+      das ist ihre Idee – und genau das, woran Apple Anstoß nehmen kann. Die
+      Alternative wäre, sie mit dem ersten Atelier zusammenzulegen; das
+      widerspräche der Gegenprobe.</small></li>
+  </ul>
+  </div>
+
+  <h3>Sommer am Meer – Malstudio</h3>
+  <div class="karte">
+  <ul class="tun">
+    <li class="tut"><b>Keine Abrufe nach außen mehr</b>
+      <small>Die Schriften kamen bei jedem Start von Google – das gab die
+      IP-Adresse preis und brach den Offline-Betrieb. Sie liegen jetzt lokal
+      bei, und der Service Worker nimmt sie mit in den Vorrat. Nachgeprüft
+      am ausgelieferten Stand.</small></li>
+    <li class="offen"><b>Kinder-Kategorie: ja oder nein?</b>
+      <small>Sie bringt Sichtbarkeit, verlangt aber Zusätzliches: keinerlei
+      Analyse durch Dritte, keine Werbung, jeder Link nach außen hinter einer
+      Elternschranke. Die App erfüllt das heute – man muss es nur wissentlich
+      zusagen.</small></li>
+    <li class="offen"><b>Eigenes Repo, eigene Einreichung</b>
+      <small>Das Malstudio liegt in <code>pahlborn/malstudio</code>. Bundle-ID,
+      Xcode-Projekt und Produktseite sind von den beiden Ateliers
+      unabhängig.</small></li>
+    <li class="offen"><b>Bildschirmfotos mit gefüllter Galerie</b>
+      <small>Die vorhandenen zeigen ein frisch angelegtes Profil. Für den Store
+      sollten sie zeigen, was nach zwei Wochen darin liegt.</small></li>
+  </ul>
+  </div>
+
+  <p class="note"><strong>Die Reihenfolge ist nicht beliebig.</strong> Solange
+     der Händlerstatus nicht entschieden ist, lohnt keiner der anderen Schritte
+     – er kostet als einziger nichts als eine Entscheidung, und ohne ihn geht
+     in der EU nichts. Danach zuerst das Konto, dann ein nativer Rahmen für
+     <em>eine</em> App als Probe. Erst wenn die durch die Prüfung ist, weiß
+     man, was die anderen beiden kostet.</p>
+
+  <footer>
+    Die Regeln des App Store ändern sich. Was hier steht, ist der Stand nach
+    bestem Wissen – maßgeblich ist, was App Store Connect beim Einreichen
+    tatsächlich verlangt.
+  </footer>
+
+</main>
+</body>
+</html>
