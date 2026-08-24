@@ -158,6 +158,10 @@ Du kannst jederzeit aufhören und später zurückkehren. Das Blatt liegt dann no
 - Ruhige, zurücktretende Oberfläche: die Bedienung liegt hinter einer kleinen Marke in der Ecke
 - Ohne Konto, ohne Werbung, ohne Netz
 
+**Ein Tipp.** Auf blankem Glas gleitet der Finger nur. Wer eine matte Folie
+auf dem iPad hat – eine, die sich wie Papier anfühlt –, spürt beim Reiben
+den Widerstand, und die App wird eine andere. Es lohnt sich.
+
 Mach aus einem leeren Bogen deinen eigenen Raum.
 
 ## Anleitung
