@@ -171,6 +171,23 @@
   table.werte th { font-weight: 600; color: var(--ink); }
   table.werte td:not(:first-child) { font-variant-numeric: tabular-nums; }
 
+  /* „(Voreinstellung)“ ist ein Wort, das nicht umbrechen kann, und es hat
+     die erste Spalte auf 125 px getrieben – die Tabelle wurde damit breiter
+     als ihr Rahmen und schob die ganze Seite sieben Pixel zur Seite. Es
+     bekommt deshalb eine eigene Zeile und etwas weniger Größe. */
+  table.werte .vor { display: block; font-size: 0.85em; }
+
+  /* Auf schmalen Geräten zusätzlich enger setzen. Danach passt sie auch auf
+     ein iPhone SE, ohne dass jemand schieben muss. */
+  @media (max-width: 460px) {
+    table.werte { font-size: 13.5px; }
+    table.werte th, table.werte td { padding-right: 6px; }
+  }
+
+  /* Und als Netz darunter: Bleibt sie doch einmal zu breit – längere Wörter,
+     größere Schrift –, schiebt sie in ihrem eigenen Kasten, nicht die Seite. */
+  .rollt { overflow-x: auto; }
+
   footer {
     margin-top: 2.6rem;
     font-size: 13.5px;
@@ -262,13 +279,15 @@
       </a>
     </div>
 
+    <div class="rollt">
     <table class="werte">
       <tr><th>Fassung</th><th>gewischt</th><th>verweilt</th><th>Spielraum</th></tr>
       <tr><td>zeichnend</td><td>15,1 : 1</td><td>4,9 : 1</td><td>3,1-fach</td></tr>
       <tr><td>zart</td><td>9,5 : 1</td><td>2,9 : 1</td><td>3,3-fach</td></tr>
       <tr><td>mittel</td><td>6,0 : 1</td><td>2,2 : 1</td><td>2,7-fach</td></tr>
-      <tr><td><b>flächig</b> (Voreinstellung)</td><td>3,3 : 1</td><td>1,7 : 1</td><td>1,9-fach</td></tr>
+      <tr><td><b>flächig</b><span class="vor">(Voreinstellung)</span></td><td>3,3 : 1</td><td>1,7 : 1</td><td>1,9-fach</td></tr>
     </table>
+    </div>
 
     <p style="font-size:14.5px; color:var(--quiet)">
       Grat gegen blanke Fläche, für einen Finger gerechnet – ein iPad meldet
