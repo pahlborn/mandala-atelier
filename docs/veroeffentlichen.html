@@ -185,9 +185,9 @@
   <ul class="tun">
     <li class="stop"><b>Ein nativer Rahmen je App</b>
       <small>Alle drei sind Web-Apps und lassen sich nicht direkt einreichen.
-      Es braucht je ein Xcode-Projekt, das die Dateien lokal bündelt – der
-      Service Worker fällt dabei weg, im Bundle liegt ohnehin alles auf dem
-      Gerät.</small></li>
+      Es braucht je ein Xcode-Projekt, das die Dateien lokal bündelt. Wie das
+      geht und was es voraussetzt, steht unten unter
+      <a href="#rahmen">D · Der native Rahmen</a>.</small></li>
 
     <li class="offen"><b>App-Symbol 1024 × 1024, ohne Alphakanal</b>
       <small>Die vorhandenen Symbole sind alle RGBA. Apple lehnt Transparenz
@@ -276,12 +276,109 @@
   </ul>
   </div>
 
+
+  <!-- ==================== D. Der native Rahmen ==================== -->
+
+  <h2 id="rahmen">D · Der native Rahmen — wie das praktisch geht</h2>
+
+  <p>Der Punkt, an dem die meisten hängenbleiben, deshalb hier ausführlich.
+     <b>Keine der drei Apps ist mit Xcode gebaut.</b> Es sind HTML, CSS und
+     JavaScript, die Safari direkt ausführt – kein Xcode-Projekt, kein iOS SDK,
+     kein Swift, nichts zu übersetzen. Genau deshalb funktioniert „Zum
+     Home-Bildschirm“, und genau deshalb kann keine von ihnen so, wie sie ist,
+     in den Store.</p>
+
+  <p>Der App Store nimmt nur signierte <code>.ipa</code>-Pakete an. Was fehlt,
+     ist also eine Hülle: ein Xcode-Projekt, das die vorhandenen Dateien
+     mitliefert und in einem <code>WKWebView</code> anzeigt. Die Apps selbst
+     werden dabei nicht umgeschrieben.</p>
+
+  <h3>Was dafür da sein muss</h3>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="stop"><b>Ein Mac</b>
+      <small>Xcode gibt es nur für macOS. Vom iPad aus lässt sich weder
+      signieren noch archivieren noch hochladen – dieser eine Schritt geht
+      nicht mit dem Finger.</small></li>
+
+    <li class="offen"><b>Xcode in einer Fassung, die Apple noch annimmt</b>
+      <small>Apple verlangt, dass eingereichte Apps mit einem hinreichend
+      neuen SDK gebaut sind, und zieht diese Grenze etwa einmal im Jahr nach.
+      Wer ein älteres Xcode benutzt, bekommt beim Hochladen eine Abweisung
+      statt einer Prüfung. <b>Welche Fassung gerade verlangt wird, steht in
+      App Store Connect</b> – nicht hier, denn es ändert sich.</small></li>
+
+    <li class="offen"><b>Ein macOS, das dieses Xcode trägt</b>
+      <small>Jede Xcode-Fassung setzt ein Mindest-macOS voraus. Ein älterer
+      Mac kann daran scheitern, ohne dass es an der App liegt – das vor dem
+      Kauf der Entwicklermitgliedschaft prüfen.</small></li>
+
+    <li class="offen"><b>Je App eine eigene Bundle-ID</b>
+      <small>Umgekehrte Domainschreibweise, etwa
+      <code>de.name.mandalaatelier</code>. Sie ist nach der
+      Veröffentlichung <b>unveränderlich</b> und darf für die drei Apps
+      nicht dieselbe sein.</small></li>
+  </ul>
+  </div>
+
+  <h3>Der Weg, dreimal</h3>
+
+  <p>Für jede App einzeln, in dieser Reihenfolge. Der bequemste Weg ist
+     <b>Capacitor</b>: Es legt das Xcode-Projekt an und kopiert die Dateien
+     hinein, ohne dass jemand Swift schreiben muss.</p>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="offen"><b>1 · Projekt anlegen</b>
+      <small>Capacitor einrichten, Name und Bundle-ID setzen, den Ordner der
+      App als Webverzeichnis angeben, das iOS-Projekt erzeugen und in Xcode
+      öffnen.</small></li>
+
+    <li class="offen"><b>2 · Den Service Worker herausnehmen</b>
+      <small>Im Bundle liegt ohnehin alles auf dem Gerät. Schlimmer noch: Er
+      würde Dateien aus einem Vorrat ausliefern, den niemand mehr auffrischt.
+      Die Registrierung entfällt, die Dateien bleiben.</small></li>
+
+    <li class="offen"><b>3 · Nachsehen, dass nichts nachgeladen wird</b>
+      <small>Apple sieht Nachladen aus dem Netz kritisch. Bei den beiden
+      Ateliers ist das erledigt – Schriften stecken als Daten-URI. Beim
+      Malstudio war es der einzige offene Punkt und ist inzwischen
+      behoben.</small></li>
+
+    <li class="offen"><b>4 · Symbol, Startbildschirm, Ausrichtungen</b>
+      <small>App-Symbol 1024 × 1024 ohne Alphakanal, ein schlichter
+      Startbildschirm, Quer- und Hochformat freigeben.</small></li>
+
+    <li class="offen"><b>5 · Signieren lassen</b>
+      <small>In Xcode „Automatically manage signing“ einschalten. Zertifikate
+      und Bereitstellungsprofile entstehen dann von selbst.</small></li>
+
+    <li class="offen"><b>6 · Archivieren und hochladen</b>
+      <small><em>Product → Archive</em>, dann <em>Distribute App → App Store
+      Connect</em>. Nach einigen Minuten Verarbeitung erscheint der Build
+      dort.</small></li>
+
+    <li class="offen"><b>7 · Erst über TestFlight, dann zur Prüfung</b>
+      <small>Interner Test geht sofort, externer Test braucht eine kurze
+      Vorprüfung. Das lohnt sich – die Prüfung selbst dauert meist ein bis
+      drei Tage, und eine Ablehnung kostet einen weiteren Durchgang.</small></li>
+  </ul>
+  </div>
+
+  <p class="note"><strong>Erst eine App, dann die anderen zwei.</strong> Der
+     ganze Ablauf – Rahmen, Signieren, Hochladen, Prüfung – ist beim ersten
+     Mal die eigentliche Arbeit; beim zweiten und dritten Mal ist es
+     Wiederholung. Solange nicht feststeht, ob eine Web-App in dieser Form
+     durch Richtlinie 4.2 kommt, wäre es unklug, den Aufwand dreimal parallel
+     zu treiben.</p>
+
   <p class="note"><strong>Die Reihenfolge ist nicht beliebig.</strong> Solange
      der Händlerstatus nicht entschieden ist, lohnt keiner der anderen Schritte
      – er kostet als einziger nichts als eine Entscheidung, und ohne ihn geht
-     in der EU nichts. Danach zuerst das Konto, dann ein nativer Rahmen für
-     <em>eine</em> App als Probe. Erst wenn die durch die Prüfung ist, weiß
-     man, was die anderen beiden kostet.</p>
+     in der EU nichts. Danach das Konto, dann ein Mac mit Xcode, dann ein
+     nativer Rahmen für <em>eine</em> App als Probe. Erst wenn die durch die
+     Prüfung ist, weiß man, was die anderen beiden kosten.</p>
 
   <footer>
     Die Regeln des App Store ändern sich. Was hier steht, ist der Stand nach
