@@ -300,9 +300,12 @@
      Datei" – mit der Datei dahinter. Ohne die zweite Farbe sieht die Seite
      aus, als wäre alles erfunden; das war sie nie, und man fand es trotzdem
      nicht wieder. */
+  /* Grün war unterlegt wie Gelb – und weil fast alles vereinbart ist, lag
+     ein Farbschleier über der halben Seite. Die Fläche gehört der Lücke:
+     Was fehlt, soll ins Auge springen. Was steht, braucht nur einen
+     feinen Strich darunter. */
   body.zeigen .q {
-    background: var(--s-echt);
-    box-shadow: inset 0 -1.5px 0 var(--s-echt-strich);
+    box-shadow: inset 0 -1px 0 var(--s-echt-strich);
   }
   body.zeigen .q::after {
     content: '·' attr(data-was);
@@ -424,7 +427,7 @@
             <b>Mandala Atelier 2</b>
             <span class="q" data-was="store-texte.md">Das ruhige Blatt</span>
           </span>
-          <span class="laden q" data-was="store-texte.md">2,99 €</span>
+          <span class="laden q" data-was="store-texte.md">6,99 €</span>
         </div>
         <div class="treffer-zeile">
           <img src="store/malstudio-icon-512.png" alt="Symbol von Sommer am Meer – Malstudio">
@@ -573,7 +576,7 @@
             <p class="unter"><span class="q" data-was="store-texte.md">Das ruhige Blatt</span></p>
             <p class="anbieter"><span class="l" data-was="fehlt">Anbietername</span></p>
             <div class="kopf-reihe">
-              <span class="laden q" data-was="store-texte.md">2,99 €</span>
+              <span class="laden q" data-was="store-texte.md">6,99 €</span>
               <svg class="teilen" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 3.5v11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8.5 7 12 3.5 15.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10.5H5.5v9h13v-9H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
@@ -673,7 +676,7 @@
             <tr><th>Sprachen</th><td><span class="q" data-was="store-texte.md">Deutsch</span></td></tr>
             <tr><th>Altersfreigabe</th><td><span class="q" data-was="store-texte.md">4+</span></td></tr>
             <tr><th>Copyright</th><td><span class="l" data-was="fehlt">© 2026 Name des Anbieters – noch festzulegen</span></td></tr>
-            <tr><th>Preis</th><td><span class="q" data-was="store-texte.md">2,99 € einmalig – kleiner als das Atelier, weil die App bewusst weniger tut</span></td></tr>
+            <tr><th>Preis</th><td><span class="q" data-was="store-texte.md">6,99 € einmalig – keine Käufe in der App, kein Abo</span></td></tr>
             <tr><th>Schlüsselwörter</th><td><span class="q" data-was="store-texte.md">Frottage, Reiben, Relief, Achtsamkeit, ruhig, Muster, Papier, Offline</span></td></tr>
             <tr><th>Datenschutzrichtlinie</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
             <tr><th>Support</th><td><span class="l" data-was="fehlt">Adresse einer Seite</span></td></tr>
@@ -881,7 +884,7 @@
       </tr>
       <tr>
         <td>Preis</td><td>–</td>
-        <td class="ja">4,99 €</td><td class="ja">2,99 €</td><td class="ja">3,99 €</td>
+        <td class="ja">4,99 €</td><td class="ja">6,99 €</td><td class="ja">3,99 €</td>
       </tr>
       <tr>
         <td>Neu in dieser Version</td><td>4000 Zeichen</td>
