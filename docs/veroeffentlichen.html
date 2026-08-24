@@ -141,17 +141,19 @@
 
   <div class="karte">
   <ul class="tun">
-    <li class="stop"><b>Händlerstatus nach dem DSA entscheiden</b>
+    <li class="offen"><b>Händlerstatus nach dem DSA</b>
       <small>Wer in der EU anbietet, hinterlegt Name, Anschrift, Telefonnummer
       und E-Mail – und die stehen danach <em>öffentlich</em> auf jeder
       Produktseite. Ohne diese Angabe wird in der EU nichts ausgeliefert.
-      Für eine Privatperson ist das die eigentliche Entscheidung, und sie
-      hängt vor allem: alles Weitere kostet Geld und Zeit, das hier kostet
-      Privatsphäre.</small></li>
+      <b>Kommt bewusst zuletzt</b> (siehe <a href="#reihenfolge">Zug 3</a>):
+      Es ist Verwaltung und hält den Bau nicht auf. Die Folge für die
+      Privatsphäre ist bekannt und in Kauf genommen.</small></li>
 
     <li class="offen"><b>Apple Developer Program</b>
       <small>99 € im Jahr. Anmeldung als Einzelperson geht sofort; als Firma
-      braucht es eine D-U-N-S-Nummer und dauert länger.</small></li>
+      braucht es eine D-U-N-S-Nummer und dauert länger. <b>Wird erst für
+      TestFlight und fürs Einreichen gebraucht</b> – zum Bauen und auf dem
+      eigenen iPad Ausprobieren genügt eine gewöhnliche Apple-ID.</small></li>
 
     <li class="tut"><b>Ein Mac — vorhanden</b>
       <small>iMac 24″ mit M3. Apple-Silicon, aktuelles macOS, aktuelles
@@ -360,7 +362,9 @@
 
     <li class="offen"><b>5 · Signieren lassen</b>
       <small>In Xcode „Automatically manage signing“ einschalten. Zertifikate
-      und Bereitstellungsprofile entstehen dann von selbst.</small></li>
+      und Bereitstellungsprofile entstehen dann von selbst – auch mit einer
+      gewöhnlichen Apple-ID. Damit läuft die App sieben Tage auf dem eigenen
+      iPad, was für Zug 1 genügt.</small></li>
 
     <li class="offen"><b>6 · Archivieren und hochladen</b>
       <small><em>Product → Archive</em>, dann <em>Distribute App → App Store
@@ -497,12 +501,48 @@
      wäre es der erste: Er kostet am wenigsten, hilft dem Stift sofort und
      wiegt bei 4.2 am schwersten.</p>
 
-  <p class="note"><strong>Die Reihenfolge ist nicht beliebig.</strong> Solange
-     der Händlerstatus nicht entschieden ist, lohnt keiner der anderen Schritte
-     – er kostet als einziger nichts als eine Entscheidung, und ohne ihn geht
-     in der EU nichts. Danach das Konto, dann Xcode auf den iMac, dann ein
-     nativer Rahmen für <em>eine</em> App als Probe. Erst wenn die durch die
-     Prüfung ist, weiß man, was die anderen beiden kosten.</p>
+  <h2 id="reihenfolge">In welcher Reihenfolge</h2>
+
+  <p>Erst das Technische klären, das Administrative zum Schluss. Das geht,
+     und es geht sogar günstiger als gedacht – denn <b>der erste Zug kostet
+     nichts</b>.</p>
+
+  <h3>Zug 1 · Ausprobieren, ohne einen Cent</h3>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="tut"><b>Man braucht das Developer Program noch nicht</b>
+      <small>Xcode signiert auch mit einer gewöhnlichen Apple-ID, kostenlos.
+      Die App landet damit per Kabel auf dem eigenen iPad und läuft dort
+      sieben Tage, danach muss neu signiert werden. Zum Prüfen reicht das
+      vollkommen – und genau das ist der Zug, in dem sich alle technischen
+      Fragen beantworten.</small></li>
+    <li class="offen"><b>Was sich dabei klärt</b>
+      <small>Läuft die App im Rahmen überhaupt? Funktioniert das Teilen-Blatt?
+      Was macht der Druckbogen? Wie fühlt sich der Apple Pencil an? Bleibt
+      alles beim Flugmodus stehen? Das sind die Fragen, an denen es scheitern
+      könnte – und keine davon kostet Geld.</small></li>
+  </ul>
+  </div>
+
+  <h3>Zug 2 · Erst dann bezahlen</h3>
+
+  <p>Das Developer Program (99 € im Jahr) wird für zwei Dinge gebraucht, und
+     erst dann: <b>TestFlight</b> – die App drahtlos auf andere Geräte bringen
+     – und das <b>Einreichen</b> selbst. Wer in Zug 1 gesehen hat, dass es
+     trägt, gibt das Geld mit Grund aus.</p>
+
+  <h3>Zug 3 · Das Administrative</h3>
+
+  <p>Händlerstatus, Verträge, Steuer- und Bankdaten, Support-Adresse,
+     Datenschutzerklärung ins Netz. Nichts davon ist schwierig, und nichts
+     davon hält den Bau auf.</p>
+
+  <p class="note"><strong>Eines bleibt zu bedenken, aber es ist entschieden.</strong>
+     Der Händlerstatus steht am Ende, weil er Verwaltung ist – nicht, weil er
+     harmlos wäre: Name, Anschrift und Telefonnummer stehen danach öffentlich
+     auf jeder Produktseite. Wer das weiß und will, kann ihn getrost zuletzt
+     erledigen. Er ist nur die letzte Tür, nicht die erste.</p>
 
   <footer>
     Die Regeln des App Store ändern sich. Was hier steht, ist der Stand nach
