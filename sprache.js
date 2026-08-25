@@ -150,6 +150,11 @@ var Sprache = (function () {
     'Die Datei ließ sich nicht lesen.': 'The file could not be read.',
     'Das ist keine Sicherung des Mandala Ateliers.':
       'That is not a Mandala Atelier backup.',
+    /* Die Zahl in der Galerie: „3 Werke". Sie stand nur da, wenn schon etwas
+       darin lag - deshalb ist sie dem ersten Durchgang ueber die fertige
+       Seite entgangen. tools/pruef-uebersetzt.js hat sie gefunden. */
+    ' Werk':                      ' piece',
+    ' Werke':                     ' pieces',
     ' Werk eingelesen.':          ' piece read in.',
     ' Werke eingelesen.':         ' pieces read in.',
     'Alles aus der Sicherung war schon vorhanden.':
