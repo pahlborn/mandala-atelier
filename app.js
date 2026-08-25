@@ -2350,7 +2350,7 @@ function renderWorks() {
   ui.works.textContent = '';
   ui.galleryEmpty.hidden = works.length > 0;
   ui.galleryCount.textContent = works.length
-    ? works.length + (works.length === 1 ? ' Werk' : ' Werke')
+    ? works.length + (works.length === 1 ? T(' Werk') : T(' Werke'))
     : '';
 
   works.forEach(function (work) {
