@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Die Texte auf Englisch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Beschreibungen und Anleitungen der drei Apps auf Englisch – Entwurf zur Durchsicht.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Die englische Fassung der Store-Texte.
+
+  Das Deutsche steht in docs/store-texte.md und bleibt die Quelle. Hier steht
+  nur, was daraus auf Englisch geworden ist – und zwar als ENTWURF. Nichts
+  davon ist beschlossen; bei diesen Texten hängt viel am Ton, und der
+  überlebt eine Übersetzung nicht von selbst.
+
+  Warum eine eigene Seite und keine zweite .md-Datei: Eine Markdown-Datei
+  liest sich auf dem iPad als Rohtext. Diese Seite kann man ansehen.
+
+  Aufbau je App:
+    - die Felder für App Store Connect, mit gezählten Zeichen
+    - Beschreibung
+    - Anleitung
+    - was an der Übersetzung diskutabel ist
+
+  Die Zeichenzahlen sind gezählt, nicht geschätzt: tools/pruef-englisch.js
+  liest diese Seite und meldet jedes Feld, das über seiner Grenze liegt.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut:  #2f6b45;
+    --offen:#a9700a;
+    --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 800px; margin: 0 auto; }
+
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 {
+    font-size: 13px; margin: 3rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+    border-top: 1px solid var(--edge); padding-top: 1.6rem;
+  }
+  h3 { font-size: 17px; margin: 1.8rem 0 .5rem; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.8rem; }
+  a { color: inherit; }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.4rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  .karte {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px 18px 4px;
+    margin-bottom: 1.4rem;
+  }
+
+  /* ---------- Der englische Text ---------------------------------------
+     Bekommt eine eigene Fläche, damit beim Lesen nie unklar ist, was
+     Fassung und was Kommentar ist. */
+
+  .en {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px clamp(16px, 3vw, 24px);
+    margin: 0 0 1.4rem;
+  }
+  .en p { margin: 0 0 .9rem; }
+  .en p:last-child { margin-bottom: 0; }
+  .en ul { margin: 0 0 .9rem; padding-left: 1.2rem; }
+  .en li { margin-bottom: .25rem; }
+  .en .schritt { margin-bottom: .9rem; }
+
+  /* ---------- Die Feldtabelle ------------------------------------------ */
+
+  .rollt { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1.4rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--edge);
+           vertical-align: top; }
+  th { font-weight: 600; color: var(--quiet); font-size: 13px;
+       text-transform: uppercase; letter-spacing: .04em; }
+  td.feld { color: var(--quiet); white-space: nowrap; }
+  .zahl { font-size: 13px; color: var(--quiet); display: block; }
+  .zahl.eng { color: var(--offen); }
+  .zahl.drueber { color: var(--stop); font-weight: 600; }
+
+  /* ---------- Der Stand ------------------------------------------------ */
+
+  ul.tun { list-style: none; margin: 0 0 1.4rem; padding: 0; }
+  ul.tun li {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: 0 10px;
+    padding: 11px 0; border-bottom: 1px solid var(--edge);
+  }
+  ul.tun li:last-child { border-bottom: 0; }
+  ul.tun li::before { grid-row: 1 / span 2; font-size: 15px; line-height: 1.5; text-align: center; }
+  li.tut::before   { content: '✓'; color: var(--tut); font-weight: 700; }
+  li.offen::before { content: '○'; color: var(--offen); }
+  li.stop::before  { content: '!'; color: var(--stop); font-weight: 700; }
+  li.tut { color: var(--quiet); }
+  li.tut b { color: var(--ink); font-weight: 600; }
+  ul.tun small { grid-column: 2; display: block; margin-top: 3px;
+                 font-size: 14px; color: var(--quiet); }
+
+  footer { margin-top: 3rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Die Texte auf Englisch</h1>
+  <p class="lede">Beschreibungen und Anleitungen der drei Apps, übersetzt.
+     <b>Ein Entwurf, kein Beschluss</b> – bei diesen Texten hängt viel am Ton,
+     und der überlebt eine Übersetzung nicht von selbst.</p>
+
+  <p class="note"><strong>Das Deutsche bleibt die Quelle.</strong> Es steht in
+     <a href="store-texte.md"><code>store-texte.md</code></a>; ändert sich dort
+     etwas, muss es hier nachgezogen werden. Was noch zu tun bleibt, steht auf
+     <a href="veroeffentlichen.html">Bis in den Store</a>.</p>
+
+  <h2>Wo die Sprachen stehen</h2>
+
+  <div class="rollt">
+    <table>
+      <tr>
+        <th>App</th><th>Name, Untertitel</th><th>Beschreibung</th>
+        <th>Anleitung</th><th>App selbst</th>
+      </tr>
+      <tr>
+        <td>Mandala Atelier</td>
+        <td style="color:var(--tut)">englisch</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--stop)">nur deutsch</td>
+      </tr>
+      <tr>
+        <td>Das ruhige Blatt</td>
+        <td style="color:var(--tut)">englisch</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--stop)">nur deutsch</td>
+      </tr>
+      <tr>
+        <td>Malstudio</td>
+        <td style="color:var(--tut)">englisch</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--offen)">Entwurf</td>
+        <td style="color:var(--tut)">umschaltbar</td>
+      </tr>
+    </table>
+  </div>
+
+  <p class="note"><strong>Die letzte Spalte ist die unangenehme.</strong> Ein
+     englischer Store-Text führt zu einer App, die auf Deutsch spricht. Bei den
+     beiden Ateliers steht in <code>index.html</code> fest
+     <code>lang="de"</code>, und im Code gibt es nichts, was Texte je nach
+     Sprache austauscht – kein Wörterbuch, keine Abfrage von
+     <code>navigator.language</code>. Beim ruhigen Blatt sind es zwar nur eine
+     Handvoll Sätze, aber gerade dort trägt jeder einzelne. Für das Malstudio
+     ist die Umschaltbarkeit von <em>Ihnen</em> angegeben; nachprüfen kann ich
+     sie hier nicht, die App liegt in einem anderen Repository.</p>
+
+  <p class="note"><strong>Was Apple verlangt und was nicht.</strong> Ein
+     englischer Name genügt, um weltweit zu erscheinen – die Beschreibung darf
+     deutsch bleiben. Nur bringt das wenig: Wer im US-Store
+     <em>Mandala&nbsp;– The Quiet Leaf</em> findet und dann deutschen Text
+     liest, lädt sie nicht. Und eine App, deren Wirkung an vier deutschen
+     Sätzen hängt, gäbe einem englischen Käufer nicht das, was der Store ihm
+     versprochen hat.</p>
+
+
+  <!-- ==================== 1 · Mandala Atelier ==================== -->
+
+  <h2>1 · Mandala Atelier</h2>
+
+  <div class="rollt">
+    <table>
+      <tr><th>Feld</th><th>Deutsch</th><th>Englisch</th></tr>
+      <tr>
+        <td class="feld">Name</td>
+        <td>Mandala Atelier<span class="zahl">15/30</span></td>
+        <td>Mandala Atelier<span class="zahl eng">15/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Untertitel</td>
+        <td>Eine Linie, ein ganzer Kranz<span class="zahl">28/30</span></td>
+        <td>A line becomes a wreath<span class="zahl eng">23/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Werbetext</td>
+        <td>Ein Strich, ringsum gespiegelt – und aus einer Handbewegung wird
+            ein Kranz.<span class="zahl">75/170</span></td>
+        <td>One stroke, mirrored all the way round – and a movement of the
+            hand becomes a wreath.<span class="zahl eng">85/170</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Schlüsselwörter</td>
+        <td>Mandala, Symmetrie, Ausmalen, Zeichnen, Meditation, Achtsamkeit,
+            Muster, Offline<span class="zahl">80/100</span></td>
+        <td>mandala, symmetry, coloring, drawing, meditation, mindfulness,
+            pattern, offline<span class="zahl eng">79/100</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>Description</h3>
+
+  <div class="en" lang="en">
+    <p><b>Make a mark. Draw a line. See what it becomes.</b></p>
+
+    <p>Mandala Atelier is not a colouring book. It is an instrument for
+       symmetry.</p>
+
+    <p>You set down a dot, a line or a shape — and the atelier turns it into a
+       pattern. Out of something simple, something manifold comes about in a
+       few moments. You need no skill for it: the order is given to you.</p>
+
+    <p>How often is yours to decide. Six axes, eight, ten, twelve, sixteen or
+       twenty-four — and, if you want it, a mirroring that doubles every
+       movement once more. A single stroke can appear forty-eight times.</p>
+
+    <p>And you are allowed to discard. Twenty steps back, everything can be
+       undone and done again — trying costs nothing here.</p>
+
+    <p>This is not about being finished quickly. There is no right and no
+       wrong. You draw with your finger or with the Apple Pencil, slowly or on
+       impulse, exactly or freely.</p>
+
+    <p><b>Or you begin with a blank sheet.</b> Symmetry only, no template —
+       then every form comes from you, and the atelier multiplies it. That is
+       how motifs of your own come about, from the ground up.</p>
+
+    <p>If you would rather colour than draw, take one of the 26 templates. One
+       tap sets colour into a field — and into all the other segments at the
+       same time. The motifs lie in five worlds: geometric and classical,
+       nature, Zen and mindfulness, the seasons, and a kids' corner.</p>
+
+    <p>Crooked circles are a matter of the tool, not of talent. The
+       <i>Shape</i> tool therefore sets exactly the same five building blocks
+       the templates are made of, and sets them precisely: ring, spoke, leaf,
+       diamond, band.</p>
+
+    <p>The colours are muted, and they carry names: terracotta, ochre, petrol,
+       moss, mist blue, sand, rust. Five colour worlds of fourteen pigments
+       each — Earth Pigments, Northern Light, Dyer's Garden, Smoked Glass —
+       and one you mix yourself.</p>
+
+    <p><b>No gamification.</b> No stars, no trophies, no streaks. Whoever
+       paints here wants to switch off, not to win.</p>
+
+    <p>Whatever is finished is given a title and stays in the gallery on your
+       device. You can save it as a picture or print it on A4 — the lines
+       alone, if you like, to colour in with real pencils.</p>
+
+    <p>No account. No advertising. No network. Nothing that comes about here
+       leaves your device.</p>
+
+    <p><b>In the atelier</b></p>
+    <ul>
+      <li><b>Blank sheet</b> — symmetry only, no template: motifs of your own
+          from the ground up</li>
+      <li>Number of axes freely chosen: 6, 8, 10, 12, 16 or 24</li>
+      <li>Mirroring can be switched on — up to 48 repetitions of one
+          movement</li>
+      <li>Filling works on all axes at once, or on a single one</li>
+      <li>26 templates in five worlds</li>
+      <li>Drawing with the finger or the Apple Pencil</li>
+      <li>Pen, fill, shapes (ring, spoke, leaf, diamond, band), eraser</li>
+      <li>Undo and redo, twenty steps deep</li>
+      <li>Five colour worlds of 14 muted pigments each, and one of your own</li>
+      <li>Light and dark</li>
+      <li>Zooming and panning with two fingers</li>
+      <li>Gallery on the device, every piece with a title</li>
+      <li>Print sheet in A4</li>
+      <li>Backup as a file — and with it the way onto a second device</li>
+      <li>Several people on one iPad, each with their own pieces</li>
+      <li>Full screen: the controls step back</li>
+    </ul>
+
+    <p>Make your own room out of an empty surface.</p>
+  </div>
+
+  <h3>How it goes</h3>
+
+  <div class="en" lang="en">
+    <p class="schritt"><b>1 · Choose your mandala.</b> One that speaks to you.
+       There are simple ones and very dense ones. You don't have to know which
+       is the right one. At the very top is the <b>blank sheet</b> — if you
+       would rather begin with nothing.</p>
+
+    <p class="schritt"><b>2 · Begin at your own pace.</b> Touch a surface or a
+       line. Finger or Apple Pencil, both work. There is no set path through
+       the mandala.</p>
+
+    <p class="schritt"><b>3 · Let the pattern come about.</b> Draw a stroke and
+       see what happens all around it. A small movement becomes a large form.
+       You don't have to know beforehand what it should turn into.</p>
+
+    <p class="schritt"><b>4 · Play with colour.</b> Choose one, try it, change
+       it again. Combine — or stay with a few on purpose. There is no wrong
+       colour.</p>
+
+    <p class="schritt"><b>5 · Take your time.</b> A single surface carefully,
+       or many areas on impulse. If your attention wanders off, simply come
+       back to the next line.</p>
+
+    <p class="schritt"><b>6 · Lay the piece in the gallery.</b> It is given a
+       title and stays on the device. From there you can save it as a picture
+       or print it.</p>
+
+    <p class="schritt"><b>7 · There is no finished mandala.</b> Perhaps at some
+       point it is exactly right. Perhaps it stays as it is. The way through
+       the mandala matters more than its end.</p>
+  </div>
+
+  <h3>Was daran diskutabel ist</h3>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="offen"><b><i>Atelier</i> bleibt stehen</b>
+      <small>Das Wort ist im Englischen geläufig und trägt dieselbe
+      Werkstattbedeutung. <i>Studio</i> wäre die nüchterne Alternative, nimmt
+      dem Namen aber die Handschrift – und der Name ist bereits
+      entschieden.</small></li>
+    <li class="offen"><b><i>colouring</i> oder <i>coloring</i>?</b>
+      <small>Der Fließtext ist britisch geschrieben, weil <i>colour</i> und
+      <i>atelier</i> zusammen einen ruhigeren Ton geben. Die Schlüsselwörter
+      stehen dagegen amerikanisch (<i>coloring</i>) – dort zählt, wonach
+      gesucht wird, und der größte Store ist der amerikanische. Diese
+      Ungleichheit ist Absicht, keine Nachlässigkeit. Wer sie nicht mag,
+      vereinheitlicht auf amerikanisch.</small></li>
+    <li class="offen"><b>„Die Ordnung wird dir geschenkt"</b>
+      <small>Wörtlich <i>the order is given to you as a gift</i> – im
+      Englischen zu feierlich. Steht jetzt als <i>the order is given to
+      you</i>. Das Geschenkhafte geht dabei verloren; einen Ersatz, der nicht
+      pathetisch klingt, habe ich nicht gefunden.</small></li>
+  </ul>
+  </div>
+
+
+  <!-- ==================== 2 · The Quiet Leaf ==================== -->
+
+  <h2>2 · Mandala – The Quiet Leaf</h2>
+
+  <div class="rollt">
+    <table>
+      <tr><th>Feld</th><th>Deutsch</th><th>Englisch</th></tr>
+      <tr>
+        <td class="feld">Name</td>
+        <td>Mandala – Das ruhige Blatt<span class="zahl">26/30</span></td>
+        <td>Mandala – The Quiet Leaf<span class="zahl eng">24/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Untertitel</td>
+        <td>Streichen, bis etwas erscheint<span class="zahl">30/30</span></td>
+        <td>Rub until something appears<span class="zahl eng">27/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Werbetext</td>
+        <td>Ein Raum für Farbe und Ruhe.<span class="zahl">28/170</span></td>
+        <td>A room for colour and quiet.<span class="zahl eng">28/170</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Schlüsselwörter</td>
+        <td>Frottage, Reiben, Relief, Achtsamkeit, ruhig, Muster, Papier,
+            Offline<span class="zahl">69/100</span></td>
+        <td>frottage, rubbing, relief, mindfulness, calm, pattern, paper,
+            offline<span class="zahl eng">69/100</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>Description</h3>
+
+  <div class="en" lang="en">
+    <p><b>Take your time. Rub across the sheet. Let something come out.</b></p>
+
+    <p>The second atelier works the other way round from the first. There, a
+       movement of the hand becomes a wreath. Here nothing is multiplied: the
+       picture already lies in the sheet, and you bring it out.</p>
+
+    <p>You are given an empty sheet. You rub across it with your finger, and
+       under your hand a drawing comes to light — the way one rubbed a coin
+       through paper as a child. It doesn't come faster if you press. Only if
+       you stay.</p>
+
+    <p>It is not about laying the sheet bare as quickly as possible. There is
+       no right and no wrong, and no “done” that has to be reached.</p>
+
+    <p>The movement is the whole of the controls. No pen, no toolbar, no
+       decision beforehand. Nine pigments lie ready under the sheet; it takes
+       no more than that.</p>
+
+    <p>The sheet gives you a frame: a centre, recurring forms, and an order
+       you can move freely inside. What lies within it you did not pick out —
+       and that is exactly what takes the decision away from the
+       beginning.</p>
+
+    <p><b>Rubbing has a sound</b>, and the app makes it audible: filtered
+       noise whose brightness and loudness hang on the speed of your hand —
+       the sound of graphite on paper. There is no set rhythm. Whoever goes in
+       a circle makes a period, and hears themselves doing it. Can be switched
+       off.</p>
+
+    <p>The atelier is neither a competition nor a task.</p>
+
+    <p>You don't have to perform.<br>
+       You don't have to reach anything.<br>
+       You don't even have to rub the sheet to the end.</p>
+
+    <p>You can stop at any time and come back later. The sheet will still be
+       lying there the way you left it.</p>
+
+    <p><b>In the atelier</b></p>
+    <ul>
+      <li>Four kinds, for whatever you feel like today: Quiet, Bloom, Clarity,
+          Abundance</li>
+      <li>Every sheet is made anew — no catalogue, no repetition</li>
+      <li>Four pigment worlds of nine colours each: Earth Pigments, Northern
+          Light, Dyer's Garden, Smoked Glass</li>
+      <li>Rubbing with the finger or the Apple Pencil</li>
+      <li>Sound that hangs on the speed of the hand — can be switched off</li>
+      <li>Day and night: at night a tinted paper with pale chalk lying on
+          it</li>
+      <li>Laying a sheet aside and taking it up again — the stack stays</li>
+      <li>A quiet surface that steps back: the controls sit behind a small
+          mark in the corner</li>
+      <li>No account, no advertising, no network</li>
+    </ul>
+
+    <p><b>One tip.</b> On bare glass the finger only glides. Whoever has a
+       matte film on their iPad — one that feels like paper — will feel the
+       resistance while rubbing, and the app becomes a different one. It is
+       worth it.</p>
+
+    <p>Make your own room out of an empty sheet.</p>
+  </div>
+
+  <h3>How it goes</h3>
+
+  <div class="en" lang="en">
+    <p class="schritt"><b>1 · Take a sheet.</b> You are only asked what you
+       feel like today — Quiet, Bloom, Clarity or Abundance. Which picture
+       lies underneath, you find out by rubbing. You don't have to know which
+       is the right one for you.</p>
+
+    <p class="schritt"><b>2 · Begin at your own pace.</b> Lay your finger down
+       and rub. Finger or Apple Pencil, both work. There is no set path across
+       the sheet.</p>
+
+    <p class="schritt"><b>3 · Let the picture come out.</b> It doesn't come
+       faster if you press — only if you stay. Out of many single strokes, a
+       drawing that hangs together gradually forms. You don't have to think
+       about what it should turn into.</p>
+
+    <p class="schritt"><b>4 · Change the pigment.</b> Nine lie ready. Take one,
+       try it, take another. Or stay with a single one on purpose. There is no
+       wrong colour.</p>
+
+    <p class="schritt"><b>5 · Take your time.</b> You can work one place out
+       carefully, or go across the whole sheet in wide sweeps. If you notice
+       your attention wandering off, listen to the sound — it follows your
+       hand.</p>
+
+    <p class="schritt"><b>6 · Break off whenever you like.</b> The sheet stays
+       lying there, even across a restart. If you want, lay it aside and take
+       it back out of the stack later. Or begin a new one.</p>
+
+    <p class="schritt"><b>7 · There is no finished sheet.</b> A sheet can keep
+       changing as long as you work on it. Perhaps at some point it is exactly
+       right. Perhaps you will want to rub on tomorrow. Perhaps it stays as it
+       is. The way across the sheet matters more than its end.</p>
+  </div>
+
+  <h3>Was daran diskutabel ist</h3>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="stop"><b><i>Leaf</i> ist die schwächste Stelle der Übersetzung</b>
+      <small>Das deutsche „Blatt" ist beides zugleich: das Papier und das
+      Pflanzenblatt, und die App lebt von genau dieser Doppeldeutigkeit.
+      <i>Leaf</i> hat sie im Englischen auch – aber schwächer: Für Papier ist
+      es dort altertümlich (<i>a leaf of a book</i>). <i>Page</i> träfe das
+      Papier genau und verlöre die Pflanze ganz. Beide Namen sind im US-Store
+      frei. <b>Das ist eine Entscheidung, keine Übersetzungsfrage.</b></small></li>
+    <li class="offen"><b>„Du musst nichts leisten"</b>
+      <small>Steht als <i>You don't have to perform.</i> Wörtlicher wäre
+      <i>achieve</i>, aber das steht schon in der nächsten Zeile
+      (<i>reach anything</i>). <i>Perform</i> trifft daneben den Beiklang von
+      Leistung, um den es geht.</small></li>
+    <li class="offen"><b>Die Namen der vier Blätter</b>
+      <small>Ruhe, Blüte, Klarheit, Fülle stehen als Quiet, Bloom, Clarity,
+      Abundance. <i>Abundance</i> ist das unsicherste – es klingt im
+      Englischen leicht nach Ratgeberliteratur. <i>Fullness</i> wäre nüchtern,
+      aber im Zusammenhang mit Bildern missverständlich.</small></li>
+    <li class="offen"><b>Diese vier Namen stehen auch <em>in</em> der App</b>
+      <small>Und dort sind sie deutsch. Wer den englischen Store-Text liest
+      und dann „Ruhe, Blüte, Klarheit, Fülle" vorfindet, findet nichts
+      wieder.</small></li>
+  </ul>
+  </div>
+
+
+  <!-- ==================== 3 · Summer by the Sea ==================== -->
+
+  <h2>3 · Summer by the Sea</h2>
+
+  <div class="rollt">
+    <table>
+      <tr><th>Feld</th><th>Deutsch</th><th>Englisch</th></tr>
+      <tr>
+        <td class="feld">Name</td>
+        <td>Sommer am Meer – Malstudio<span class="zahl">26/30</span></td>
+        <td>Summer by the Sea<span class="zahl eng">17/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Untertitel</td>
+        <td>Schritt für Schritt malen<span class="zahl">25/30</span></td>
+        <td>Learn to draw, step by step<span class="zahl eng">27/30</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Werbetext</td>
+        <td>Zwanzig Motive gemalt – dann geht die Schatzkiste auf, und der
+            Schatz liegt wirklich am Strand.<span class="zahl">95/170</span></td>
+        <td>Twenty motifs drawn – then the treasure chest opens, and the
+            treasure really is on the beach.<span class="zahl eng">93/170</span></td>
+      </tr>
+      <tr>
+        <td class="feld">Schlüsselwörter</td>
+        <td>Malen, Kinder, zeichnen lernen, Schritt für Schritt, Schatzsuche,
+            Urlaub, Strand, Meer, Ausmalen, Sticker,
+            Offline<span class="zahl drueber">114/100 – über der Grenze</span></td>
+        <td>drawing, kids, learn to draw, step by step, treasure hunt,
+            beach, sea, coloring, stickers,
+            offline<span class="zahl eng">98/100</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <p class="note"><strong>Die deutsche Zeile ist zu lang</strong> – 114 Zeichen
+     bei 100 erlaubten, nachgezählt. Drei Begriffe müssen weg, bevor
+     eingereicht wird. Die englische stand zuerst bei 107 und liegt jetzt bei
+     98; herausgenommen ist <em>holiday</em>, weil <em>beach</em> und
+     <em>sea</em> dasselbe Bild schon tragen.</p>
+
+  <p class="note"><strong>Zehn Zeichen liegen noch herum.</strong> Alle
+     Schlüsselwortzeilen sind hier mit Komma <em>und</em> Leerzeichen gezählt,
+     so wie sie in <a href="store-texte.md"><code>store-texte.md</code></a>
+     stehen. In das Feld gehören sie ohne Leerzeichen – die zählen mit, und
+     ohne sie werden aus 114 deutschen Zeichen 104. <em>Auch das ist noch
+     über der Grenze</em>, aber es fehlt dann nur noch ein Begriff statt
+     drei.</p>
+
+  <h3>Description</h3>
+
+  <div class="en" lang="en">
+    <p><b>A child, an iPad, a day at the beach — and suddenly an hour has gone
+       by.</b></p>
+
+    <p>In the studio your child learns to draw. Not from instructions in a
+       book, but stroke by stroke: the template stands on the left, and the
+       stroke whose turn it is glows red. On the right the child draws it.
+       Five or six steps later, out of nothing, a dolphin has come about — and
+       the child drew it themselves.</p>
+
+    <p>That is the moment this is all about.</p>
+
+    <p><b>29 motifs, from easy to tricky.</b> Heart, shell and ice cream to
+       begin with. Dolphin, lighthouse and seahorse once it is going better.
+       Pirate ship, octopus and rocket for those who can already do it.
+       Whoever would rather colour in than copy switches over and gets the
+       same motifs as finished outlines.</p>
+
+    <p><b>And then there is the treasure hunt.</b></p>
+
+    <p>Here it turns serious — in the nicest sense. You hide something real: a
+       shell, a voucher for an ice cream, a small surprise. In the parents'
+       area you enter where it is, along with a photo and a clue.</p>
+
+    <p>Once your child has drawn twenty different motifs, the treasure chest
+       opens: with your photo, your clue and a button — <i>“I'll show you the
+       way.”</i> Then a child runs across the beach looking for a treasure
+       they have earned. Nobody forgets that in a hurry.</p>
+
+    <p>Whoever doesn't want to wait unlocks the map in the parents' area
+       straight away.</p>
+
+    <p><b>What children love as well</b></p>
+    <ul>
+      <li>Medals for five, ten and twenty motifs — bronze, silver, gold</li>
+      <li>Eight levels, from <i>Beach Child</i> to <i>Ocean Child</i></li>
+      <li>A collector's album with stickers</li>
+      <li>A friendly voice that reads out every step</li>
+      <li>Quiet music and the sound of the sea in the background</li>
+      <li>Inventing a motif of your own and setting the steps yourself</li>
+      <li>A gallery where every finished picture stays</li>
+    </ul>
+
+    <p><b>And what puts parents at ease</b></p>
+    <ul>
+      <li>Runs without a network — on the plane, on the beach, in the car</li>
+      <li>No advertising. No purchases inside the app. No chat. No
+          account.</li>
+      <li>Nothing leaves the device — not even the child's first name</li>
+      <li>Several children, each with their own profile and their own
+          gallery</li>
+      <li>German and English, switchable</li>
+    </ul>
+
+    <p><b>Where the motifs come from.</b> From Albarella, an island in the Po
+       delta: seahorse, crab, flamingo, white poplar. Along with a small part
+       to learn from — why the island is called that, where its sand comes
+       from. Whoever holidays there will find it again. Whoever doesn't gets
+       to know an island.</p>
+
+    <p>For children from about five years old.</p>
+  </div>
+
+  <h3>How it goes</h3>
+
+  <div class="en" lang="en">
+    <p class="schritt"><b>1 · Who is drawing today?</b> Tap your name. If you
+       don't have one yet, tap <b>New child</b>, write your name and pick an
+       animal. Every child has their own studio — your pictures stay
+       yours.</p>
+
+    <p class="schritt"><b>2 · Find yourself a motif.</b> The easy ones are at
+       the very top: heart, shell, ice cream. Further down it gets trickier —
+       dolphin, lighthouse, pirate ship. Start wherever you like.</p>
+
+    <p class="schritt"><b>3 · Draw the red stroke.</b> On the left you see the
+       template. One stroke in it glows red: that one's turn it is. Draw it on
+       your sheet on the right. That is all there is to it.</p>
+
+    <p class="schritt"><b>4 · Then the next one.</b> Tap <b>Next</b>, and the
+       next stroke lights up. After five or six steps your picture is
+       finished. Something slipped? <b>Back</b> takes the last stroke away,
+       the eraser does the rest.</p>
+
+    <p class="schritt"><b>5 · Take your time with the colours.</b> Thirty-six
+       lie ready, along with four pen widths. With the <b>bucket</b> you fill
+       a whole area, with <b>magic</b> it turns colourful. There is no wrong
+       colour.</p>
+
+    <p class="schritt"><b>6 · Lay your picture in the gallery.</b> It stays
+       lying there, and you can look at it again whenever you like. Whoever
+       would rather colour in than copy switches to <b>Colour in</b> at the
+       top — the same motifs, already as outlines.</p>
+
+    <p class="schritt"><b>7 · And then comes the collecting.</b> For five
+       motifs there is bronze, for ten silver, for twenty gold. Along with
+       stickers for your album, and you move up — from Beach Child to Ocean
+       Child.</p>
+
+    <p class="schritt"><b>For parents: the treasure hunt.</b> Once the child
+       has drawn twenty different motifs, the treasure island opens. Before
+       that, enter a place, a photo and a clue under the gear wheel at the top
+       — then the treasure chest shows the child the way to something you have
+       really hidden. Whoever doesn't want to wait presses and holds the
+       treasure-island button; then the map is open straight away.</p>
+  </div>
+
+  <h3>Was daran diskutabel ist</h3>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="stop"><b>Der Name verliert das Malstudio</b>
+      <small><i>Summer by the Sea</i> sagt nicht mehr, dass gemalt wird – das
+      steht nur noch im Untertitel. Auf Deutsch trägt „Malstudio" es im Namen.
+      <i>Summer by the Sea – Art Studio</i> wären 33 Zeichen und damit über
+      der Grenze. Nachgeprüft ist nur die Verfügbarkeit von <i>Summer by the
+      Sea</i>; eine kürzere Variante mit <i>Draw</i> darin wäre neu zu
+      prüfen.</small></li>
+    <li class="offen"><b>Die Motivnamen stehen <em>in</em> der App</b>
+      <small>Delfin, Leuchtturm, Seepferdchen – hier übersetzt, aber ob die
+      App sie auf Englisch führt, kann ich nicht nachsehen: Sie liegt in
+      <code>pahlborn/malstudio</code>. <b>Vor dem Einreichen abgleichen</b>,
+      sonst verspricht der Store Namen, die das Kind nicht
+      vorfindet.</small></li>
+    <li class="offen"><b><i>Beach Child</i> und <i>Ocean Child</i></b>
+      <small>Wörtlich richtig, klingt aber steifer als „Strandkind". Die
+      Stufennamen stehen ebenfalls in der App und müssten dort
+      übereinstimmen.</small></li>
+    <li class="offen"><b>„Wissensteil" → <i>a small part to learn from</i></b>
+      <small>Umständlich. <i>A little island lore</i> wäre schöner, ist aber
+      freier, als ich ohne Rückfrage gehen wollte.</small></li>
+  </ul>
+  </div>
+
+
+  <h2>Was danach noch fehlt</h2>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="offen"><b>Die Texte durchsehen und freigeben</b>
+      <small>Nichts hiervon ist beschlossen. Erst wenn Sie sie freigeben,
+      gehören sie in App Store Connect.</small></li>
+    <li class="offen"><b>Zwei Namensentscheidungen</b>
+      <small><i>Leaf</i> oder <i>Page</i> bei der zweiten App, und ob der
+      dritten der Hinweis aufs Malen im Namen fehlen darf.</small></li>
+    <li class="stop"><b>Die Apps selbst sprechen weiter deutsch</b>
+      <small>Die beiden Ateliers haben keine Sprachumschaltung – sie müsste
+      gebaut werden, samt einem Ort, an dem die Sätze liegen. Beim ruhigen
+      Blatt sind es wenige, aber tragende; im Mandala Atelier sind es die
+      Namen von 26 Motiven, fünf Welten und siebzig Pigmenten.</small></li>
+    <li class="offen"><b>Die Datenschutzerklärung</b>
+      <small>Liegt nur auf Deutsch vor. Sie wird je Sprache verlinkt und
+      sollte englisch danebenstehen.</small></li>
+  </ul>
+  </div>
+
+  <footer>
+    Zurück zu <a href="../beide.html">Zwei Ateliers</a> ·
+    <a href="veroeffentlichen.html">Bis in den Store</a> ·
+    <a href="store.html">Attrappe der Store-Seiten</a> ·
+    <a href="store-texte.md">Die Texte auf Deutsch</a>
+  </footer>
+
+</main>
+</body>
+</html>
