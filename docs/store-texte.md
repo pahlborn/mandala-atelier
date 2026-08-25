@@ -18,8 +18,13 @@ bei jeder App unter „Noch offen".
 
 **Die englischen Beschreibungen und Anleitungen** stehen als Entwurf auf einer
 eigenen Seite: [`docs/englisch.html`](englisch.html). Dort ist auch vermerkt,
-was an der Übersetzung diskutabel ist – und dass die beiden Ateliers selbst
-weiterhin nur Deutsch sprechen.
+was an der Übersetzung diskutabel ist.
+
+**Die Apps selbst schalten um.** Im deutschsprachigen Raum laufen sie deutsch,
+überall sonst englisch; ein Knopf in der Bedienung hebt die Erkennung auf.
+Deshalb steht bei allen dreien „Deutsch, Englisch". Nicht umgeschaltet wird der
+Name unter dem Symbol – der kommt aus dem Bundle und braucht in Xcode eine
+eigene `InfoPlist.strings`.
 
 **Zu den Zeichenzahlen.** Sie werden von `node tools/pruef-englisch.js`
 nachgezählt. Beim Werbetext des Mandala Atelier stand hier bisher 74; gezählt
@@ -43,7 +48,7 @@ in das Feld gehören sie ohne, das spart je Begriff ein Zeichen.
 | **Preis** | 4,99 € einmalig – keine Käufe in der App, kein Abo |
 | **Altersfreigabe** | 4+ – keine bedenklichen Inhalte, keine Links nach außen, kein Chat |
 | **Schlüsselwörter** | Mandala, Symmetrie, Ausmalen, Zeichnen, Meditation, Achtsamkeit, Muster, Offline |
-| **Sprachen** | Deutsch |
+| **Sprachen** | Deutsch, Englisch |
 | **Geräte** | iPad und iPhone, Quer- und Hochformat, Apple Pencil |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
 
@@ -118,7 +123,8 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 
 - Neigung des Apple Pencil – steht als offener Punkt im Konzeptpapier und wäre gegenüber Apples Richtlinie 4.2 ein starkes Argument.
 - App-Symbol in 1024 × 1024 **ohne Alphakanal** – die vorhandenen Icons sind alle RGBA und würden abgelehnt.
-- Englische Fassung? Ohne sie bleibt der Store faktisch auf den deutschsprachigen Raum beschränkt.
+- **Die App spricht Englisch.** Deutsch im deutschsprachigen Raum, sonst Englisch – 34 Motive mit Beischrift, sechs Welten, 31 Bereichsnamen und 50 Pigmente. Offen bleibt der Name unter dem Symbol; der kommt aus dem Bundle.
+- **Eine Zahl stimmt nicht.** Unter den Motiven steht in der App „19 Vorlagen in 5 Welten", oben in dieser Beschreibung „26 Vorlagen in fünf Welten". Gezählt am laufenden Programm sind es **34 in 6**. Vor dem Einreichen zu berichtigen – Richtlinie 2.3.1 verlangt zutreffende Angaben.
 **Entschieden – zurückgestellt**
 
 - **Keine Fortsetzen-Funktion.** Ein angefangenes Mandala überlebt den Neustart nicht; die Galerie bewahrt ein fertiges Bild, keinen Arbeitsstand. Das bleibt so – das Atelier hat darin einen anderen Charakter als das zweite, wo das Aufnehmen eines weggelegten Blattes zur Sache gehört. *Der Text verspricht es deshalb nirgends.*
@@ -141,7 +147,7 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 | **Preis** | 6,99 € einmalig – keine Käufe in der App, kein Abo |
 | **Altersfreigabe** | 4+ |
 | **Schlüsselwörter** | Frottage, Reiben, Relief, Achtsamkeit, ruhig, Muster, Papier, Offline |
-| **Sprachen** | Deutsch |
+| **Sprachen** | Deutsch, Englisch |
 | **Geräte** | iPad und iPhone, Quer- und Hochformat |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
 

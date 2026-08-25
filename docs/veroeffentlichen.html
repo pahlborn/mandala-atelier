@@ -231,14 +231,23 @@
       zweiten App, und ob der dritten der Hinweis aufs Malen im Namen fehlen
       darf.</small></li>
 
-    <li class="stop"><b>Die beiden Ateliers sprechen nur Deutsch</b>
-      <small>Sie haben keine Sprachumschaltung: In <code>index.html</code>
-      steht fest <code>lang="de"</code>, und im Code gibt es weder ein
-      Wörterbuch noch eine Abfrage von <code>navigator.language</code>. Ein
-      englischer Store-Text führte also auf eine deutsch sprechende App. Das
-      Malstudio ist laut Ihren Angaben umschaltbar; nachprüfen lässt es sich
-      hier nicht, es liegt in einem anderen Repository. <b>Hält die deutsche
-      Veröffentlichung nicht auf</b> – nur die englische.</small></li>
+    <li class="tut"><b>Die Apps schalten die Sprache um</b>
+      <small>Deutsch im deutschsprachigen Raum, sonst Englisch – entschieden
+      nach <code>navigator.languages</code>, geprüft mit sieben echten
+      Gerätesprachen. Dazu ein Knopf, der immer den Namen der
+      <em>anderen</em> Sprache trägt, für den Fall, dass die Erkennung falsch
+      liegt. Gebaut als <code>sprache.js</code> je App; der deutsche Text ist
+      darin der Schlüssel, damit im Quelltext stehen bleibt, was auf dem Knopf
+      steht. Zum Ansehen: <a href="../index.html?sprache=en">Atelier</a> ·
+      <a href="../atelier3/index.html?sprache=en">Blatt</a>.</small></li>
+
+    <li class="offen"><b>Der Name unter dem Symbol</b>
+      <small>Den schaltet die App nicht um – er kommt aus dem Bundle. In Xcode
+      braucht es eine <code>InfoPlist.strings</code> mit
+      <code>CFBundleDisplayName</code>, deutsch und englisch, und unter
+      <em>General → Localizations</em> Englisch dazu. Sonst meldet App Store
+      Connect die App als einsprachig. Die Schritte stehen in der
+      <code>LIESMICH.md</code> des nativen Ordners.</small></li>
 
     <li class="offen"><b>Datenschutzerklärung auf Englisch</b>
       <small>Sie wird je Sprache verlinkt. Bisher gibt es sie nur auf
@@ -277,11 +286,18 @@
       Rechenmandalas. Das verträgt sich nicht bruchlos mit „für Erwachsene,
       keine Aufgaben“. Zurückgestellt – aber vor dem Einreichen zu
       entscheiden, weil es die Zielgruppe verschiebt.</small></li>
-    <li class="offen"><b>Englisch: die Texte stehen, die App nicht</b>
-      <small>Beschreibung und Anleitung liegen als
-      <a href="englisch.html">Entwurf</a> vor. In der App sind es die Namen
-      von 26 Motiven, fünf Welten und siebzig Pigmenten – von allen dreien der
-      größte Brocken.</small></li>
+    <li class="tut"><b>Englisch: die App spricht es</b>
+      <small>34 Motive mit Beischrift, sechs Welten, 31 Bereichsnamen der
+      Anlagen, 50 Pigmente und die Bedienung. Beschreibung und Anleitung für
+      den Store stehen als <a href="englisch.html">Entwurf</a>
+      daneben.</small></li>
+
+    <li class="stop"><b>„19 Vorlagen in 5 Welten“ stimmt nicht</b>
+      <small>So steht es unter den Motiven; in der Beschreibung stehen „26
+      Vorlagen in fünf Welten“. Gezählt am laufenden Programm sind es
+      <b>34 in 6</b>. Ihr Text, deshalb unverändert gelassen – aber
+      Richtlinie 2.3.1 verlangt zutreffende Angaben, und drei verschiedene
+      Zahlen für dieselbe Sache fallen auf.</small></li>
   </ul>
   </div>
 
@@ -299,6 +315,12 @@
       Alternative wäre, sie mit dem ersten Atelier zusammenzulegen; das
       widerspräche der Gegenprobe. Vier Vorschläge, die aus der Sache selbst
       kommen, stehen unter <a href="#blatt-mehr">F</a>.</small></li>
+    <li class="tut"><b>Englisch: die App spricht es</b>
+      <small>Die Bedienung, die vier Blattarten, 44 Pigmente – und die
+      fünfundzwanzig Sätze, bei denen es darauf ankam: kein „you", kein
+      Imperativ, keiner länger als 45 Zeichen. Der Testlauf zählt beides
+      nach; längster englischer Satz 41 Zeichen.</small></li>
+
     <li class="offen"><b>Englisch: <em>Leaf</em> oder <em>Page</em>?</b>
       <small>Das deutsche „Blatt" ist beides zugleich – das Papier und das
       Pflanzenblatt –, und die App lebt von dieser Doppeldeutigkeit.

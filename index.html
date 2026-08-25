@@ -32,6 +32,9 @@
     <button type="button" class="chip" id="btn-gallery">Galerie</button>
     <button type="button" class="chip" id="btn-fullscreen">Vollbild</button>
     <button type="button" class="chip" id="btn-theme" title="Hell / Dunkel umschalten">Dunkel</button>
+    <!-- Die Sprache richtet sich nach dem Geraet. Dieser Knopf ist fuer den
+         Fall, dass sie falsch liegt, und traegt den Namen der anderen. -->
+    <button type="button" class="chip" id="btn-lang" aria-label="Sprache wählen">English</button>
   </div>
 </header>
 
@@ -86,7 +89,10 @@
       </button>
     </div>
 
-    <div class="quick-shapes" id="quick-shapes" role="group" aria-label="Grundform" hidden>
+    <!-- data-sinn="form" gilt fuer alles darin: "Blatt" ist hier die
+     Grundform (leaf), nicht der Bogen (sheet). -->
+    <div class="quick-shapes" id="quick-shapes" role="group" aria-label="Grundform"
+         data-sinn="form" hidden>
       <button type="button" class="shape is-active" data-shape="ring">Ring</button>
       <button type="button" class="shape" data-shape="spoke">Speiche</button>
       <button type="button" class="shape" data-shape="petal">Blatt</button>
@@ -123,7 +129,7 @@
         <span class="motif-note">Nur Symmetrie, keine Vorlage</span>
       </button>
       <div id="worlds"></div>
-      <p class="drawer-foot">
+      <p class="drawer-foot" data-satz>
         19 Vorlagen in 5 Welten. Ein Motiv setzt die Achsenzahl passend –
         du kannst sie danach jederzeit ändern.
       </p>
@@ -148,7 +154,7 @@
           <button type="button" class="tool" data-tool="shape">Form</button>
           <button type="button" class="tool" data-tool="eraser">Radierer</button>
         </div>
-        <p class="switch-note">
+        <p class="switch-note" data-satz>
           Mit „Form“ entstehen die Grundformen exakt: Ring, Speiche, Blatt,
           Raute und Band – dieselben Bausteine, aus denen auch die Vorlagen
           gemacht sind. Ziehen setzt die Länge, seitlich ziehen die Breite.
@@ -230,18 +236,18 @@
     <button type="button" class="drawer-close" id="btn-gallery-close" aria-label="Galerie schließen">✕</button>
   </header>
   <div class="overlay-body">
-    <p class="empty" id="gallery-empty" hidden>
+    <p class="empty" id="gallery-empty" data-satz hidden>
       Noch nichts abgelegt. Leg ein fertiges Bild über
       „In die Galerie legen“ hierher.
     </p>
     <div class="works" id="works"></div>
     <footer class="overlay-foot">
-      <p>
+      <p data-satz>
         Werke liegen nur auf diesem Gerät. Eine Sicherung ist zugleich der Weg
         auf ein zweites Gerät – sie enthält alle Personen, deren Werke und die
         eigene Farbwelt.
       </p>
-      <p>
+      <p data-satz>
         <b>Sicherung speichern</b> packt alles in eine Datei und öffnet das
         Teilen-Blatt. Dort <b>„In Dateien sichern“</b> wählen – etwa in
         iCloud Drive, dann liegt sie auch auf dem zweiten Gerät bereit.
@@ -278,6 +284,9 @@
   </div>
 </div>
 
+<!-- Zuerst die Sprache, dann die App: app.js ruft T() schon beim Aufbau
+     seiner Daten auf. -->
+<script src="sprache.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

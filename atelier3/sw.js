@@ -9,13 +9,14 @@
    WICHTIG: Bei jedem Release die Version erhöhen.
    ========================================================================== */
 
-const CACHE = 'atelier3-v1-19';
+const CACHE = 'atelier3-v1-20';
 
 const SHELL = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './sprache.js',
   './manifest.webmanifest',
   './icon-72.png',
   './icon-120.png',

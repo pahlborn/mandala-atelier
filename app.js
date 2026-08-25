@@ -186,6 +186,17 @@ const PALETTES = [
   }
 ];
 
+/* Die sichtbaren Namen einmal durch die Sprache ziehen.
+
+   Warum hier und nicht oben an jedem einzelnen Namen: Die Liste ist der
+   Bestand, und ein Bestand liest sich besser ohne Klammern um jeden Eintrag.
+   Was oben steht, ist zugleich der Schlüssel im Wörterbuch – deshalb muss es
+   deutsch bleiben. Übersetzt wird genau einmal, beim Laden. */
+PALETTES.forEach(function (welt) {
+  welt.name = T(welt.name);
+  welt.colors.forEach(function (farbe) { farbe.name = T(farbe.name); });
+});
+
 /* Die sechste Farbwelt gehört dem Haushalt und wird selbst gemischt.
    Sie ist Material wie der Motivkatalog – deshalb gilt sie für alle
    Personen, nicht nur für eine. */
@@ -1580,6 +1591,20 @@ const MOTIFS = [
   }
 ];
 
+/* Welten, Motive und die Bereiche der Anlagen – dieselbe Bewegung wie oben
+   bei den Pigmenten. Die Bereichsnamen stehen unter dem Blatt, sobald die
+   Symmetrie den Bereichen folgt; auch sie werden gelesen. */
+WORLDS.forEach(function (welt) { welt.title = T(welt.title); });
+
+MOTIFS.forEach(function (motiv) {
+  motiv.name = T(motiv.name);
+  motiv.note = T(motiv.note);
+  if (motiv.task) motiv.task = T(motiv.task);
+  if (motiv.zones) {
+    motiv.zones.forEach(function (bereich) { bereich.name = T(bereich.name); });
+  }
+});
+
 /* Gitter für Zähl- und Rechenmandalas: der Rahmen liefert Nabe, Außenring
    und Speichen, hier kommen nur die Bandgrenzen dazu. */
 function gridBuild(pen) {
@@ -1640,8 +1665,8 @@ function makeLegend(motif, fields) {
       value: value,
       hex: pigments()[index % pigments().length].hex,
       text: motif.kind === 'math'
-        ? 'Ergebnis ' + value
-        : value + (value === 1 ? ' Punkt' : ' Punkte')
+        ? T('Ergebnis ') + value
+        : value + (value === 1 ? T(' Punkt') : T(' Punkte'))
     };
   });
 }
@@ -1807,12 +1832,14 @@ function strokeOn(ctx, a, b, erasing) {
    Achsen zugleich gesetzt.
    ------------------------------------------------------------------------- */
 
+/* `T(…, 'form')` und nicht bloß `T(…)`: „Blatt" heißt hier das Blatt am
+   Zweig. Ohne den Sinn käme der Bogen Papier heraus. */
 const SHAPE_NAMES = {
-  ring:    'Ring',
-  spoke:   'Speiche',
-  petal:   'Blatt',
-  diamond: 'Raute',
-  band:    'Band'
+  ring:    T('Ring', 'form'),
+  spoke:   T('Speiche', 'form'),
+  petal:   T('Blatt', 'form'),
+  diamond: T('Raute', 'form'),
+  band:    T('Band', 'form')
 };
 
 function polarOf(point) {
@@ -2288,8 +2315,8 @@ function formatDate(stamp) {
 function keepWork() {
   const work = {
     id: newId(),
-    title: state.motif ? state.motif.name : 'Freies Blatt',
-    motif: state.motif ? state.motif.name : 'Leeres Blatt',
+    title: state.motif ? state.motif.name : T('Freies Blatt'),
+    motif: state.motif ? state.motif.name : T('Leeres Blatt'),
     created: Date.now(),
     person: currentPerson().id,
     thumb: composeImage(280).toDataURL('image/png'),
@@ -2298,11 +2325,11 @@ function keepWork() {
 
   return Gallery.put(work).then(function () {
     say(Gallery.persistent
-      ? 'In die Galerie gelegt.'
-      : 'In die Galerie gelegt – bleibt aber nur, solange die Seite offen ist.');
+      ? T('In die Galerie gelegt.')
+      : T('In die Galerie gelegt – bleibt aber nur, solange die Seite offen ist.'));
     refreshGallery();
   }).catch(function () {
-    say('Das Werk ließ sich nicht ablegen – der Speicher des Geräts ist voll.');
+    say(T('Das Werk ließ sich nicht ablegen – der Speicher des Geräts ist voll.'));
   });
 }
 
@@ -2378,7 +2405,7 @@ function deleteWork() {
 function downloadWork() {
   const work = state.viewing;
   if (!work) return;
-  gibDateiAus(dataUrlZuBlob(work.full), fileName(work.title, work.created), 'Das Bild');
+  gibDateiAus(dataUrlZuBlob(work.full), fileName(work.title, work.created), T('Das Bild'));
 }
 
 function fileName(title, stamp) {
@@ -2433,20 +2460,20 @@ function selectPerson(id) {
 function renderPeople() {
   const person = currentPerson();
   state.person = person.id;
-  ui.galleryHead.textContent = person.name ? 'Galerie von ' + person.name : 'Galerie';
+  ui.galleryHead.textContent = person.name ? T('Galerie von ') + person.name : T('Galerie');
   if (ui.owner.value !== person.name) ui.owner.value = person.name;
 
   ui.personSelect.textContent = '';
   people().forEach(function (p, i) {
     const option = document.createElement('option');
     option.value = p.id;
-    option.textContent = p.name || 'Ohne Namen ' + (i + 1);
+    option.textContent = p.name || T('Ohne Namen ') + (i + 1);
     if (p.id === person.id) option.selected = true;
     ui.personSelect.appendChild(option);
   });
   const add = document.createElement('option');
   add.value = '+';
-  add.textContent = '＋ Neue Person';
+  add.textContent = T('＋ Neue Person');
   ui.personSelect.appendChild(add);
 }
 
@@ -2467,7 +2494,7 @@ function saveBackup() {
     const name = 'mandala-atelier-sicherung-' +
       new Date().toISOString().slice(0, 10) + '.json';
     say(works.length + (works.length === 1 ? ' Werk' : ' Werke') + ' zusammengepackt …');
-    gibDateiAus(blob, name, 'Die Sicherung');
+    gibDateiAus(blob, name, T('Die Sicherung'));
   });
 }
 
@@ -2478,11 +2505,11 @@ function loadBackup(file) {
     try {
       backup = JSON.parse(reader.result);
     } catch (err) {
-      say('Die Datei ließ sich nicht lesen.');
+      say(T('Die Datei ließ sich nicht lesen.'));
       return;
     }
     if (!backup || backup.app !== 'mandala-atelier' || !Array.isArray(backup.works)) {
-      say('Das ist keine Sicherung des Mandala Ateliers.');
+      say(T('Das ist keine Sicherung des Mandala Ateliers.'));
       return;
     }
 
@@ -2515,8 +2542,8 @@ function loadBackup(file) {
         renderPeople();
         return refreshGallery().then(function () {
           say(fresh.length
-            ? fresh.length + (fresh.length === 1 ? ' Werk eingelesen.' : ' Werke eingelesen.')
-            : 'Alles aus der Sicherung war schon vorhanden.');
+            ? fresh.length + (fresh.length === 1 ? T(' Werk eingelesen.') : T(' Werke eingelesen.'))
+            : T('Alles aus der Sicherung war schon vorhanden.'));
         });
       });
     });
@@ -2576,6 +2603,7 @@ function cacheUi() {
   ui.clear      = document.getElementById('btn-clear');
   ui.save       = document.getElementById('btn-save');
   ui.theme      = document.getElementById('btn-theme');
+  ui.lang       = document.getElementById('btn-lang');
   ui.full       = document.getElementById('btn-fullscreen');
   ui.keep       = document.getElementById('btn-keep');
   ui.gallery      = document.getElementById('gallery');
@@ -2714,7 +2742,7 @@ function mixPigment(hex) {
     return c.hex === state.color ? i : found;
   }, -1);
   if (index < 0) return;
-  own.colors[index] = { name: 'Eigen ' + (index + 1), hex: hex };
+  own.colors[index] = { name: T('Eigen ') + (index + 1), hex: hex };
   Store.set('ownPalette', own.colors);
   state.color = hex;
   buildPalette();
@@ -2758,8 +2786,8 @@ function renderLegend() {
   }
   ui.legendBox.hidden = false;
   ui.legendHead.textContent = state.motif && state.motif.kind === 'math'
-    ? 'Farblegende – Ergebnis'
-    : 'Farblegende – Anzahl';
+    ? T('Farblegende – Ergebnis')
+    : T('Farblegende – Anzahl');
 
   state.legend.forEach(function (item) {
     const li = document.createElement('li');
@@ -2886,7 +2914,7 @@ function gibDateiAus(blob, name, wort) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }, 4000);
-    say(wort + ' liegt bei den Downloads.');
+    say(wort + T(' liegt bei den Downloads.'));
   };
 
   if (navigator.canShare && navigator.canShare({ files: [datei] })) {
@@ -2903,7 +2931,7 @@ function gibDateiAus(blob, name, wort) {
 
 function exportImage() {
   const name = fileName(state.motif ? state.motif.name : 'freies Blatt', Date.now());
-  gibDateiAus(dataUrlZuBlob(composeImage(SIZE * 2).toDataURL('image/png')), name, 'Das Bild');
+  gibDateiAus(dataUrlZuBlob(composeImage(SIZE * 2).toDataURL('image/png')), name, T('Das Bild'));
 }
 
 /* Beim allerersten Start: einer bereits gesetzten Vorgabe folgen, sonst der
@@ -2922,9 +2950,9 @@ function preferredTheme() {
    fertige Werk. Gedruckt wird immer auf hellem Grund, auch im Dunkelmodus. */
 function printSheet() {
   const withColour = window.confirm(
-    'Druckbogen erstellen.\n\n' +
-    'OK: mit den gesetzten Farben\n' +
-    'Abbrechen: nur die Linien zum Ausmalen'
+    T('Druckbogen erstellen.\n\n') +
+    T('OK: mit den gesetzten Farben\n') +
+    T('Abbrechen: nur die Linien zum Ausmalen')
   );
 
   const size = 1600;
@@ -2952,10 +2980,10 @@ function printSheet() {
   ctx.drawImage(lines, 0, 0);
 
   const person = currentPerson().name;
-  const title = state.motif ? state.motif.name : 'Freies Blatt';
+  const title = state.motif ? state.motif.name : T('Freies Blatt');
   const frame = window.open('', '_blank');
   if (!frame) {
-    say('Der Browser hat das Druckfenster blockiert.');
+    say(T('Der Browser hat das Druckfenster blockiert.'));
     return;
   }
   frame.document.write(
@@ -2994,7 +3022,7 @@ function setTheme(theme) {
   /* Die Farbe der Systemleiste mitziehen, wo es die Angabe gibt. */
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', palette().paper);
-  ui.theme.textContent = state.theme === 'dunkel' ? 'Hell' : 'Dunkel';
+  ui.theme.textContent = state.theme === 'dunkel' ? T('Hell') : T('Dunkel');
   Store.set('theme', state.theme);
 
   /* Papier und Linien der Vorlage wechseln mit. Eigene Striche behalten ihr
@@ -3054,11 +3082,11 @@ function syncUI() {
   ui.fillAll.checked = state.fillAll;
   ui.fillAll.disabled = isExercise(state.motif);
   ui.fillAllNote.textContent = isExercise(state.motif)
-    ? 'Bei Zähl- und Rechenmandalas wird immer einzeln gefüllt – sonst bekämen '
-      + 'Felder mit verschiedenen Ergebnissen dieselbe Farbe.'
+    ? T('Bei Zähl- und Rechenmandalas wird immer einzeln gefüllt – sonst bekämen ')
+      + T('Felder mit verschiedenen Ergebnissen dieselbe Farbe.')
     : (state.fillAll
-        ? 'Ein Tipp färbt alle gleichwertigen Felder zugleich.'
-        : 'Ein Tipp färbt nur das angetippte Feld.');
+        ? T('Ein Tipp färbt alle gleichwertigen Felder zugleich.')
+        : T('Ein Tipp färbt nur das angetippte Feld.'));
   const anlage = !!(state.motif && state.motif.zones);
   ui.gradedBox.hidden = !anlage;
   ui.gradedNote.hidden = !anlage;
@@ -3066,9 +3094,9 @@ function syncUI() {
   if (anlage) {
     ui.gradedNote.textContent = state.graded
       ? state.motif.zones.map(function (zone) {
-          return zone.name + ': ' + (zone.axes > 1 ? zone.axes + '-fach' : 'frei');
+          return zone.name + ': ' + (zone.axes > 1 ? zone.axes + T('-fach') : T('frei'));
         }).reverse().join(' · ')
-      : 'Aus: überall dieselbe Achsenzahl, wie bei den anderen Vorlagen.';
+      : T('Aus: überall dieselbe Achsenzahl, wie bei den anderen Vorlagen.');
   }
 
   ui.width.value = state.width;
@@ -3085,14 +3113,14 @@ function syncUI() {
   ui.redo.disabled = future.length === 0;
 
   if (!state.motif) {
-    ui.hint.textContent = 'Leeres Blatt · zeichne ein Segment, der Rest entsteht von selbst';
+    ui.hint.textContent = T('Leeres Blatt · zeichne ein Segment, der Rest entsteht von selbst');
   } else {
     ui.hint.textContent = state.motif.name + ' · ' + state.motif.note +
       (zoned
-        ? ' · die Symmetrie folgt dem Bereich, in dem die Hand aufsetzt'
+        ? T(' · die Symmetrie folgt dem Bereich, in dem die Hand aufsetzt')
         : fillsSymmetrically(state.motif)
-          ? ' · ein Tipp färbt alle gleichwertigen Felder'
-          : ' · ein Tipp färbt nur das angetippte Feld');
+          ? T(' · ein Tipp färbt alle gleichwertigen Felder')
+          : T(' · ein Tipp färbt nur das angetippte Feld'));
   }
 }
 
@@ -3352,7 +3380,7 @@ function bindEvents() {
     renderGuides();
     pushHistory(['draw']);
     commitFigure(figure);
-    say(SHAPE_NAMES[figure.kind] + ' gesetzt.');
+    say(SHAPE_NAMES[figure.kind] + ' ' + T('gesetzt.'));
   });
 
   ['pointerup', 'pointercancel'].forEach(function (type) {
@@ -3452,7 +3480,7 @@ function bindEvents() {
   ui.redo.addEventListener('click', redo);
   ui.quickCollapse.addEventListener('click', function () {
     const collapsed = document.body.classList.toggle('quick-collapsed');
-    ui.quickCollapse.title = collapsed ? 'Leiste ausklappen' : 'Leiste einklappen';
+    ui.quickCollapse.title = collapsed ? T('Leiste ausklappen') : T('Leiste einklappen');
     Store.set('quickCollapsed', collapsed);
     fitStage();
   });
@@ -3493,6 +3521,14 @@ function bindEvents() {
   ui.fullExit.addEventListener('click', leaveFullscreen);
   ui.theme.addEventListener('click', function () {
     setTheme(state.theme === 'dunkel' ? 'hell' : 'dunkel');
+  });
+
+  /* Der Sprachknopf trägt immer den Namen der *anderen* Sprache – so muss
+     niemand raten, was ein Druck bewirkt. Die Werke bleiben dabei; sie liegen
+     im Speicher des Geräts, nicht in der Seite. */
+  ui.lang.textContent = Sprache.aktiv === 'de' ? 'English' : 'Deutsch';
+  ui.lang.addEventListener('click', function () {
+    Sprache.waehle(Sprache.aktiv === 'de' ? 'en' : 'de');
   });
 
   /* Verlässt der Browser das Vollbild von sich aus (Escape, Wischgeste),
@@ -3540,6 +3576,10 @@ function bindEvents() {
    ------------------------------------------------------------------------- */
 
 function start() {
+  /* Die Bedienung steht deutsch im HTML. Einmal durchgehen und, wenn
+     Englisch gilt, austauschen – bevor irgendetwas davon gelesen wird. */
+  Sprache.seite();
+
   cacheUi();
   setupLayers();
   buildLibrary();
@@ -3571,7 +3611,7 @@ function start() {
   renderPeople();
   if (Store.get('quickCollapsed', false)) {
     document.body.classList.add('quick-collapsed');
-    ui.quickCollapse.title = 'Leiste ausklappen';
+    ui.quickCollapse.title = T('Leiste ausklappen');
   }
 
   applyZoom();

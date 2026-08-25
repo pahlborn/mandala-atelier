@@ -20,7 +20,12 @@
 const path = require('path');
 const { launch } = require('./browser');
 
-const FILE_URL = 'file://' + path.join(__dirname, '..', 'index.html');
+/* Mit fester Sprache. Der Rechner, auf dem geprüft wird, steht nicht
+   zwangsläufig auf Deutsch – ohne diesen Zusatz liefe die App auf einem
+   englischen System englisch, und jede Prüfung auf einen deutschen Namen
+   schlüge fehl, ohne dass etwas kaputt wäre. Die englische Fassung prüft
+   tools/test-sprache.js. */
+const FILE_URL = 'file://' + path.join(__dirname, '..', 'index.html') + '?sprache=de';
 
 /* Testpunkte: Radien quer durch das Motiv, Winkel in den Feldmitten und
    leicht daneben – aber nie auf der Speiche bei einem halben Segment. */

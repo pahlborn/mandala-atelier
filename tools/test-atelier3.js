@@ -27,7 +27,13 @@
 const path = require('path');
 const { launch } = require('./browser');
 
-const FILE_URL = 'file://' + path.join(__dirname, '..', 'atelier3', 'index.html');
+/* Mit fester Sprache. Der Rechner, auf dem geprüft wird, steht nicht
+   zwangsläufig auf Deutsch – ohne diesen Zusatz liefe die App auf einem
+   englischen System englisch, und jede Prüfung auf einen deutschen Satz
+   schlüge fehl, ohne dass etwas kaputt wäre. Die englische Fassung prüft
+   tools/test-sprache.js. */
+const FILE_URL = 'file://' + path.join(__dirname, '..', 'atelier3', 'index.html') +
+                 '?sprache=de';
 
 const befunde = [];
 function prüfe(name, ok, notiz) {

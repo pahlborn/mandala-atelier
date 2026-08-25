@@ -156,14 +156,14 @@
         <td style="color:var(--tut)">englisch</td>
         <td style="color:var(--offen)">Entwurf</td>
         <td style="color:var(--offen)">Entwurf</td>
-        <td style="color:var(--stop)">nur deutsch</td>
+        <td style="color:var(--tut)">umschaltbar</td>
       </tr>
       <tr>
         <td>Das ruhige Blatt</td>
         <td style="color:var(--tut)">englisch</td>
         <td style="color:var(--offen)">Entwurf</td>
         <td style="color:var(--offen)">Entwurf</td>
-        <td style="color:var(--stop)">nur deutsch</td>
+        <td style="color:var(--tut)">umschaltbar</td>
       </tr>
       <tr>
         <td>Malstudio</td>
@@ -175,15 +175,21 @@
     </table>
   </div>
 
-  <p class="note"><strong>Die letzte Spalte ist die unangenehme.</strong> Ein
-     englischer Store-Text führt zu einer App, die auf Deutsch spricht. Bei den
-     beiden Ateliers steht in <code>index.html</code> fest
-     <code>lang="de"</code>, und im Code gibt es nichts, was Texte je nach
-     Sprache austauscht – kein Wörterbuch, keine Abfrage von
-     <code>navigator.language</code>. Beim ruhigen Blatt sind es zwar nur eine
-     Handvoll Sätze, aber gerade dort trägt jeder einzelne. Für das Malstudio
-     ist die Umschaltbarkeit von <em>Ihnen</em> angegeben; nachprüfen kann ich
-     sie hier nicht, die App liegt in einem anderen Repository.</p>
+  <p class="note"><strong>Die letzte Spalte war die unangenehme – sie ist
+     erledigt.</strong> Beide Ateliers schalten jetzt um: Im deutschsprachigen
+     Raum laufen sie deutsch, überall sonst englisch. Entschieden wird nach
+     <code>navigator.languages</code>; <em>de-DE</em>, <em>de-AT</em> und
+     <em>de-CH</em> ergeben Deutsch, alles andere Englisch. Wer es anders will,
+     drückt den Knopf, der immer den Namen der <em>anderen</em> Sprache trägt.
+     Für das Malstudio ist die Umschaltbarkeit von <em>Ihnen</em> angegeben;
+     nachprüfen lässt sie sich hier nicht, die App liegt in einem anderen
+     Repository.</p>
+
+  <p class="note"><strong>Zum Ansehen, ohne das iPad umzustellen:</strong>
+     <a href="../index.html?sprache=en">Mandala Atelier auf Englisch</a> ·
+     <a href="../atelier3/index.html?sprache=en">Das ruhige Blatt auf
+     Englisch</a>. Der Zusatz <code>?sprache=de</code> holt das Deutsche
+     zurück.</p>
 
   <p class="note"><strong>Was Apple verlangt und was nicht.</strong> Ein
      englischer Name genügt, um weltweit zu erscheinen – die Beschreibung darf
@@ -723,14 +729,38 @@
     <li class="offen"><b>Zwei Namensentscheidungen</b>
       <small><i>Leaf</i> oder <i>Page</i> bei der zweiten App, und ob der
       dritten der Hinweis aufs Malen im Namen fehlen darf.</small></li>
-    <li class="stop"><b>Die Apps selbst sprechen weiter deutsch</b>
-      <small>Die beiden Ateliers haben keine Sprachumschaltung – sie müsste
-      gebaut werden, samt einem Ort, an dem die Sätze liegen. Beim ruhigen
-      Blatt sind es wenige, aber tragende; im Mandala Atelier sind es die
-      Namen von 26 Motiven, fünf Welten und siebzig Pigmenten.</small></li>
+    <li class="tut"><b>Die Apps selbst schalten um</b>
+      <small>Gebaut: <code>sprache.js</code> je App, der deutsche Text ist
+      darin der Schlüssel. Im Mandala Atelier sind es 34 Motive mit
+      Beischrift, sechs Welten, 31 Bereichsnamen der Anlagen und 50 Pigmente;
+      im ruhigen Blatt dazu die fünfundzwanzig Sätze, die dort das Einzige
+      sind, was gesprochen wird. <code>tools/test-sprache.js</code> sucht
+      nach Deutschem, das stehen geblieben ist – zuletzt: nichts.</small></li>
+
+    <li class="stop"><b>Eine Zahl in der App stimmt nicht</b>
+      <small>Unter den Motiven steht „19 Vorlagen in 5 Welten“, in der
+      Beschreibung stehen „26 Vorlagen in fünf Welten“. Gezählt am laufenden
+      Programm sind es <b>34 in 6</b>. Das ist Ihr Text, deshalb habe ich ihn
+      wortgetreu übersetzt und nichts stillschweigend berichtigt – aber vor
+      dem Einreichen muss die Zahl stimmen: Richtlinie 2.3.1 verlangt
+      zutreffende Angaben.</small></li>
     <li class="offen"><b>Die Datenschutzerklärung</b>
       <small>Liegt nur auf Deutsch vor. Sie wird je Sprache verlinkt und
       sollte englisch danebenstehen.</small></li>
+
+    <li class="offen"><b>Der Name unter dem Symbol</b>
+      <small>Den schaltet die App nicht um – er kommt aus dem Bundle. In Xcode
+      braucht es dafür eine <code>InfoPlist.strings</code> mit
+      <code>CFBundleDisplayName</code>, deutsch und englisch. Die Schritte
+      stehen in der <code>LIESMICH.md</code>, die
+      <code>tools/gen-nativ.js</code> mitschreibt.</small></li>
+
+    <li class="offen"><b>Britisch oder amerikanisch?</b>
+      <small>Alles hier ist britisch geschrieben – <em>colour</em>,
+      <em>centre</em>. Das passt zu <em>atelier</em> und zum ruhigen Ton, aber
+      der größte Store ist der amerikanische. Umstellen wäre ein Dutzend
+      Wörter, an einer Stelle je App. Eine Entscheidung, kein
+      Aufwand.</small></li>
   </ul>
   </div>
 

@@ -130,6 +130,7 @@ Dateien unverändert ausliefert.
     fonts.css               Schriften als Daten-URI (erzeugt)
     style.css               Design-Tokens, Hell/Dunkel, Layout
     app.js                  Gesamte Logik, in kommentierte Abschnitte geteilt
+    sprache.js              Wörterbuch Deutsch → Englisch, vor app.js geladen
     manifest.webmanifest    PWA-Manifest
     sw.js                   Service Worker (Offline-Cache)
     icon-*.png              6 Icons, prozedural erzeugt
@@ -144,10 +145,50 @@ Dateien unverändert ausliefert.
     tools/gen-atelier3-icons.js  Icons für „Blatt“
     tools/test-atelier3.js  Testlauf für „Blatt“
     tools/test-nebeneinander.js  Prüft, dass sich beide Apps nicht stören
+    tools/test-sprache.js   Prüft die englische Fassung beider Ateliers
+    tools/gen-nativ.js      Baut nativ/<app>/ für Capacitor
+    tools/pruef-englisch.js Zählt die Zeichen in docs/englisch.html nach
     package.json            Nur devDependencies (playwright-core) für tools/
 
 Zur Laufzeit hat die App **keine Abhängigkeiten**. `node_modules` wird nur für
 die Testskripte gebraucht und steht in `.gitignore`.
+
+## Zwei Sprachen
+
+Beide Ateliers laufen im deutschsprachigen Raum deutsch und überall sonst
+englisch. Entschieden wird beim Start nach `navigator.languages`; ein Knopf in
+der Bedienung hebt die Entscheidung auf und merkt sich das. Zum Vorführen,
+ohne am Gerät etwas umzustellen, gibt es `?sprache=de` und `?sprache=en`.
+
+**Der deutsche Text ist der Schlüssel.** `T('Neues Blatt')` gibt auf Deutsch
+`Neues Blatt` zurück und auf Englisch `New sheet`. Keine Kennungen wie
+`blatt.neu` – sonst stünde im Quelltext nirgends mehr, was auf dem Knopf steht.
+Fehlt ein Eintrag, erscheint Deutsch: sichtbar unfertig ist besser als leer.
+
+Zwei Stellen brauchen mehr als das eine Wort:
+
+- **Doppeldeutigkeit.** „Blatt" ist im Mandala Atelier die Grundform (`leaf`)
+  *und* der Bogen (`sheet`). Der zweite Schlüssel heißt Sinn:
+  `'Blatt @form': 'Leaf'` im Wörterbuch, `data-sinn="form"` im HTML,
+  `T('Blatt', 'form')` im Quelltext.
+- **Fließtext mit Auszeichnung.** Ein Absatz mit `<b>` darin zerfällt beim
+  Durchgang über die Textknoten in Halbsätze. Solche Absätze tragen
+  `data-satz` und werden als Ganzes nachgeschlagen.
+
+`node tools/test-sprache.js` sucht auf Englisch nach Deutschem, das stehen
+geblieben ist, prüft die Geräteerkennung mit sieben echten Sprachen und zählt
+im ruhigen Blatt nach, dass die fünfundzwanzig Sätze ihre Regeln einhalten –
+kein „you", kein Imperativ, keiner länger als 45 Zeichen.
+
+Die Testläufe `test-app.js` und `test-atelier3.js` öffnen die Apps mit
+`?sprache=de`. Ohne das liefen sie auf einem englischen System englisch, und
+jede Prüfung auf einen deutschen Namen schlüge fehl, ohne dass etwas kaputt
+wäre.
+
+Nicht umgeschaltet wird der **Name unter dem Symbol**. Der kommt im nativen
+Rahmen aus dem Bundle und braucht in Xcode eine eigene `InfoPlist.strings`;
+die Schritte stehen in der `LIESMICH.md`, die `tools/gen-nativ.js`
+mitschreibt.
 
 ## Technischer Aufbau
 
