@@ -210,16 +210,39 @@
       Anforderungen ändern sich.</small></li>
 
     <li class="tut"><b>Name, Untertitel, Werbetext, Beschreibung</b>
-      <small>Stehen für alle drei fest, mit geprüften Zeichenzahlen. Auch
-      Schlüsselwörter, Kategorie, Preis und Altersfreigabe.</small></li>
+      <small>Stehen für alle drei fest, mit nachgezählten Zeichenzahlen. Auch
+      Schlüsselwörter, Kategorie, Preis und Altersfreigabe. Eine Zahl war
+      falsch – der Werbetext des Mandala Atelier hat 75 Zeichen, nicht 74;
+      <code>tools/pruef-englisch.js</code> zählt sie jetzt nach.</small></li>
 
     <li class="tut"><b>Englische Namen und Untertitel</b>
       <small>Der Store erlaubt je Sprache einen eigenen Namen; jeder muss
       einzeln frei sein. Geprüft im US-Store, alle drei frei:
       <em>Mandala Atelier</em>, <em>Mandala – The Quiet Leaf</em>,
-      <em>Summer by the Sea</em>. Sie stehen in
-      <a href="store-texte.md"><code>store-texte.md</code></a>. Die
-      Beschreibungen sind damit noch nicht übersetzt.</small></li>
+      <em>Summer by the Sea</em>. <b>Namen und Untertitel, sonst nichts</b> –
+      wie es um die übrigen Texte steht, sagen die nächsten drei
+      Punkte.</small></li>
+
+    <li class="offen"><b>Englische Beschreibungen und Anleitungen</b>
+      <small>Liegen als <b>Entwurf</b> vor, nachgezählt und mit Anmerkungen:
+      <a href="englisch.html">Die Texte auf Englisch</a>. Zur Durchsicht, nicht
+      zur Übernahme. Dort stehen auch zwei Fragen, die keine
+      Übersetzungsfragen sind: <em>Leaf</em> oder <em>Page</em> bei der
+      zweiten App, und ob der dritten der Hinweis aufs Malen im Namen fehlen
+      darf.</small></li>
+
+    <li class="stop"><b>Die beiden Ateliers sprechen nur Deutsch</b>
+      <small>Sie haben keine Sprachumschaltung: In <code>index.html</code>
+      steht fest <code>lang="de"</code>, und im Code gibt es weder ein
+      Wörterbuch noch eine Abfrage von <code>navigator.language</code>. Ein
+      englischer Store-Text führte also auf eine deutsch sprechende App. Das
+      Malstudio ist laut Ihren Angaben umschaltbar; nachprüfen lässt es sich
+      hier nicht, es liegt in einem anderen Repository. <b>Hält die deutsche
+      Veröffentlichung nicht auf</b> – nur die englische.</small></li>
+
+    <li class="offen"><b>Datenschutzerklärung auf Englisch</b>
+      <small>Sie wird je Sprache verlinkt. Bisher gibt es sie nur auf
+      Deutsch.</small></li>
 
     <li class="offen"><b>Fragebogen zur Altersfreigabe</b>
       <small>Wird in App Store Connect ausgefüllt, je App einmal. Bei allen
@@ -254,9 +277,11 @@
       Rechenmandalas. Das verträgt sich nicht bruchlos mit „für Erwachsene,
       keine Aufgaben“. Zurückgestellt – aber vor dem Einreichen zu
       entscheiden, weil es die Zielgruppe verschiebt.</small></li>
-    <li class="offen"><b>Englische Fassung?</b>
-      <small>Ohne sie bleibt der Store faktisch auf den deutschsprachigen Raum
-      beschränkt.</small></li>
+    <li class="offen"><b>Englisch: die Texte stehen, die App nicht</b>
+      <small>Beschreibung und Anleitung liegen als
+      <a href="englisch.html">Entwurf</a> vor. In der App sind es die Namen
+      von 26 Motiven, fünf Welten und siebzig Pigmenten – von allen dreien der
+      größte Brocken.</small></li>
   </ul>
   </div>
 
@@ -274,6 +299,15 @@
       Alternative wäre, sie mit dem ersten Atelier zusammenzulegen; das
       widerspräche der Gegenprobe. Vier Vorschläge, die aus der Sache selbst
       kommen, stehen unter <a href="#blatt-mehr">F</a>.</small></li>
+    <li class="offen"><b>Englisch: <em>Leaf</em> oder <em>Page</em>?</b>
+      <small>Das deutsche „Blatt" ist beides zugleich – das Papier und das
+      Pflanzenblatt –, und die App lebt von dieser Doppeldeutigkeit.
+      <em>Leaf</em> hat sie auch, aber schwächer: Für Papier ist es im
+      Englischen altertümlich. <em>Page</em> träfe das Papier genau und
+      verlöre die Pflanze. Beide sind im US-Store frei. In der App sind es nur
+      eine Handvoll Sätze – aber jeder einzelne trägt, und die vier
+      Blattnamen (Ruhe, Blüte, Klarheit, Fülle) stehen mit
+      darin.</small></li>
   </ul>
   </div>
 
@@ -297,6 +331,18 @@
     <li class="offen"><b>Bildschirmfotos mit gefüllter Galerie</b>
       <small>Die vorhandenen zeigen ein frisch angelegtes Profil. Für den Store
       sollten sie zeigen, was nach zwei Wochen darin liegt.</small></li>
+    <li class="offen"><b>Der englische Name verliert das Malstudio</b>
+      <small><em>Summer by the Sea</em> sagt nicht mehr, dass gemalt wird – das
+      steht nur noch im Untertitel; auf Deutsch trägt „Malstudio" es im Namen.
+      Eine Fassung mit <em>Draw</em> darin wäre neu auf Verfügbarkeit zu
+      prüfen. Und: Die App ist als einzige umschaltbar – ob sie die Motiv- und
+      Stufennamen so führt, wie der englische Store-Text sie nennt, muss vor
+      dem Einreichen abgeglichen werden, sonst verspricht der Store Namen, die
+      das Kind nicht vorfindet.</small></li>
+    <li class="offen"><b>Deutsche Schlüsselwörter zu lang</b>
+      <small>114 Zeichen bei 100 erlaubten, nachgezählt. Ohne die Leerzeichen
+      nach den Kommas – so gehören sie ins Feld – bleiben 104; es fehlt dann
+      noch ein Begriff. Die englische Zeile passt mit 98.</small></li>
   </ul>
   </div>
 

@@ -16,6 +16,16 @@ ein Blatt Papier, und es klingt, statt bloß zu benennen. Wer es nüchterner
 will, nimmt „Mandala – The Quiet Page"; auch frei. Was noch offen ist, steht
 bei jeder App unter „Noch offen".
 
+**Die englischen Beschreibungen und Anleitungen** stehen als Entwurf auf einer
+eigenen Seite: [`docs/englisch.html`](englisch.html). Dort ist auch vermerkt,
+was an der Übersetzung diskutabel ist – und dass die beiden Ateliers selbst
+weiterhin nur Deutsch sprechen.
+
+**Zu den Zeichenzahlen.** Sie werden von `node tools/pruef-englisch.js`
+nachgezählt. Beim Werbetext des Mandala Atelier stand hier bisher 74; gezählt
+sind es 75. Die Schlüsselwortzeilen sind mit Komma *und* Leerzeichen gezählt;
+in das Feld gehören sie ohne, das spart je Begriff ein Zeichen.
+
 ---
 
 # Mandala Atelier – Eine Linie, ein ganzer Kranz
@@ -28,7 +38,7 @@ bei jeder App unter „Noch offen".
 | **Untertitel** | Eine Linie, ein ganzer Kranz<br><sub>28/30 Zeichen</sub> |
 | **Name (englisch)** | Mandala Atelier<br><sub>15/30 Zeichen · im US-Store frei</sub> |
 | **Untertitel (englisch)** | A line becomes a wreath<br><sub>23/30 Zeichen</sub> |
-| **Werbetext** | Ein Strich, ringsum gespiegelt – und aus einer Handbewegung wird ein Kranz.<br><sub>74/170 Zeichen · ohne neue Prüfung änderbar</sub> |
+| **Werbetext** | Ein Strich, ringsum gespiegelt – und aus einer Handbewegung wird ein Kranz.<br><sub>75/170 Zeichen · ohne neue Prüfung änderbar</sub> |
 | **Kategorie** | Grafik & Design (primär), Lifestyle (sekundär) |
 | **Preis** | 4,99 € einmalig – keine Käufe in der App, kein Abo |
 | **Altersfreigabe** | 4+ – keine bedenklichen Inhalte, keine Links nach außen, kein Chat |
