@@ -232,9 +232,9 @@ Mach aus einem leeren Bogen deinen eigenen Raum.
 | **Werbetext** | Zwanzig Motive gemalt – dann geht die Schatzkiste auf, und der Schatz liegt wirklich am Strand.<br><sub>95/170 Zeichen · ohne neue Prüfung änderbar</sub> |
 | **Kategorie** | Bildung (primär), Kinder / 6–8 Jahre (sekundär) |
 | **Preis** | 3,99 € einmalig – bei Kinder-Apps ist ein einmaliger Preis der ehrlichste Weg |
-| **Altersfreigabe** | 4+ – kein Chat, keine Links nach außen, keine Käufe |
+| **Altersfreigabe** | 4+ – kein Chat, keine Käufe. *Links nach außen gibt es:* fünfzehn Wikipedia-Verweise im Wissensteil und der Kartenlink der Schatzkiste. Für 4+ unschädlich, für die Kinder-Kategorie nicht (siehe „Noch offen“) |
 | **Schlüsselwörter** | Malen, Kinder, zeichnen lernen, Schritt für Schritt, Schatzsuche, Urlaub, Strand, Meer, Ausmalen, Sticker, Offline |
-| **Sprachen** | Deutsch, Englisch |
+| **Sprachen** | Deutsch, Englisch, Italienisch |
 | **Geräte** | iPad zuerst, iPhone möglich; Quer- und Hochformat |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
 
@@ -272,9 +272,9 @@ Wer nicht warten will, schaltet die Karte im Elternbereich sofort frei.
 - Keine Werbung. Keine Käufe in der App. Kein Chat. Kein Konto.
 - Nichts verlässt das Gerät – auch der Vorname des Kindes nicht
 - Mehrere Kinder, jedes mit eigenem Profil und eigener Galerie
-- Deutsch und Englisch, umschaltbar
+- Deutsch, Englisch und Italienisch, umschaltbar
 
-**Woher die Motive kommen.** Von Albarella, einer Insel im Po-Delta: Seepferdchen, Krabbe, Flamingo, Silberpappel. Dazu ein kleiner Wissensteil – warum die Insel so heißt, woher ihr Sand kommt. Wer dort Urlaub macht, findet sich wieder. Wer nicht, lernt eine Insel kennen.
+**Woher die Motive kommen.** Von Albarella, einer Insel im Po-Delta: Seepferdchen, Krabbe, Muschel, Seestern. Dazu ein kleiner Wissensteil – warum die Insel so heißt, woher ihr Sand kommt. Wer dort Urlaub macht, findet sich wieder. Wer nicht, lernt eine Insel kennen.
 
 Für Kinder ab etwa fünf Jahren.
 
@@ -319,9 +319,9 @@ sofort offen.
 
 **Noch zu entscheiden**
 
-- **Kinder-Kategorie ja oder nein?** Sie bringt Sichtbarkeit, verlangt aber Zusätzliches: keinerlei Analyse durch Dritte, keine Werbung, und jeder Link nach außen muss hinter eine Elternschranke. Die App erfüllt das heute schon – man muss es nur wissentlich zusagen.
+- **Kinder-Kategorie ja oder nein?** Sie bringt Sichtbarkeit, verlangt aber Zusätzliches: keinerlei Analyse durch Dritte, keine Werbung, und jeder Link nach außen muss hinter eine Elternschranke. **Das erfüllt die App heute *nicht*.** Am Quelltext nachgesehen: Im Albarella-Wissen stehen **fünfzehn Wikipedia-Verweise**, die ein Kind ohne Schranke antippen kann, dazu der Kartenlink der Schatzkiste. Für eine gewöhnliche Veröffentlichung ist das kein Problem – für die Kinder-Kategorie müsste eine Schranke davor.
 - Das Malstudio liegt in einem **eigenen Repo** (pahlborn/malstudio) und wäre eine dritte, getrennte Einreichung mit eigener Bundle-ID.
-- **Die Google-Schriften sind abgestellt – aber noch nicht eingespielt.** tools/gen-fonts.js malstudio erzeugt jetzt auch für die Schwester-App eine lokale fonts.css (642 kB, elf Schnitte, nur „latin“). Die Änderung ist erzeugt und geprüft: bei blockiertem Netz lädt die App ihre Schriften vollständig und ruft *nichts* mehr nach außen. Sie liegt aber im anderen Repo und muss dort noch eingespielt werden. Erst danach darf der Google-Absatz aus der Datenschutzerklärung verschwinden.
+- **Die Google-Schriften sind eingespielt – erledigt.** Am Quelltext nachgesehen: `index.html` bindet nur noch `fonts.css` lokal ein, und `sw.js` nimmt sie in den Vorrat. Kein `fonts.googleapis` mehr, nirgends. Steht seit Fassung v7-48. Der Google-Absatz darf damit aus der Datenschutzerklärung verschwinden.
 - Die Beispielbilder oben zeigen ein frisch angelegtes Profil „Mia“. Für den Store sollten es Aufnahmen mit gefüllter Galerie sein.
 
 
