@@ -4,7 +4,7 @@
    Bereitet eine App für den nativen Rahmen vor.
 
      node tools/gen-nativ.js            → Mandala Atelier
-     node tools/gen-nativ.js blatt      → Mandala Atelier 2
+     node tools/gen-nativ.js blatt      → Mandala – Das ruhige Blatt
 
    Das Ergebnis liegt in nativ/<app>/ und ist alles, was Capacitor braucht:
    ein Ordner www mit genau den Dateien dieser App, die Konfiguration, das
@@ -41,8 +41,11 @@ const APPS = {
     grund: '#efe9dd'
   },
   blatt: {
-    name: 'Mandala Atelier 2',
-    kennung: 'de.pahlborn.mandalaatelier2',
+    name: 'Mandala – Das ruhige Blatt',
+    /* Hieß bis zur Umbenennung de.pahlborn.mandalaatelier2. Die Kennung ist
+       nach der ersten Einreichung unveränderlich – jetzt ist der einzige
+       Zeitpunkt, an dem sie noch dem Namen folgen kann. */
+    kennung: 'de.pahlborn.ruhigesblatt',
     quelle: 'atelier3',
     dateien: ['index.html', 'app.js', 'style.css', 'manifest.webmanifest',
               'icon-72.png', 'icon-120.png', 'icon-152.png',
