@@ -215,7 +215,9 @@
 
     <li class="offen"><b>Fragebogen zur Altersfreigabe</b>
       <small>Wird in App Store Connect ausgefüllt, je App einmal. Bei allen
-      dreien läuft er auf 4+ hinaus.</small></li>
+      dreien läuft er auf 4+ hinaus. Er ist nicht die einzige Erklärung –
+      die übrigen stehen unter
+      <a href="#erklaerungen">G · Die Erklärungen</a>.</small></li>
 
     <li class="offen"><b>Datenschutz-Kennzeichnung</b>
       <small>Die „Nutrition Labels“. Bei allen dreien: <em>Keine Daten
@@ -507,6 +509,68 @@
      App ein, und die gehört nicht mir. Wenn nur einer davon gebaut wird,
      wäre es der erste: Er kostet am wenigsten, hilft dem Stift sofort und
      wiegt bei 4.2 am schwersten.</p>
+
+
+  <!-- ==================== G. Die Erklaerungen ==================== -->
+
+  <h2 id="erklaerungen">G · Die Erklärungen in App Store Connect</h2>
+
+  <p>Neben Texten und Bildern verlangt App Store Connect eine Reihe von
+     <b>Erklärungen</b> – Fragen, die man beantworten muss, bevor eine App
+     eingereicht werden kann. Sie sind leicht zu übersehen, weil sie nicht
+     nach Arbeit aussehen; eine falsch beantwortete kann die Einreichung
+     trotzdem aufhalten.</p>
+
+  <div class="karte">
+  <ul class="tun">
+    <li class="tut"><b>Reguliertes Medizinprodukt — nicht betroffen</b>
+      <small>Die Erklärung greift nur bei <em>Gesundheit &amp; Fitness</em>
+      oder <em>Medizin</em> als Kategorie, oder wenn im Altersfragebogen
+      „häufig“ bei medizinischen Informationen steht. Die Kategorien hier
+      sind Grafik &amp; Design und Bildung.
+      <b>Das ist eine Bedingung, keine Selbstverständlichkeit:</b> Wer die
+      Ateliers wegen „Achtsamkeit“ in Gesundheit &amp; Fitness einordnet,
+      löst sie aus – und braucht dann eine Herstellernummer, eine Adresse mit
+      der Gebrauchsanweisung und eine Zweckbestimmung.</small></li>
+
+    <li class="offen"><b>Exportbestimmungen — Verschlüsselung</b>
+      <small>Muss jede App beantworten, auch diese. Keine der drei
+      verschlüsselt etwas Eigenes. In der <code>Info.plist</code> genügt
+      <code>ITSAppUsesNonExemptEncryption = NO</code>; dann fragt App Store
+      Connect bei jedem Build nicht mehr nach.</small></li>
+
+    <li class="tut"><b>Inhaltsrechte</b>
+      <small>Schriften: SIL Open Font License, Einbetten ausdrücklich
+      erlaubt. Die Fotos im Malstudio stammen von Wikimedia Commons unter
+      CC BY, CC BY-SA, CC0 und Public Domain – <b>Urheber und Lizenz werden
+      in der App angezeigt</b>, das ist die Bedingung. Alles andere ist
+      selbst gezeichnet.
+      <em>Anmerkung:</em> Zur Namensnennung gehört streng genommen auch ein
+      Verweis auf die Quelle. Die Adressen sind hinterlegt, werden aber nicht
+      angezeigt – in einer Kinder-App müsste ein Link ohnehin hinter eine
+      Elternschranke.</small></li>
+
+    <li class="tut"><b>Werbe-ID (IDFA) — nein</b>
+      <small>Keine der drei benutzt eine. Damit entfällt auch die Abfrage
+      zur Nachverfolgung.</small></li>
+
+    <li class="tut"><b>Kontolöschung — nicht betroffen</b>
+      <small>Apps, in denen man ein Konto anlegen kann, müssen es auch in der
+      App wieder löschen lassen. Hier gibt es keine Konten.</small></li>
+
+    <li class="offen"><b>Altersfreigabe-Fragebogen</b>
+      <small>Je App einmal auszufüllen. Achte auf das Feld <em>Medizinische
+      Informationen oder Behandlung</em> – dort „häufig“ anzugeben, löst die
+      Medizinprodukt-Erklärung aus. Bei allen dreien ist die richtige Antwort
+      „keine“.</small></li>
+  </ul>
+  </div>
+
+  <p class="note"><strong>Diese Liste stand vorher nicht hier.</strong> Sie
+     kam erst dazu, als jemand die Apple-Seite zur Medizinprodukt-Erklärung
+     danebenhielt und fragte, ob das berücksichtigt sei. War es nicht. Falls
+     dir weitere Stellen aus den Apple-Hilfeseiten auffallen, die hier
+     fehlen: Sie gehören hierher.</p>
 
   <h2 id="reihenfolge">In welcher Reihenfolge</h2>
 
