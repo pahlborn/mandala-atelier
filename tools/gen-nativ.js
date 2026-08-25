@@ -221,6 +221,13 @@ function anleitung() {
 'steht unter *Einstellungen → Allgemein → VPN & Geräteverwaltung*.\n\n' +
 'Mit einer gewöhnlichen Apple-ID läuft die App **sieben Tage**, danach neu\n' +
 'aufspielen. Zum Ausprobieren reicht das.\n\n' +
+'## Eine Zeile in der Info.plist\n\n' +
+'Nach `npx cap add ios` liegt die Datei unter\n' +
+'`ios/App/App/Info.plist`. Dort gehoert hinein:\n\n' +
+'```xml\n<key>ITSAppUsesNonExemptEncryption</key>\n<false/>\n```\n\n' +
+'Ohne sie fragt App Store Connect bei **jedem** Build nach den\n' +
+'Exportbestimmungen. Die App verschluesselt nichts Eigenes, also ist die\n' +
+'Antwort immer dieselbe - dann kann sie auch gleich dort stehen.\n\n' +
 '## Das Symbol\n\n' +
 '`resources/icon.png` ist da, muss aber noch in die Größen umgerechnet\n' +
 'werden, die iOS erwartet:\n\n' +
