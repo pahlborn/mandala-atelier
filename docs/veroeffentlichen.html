@@ -197,9 +197,12 @@
       geht und was es voraussetzt, steht unten unter
       <a href="#rahmen">D · Der native Rahmen</a>.</small></li>
 
-    <li class="offen"><b>App-Symbol 1024 × 1024, ohne Alphakanal</b>
-      <small>Die vorhandenen Symbole sind alle RGBA. Apple lehnt Transparenz
-      im Store-Symbol ab – neu erzeugen, für jede App eines.</small></li>
+    <li class="tut"><b>App-Symbol 1024 × 1024, ohne Alphakanal</b>
+      <small>Liegt für beide Ateliers vor, erzeugt von
+      <code>tools/gen-nativ.js</code> – dieselbe Zeichnung wie auf dem
+      Homescreen, nur größer. Der Alphakanal musste dabei von Hand entfernt
+      werden: Ein Browser schreibt immer RGBA, auch wenn jedes Pixel deckend
+      ist, und Apple weist das ab.</small></li>
 
     <li class="offen"><b>Bildschirmfotos</b>
       <small>iPhone 6,9″ und – da alle drei das iPad unterstützen – iPad 13″.
@@ -340,15 +343,19 @@
 
   <div class="karte">
   <ul class="tun">
-    <li class="offen"><b>1 · Projekt anlegen</b>
-      <small>Capacitor einrichten, Name und Bundle-ID setzen, den Ordner der
-      App als Webverzeichnis angeben, das iOS-Projekt erzeugen und in Xcode
-      öffnen.</small></li>
+    <li class="tut"><b>1 · Projekt anlegen — vorbereitet</b>
+      <small><code>node tools/gen-nativ.js</code> legt alles an, was
+      Capacitor braucht: einen Ordner <code>www</code> mit genau den Dateien
+      dieser App, die Konfiguration mit Name und Kennung, das Store-Symbol –
+      und eine LIESMICH.md mit den Schritten am Mac.
+      <code>gen-nativ.js blatt</code> tut dasselbe fürs zweite
+      Atelier.</small></li>
 
-    <li class="offen"><b>2 · Den Service Worker herausnehmen</b>
+    <li class="tut"><b>2 · Den Service Worker herausnehmen — erledigt</b>
       <small>Im Bundle liegt ohnehin alles auf dem Gerät. Schlimmer noch: Er
       würde Dateien aus einem Vorrat ausliefern, den niemand mehr auffrischt.
-      Die Registrierung entfällt, die Dateien bleiben.</small></li>
+      Das Werkzeug entfernt die Registrierung aus der Kopie – das Original
+      bleibt unangetastet.</small></li>
 
     <li class="offen"><b>3 · Nachsehen, dass nichts nachgeladen wird</b>
       <small>Apple sieht Nachladen aus dem Netz kritisch. Bei den beiden
@@ -517,6 +524,11 @@
       sieben Tage, danach muss neu signiert werden. Zum Prüfen reicht das
       vollkommen – und genau das ist der Zug, in dem sich alle technischen
       Fragen beantworten.</small></li>
+    <li class="tut"><b>Vorbereitet ist es schon</b>
+      <small><code>node tools/gen-nativ.js</code> am Mac ausführen, dann in
+      <code>nativ/mandala/</code> weiterlesen. Dort steht Befehl für Befehl,
+      was zu tun ist.</small></li>
+
     <li class="offen"><b>Was sich dabei klärt</b>
       <small>Läuft die App im Rahmen überhaupt? Funktioniert das Teilen-Blatt?
       Was macht der Druckbogen? Wie fühlt sich der Apple Pencil an? Bleibt

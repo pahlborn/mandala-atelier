@@ -91,6 +91,15 @@ function drawIcon(size) {
   return canvas.toDataURL('image/png');
 }
 
+/* Auch von gen-nativ.js gebraucht: Das Store-Symbol muss dieselbe Zeichnung
+   tragen wie die Symbole auf dem Homescreen, nur größer und ohne
+   Alphakanal. Zwei Zeichnungen wären zwei Wahrheiten. */
+module.exports = { drawIcon: drawIcon };
+
+/* Nur ausführen, wenn das Skript selbst aufgerufen wurde – nicht, wenn ein
+   anderes es einbindet. */
+if (require.main !== module) return;
+
 (async function main() {
   const browser = await launch();
   const page = await browser.newPage();
