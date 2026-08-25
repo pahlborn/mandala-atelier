@@ -377,6 +377,17 @@ const WORLDS = [
   }
 ];
 
+/* Die sichtbaren Namen einmal durch die Sprache ziehen.
+
+   Warum hier und nicht oben an jedem Namen: Die Liste ist der Bestand, und
+   ein Bestand liest sich besser ohne Klammern um jeden Eintrag. Was oben
+   steht, ist zugleich der Schlüssel im Wörterbuch – deshalb muss es deutsch
+   bleiben. Übersetzt wird genau einmal, beim Laden. */
+WORLDS.forEach(function (welt) {
+  welt.name = T(welt.name);
+  welt.colors.forEach(function (farbe) { farbe.name = T(farbe.name); });
+});
+
 function hexRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -575,6 +586,8 @@ const KINDS = [
     wide: [], narrow: [] }
 ];
 
+KINDS.forEach(function (art) { art.name = T(art.name); });
+
 function kindById(id) {
   return KINDS.filter(function (k) { return k.id === id; })[0] || null;
 }
@@ -649,6 +662,13 @@ const THOUGHTS = [
   'Nicht alles muss etwas bedeuten.',
   'Das Blatt hat keine Meinung.'
 ];
+
+/* Auch die Sätze. Sie stehen oben in ihrer eigenen Ordnung – Rahmen,
+   Material, Ungleichmäßigkeit, kein Ende, schlicht –, und die soll man beim
+   Lesen sehen. Deshalb hier, in einer Zeile, statt fünfundzwanzigmal oben. */
+for (var iSatz = 0; iSatz < THOUGHTS.length; iSatz++) {
+  THOUGHTS[iSatz] = T(THOUGHTS[iSatz]);
+}
 
 /* Ein Satz soll sich nicht so bald wiederholen. Gemerkt werden die zuletzt
    gezeigten – mehr Buchführung braucht es nicht. */
@@ -3059,9 +3079,12 @@ function setLadeKind(id) {
    Ton, mit drei Pigmenten der gerade gewählten Welt darauf, so wie sie
    darauf aussehen werden. Kein Schalter, keine Sonne, kein Mond – die
    Sache selbst. */
+/* `aria` steht als eigenes Feld da, statt aus name + 'papier' zusammengesetzt
+   zu werden. Zusammengeklebte Wörter überleben keine Übersetzung: aus „Tag"
+   und „papier" würde „Daypapier". */
 const PAPERS = [
-  { id: 'tag',   name: 'Tag' },
-  { id: 'nacht', name: 'Nacht' }
+  { id: 'tag',   name: T('Tag'),   aria: T('Tagpapier') },
+  { id: 'nacht', name: T('Nacht'), aria: T('Nachtpapier') }
 ];
 
 function buildLadePapers() {
@@ -3072,7 +3095,7 @@ function buildLadePapers() {
     button.type = 'button';
     button.className = 'lade-paper';
     button.dataset.paper = p.id;
-    button.setAttribute('aria-label', p.name + 'papier');
+    button.setAttribute('aria-label', p.aria);
     button.setAttribute('aria-pressed', p.id === lade.mode ? 'true' : 'false');
     button.style.background = 'rgb(' + look.paper.join(',') + ')';
 
@@ -3135,7 +3158,7 @@ function buildLadeSheets() {
     button.type = 'button';
     button.className = 'lade-sheet';
     button.dataset.seed = String(seed);
-    button.setAttribute('aria-label', 'Dieses Blatt nehmen');
+    button.setAttribute('aria-label', T('Dieses Blatt nehmen'));
     const cv = document.createElement('canvas');
     cv.width = PREVIEW_PX;
     cv.height = PREVIEW_PX;
@@ -3305,7 +3328,7 @@ let discardArmed = 0;
 
 function resetDiscard() {
   discardArmed = 0;
-  ui.stackRemove.textContent = 'Verwerfen';
+  ui.stackRemove.textContent = T('Verwerfen');
   ui.stackRemove.classList.remove('is-armed');
 }
 
@@ -3314,7 +3337,7 @@ async function removeStackItem() {
 
   if (!discardArmed || Date.now() - discardArmed > 5000) {
     discardArmed = Date.now();
-    ui.stackRemove.textContent = 'Wirklich verwerfen';
+    ui.stackRemove.textContent = T('Wirklich verwerfen');
     ui.stackRemove.classList.add('is-armed');
     return;
   }
@@ -3504,6 +3527,7 @@ function cacheUi() {
   ui.trayNew     = document.getElementById('tray-new');
   ui.trayStack   = document.getElementById('tray-stack');
   ui.traySound   = document.getElementById('tray-sound');
+  ui.trayLang    = document.getElementById('tray-lang');
   ui.trayNote    = document.getElementById('tray-note');
   ui.fassung     = document.getElementById('fassung');
   ui.stack       = document.getElementById('stack');
@@ -3571,6 +3595,13 @@ function bindUi() {
     syncSoundLabel();
   });
 
+  /* Der Knopf trägt immer den Namen der *anderen* Sprache – so muss niemand
+     raten, was ein Druck bewirkt. */
+  ui.trayLang.textContent = Sprache.aktiv === 'de' ? 'English' : 'Deutsch';
+  ui.trayLang.addEventListener('click', function () {
+    Sprache.waehle(Sprache.aktiv === 'de' ? 'en' : 'de');
+  });
+
   ui.stackPrev.addEventListener('click', function () { stepStack(-1); });
   ui.stackNext.addEventListener('click', function () { stepStack(1); });
   ui.stackTake.addEventListener('click', takeStackItem);
@@ -3620,13 +3651,17 @@ function showHint(text, hold) {
 }
 
 function syncSoundLabel() {
-  ui.traySound.textContent = Klang.muted ? 'Ton an' : 'Ton aus';
+  ui.traySound.textContent = Klang.muted ? T('Ton an') : T('Ton aus');
 }
 
 async function start() {
   /* Vor allem anderen: eine etwaige Griffkurve aus der Adresse übernehmen.
      Sie muss stehen, bevor der erste Strich eine Nachschlagetabelle baut. */
   const griff = applyGrip();
+
+  /* Die Bedienung steht deutsch im HTML. Einmal durchgehen und, wenn
+     Englisch gilt, austauschen – bevor irgendetwas davon gelesen wird. */
+  Sprache.seite();
 
   canvas = document.getElementById('sheet');
   canvas.width = SIZE;
@@ -3643,7 +3678,7 @@ async function start() {
 
   /* Welche Fassung läuft hier – und, falls vom Regelfall abgewichen wird,
      welcher Griff. Ohne Abweichung steht nur die Nummer da. */
-  ui.fassung.textContent = 'Blatt ' + FASSUNG +
+  ui.fassung.textContent = T('Blatt') + ' ' + FASSUNG +
     (griff === GRIFF_VOREINSTELLUNG ? '' : ' · ' + griff);
 
   /* Ein begonnenes Blatt liegt da, wo man es verlassen hat. */
@@ -3668,7 +3703,7 @@ async function start() {
   let seen = false;
   try { seen = localStorage.getItem('atelier3-gesehen') === 'ja'; } catch (err) {}
   if (!seen && !sheet.touched) {
-    showHint('Streiche über das Blatt.', 9000);
+    showHint(T('Streiche über das Blatt.'), 9000);
     try { localStorage.setItem('atelier3-gesehen', 'ja'); } catch (err) {}
   }
 

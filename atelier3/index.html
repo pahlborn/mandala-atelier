@@ -46,6 +46,10 @@
   <button type="button" id="tray-new">Neues Blatt</button>
   <button type="button" id="tray-stack">Blätter</button>
   <button type="button" id="tray-sound">Ton aus</button>
+  <!-- Die Sprache richtet sich nach dem Gerät. Dieser Knopf ist für den
+       Fall, dass sie falsch liegt: ein deutsches iPad im Ausland, ein
+       englisches im Inland. Er trägt den Namen der anderen Sprache. -->
+  <button type="button" id="tray-lang" aria-label="Sprache wählen">English</button>
   <p class="tray-note" id="tray-note" hidden>Dieses Gerät behält nichts.</p>
 </div>
 
@@ -87,6 +91,9 @@
   </div>
 </section>
 
+<!-- Zuerst die Sprache, dann die App: app.js ruft T() schon beim Aufbau
+     seiner Daten auf. -->
+<script src="sprache.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

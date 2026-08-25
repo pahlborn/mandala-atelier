@@ -34,7 +34,7 @@ const APPS = {
     name: 'Mandala Atelier',
     kennung: 'de.pahlborn.mandalaatelier',
     quelle: '.',
-    dateien: ['index.html', 'app.js', 'style.css', 'fonts.css',
+    dateien: ['index.html', 'app.js', 'sprache.js', 'style.css', 'fonts.css',
               'manifest.webmanifest',
               'icon-72.png', 'icon-120.png', 'icon-152.png',
               'icon-180.png', 'icon-192.png', 'icon-512.png'],
@@ -47,7 +47,8 @@ const APPS = {
        Zeitpunkt, an dem sie noch dem Namen folgen kann. */
     kennung: 'de.pahlborn.ruhigesblatt',
     quelle: 'atelier3',
-    dateien: ['index.html', 'app.js', 'style.css', 'manifest.webmanifest',
+    dateien: ['index.html', 'app.js', 'sprache.js', 'style.css',
+              'manifest.webmanifest',
               'icon-72.png', 'icon-120.png', 'icon-152.png',
               'icon-180.png', 'icon-192.png', 'icon-512.png'],
     grund: '#e6dfd1'
@@ -231,6 +232,18 @@ function anleitung() {
 'Ohne sie fragt App Store Connect bei **jedem** Build nach den\n' +
 'Exportbestimmungen. Die App verschluesselt nichts Eigenes, also ist die\n' +
 'Antwort immer dieselbe - dann kann sie auch gleich dort stehen.\n\n' +
+'## Zwei Sprachen im Namen der App\n\n' +
+'Die App selbst schaltet um: Im deutschsprachigen Raum laeuft sie deutsch,\n' +
+'sonst englisch (`sprache.js`). Der **Name unter dem Symbol** kommt aber\n' +
+'nicht von dort, sondern aus dem Bundle - und der ist zunaechst nur\n' +
+'deutsch.\n\n' +
+'In Xcode: **File -> Add Files**, eine Datei `InfoPlist.strings` anlegen,\n' +
+'rechts im Inspektor auf **Localize** klicken und Deutsch und Englisch\n' +
+'ankreuzen. In die englische Fassung gehoert:\n\n' +
+'```\n"CFBundleDisplayName" = "' + (WAHL === 'mandala' ? 'Mandala Atelier' : 'Mandala - The Quiet Leaf') + '";\n```\n\n' +
+'Dazu unter **General -> Localizations** Englisch hinzufuegen. Ohne das\n' +
+'meldet App Store Connect die App als einsprachig, und der englische\n' +
+'Store-Eintrag stuende neben einem deutschen Symbolnamen.\n\n' +
 '## Das Symbol\n\n' +
 '`resources/icon.png` ist da, muss aber noch in die Größen umgerechnet\n' +
 'werden, die iOS erwartet:\n\n' +
