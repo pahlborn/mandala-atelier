@@ -1,10 +1,19 @@
 # Store-Texte für alle drei Apps
 
-> **Erzeugt aus `PA-APPS.html` mit `node tools/gen-storetexte.js`.**
-> Nicht hier ändern – Änderungen gehören in die Arbeitsseite, sonst
-> laufen beide Fassungen auseinander. Stand: 2026-08-23.
+> **Hier stehen die Texte im Original.** Der Hinweis auf eine Arbeitsseite
+> `PA-APPS.html` und ein Werkzeug `gen-storetexte.js` stand hier bisher zu
+> Unrecht: Beides liegt nicht im Repository, der Verweis führte ins Leere.
+> Was in `docs/store.html` zu sehen ist, wird von Hand nachgezogen.
+> Stand: 2026-08-25.
 
-Alle Angaben sind Vorschläge, kein Beschluss. Was noch offen ist, steht
+Alle Angaben sind Vorschläge, kein Beschluss.
+
+**Zu den englischen Namen.** Der App Store erlaubt je Sprache einen eigenen
+Namen; sie müssen einzeln frei sein, und das sind sie – im US-Store geprüft.
+„Mandala Atelier" trägt auch auf Englisch, *atelier* ist dort ein geläufiges
+Wort. Beim ruhigen Blatt war *leaf* die Wahl: Es heißt im Englischen auch
+ein Blatt Papier, und es klingt, statt bloß zu benennen. Wer es nüchterner
+will, nimmt „Mandala – The Quiet Page"; auch frei. Was noch offen ist, steht
 bei jeder App unter „Noch offen".
 
 ---
@@ -17,6 +26,8 @@ bei jeder App unter „Noch offen".
 |---|---|
 | **Name** | Mandala Atelier<br><sub>15/30 Zeichen</sub> |
 | **Untertitel** | Eine Linie, ein ganzer Kranz<br><sub>28/30 Zeichen</sub> |
+| **Name (englisch)** | Mandala Atelier<br><sub>15/30 Zeichen · im US-Store frei</sub> |
+| **Untertitel (englisch)** | A line becomes a wreath<br><sub>23/30 Zeichen</sub> |
 | **Werbetext** | Ein Strich, ringsum gespiegelt – und aus einer Handbewegung wird ein Kranz.<br><sub>74/170 Zeichen · ohne neue Prüfung änderbar</sub> |
 | **Kategorie** | Grafik & Design (primär), Lifestyle (sekundär) |
 | **Preis** | 4,99 € einmalig – keine Käufe in der App, kein Abo |
@@ -105,14 +116,16 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 
 ---
 
-# Mandala Atelier 2 – Das ruhige Blatt
+# Mandala – Das ruhige Blatt
 
 ## Angaben für App Store Connect
 
 | Feld | Inhalt |
 |---|---|
-| **Name** | Mandala Atelier 2<br><sub>17/30 Zeichen · im Store frei</sub> |
-| **Untertitel** | Das ruhige Blatt<br><sub>16/30 Zeichen</sub> |
+| **Name** | Mandala – Das ruhige Blatt<br><sub>26/30 Zeichen · im Store frei</sub> |
+| **Untertitel** | Streichen, bis etwas erscheint<br><sub>30/30 Zeichen</sub> |
+| **Name (englisch)** | Mandala – The Quiet Leaf<br><sub>24/30 Zeichen · im US-Store frei</sub> |
+| **Untertitel (englisch)** | Rub until something appears<br><sub>27/30 Zeichen</sub> |
 | **Werbetext** | Ein Raum für Farbe und Ruhe.<br><sub>28/170 Zeichen · ohne neue Prüfung änderbar</sub> |
 | **Kategorie** | Grafik & Design (primär), Lifestyle (sekundär) |
 | **Preis** | 6,99 € einmalig – keine Käufe in der App, kein Abo |
@@ -184,7 +197,7 @@ Mach aus einem leeren Bogen deinen eigenen Raum.
 
 **Noch zu entscheiden**
 
-- **Der Name ist entschieden** – gut so, denn „Blatt“ allein *war* vergeben: eine aktive App gleichen Namens (Ahmet Aydin, Bildung, zuletzt April 2026), im US-Store zusätzlich „blatt – Goethe daily“. „Mandala Atelier 2“ und „Mandala Atelier“ sind beide frei. Gemeinsam gelesen ergeben Name und Untertitel den gewünschten Titel; als *ein* Feld wären die 36 Zeichen über dem Limit von 30 gewesen.
+- **Der Name ist entschieden** – gut so, denn „Blatt“ allein *war* vergeben: eine aktive App gleichen Namens (Ahmet Aydin, Bildung, zuletzt April 2026), im US-Store zusätzlich „blatt – Goethe daily“. „Mandala – Das ruhige Blatt“ ist frei und passt mit 26 Zeichen in **ein** Feld – der Untertitel bleibt dadurch für die Beschreibung frei. Der frühere Vorschlag „Mandala Atelier 2“ ist damit hinfällig, und das ist gut so: Er las sich wie dieselbe App in zweiter Fassung und hätte Richtlinie 4.3 auf den Plan gerufen.
 - Reicht die App für Apples Richtlinie 4.2 („Minimum Functionality“)? Von den dreien ist sie die schmalste und damit die gefährdetste. Eine gemeinsame App mit dem Mandala Atelier wäre die Alternative – widerspräche aber der Idee, beide getrennt zu vergleichen.
 - App-Symbol in 1024 × 1024 ohne Alphakanal.
 
@@ -198,6 +211,8 @@ Mach aus einem leeren Bogen deinen eigenen Raum.
 |---|---|
 | **Name** | Sommer am Meer – Malstudio<br><sub>26/30 Zeichen</sub> |
 | **Untertitel** | Schritt für Schritt malen<br><sub>25/30 Zeichen</sub> |
+| **Name (englisch)** | Summer by the Sea<br><sub>17/30 Zeichen · im US-Store frei</sub> |
+| **Untertitel (englisch)** | Learn to draw, step by step<br><sub>27/30 Zeichen</sub> |
 | **Werbetext** | Zwanzig Motive gemalt – dann geht die Schatzkiste auf, und der Schatz liegt wirklich am Strand.<br><sub>95/170 Zeichen · ohne neue Prüfung änderbar</sub> |
 | **Kategorie** | Bildung (primär), Kinder / 6–8 Jahre (sekundär) |
 | **Preis** | 3,99 € einmalig – bei Kinder-Apps ist ein einmaliger Preis der ehrlichste Weg |
