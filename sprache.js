@@ -110,8 +110,8 @@ var Sprache = (function () {
        Die Träger stehen im HTML mit `data-satz`. Schlüssel ist der innere
        HTML-Text, auf einzelne Leerzeichen zusammengezogen – deshalb steht
        hier auch das <b> mit drin. */
-    '19 Vorlagen in 5 Welten. Ein Motiv setzt die Achsenzahl passend – du kannst sie danach jederzeit ändern.':
-      '19 templates in 5 worlds. A motif sets the number of axes to suit it — you can change that afterwards at any time.',
+    '34 Vorlagen in 6 Welten. Ein Motiv setzt die Achsenzahl passend – du kannst sie danach jederzeit ändern.':
+      '34 templates in 6 worlds. A motif sets the number of axes to suit it — you can change that afterwards at any time.',
 
     'Mit „Form“ entstehen die Grundformen exakt: Ring, Speiche, Blatt, Raute und Band – dieselben Bausteine, aus denen auch die Vorlagen gemacht sind. Ziehen setzt die Länge, seitlich ziehen die Breite.':
       'With “Shape” the basic forms come out exact: ring, spoke, leaf, diamond and band — the same building blocks the templates are made of. Dragging sets the length, dragging sideways the width.',
