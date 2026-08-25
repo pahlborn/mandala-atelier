@@ -68,11 +68,11 @@ Es geht nicht darum, schnell fertig zu werden. Es gibt kein Richtig und kein Fal
 
 **Oder du fängst mit einem leeren Blatt an.** Nur Symmetrie, keine Vorlage – dann stammt jede Form von dir, und das Atelier vervielfacht sie. So entstehen eigene Motive von Grund auf.
 
-Wer lieber färbt als zeichnet, nimmt eine der 26 Vorlagen. Ein Tippen setzt Farbe in ein Feld – und zugleich in alle übrigen Segmente. Die Motive liegen in fünf Welten: Geometrisch-klassisch, Natur, Zen & Achtsamkeit, Jahreszeiten und eine Kids-Corner.
+Wer lieber färbt als zeichnet, nimmt eine der 34 Vorlagen. Ein Tippen setzt Farbe in ein Feld – und zugleich in alle übrigen Segmente. Die Motive liegen in sechs Welten: Geometrisch-klassisch, Natur, Zen & Achtsamkeit, Jahreszeiten, Anlagen und eine Kids-Corner.
 
 Krumme Kreise sind eine Frage der Sache, nicht des Könnens. Das Werkzeug *Form* setzt deshalb dieselben fünf Bausteine exakt, aus denen auch die Vorlagen bestehen: Ring, Speiche, Blatt, Raute, Band.
 
-Die Farben sind gedeckt und tragen Namen: Terrakotta, Ocker, Petrol, Moos, Nebelblau, Sand, Rost. Fünf Farbwelten zu je vierzehn Pigmenten – Erdpigmente, Nordlicht, Färbergarten, Rauchglas – und eine, die du dir selbst mischst.
+Die Farben sind gedeckt und tragen Namen: Terrakotta, Ocker, Petrol, Moos, Nebelblau, Sand, Rost. Fünf Farbwelten zu je zehn Pigmenten – Erdpigmente, Nordlicht, Färbergarten, Rauchglas, Goldgrund – und eine, die du dir selbst mischst.
 
 **Keine Gamification.** Keine Sterne, keine Pokale, keine Serien. Wer hier malt, will abschalten, nicht gewinnen.
 
@@ -86,11 +86,11 @@ Ohne Konto. Ohne Werbung. Ohne Netz. Nichts, was hier entsteht, verlässt dein G
 - Achsenzahl frei wählbar: 6, 8, 10, 12, 16 oder 24
 - Spiegelung zuschaltbar – bis zu 48 Wiederholungen einer Bewegung
 - Füllen wirkt auf alle Achsen zugleich, oder nur auf eine
-- 26 Vorlagen in fünf Welten
+- 34 Vorlagen in sechs Welten
 - Zeichnen mit Finger oder Apple Pencil
 - Stift, Füllen, Formen (Ring, Speiche, Blatt, Raute, Band), Radierer
 - Rückgängig und Wiederherstellen, zwanzig Schritte weit
-- Fünf Farbwelten zu je 14 gedeckten Pigmenten, dazu eine eigene
+- Fünf Farbwelten zu je 10 gedeckten Pigmenten, dazu eine eigene
 - Hell und Dunkel
 - Vergrößern und Schieben mit zwei Fingern
 - Galerie auf dem Gerät, jedes Werk mit Titel
@@ -124,11 +124,11 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 - Neigung des Apple Pencil – steht als offener Punkt im Konzeptpapier und wäre gegenüber Apples Richtlinie 4.2 ein starkes Argument.
 - App-Symbol in 1024 × 1024 **ohne Alphakanal** – die vorhandenen Icons sind alle RGBA und würden abgelehnt.
 - **Die App spricht Englisch.** Deutsch im deutschsprachigen Raum, sonst Englisch – 34 Motive mit Beischrift, sechs Welten, 31 Bereichsnamen und 50 Pigmente. Offen bleibt der Name unter dem Symbol; der kommt aus dem Bundle.
-- **Eine Zahl stimmt nicht.** Unter den Motiven steht in der App „19 Vorlagen in 5 Welten", oben in dieser Beschreibung „26 Vorlagen in fünf Welten". Gezählt am laufenden Programm sind es **34 in 6**. Vor dem Einreichen zu berichtigen – Richtlinie 2.3.1 verlangt zutreffende Angaben.
+- **Die Zahlen sind geradegezogen.** Nachgezählt am laufenden Programm und überall angeglichen: **34 Vorlagen in sechs Welten** (die *Anlagen* fehlten in jeder Aufzählung), **je zehn** statt vierzehn Pigmente, und *Goldgrund* war als fünfte Farbwelt nicht genannt. Im ruhigen Blatt ebenso: zehn statt neun Pigmente, fünf statt vier Blattarten und Pigmentwelten. Richtlinie 2.3.1 verlangt zutreffende Angaben.
 **Entschieden – zurückgestellt**
 
 - **Keine Fortsetzen-Funktion.** Ein angefangenes Mandala überlebt den Neustart nicht; die Galerie bewahrt ein fertiges Bild, keinen Arbeitsstand. Das bleibt so – das Atelier hat darin einen anderen Charakter als das zweite, wo das Aufnehmen eines weggelegten Blattes zur Sache gehört. *Der Text verspricht es deshalb nirgends.*
-- **Kids-Corner bleibt Anhängsel.** Sie ist mit 7 von 26 Motiven die größte der fünf Welten und bringt Zähl- und Rechenmandalas mit, wird aber vorerst nicht beworben – was mit ihr geschehen soll, ist offen. *Wiedervorlage vor dem Einreichen:* Entweder sie wird Teil des Angebots, dann verschiebt sich die Zielgruppe, oder sie verschwindet aus der ausgelieferten Fassung.
+- **Kids-Corner bleibt Anhängsel.** Sie ist mit 7 von 34 Motiven die zweitgrößte der sechs Welten – nach den Anlagen mit acht – und bringt Zähl- und Rechenmandalas mit, wird aber vorerst nicht beworben – was mit ihr geschehen soll, ist offen. *Wiedervorlage vor dem Einreichen:* Entweder sie wird Teil des Angebots, dann verschiebt sich die Zielgruppe, oder sie verschwindet aus der ausgelieferten Fassung.
 
 ---
 
@@ -161,7 +161,7 @@ Du bekommst einen leeren Bogen. Du streichst mit dem Finger darüber, und unter 
 
 Dabei geht es nicht darum, den Bogen möglichst rasch freizulegen. Es gibt kein Richtig und kein Falsch und kein „fertig“, das erreicht werden muss.
 
-Die Bewegung ist die ganze Bedienung. Kein Stift, keine Werkzeugleiste, keine Entscheidung vorweg. Neun Pigmente liegen unter dem Bogen bereit, mehr braucht es nicht.
+Die Bewegung ist die ganze Bedienung. Kein Stift, keine Werkzeugleiste, keine Entscheidung vorweg. Zehn Pigmente liegen unter dem Bogen bereit, mehr braucht es nicht.
 
 Das Blatt gibt dabei einen Rahmen vor: ein Zentrum, wiederkehrende Formen und eine Ordnung, innerhalb derer du dich frei bewegen kannst. Was darin liegt, hast du nicht ausgesucht – und genau das nimmt die Entscheidung vom Anfang weg.
 
@@ -177,9 +177,9 @@ Du kannst jederzeit aufhören und später zurückkehren. Das Blatt liegt dann no
 
 **Im Atelier**
 
-- Vier Arten, wonach dir heute ist: Ruhe, Blüte, Klarheit, Fülle
+- Fünf Arten, wonach dir heute ist: Ruhe, Blüte, Klarheit, Fülle, Anlage
 - Jedes Blatt wird neu erzeugt – kein Katalog, keine Wiederholung
-- Vier Pigmentwelten zu je neun Farben: Erdpigmente, Nordlicht, Färbergarten, Rauchglas
+- Fünf Pigmentwelten zu je zehn Farben: Erdpigmente, Nordlicht, Färbergarten, Rauchglas, Goldgrund
 - Reiben mit Finger oder Apple Pencil
 - Klang, der an der Geschwindigkeit der Hand hängt – abschaltbar
 - Tag und Nacht: nachts getöntes Papier, auf dem helle Kreide liegt
@@ -195,13 +195,13 @@ Mach aus einem leeren Bogen deinen eigenen Raum.
 
 ## Anleitung
 
-**1 · Nimm ein Blatt.** Du wirst nur gefragt, wonach dir heute ist – Ruhe, Blüte, Klarheit oder Fülle. Welches Bild darunter liegt, erfährst du beim Reiben. Du musst nicht wissen, welches das richtige für dich ist.
+**1 · Nimm ein Blatt.** Du wirst nur gefragt, wonach dir heute ist – Ruhe, Blüte, Klarheit, Fülle oder Anlage. Welches Bild darunter liegt, erfährst du beim Reiben. Du musst nicht wissen, welches das richtige für dich ist.
 
 **2 · Beginne in deinem eigenen Tempo.** Leg den Finger auf und streich. Finger oder Apple Pencil, beides geht. Es gibt keinen vorgegebenen Weg über das Blatt.
 
 **3 · Lass das Bild hervorkommen.** Es kommt nicht schneller, wenn du drückst – nur, wenn du bleibst. Aus vielen einzelnen Zügen wird allmählich eine zusammenhängende Zeichnung. Du musst nicht darüber nachdenken, was daraus werden soll.
 
-**4 · Wechsle das Pigment.** Neun liegen bereit. Nimm eines, probier es, nimm ein anderes. Oder bleib bewusst bei einem einzigen. Es gibt keine falsche Farbe.
+**4 · Wechsle das Pigment.** Zehn liegen bereit. Nimm eines, probier es, nimm ein anderes. Oder bleib bewusst bei einem einzigen. Es gibt keine falsche Farbe.
 
 **5 · Nimm dir Zeit.** Du kannst eine Stelle sorgfältig herausarbeiten oder weit ausholend über den ganzen Bogen gehen. Wenn du merkst, dass deine Aufmerksamkeit abschweift, hör auf den Klang – er folgt deiner Hand.
 
