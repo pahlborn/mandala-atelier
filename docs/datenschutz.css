@@ -1,0 +1,112 @@
+/* ============================================================================
+   Gemeinsames Aussehen der drei Datenschutzerklärungen.
+
+   Eine Datei statt dreimal derselbe Block: Drei Kopien liefen auseinander,
+   und dann sähe eine App anders aus als die anderen, ohne dass es jemand
+   beschlossen hätte.
+
+   Die Farben sind dieselben wie in veroeffentlichen.html und store.html.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+  --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+  --tut:  #2f6b45;                 /* trifft zu, nachgeprüft */
+  --offen:#a9700a;                 /* muss noch eingetragen werden */
+  --stop: #9a3b2f;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+          --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+          --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+           calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+  background: var(--room); color: var(--ink);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+main { max-width: 760px; margin: 0 auto; }
+
+h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+.app { font-size: 15px; color: var(--quiet); margin: 0 0 1.6rem; }
+h2 {
+  font-size: 13px; margin: 2.4rem 0 .8rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+}
+h3 { font-size: 16.5px; margin: 1.6rem 0 .4rem; font-weight: 600; }
+p { margin: 0 0 1rem; }
+a { color: inherit; }
+code {
+  font: 13.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--card); padding: 1px 5px; border-radius: 4px;
+}
+
+/* Der eine Satz, auf den es ankommt. Wer nur eine Zeile liest, liest die. */
+.kern {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin: 0 0 1.8rem;
+  font-size: 17px;
+}
+.kern b { display: block; margin-bottom: .3rem; }
+
+table.was {
+  width: 100%; border-collapse: collapse; margin: 0 0 1.4rem;
+  font-size: 15px;
+}
+table.was th, table.was td {
+  text-align: left; vertical-align: top;
+  padding: 9px 12px 9px 0; border-bottom: 1px solid var(--edge);
+}
+table.was th { font-weight: 600; width: 34%; }
+table.was tr:last-child th, table.was tr:last-child td { border-bottom: 0; }
+
+ul.punkte { list-style: none; margin: 0 0 1.4rem; padding: 0; }
+
+/* Kein Grid hier. Ein Grid macht JEDES Kind zu einer eigenen Zelle — auch
+   ein <b> mitten im Satz. Der Rest des Satzes landet dann in der schmalen
+   Zeichenspalte und bricht in Einzelwörter um. Deshalb hängt das Zeichen
+   absolut daneben, und der Text fließt normal weiter. */
+ul.punkte li {
+  position: relative;
+  padding: 7px 0 7px 1.9rem;
+}
+ul.punkte li::before {
+  content: '—'; color: var(--quiet);
+  position: absolute; left: 0; top: 7px;
+  width: 1.4rem; text-align: center;
+}
+ul.punkte li.ja::before  { content: '✓'; color: var(--tut); font-weight: 700; }
+ul.punkte li.nein::before{ content: '✕'; color: var(--quiet); }
+
+.note {
+  font-size: 14.5px; color: var(--quiet);
+  border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.4rem 0;
+}
+.note strong { color: var(--ink); }
+
+/* Was vor dem Veröffentlichen eingetragen werden MUSS. Auffällig, damit es
+   niemandem durchgeht: Eine Datenschutzerklärung ohne Anbieter ist keine. */
+.fehlt {
+  background: rgba(169, 112, 10, 0.16);
+  color: var(--offen);
+  border: 1px dashed var(--offen);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+footer {
+  margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+  border-top: 1px solid var(--edge); padding-top: 1.2rem;
+}
+footer a { color: inherit; }

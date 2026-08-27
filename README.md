@@ -120,6 +120,9 @@ Dateien unverändert ausliefert.
     docs/architektur.md     Konzept der Anlagen (Stufe 4.0)
     docs/motive.html        Schautafel: 15 Motivfamilien (erzeugt)
     docs/store.html         Attrappe: die drei Apps als Store-Seiten
+    docs/pruefliste.html    Acht Zeilen App-Store-Risiko, nachgesehen
+    docs/datenschutz-*.html Datenschutzerklärung, je App eine
+    docs/datenschutz.css    gemeinsames Aussehen der drei Erklärungen
     docs/store/             Bildschirmfotos dafür (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen

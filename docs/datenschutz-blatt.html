@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Datenschutz – Mandala – Das ruhige Blatt</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Datenschutzerklärung für Mandala – Das ruhige Blatt. Die App erhebt keine Daten.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../atelier3/icon-192.png">
+<link rel="stylesheet" href="datenschutz.css">
+
+<!--
+  Datenschutzerklärung für Mandala – Das ruhige Blatt.
+
+  Am Quelltext nachgesehen, nicht angenommen:
+  - localStorage: genau drei Schlüssel, atelier3-gedanken, atelier3-gesehen
+    und atelier3-ton. Mehr setzt die App nicht.
+  - IndexedDB: die Speicher `kv` und `blaetter`.
+  - Kein Abruf nach außen: tools/test-atelier3.js prüft das mit einer eigenen
+    Zeile, „nichts von außen".
+
+  Diese App kennt keine Personen und keine Namen — das ist der Unterschied
+  zum Atelier, und deshalb ist diese Erklärung kürzer.
+-->
+</head>
+<body>
+<main>
+
+  <h1>Datenschutz</h1>
+  <p class="app">Mandala – Das ruhige Blatt</p>
+
+  <div class="kern">
+    <b>Diese App erhebt keine Daten.</b>
+    Kein Konto, keine Werbung, keine Messung, keine Verbindung ins Netz.
+    Die App fragt Sie nicht einmal nach einem Namen.
+  </div>
+
+  <h2>Wer verantwortlich ist</h2>
+
+  <p><span class="fehlt">Anbietername, Anschrift und E-Mail-Adresse eintragen</span></p>
+
+  <p class="note"><strong>Vor dem Veröffentlichen auszufüllen.</strong> Unter
+     welchem Namen verkauft wird, ist noch nicht entschieden. Die Angabe ist
+     auch dann Pflicht, wenn nichts erhoben wird.</p>
+
+  <h2>Was gespeichert wird</h2>
+
+  <p>Alles bleibt <b>auf Ihrem Gerät</b>. Nichts wird übertragen,
+     ausgewertet oder gesichert.</p>
+
+  <table class="was">
+    <tr>
+      <th>Ihre Blätter</th>
+      <td>Der Stapel angefangener und weggelegter Blätter, mit dem, was Sie
+          darauf herausgerieben haben. Ein Blatt merkt sich nicht das Bild,
+          sondern die Angaben, aus denen es wieder entsteht — Ausgangszahl,
+          Welt, Charakter und Grammatik.</td>
+    </tr>
+    <tr>
+      <th>Drei Kleinigkeiten</th>
+      <td>Ob der Ton an oder aus ist; ob Sie die Einführung schon gesehen
+          haben; welche der stillen Hinweise Ihnen bereits gezeigt wurden.
+          Mehr legt die App nicht ab.</td>
+    </tr>
+  </table>
+
+  <p>Technisch: die drei Kleinigkeiten im <code>localStorage</code> unter
+     <code>atelier3-ton</code>, <code>atelier3-gesehen</code> und
+     <code>atelier3-gedanken</code>, die Blätter im IndexedDB-Speicher der
+     App.</p>
+
+  <p><b>Kein Name, keine Person, kein Profil.</b> Anders als im Mandala
+     Atelier gibt es hier keine Personenverwaltung. Die App weiß nicht, wer
+     Sie sind, und fragt auch nicht danach.</p>
+
+  <h2>Was nicht passiert</h2>
+
+  <ul class="punkte">
+    <li class="nein">Kein Konto, keine Anmeldung, keine Registrierung.</li>
+    <li class="nein">Keine Werbung und keine Werbekennung (IDFA).</li>
+    <li class="nein">Keine Analyse, keine Statistik, keine Absturzberichte.</li>
+    <li class="nein">Keine Weitergabe an Dritte — es gibt nichts weiterzugeben.</li>
+    <li class="nein">Keine Schnittstellen fremder Anbieter, kein CDN, keine
+        nachgeladene Schrift.</li>
+    <li class="nein">Keine Standortdaten, keine Kontakte, kein Mikrofon,
+        keine Kamera.</li>
+  </ul>
+
+  <p><b>Zum Klang:</b> Das Reiben klingt, und dieser Klang wird im Gerät
+     selbst erzeugt — gefiltertes Rauschen, das der Geschwindigkeit Ihrer
+     Hand folgt. Es wird nichts aufgenommen und nichts abgespielt, was von
+     außen käme. Das Mikrofon bleibt unberührt.</p>
+
+  <p>Die App ruft zur Laufzeit <b>nichts</b> aus dem Netz ab. Der Testlauf
+     des Projekts prüft das mit einer eigenen Zeile und schlägt fehl, sobald
+     doch etwas von außen geholt würde.</p>
+
+  <h2>Wie Sie alles wieder löschen</h2>
+
+  <p>Ein einzelnes Blatt legen Sie im Stapel weg oder verwerfen es dort.
+     Alles auf einmal: Löschen Sie die App vom Gerät. Wird die App im Browser
+     benutzt, verschwindet ebenso alles beim Löschen der Websitedaten. Eine
+     Anfrage bei uns ist nicht nötig und bliebe wirkungslos — bei uns liegt
+     nichts.</p>
+
+  <h2>Ihre Rechte</h2>
+
+  <p>Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch,
+     Datenübertragbarkeit: Diese Rechte der Datenschutz-Grundverordnung
+     richten sich gegen eine Stelle, die Ihre Daten verarbeitet.
+     <b>Wir verarbeiten keine.</b> Eine Auskunft unsererseits bliebe
+     notwendig leer.</p>
+
+  <p><b>Beschwerderecht.</b> Unabhängig davon können Sie sich jederzeit bei
+     einer Datenschutz-Aufsichtsbehörde beschweren. Zuständig ist
+     <span class="fehlt">zuständige Aufsichtsbehörde eintragen</span> —
+     welche es ist, hängt vom Sitz des Anbieters ab und wird zusammen mit
+     ihm festgelegt.</p>
+
+  <h2>Kinder</h2>
+
+  <p>Die App sammelt von niemandem etwas — auch nicht von Kindern.</p>
+
+  <h2>Änderungen</h2>
+
+  <p>Ändert sich an der App etwas, das diese Seite berührt, wird sie
+     mitgeändert. Maßgeblich ist die Fassung, die zum Zeitpunkt Ihrer
+     Nutzung hier steht.</p>
+
+  <p><b>Stand dieser Fassung:</b> 27. August 2026.</p>
+
+  <footer>
+    Für die Schwester-App gilt eine eigene Erklärung:
+    <a href="datenschutz-atelier.html">Mandala Atelier</a>.
+    Für das Malstudio ebenso:
+    <a href="datenschutz-malstudio.html">Sommer am Meer – Malstudio</a>.
+  </footer>
+
+</main>
+</body>
+</html>

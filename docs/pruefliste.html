@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Acht Zeilen, nachgesehen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Eine Prüfliste zum App-Store-Risiko für die Mandala-Apps, Zeile für Zeile gegen den Quelltext gehalten.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Eine von außen gereichte Prüfliste — acht Zeilen „Risiko / empfohlene
+  Ausrichtung" —, hier Zeile für Zeile gegen den Quelltext und die
+  vorhandenen Papiere gehalten.
+
+  Der Sinn der Seite ist nicht, die Liste abzunicken. Er ist, für jede Zeile
+  den Fundort zu nennen: Wo im Repository steht das, und stimmt es noch?
+  Eine Zeile ohne Fundort ist nicht abgedeckt, auch wenn sie plausibel klingt.
+
+  Zwei Dinge sind dabei herausgekommen, die man beim Abnicken übersehen
+  hätte: Zeile 8 widerspricht Zeile 2, und die Schlüsselwörter tragen den
+  Widerspruch in sich. Beides steht unten, nicht im Kleingedruckten.
+
+  docs/veroeffentlichen.html hat den vollständigen Ablauf bis zur
+  Einreichung; hier steht nur diese eine Liste. Sie sollen sich nicht
+  doppeln: Ablauf dort, Prüfung hier.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut:  #2f6b45;                 /* abgedeckt, nachgeprüft */
+    --offen:#a9700a;                 /* teilweise oder ungeschrieben */
+    --stop: #9a3b2f;                 /* Konflikt oder Lücke */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 820px; margin: 0 auto; }
+
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  a { color: inherit; }
+  code {
+    font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--card); padding: 1px 5px; border-radius: 4px;
+  }
+
+  .zeichen { font-size: 14px; color: var(--quiet); margin-bottom: 1.8rem; }
+  .zeichen span { white-space: nowrap; margin-right: 1.2rem; }
+
+  /* ---------- Eine Zeile der Liste ------------------------------------- */
+
+  .zeile {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    border-left: 3px solid var(--edge);
+  }
+  .zeile.ja   { border-left-color: var(--tut); }
+  .zeile.halb { border-left-color: var(--offen); }
+  .zeile.nein { border-left-color: var(--stop); }
+
+  .kopf {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: .5rem; flex-wrap: wrap;
+  }
+  .kopf .nr {
+    font-size: 12px; color: var(--quiet); font-weight: 600;
+    letter-spacing: .05em;
+  }
+  .kopf h3 { font-size: 17px; margin: 0; font-weight: 600; }
+  .kopf .urteil {
+    font-size: 12.5px; font-weight: 600; margin-left: auto;
+    padding: 2px 9px; border-radius: 20px; white-space: nowrap;
+  }
+  .ja   .urteil { color: var(--tut);   background: rgba(47, 107, 69, .12); }
+  .halb .urteil { color: var(--offen); background: rgba(169, 112, 10, .14); }
+  .nein .urteil { color: var(--stop);  background: rgba(154, 59, 47, .12); }
+  @media (prefers-color-scheme: dark) {
+    .ja   .urteil { background: rgba(111, 191, 142, .14); }
+    .halb .urteil { background: rgba(224, 169, 60, .16); }
+    .nein .urteil { background: rgba(224, 133, 115, .14); }
+  }
+
+  /* Was in der gereichten Liste stand — als Zitat, unverändert. */
+  .empfohlen {
+    font-size: 14px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 12px;
+    margin: 0 0 .8rem;
+  }
+
+  .zeile p { margin: 0 0 .7rem; font-size: 15.5px; }
+  .zeile p:last-child { margin-bottom: 0; }
+
+  .fund {
+    font-size: 13.5px; color: var(--quiet);
+    margin-top: .7rem; padding-top: .7rem;
+    border-top: 1px solid var(--edge);
+  }
+  .fund b { color: var(--ink); font-weight: 600; }
+
+  .warnung {
+    background: rgba(154, 59, 47, .09);
+    border: 1px solid rgba(154, 59, 47, .3);
+    border-radius: 14px; padding: 18px 20px; margin: 1.6rem 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .warnung { background: rgba(224, 133, 115, .1);
+               border-color: rgba(224, 133, 115, .3); }
+  }
+  .warnung h3 { margin: 0 0 .6rem; font-size: 17px; font-weight: 600; }
+  .warnung p { font-size: 15.5px; }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.4rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Acht Zeilen, nachgesehen</h1>
+  <p class="lede">Eine von außen gereichte Prüfliste zum App-Store-Risiko,
+     Zeile für Zeile gegen den Quelltext und die vorhandenen Papiere
+     gehalten. Für jede Zeile steht dabei, <b>wo</b> sie abgedeckt ist —
+     eine Zeile ohne Fundort gilt als nicht abgedeckt, auch wenn sie
+     plausibel klingt.</p>
+
+  <p class="zeichen">
+    <span><b style="color:var(--tut)">●</b> abgedeckt und nachgeprüft</span>
+    <span><b style="color:var(--offen)">●</b> teilweise</span>
+    <span><b style="color:var(--stop)">●</b> Lücke oder Konflikt</span>
+  </p>
+
+  <p class="note"><strong>Woher die Liste kommt:</strong> Sie wurde von außen
+     hereingereicht, nicht hier erarbeitet. Das ist ihr Wert — sie sieht
+     Dinge, die man selbst übersieht. Genau so ist der Abschnitt zur
+     Medizinprodukt-Erklärung in <a href="veroeffentlichen.html">Bis in den
+     Store</a> entstanden: weil jemand die Apple-Seite danebenhielt und
+     fragte, ob das berücksichtigt sei. War es nicht.</p>
+
+  <!-- ==================== 1 ==================== -->
+
+  <div class="zeile ja">
+    <div class="kopf">
+      <span class="nr">1</span>
+      <h3>Kategorie</h3>
+      <span class="urteil">abgedeckt</span>
+    </div>
+    <p class="empfohlen">Empfohlen: „Lifestyle“ oder „Health &amp; Fitness“</p>
+    <p>Gewählt ist <b>Grafik &amp; Design</b> als primäre und
+       <b>Lifestyle</b> als sekundäre Kategorie — für beide Mandala-Apps.
+       „Gesundheit &amp; Fitness“ kommt nirgends vor.</p>
+    <p>Das ist die vorsichtigere Hälfte der Empfehlung, und sie ist der
+       Grund, warum Zeile 2 überhaupt aufgeht: Die Medizinprodukt-Erklärung
+       hängt an dieser Kategorie.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="store-texte.md"><code>store-texte.md</code></a>, Tabelle
+       „Angaben für App Store Connect“ je App ·
+       <a href="store.html">store.html</a>, Zeile „Kategorie“</p>
+  </div>
+
+  <!-- ==================== 2 ==================== -->
+
+  <div class="zeile ja">
+    <div class="kopf">
+      <span class="nr">2</span>
+      <h3>Medical-Device-Deklaration</h3>
+      <span class="urteil">abgedeckt</span>
+    </div>
+    <p class="empfohlen">Empfohlen: „No – not a regulated medical device“</p>
+    <p>Steht als eigener Punkt in <a href="veroeffentlichen.html">Bis in den
+       Store</a>, Abschnitt G, mit der Bedingung dazu: Die Erklärung greift
+       nur bei <em>Gesundheit &amp; Fitness</em> oder <em>Medizin</em> als
+       Kategorie — oder wenn im Altersfragebogen beim Feld <em>Medizinische
+       Informationen oder Behandlung</em> „häufig“ angegeben wird.</p>
+    <p>Beides wird vermieden. Dort steht ausdrücklich, dass das eine
+       Bedingung ist und keine Selbstverständlichkeit: Wer die Ateliers
+       wegen „Achtsamkeit“ in Gesundheit &amp; Fitness einordnet, löst sie
+       aus — und braucht dann eine Herstellernummer, eine Adresse mit der
+       Gebrauchsanweisung und eine Zweckbestimmung.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="veroeffentlichen.html">veroeffentlichen.html</a>,
+       Abschnitt G · <b>Achtung:</b> siehe den Konflikt mit Zeile 8 unten</p>
+  </div>
+
+  <!-- ==================== 3 ==================== -->
+
+  <div class="zeile ja">
+    <div class="kopf">
+      <span class="nr">3</span>
+      <h3>Gesundheitsaussagen</h3>
+      <span class="urteil">abgedeckt</span>
+    </div>
+    <p class="empfohlen">Empfohlen: Wörter wie „behandelt“, „lindert“,
+       „therapiert“ vermeiden</p>
+    <p>Es gibt dazu eine geschriebene Hausregel, und sie ist älter als diese
+       Prüfliste: <em>„Keine Wirkungsversprechen, nirgends — nicht in der
+       App, nicht im Auftrag an die Testpersonen, nicht in einer späteren
+       Beschreibung.“</em> Mit dem Beispiel daneben, dass „senkt nachweislich
+       den Cortisolspiegel“ deutlich stärker wäre, als die Evidenz hergibt.</p>
+    <p>Nachgesucht in App und Store-Texten, deutsch wie englisch: kein
+       <em>behandelt</em>, <em>lindert</em>, <em>therapiert</em>,
+       <em>heilt</em>, kein <em>treat</em>, <em>relieve</em>,
+       <em>cure</em>.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="atelier-3.md"><code>atelier-3.md</code></a>, Abschnitt 14,
+       Absatz „Ehrlichkeit“ · <b>Aber:</b> siehe die Beobachtung zu den
+       Schlüsselwörtern unten</p>
+  </div>
+
+  <!-- ==================== 4 ==================== -->
+
+  <div class="zeile halb">
+    <div class="kopf">
+      <span class="nr">4</span>
+      <h3>Datenschutz</h3>
+      <span class="urteil">teilweise</span>
+    </div>
+    <p class="empfohlen">Empfohlen: Privacy Policy + Privacy Nutrition Label;
+       keine Gesundheitsdaten für Werbung/Tracking</p>
+    <p><b>Die inhaltliche Antwort steht und stimmt.</b> „Keine Daten erfasst“
+       ist nicht behauptet, sondern maschinell abgesichert:
+       <code>tools/test-app.js</code> zählt jeden Abruf, der nicht
+       <code>file:</code> oder <code>data:</code> ist, und lässt den Testlauf
+       durchfallen, sobald einer auftaucht; <code>test-atelier3.js</code> hat
+       dafür eine eigene Zeile, <em>„nichts von außen“</em>. Gesundheitsdaten
+       gibt es nicht, weil es überhaupt keine Daten gibt.</p>
+    <p><b>Die drei Erklärungen gibt es jetzt:</b>
+       <a href="datenschutz-atelier.html">Mandala Atelier</a>,
+       <a href="datenschutz-blatt.html">Das ruhige Blatt</a>,
+       <a href="datenschutz-malstudio.html">Malstudio</a>. Sie sind am
+       Quelltext geschrieben, nicht aus einer Vorlage.</p>
+    <p><b>Was noch fehlt:</b> In allen dreien steht der Anbieter als
+       gelb hinterlegte Lücke — unter welchem Namen verkauft wird, ist nicht
+       entschieden. Und die <b>Support-Adresse</b> fehlt weiterhin ganz; sie
+       ist ebenso Pflichtfeld wie die Datenschutzerklärung.</p>
+    <p class="fund"><b>Fundort:</b> die drei Seiten oben ·
+       <a href="store.html">store.html</a> führt Support noch als ✗</p>
+  </div>
+
+  <!-- ==================== 5 ==================== -->
+
+  <div class="zeile ja">
+    <div class="kopf">
+      <span class="nr">5</span>
+      <h3>Login</h3>
+      <span class="urteil">trifft nicht zu</span>
+    </div>
+    <p class="empfohlen">Empfohlen: Wenn Drittanbieter-Login, dann auch
+       „Sign in with Apple“ anbieten</p>
+    <p>Es gibt keinen Login. Die einzigen Treffer für <em>account</em> im
+       ganzen Repository sind Werbesätze — <em>„no account“</em>. Damit ist
+       „Sign in with Apple“ gegenstandslos.</p>
+    <p>Mitgedacht ist auch die Folgeregel: Apps, in denen man ein Konto
+       anlegen kann, müssen es auch in der App wieder löschen lassen. Ohne
+       Konten entfällt sie.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="veroeffentlichen.html">veroeffentlichen.html</a>,
+       Abschnitt G, „Kontolöschung — nicht betroffen“</p>
+  </div>
+
+  <!-- ==================== 6 ==================== -->
+
+  <div class="zeile ja">
+    <div class="kopf">
+      <span class="nr">6</span>
+      <h3>Zahlungen</h3>
+      <span class="urteil">abgedeckt</span>
+    </div>
+    <p class="empfohlen">Empfohlen: IAP für digitale Inhalte/Abos;
+       B2B-Lizenzen außerhalb der App klären</p>
+    <p>Alle drei Apps sind als <b>Einmalpreis</b> vorgesehen, ohne Käufe in
+       der App und ohne Abonnement. Im Quelltext findet sich kein StoreKit,
+       kein Zahlungsanbieter, nichts dergleichen — es gibt schlicht nichts
+       zu kaufen.</p>
+    <p><b>B2B ist nicht behandelt</b>, aber auch nicht geplant. Sollte je an
+       Praxen, Schulen oder Einrichtungen verkauft werden, ist das
+       unbeackert — dann wäre es eine eigene Frage, kein Nachtrag.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="store-texte.md"><code>store-texte.md</code></a>, Zeile
+       „Preis“ je App</p>
+  </div>
+
+  <!-- ==================== 7 ==================== -->
+
+  <div class="zeile halb">
+    <div class="kopf">
+      <span class="nr">7</span>
+      <h3>SDKs</h3>
+      <span class="urteil">ungeschrieben</span>
+    </div>
+    <p class="empfohlen">Empfohlen: Privacy Manifests prüfen, Tracking
+       minimieren</p>
+    <p><b>Tracking gibt es nicht</b>, und das ist der oben genannte
+       Testlauf: zur Laufzeit kein fremdes SDK, kein CDN, keine nachgeladene
+       Schrift. Die Schriften stecken seit Fassung 7-48 als Daten im
+       Programm.</p>
+    <p><b>Der native Rahmen</b> ist Capacitor, in
+       <code>tools/gen-nativ.js</code> auf <code>^6.0.0</code> festgelegt.
+       Capacitor 6 bringt sein Privacy Manifest selbst mit — in der Praxis
+       dürfte das also tragen.</p>
+    <p><b>Geschrieben steht es nirgends.</b> Die erzeugte
+       <code>LIESMICH.md</code> führt sorgfältig durch Signing,
+       <code>Info.plist</code>, <code>InfoPlist.strings</code> und
+       Symbolgrößen — erwähnt <code>PrivacyInfo.xcprivacy</code> aber mit
+       keinem Wort. Wer die Anleitung abarbeitet, prüft es nicht. Das ist
+       die Lücke dieser Zeile: keine falsche Angabe, eine fehlende.</p>
+    <p class="fund"><b>Fundort:</b>
+       <code>tools/gen-nativ.js</code> (Version) ·
+       <code>tools/test-app.js</code>, <code>tools/test-atelier3.js</code>
+       (Abrufe nach außen)</p>
+  </div>
+
+  <!-- ==================== 8 ==================== -->
+
+  <div class="zeile nein">
+    <div class="kopf">
+      <span class="nr">8</span>
+      <h3>Altersfreigabe</h3>
+      <span class="urteil">widerspricht Zeile 2</span>
+    </div>
+    <p class="empfohlen">Empfohlen: möglichst „9+“ / „Health or Wellness
+       Topics“ wählen</p>
+    <p>Im Repository steht überall <b>4+</b>, und
+       <a href="veroeffentlichen.html">Bis in den Store</a> sagt
+       ausdrücklich, die richtige Antwort im Feld <em>Medizinische
+       Informationen oder Behandlung</em> sei <b>„keine“</b>.</p>
+    <p>Das ist kein Versäumnis. Es ist der Grund, warum Zeile 2 aufgeht —
+       und deshalb steht diese Zeile rot. Siehe unten.</p>
+    <p class="fund"><b>Fundort:</b>
+       <a href="store-texte.md"><code>store-texte.md</code></a>, Zeile
+       „Altersfreigabe“ je App ·
+       <a href="veroeffentlichen.html">veroeffentlichen.html</a>,
+       Abschnitt G</p>
+  </div>
+
+  <!-- ==================== Der Konflikt ==================== -->
+
+  <h2>Der Punkt, an dem die Liste sich selbst widerspricht</h2>
+
+  <div class="warnung">
+    <h3>Zeile 8 macht Zeile 2 kaputt</h3>
+    <p>Zeile 2 will die Medizinprodukt-Erklärung vermeiden. Zeile 8
+       empfiehlt, im Altersfragebogen <em>Health or Wellness Topics</em>
+       anzukreuzen. Genau dieses Ankreuzen ist aber einer der beiden Auslöser
+       für die Erklärung, die Zeile 2 vermeiden will.</p>
+    <p>Die Empfehlung liest sich, als sei sie für eine App geschrieben, die
+       sich <em>als</em> Wellness-Anwendung positioniert. Diese beiden tun
+       das bewusst nicht — die eigene Beschreibung sagt: <em>„kein
+       Ausmalbuch, ein Symmetriewerkzeug“</em>.</p>
+    <p>Für ein Zeichenwerkzeug ist <b>4+ mit „keine“</b> schlicht die
+       zutreffendere Angabe. Und Richtlinie 2.3.1 verlangt zutreffende
+       Angaben — eine vorsichtshalber höher gewählte Einstufung ist keine
+       harmlose Vorsichtsmaßnahme, sondern eine unzutreffende Angabe mit
+       Folgen.</p>
+    <p><b>Zu entscheiden bleibt es trotzdem.</b> Hier steht nur, dass die
+       beiden Zeilen nicht zusammen gehen und man nicht beide haben kann.</p>
+  </div>
+
+  <h2>Eine Beobachtung, die auf keiner der acht Zeilen steht</h2>
+
+  <p>Die Schlüsselwörter des Mandala Ateliers enthalten in beiden Sprachen
+     <b>„Meditation, Achtsamkeit“</b> beziehungsweise <em>meditation,
+     mindfulness</em>. Eine der sechs Motivwelten heißt <b>„Zen &amp;
+     Achtsamkeit“</b>, mit Motiven namens <em>Atemringe</em> und
+     <em>Ruhefeld</em>.</p>
+
+  <p>Das sind keine Gesundheitsaussagen, und sie gehören nicht geändert.
+     Sie sind aber genau der Faden, an dem ein Prüfer zieht, wenn er die App
+     in Richtung Wellness liest — und damit die Verbindung zwischen Zeile 3
+     und Zeile 8. Wer an einer Stelle sparsam sein will, wäre beim
+     Schlüsselwort „Meditation“ besser bedient als beim Weltnamen: Das
+     Schlüsselwort bringt Sichtbarkeit in genau der Ecke, aus der die Frage
+     kommt.</p>
+
+  <p class="note"><strong>Nebenbei:</strong> „Zen“ berührt die Hausregel,
+     wonach religiöse Symbolik der ausdrücklichen Rücksprache in der Familie
+     bedarf — übernommen wird die Ordnung eines Vorbilds, nicht seine
+     Bedeutung. Diese Rücksprache steht laut
+     <a href="architektur.md"><code>architektur.md</code></a> §5 noch aus.</p>
+
+  <h2>Was daraus zu tun bleibt</h2>
+
+  <p>Drei Dinge, in dieser Reihenfolge:</p>
+
+  <p><b>1 · Anbieter und Support-Adresse festlegen.</b> Das sind die beiden
+     Punkte, die eine Einreichung heute tatsächlich aufhalten würden. Der
+     Anbietername füllt zugleich die drei gelben Lücken in den
+     Datenschutzerklärungen.</p>
+
+  <p><b>2 · Über Zeile 8 entscheiden.</b> 4+ mit „keine“, oder 9+ mit
+     Wellness-Themen und der Medizinprodukt-Erklärung im Schlepptau. Nicht
+     beides.</p>
+
+  <p><b>3 · Das Privacy Manifest in die <code>LIESMICH.md</code>
+     schreiben</b>, damit es beim nächsten nativen Durchgang jemand prüft,
+     statt sich darauf zu verlassen, dass Capacitor es mitbringt.</p>
+
+  <footer>
+    Die Regeln des App Store ändern sich, und diese Liste kam von außen.
+    Was hier steht, ist der Stand nach bestem Wissen vom 27. August 2026 —
+    maßgeblich ist, was App Store Connect beim Einreichen tatsächlich
+    verlangt. Der vollständige Ablauf steht in
+    <a href="veroeffentlichen.html">Bis in den Store</a>.
+  </footer>
+
+</main>
+</body>
+</html>

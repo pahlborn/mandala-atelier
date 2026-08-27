@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Datenschutz – Mandala Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Datenschutzerklärung für Mandala Atelier. Die App erhebt keine Daten.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="datenschutz.css">
+
+<!--
+  Datenschutzerklärung für Mandala Atelier.
+
+  Pflichtfeld in App Store Connect, auch wenn nichts erhoben wird — dann
+  steht eben das darin. Diese Seite ist die Adresse, die dort einzutragen
+  ist; GitHub Pages liefert sie ohnehin aus.
+
+  Was hier steht, ist am Quelltext nachgesehen, nicht angenommen:
+  - Speicherorte: `Store` in app.js (localStorage, Präfix `mandala-atelier.`)
+    und der IndexedDB-Speicher `mandala-atelier`, Objektspeicher `werke`.
+  - Kein Abruf nach außen: tools/test-app.js zählt jeden Abruf, der nicht
+    file: oder data: ist, und lässt den Testlauf durchfallen, wenn einer
+    auftaucht.
+
+  Wer die App ändert, ändert womöglich auch diese Seite. Neue Speicher,
+  neue Verbindungen und neue Felder gehören hier hinein — sonst steht hier
+  bald etwas, das nicht mehr stimmt.
+-->
+</head>
+<body>
+<main>
+
+  <h1>Datenschutz</h1>
+  <p class="app">Mandala Atelier</p>
+
+  <div class="kern">
+    <b>Diese App erhebt keine Daten.</b>
+    Es gibt kein Konto, keine Werbung, keine Messung und keine Verbindung
+    ins Netz. Was Sie im Atelier anlegen, bleibt auf Ihrem Gerät — wir
+    bekommen es nie zu sehen.
+  </div>
+
+  <h2>Wer verantwortlich ist</h2>
+
+  <p><span class="fehlt">Anbietername, Anschrift und E-Mail-Adresse eintragen</span></p>
+
+  <p class="note"><strong>Vor dem Veröffentlichen auszufüllen.</strong> Der
+     gelb hinterlegte Platz oben ist absichtlich leer: Unter welchem Namen
+     verkauft wird, ist noch nicht entschieden. Eine Datenschutzerklärung
+     ohne benannten Anbieter ist keine — die Angabe ist auch dann Pflicht,
+     wenn gar nichts erhoben wird.</p>
+
+  <h2>Was gespeichert wird</h2>
+
+  <p>Alles, was die App speichert, liegt <b>ausschließlich auf Ihrem
+     Gerät</b>, im Speicher des Browsers beziehungsweise der App. Nichts
+     davon wird übertragen, ausgewertet oder gesichert.</p>
+
+  <table class="was">
+    <tr>
+      <th>Ihre Werke</th>
+      <td>Fertige Mandalas mit dem Titel, den Sie ihnen geben. Sie liegen
+          in der Galerie und bleiben dort, bis Sie sie löschen.</td>
+    </tr>
+    <tr>
+      <th>Personen auf dem Gerät</th>
+      <td>Damit mehrere Menschen ein iPad teilen können, ohne dass sich die
+          Galerien mischen, lässt sich je Person ein Name eintragen. Der
+          Name ist freiwillig, frei gewählt und verlässt das Gerät nicht.
+          Ein leeres Feld ist ausdrücklich zulässig.</td>
+    </tr>
+    <tr>
+      <th>Ihre Einstellungen</th>
+      <td>Zuletzt gewähltes Motiv, Farbwelt und selbst gemischte Farben,
+          Achsenzahl, Spiegelung, Werkzeug, Strichstärke, Hilfslinien sowie
+          hell oder dunkel.</td>
+    </tr>
+  </table>
+
+  <p>Technisch: die Einstellungen und die Personenliste im
+     <code>localStorage</code> unter dem Präfix
+     <code>mandala-atelier.</code>, die Werke im IndexedDB-Speicher
+     <code>mandala-atelier</code>.</p>
+
+  <h2>Was nicht passiert</h2>
+
+  <ul class="punkte">
+    <li class="nein">Kein Konto, keine Anmeldung, keine Registrierung.</li>
+    <li class="nein">Keine Werbung und keine Werbekennung (IDFA).</li>
+    <li class="nein">Keine Analyse, keine Statistik, keine Absturzberichte.</li>
+    <li class="nein">Keine Weitergabe an Dritte — es gibt nichts weiterzugeben.</li>
+    <li class="nein">Keine Schnittstellen fremder Anbieter, kein CDN, keine
+        nachgeladene Schrift. Die Schriften stecken als Daten im Programm.</li>
+    <li class="nein">Keine Standortdaten, keine Kontakte, kein Mikrofon,
+        keine Kamera.</li>
+  </ul>
+
+  <p>Die App ruft zur Laufzeit <b>nichts</b> aus dem Netz ab. Das ist keine
+     Absichtserklärung, sondern geprüft: Der Testlauf des Projekts zählt
+     jeden Abruf, der nicht aus dem Programm selbst stammt, und schlägt fehl,
+     sobald einer auftaucht.</p>
+
+  <h2>Wenn Sie selbst etwas weitergeben</h2>
+
+  <p>Zwei Wege führen aus der App heraus, und beide beschreiten Sie —
+     nicht die App:</p>
+
+  <ul class="punkte">
+    <li><b>Sichern und Teilen.</b> Sie können ein Werk oder eine
+        Sicherungsdatei über das Teilen-Blatt Ihres Geräts weitergeben. Wohin
+        es geht, entscheiden Sie in diesem Moment; ab dort gelten die
+        Bedingungen des Ziels, das Sie gewählt haben.</li>
+    <li><b>Drucken.</b> Der Druckbogen geht an das Drucksystem Ihres Geräts.
+        Wir sehen davon nichts.</li>
+  </ul>
+
+  <h2>Wie Sie alles wieder löschen</h2>
+
+  <p>Ein einzelnes Werk löschen Sie in der Galerie. Eine Person löschen Sie
+     in der Personenverwaltung; ihre Werke gehen mit.</p>
+
+  <p>Alles auf einmal: Löschen Sie die App vom Gerät. Wird das Atelier als
+     Web-App im Browser benutzt, verschwindet ebenso alles beim Löschen der
+     Websitedaten. Ein Widerruf oder eine Anfrage bei uns ist nicht nötig
+     und wäre auch wirkungslos — bei uns liegt nichts.</p>
+
+  <h2>Ihre Rechte</h2>
+
+  <p>Nach der Datenschutz-Grundverordnung haben Sie Anspruch auf Auskunft,
+     Berichtigung, Löschung, Einschränkung, Widerspruch und
+     Datenübertragbarkeit. Diese Rechte richten sich gegen eine Stelle, die
+     Ihre Daten verarbeitet. <b>Wir verarbeiten keine.</b> Eine Auskunft
+     unsererseits bliebe deshalb notwendig leer.</p>
+
+  <p>Was auf Ihrem Gerät liegt, haben Sie ohnehin selbst in der Hand: ansehen,
+     ändern, ausführen als Sicherungsdatei, löschen — alles in der App, ohne
+     uns zu fragen.</p>
+
+  <p><b>Beschwerderecht.</b> Unabhängig davon können Sie sich jederzeit bei
+     einer Datenschutz-Aufsichtsbehörde beschweren. Zuständig ist
+     <span class="fehlt">zuständige Aufsichtsbehörde eintragen</span> —
+     welche es ist, hängt vom Sitz des Anbieters ab und wird zusammen mit
+     ihm festgelegt.</p>
+
+  <h2>Kinder</h2>
+
+  <p>Die App richtet sich an niemanden bestimmten Alters und sammelt von
+     niemandem etwas — auch nicht von Kindern.</p>
+
+  <h2>Änderungen</h2>
+
+  <p>Ändert sich an der App etwas, das diese Seite berührt, wird sie
+     mitgeändert. Maßgeblich ist die Fassung, die zum Zeitpunkt Ihrer
+     Nutzung hier steht.</p>
+
+  <p><b>Stand dieser Fassung:</b> 27. August 2026.</p>
+
+  <footer>
+    Für die zweite App gilt eine eigene Erklärung:
+    <a href="datenschutz-blatt.html">Mandala – Das ruhige Blatt</a>.
+    Für das Malstudio ebenso:
+    <a href="datenschutz-malstudio.html">Sommer am Meer – Malstudio</a>.
+  </footer>
+
+</main>
+</body>
+</html>
