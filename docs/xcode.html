@@ -308,6 +308,34 @@ npx cap open ios</code></pre>
   </div>
 
   <!-- ============================================================= -->
+  <h2>Die eine Falle</h2>
+
+  <div class="warn">
+    <b>Was Sie in Xcode ändern, ist beim nächsten <code>npm run nativ</code> weg.</b>
+    Der Ordner <code>nativ/</code> ist <em>erzeugt</em>, nicht gepflegt. Er
+    steht in <code>.gitignore</code> und wird bei jedem Lauf vollständig neu
+    angelegt — vorher gelöscht, dann frisch befüllt.
+  </div>
+
+  <p>Das ist Absicht: Zwei Kopien derselben App laufen auseinander. Aber es
+     heißt auch, dass jede Änderung dort ein Wegwerfstück ist.</p>
+
+  <p><b>Merken Sie sich die Regel:</b> Was an der App geändert werden soll,
+     wird <em>oben</em> geändert — in <code>index.html</code>,
+     <code>app.js</code>, <code>style.css</code> — und danach
+     <code>npm run nativ</code> erneut aufgerufen. Was nur in Xcode
+     einzustellen ist (Team, Bundle-ID, die Zeile in der
+     <code>Info.plist</code>), muss nach jedem Neuerzeugen wieder gesetzt
+     werden. Notieren Sie sich diese Einstellungen beim ersten Mal.</p>
+
+  <p class="note"><strong>Falls Ihnen in Xcode jemand hilft</strong> — etwa
+     der Claude Agent, den Xcode selbst mitbringt: Er sieht den Ordner
+     <code>nativ/</code>, nicht das Repository darüber. Er kennt weder die
+     Absprachen in <code>CLAUDE.md</code> noch die Papiere unter
+     <code>docs/</code>. Für Fehlermeldungen aus Xcode ist er der Richtige;
+     für Änderungen an der App selbst gehört die Arbeit nach oben.</p>
+
+  <!-- ============================================================= -->
   <h2>Teil D · Der Befundbogen</h2>
 
   <p>Das ist der Zweck des ganzen Durchgangs. Bitte wirklich aufschreiben,
