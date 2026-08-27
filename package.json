@@ -13,6 +13,7 @@
     "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js && node tools/test-druck.js && node tools/test-regal.js",
     "icons": "node tools/gen-icons.js",
     "icons:atelier3": "node tools/gen-atelier3-icons.js",
+    "mac": "node tools/mac-pruefen.js",
     "nativ": "node tools/gen-nativ.js",
     "nativ:blatt": "node tools/gen-nativ.js blatt",
     "einfrieren": "node tools/einfrieren.js",
