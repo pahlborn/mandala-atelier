@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Der erste Durchgang mit Xcode</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Schritt für Schritt: die Web-App als iPad-Programm auf das eigene Gerät bringen. Für jemanden, der Xcode noch nie geöffnet hat.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Anleitung für den ersten nativen Durchgang, geschrieben für jemanden, der
+  Xcode noch nie geöffnet hat.
+
+  Zwei Dinge, die beim Schreiben aufgefallen sind und die eine Anleitung
+  sonst hätten stolpern lassen:
+
+  1. tools/gen-nativ.js startet einen Browser, um das Symbol in 1024 × 1024
+     zu zeichnen (launch() aus tools/browser.js). Auf dem Mac sucht es unter
+     anderem /Applications/Google Chrome.app. Ohne Chrome oder Chromium
+     bricht der Schritt ab. Safari genügt NICHT. Das stand nirgends.
+  2. Es gab kein npm-Skript dafür; der Aufruf war `node tools/gen-nativ.js`.
+     Jetzt gibt es `npm run nativ`, passend zu allen anderen Werkzeugen.
+
+  Der Zweck dieses Durchgangs ist eine MESSUNG, kein Ergebnis: Trägt die
+  Web-App im nativen Rahmen? Deshalb steht am Ende ein Befundbogen und nicht
+  ein „fertig". Er kostet nichts — das Developer Program wird hier noch
+  nicht gebraucht.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 {
+    font-size: 13px; margin: 2.8rem 0 1rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+    border-top: 1px solid var(--edge); padding-top: 1.2rem;
+  }
+  h3 { font-size: 17px; margin: 1.8rem 0 .5rem; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  a { color: inherit; }
+
+  code {
+    font: 13.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--card); padding: 1px 5px; border-radius: 4px;
+  }
+  pre {
+    background: var(--card); border-radius: 12px;
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 1rem;
+    border-left: 3px solid var(--edge);
+  }
+  pre code { background: none; padding: 0; font-size: 13.5px; }
+
+  /* Ein nummerierter Schritt. */
+  .schritt {
+    display: grid; grid-template-columns: 2rem 1fr; gap: 0 14px;
+    margin-bottom: 1.6rem;
+  }
+  .schritt .nr {
+    grid-row: 1 / span 99;
+    width: 1.9rem; height: 1.9rem; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--edge);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--quiet);
+  }
+  .schritt > *:not(.nr) { grid-column: 2; }
+  .schritt h3 { margin-top: .1rem; }
+
+  .warn {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 16px; margin: 0 0 1rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .warn { background: rgba(224, 169, 60, .12);
+            border-color: rgba(224, 169, 60, .3); }
+  }
+  .warn b { display: block; margin-bottom: .3rem; }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.2rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  table.bogen { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 1.4rem; }
+  table.bogen th, table.bogen td {
+    text-align: left; vertical-align: top;
+    padding: 10px 12px 10px 0; border-bottom: 1px solid var(--edge);
+  }
+  table.bogen th { font-weight: 600; width: 38%; }
+
+  ul { margin: 0 0 1rem; padding-left: 1.3rem; }
+  li { margin-bottom: .4rem; }
+
+  footer { margin-top: 2.8rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Der erste Durchgang mit Xcode</h1>
+  <p class="lede">Die Web-App als richtiges iPad-Programm auf das eigene
+     Gerät bringen. Schritt für Schritt, für jemanden, der Xcode noch nie
+     geöffnet hat.</p>
+
+  <div class="warn">
+    <b>Das hier kostet nichts.</b>
+    Das Apple Developer Program (99 € im Jahr) wird für diesen Durchgang
+    <em>nicht</em> gebraucht. Eine gewöhnliche Apple-ID genügt. Die App läuft
+    danach sieben Tage auf Ihrem iPad — genau lange genug, um zu sehen, ob
+    es trägt.
+  </div>
+
+  <p><b>Und darum geht es:</b> nicht darum, fertig zu werden, sondern
+     herauszufinden, ob der Weg überhaupt gangbar ist. Läuft die App im
+     Flugmodus vollständig? Wie fühlt sich der Stift an? Was macht der
+     Druckbogen? Am Ende dieser Seite steht ein Befundbogen — der ist das
+     eigentliche Ergebnis.</p>
+
+  <!-- ============================================================= -->
+  <h2>Was Sie vorher brauchen</h2>
+
+  <ul>
+    <li><b>Der Mac.</b> Der iMac mit M3 genügt vollauf.</li>
+    <li><b>Xcode</b> mit angehaktem <b>iOS</b>-Baustein. watchOS, tvOS und
+        visionOS sind nicht nötig; das Predictive-Code-Modell auch nicht.</li>
+    <li><b>Node.</b> Falls noch nicht da: von <code>nodejs.org</code> die
+        Fassung mit dem Zusatz <b>LTS</b> laden und das Installationsprogramm
+        durchklicken.</li>
+    <li><b>Google Chrome</b> — ja, wirklich. Warum, steht gleich in Schritt 4.</li>
+    <li><b>Ein Kabel</b> und das iPad.</li>
+  </ul>
+
+  <!-- ============================================================= -->
+  <h2>Teil A · Auf dem Mac vorbereiten</h2>
+
+  <div class="schritt">
+    <span class="nr">1</span>
+    <h3>Das Terminal öffnen</h3>
+    <p>Das ist das Fenster, in das man Befehle tippt. <b>⌘ + Leertaste</b>
+      drücken, <code>Terminal</code> eintippen, Enter.</p>
+    <p>Es erschreckt beim ersten Mal, ist aber harmlos: Sie können jeden
+      Befehl von hier <b>kopieren und einsetzen</b> und dann Enter drücken.
+      Nichts davon verändert etwas an Ihrem Mac außer in einem Ordner, den
+      wir gleich anlegen.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">2</span>
+    <h3>Nachsehen, ob Node da ist</h3>
+    <pre><code>node --version</code></pre>
+    <p>Kommt eine Zahl wie <code>v22.11.0</code>, ist alles gut. Kommt
+      <em>command not found</em>, fehlt Node — dann von
+      <code>nodejs.org</code> die LTS-Fassung installieren und dieses Fenster
+      einmal schließen und neu öffnen.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">3</span>
+    <h3>Das Repository auf den Mac holen</h3>
+    <pre><code>cd ~/Documents
+git clone https://github.com/pahlborn/mandala-atelier.git
+cd mandala-atelier</code></pre>
+    <p><code>cd</code> heißt „geh in diesen Ordner“. Nach diesen drei Zeilen
+      liegt das ganze Projekt in <em>Dokumente → mandala-atelier</em>, und
+      das Terminal steht darin.</p>
+    <p class="note"><strong>Falls <code>git</code> nicht gefunden wird:</strong>
+      macOS fragt dann selbst, ob es die Entwicklerwerkzeuge nachladen soll —
+      annehmen und warten. Xcode bringt sie ohnehin mit.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">4</span>
+    <h3>Die Hilfspakete holen</h3>
+    <pre><code>npm install</code></pre>
+    <p>Holt, was die Werkzeuge des Projekts brauchen. Dauert ein paar
+      Sekunden.</p>
+    <div class="warn">
+      <b>Hier braucht es Chrome.</b>
+      Der nächste Schritt zeichnet das App-Symbol in 1024 × 1024 — und dafür
+      startet er im Hintergrund einen Browser. Gesucht wird nach
+      <b>Google Chrome</b> oder Chromium in <em>Programme</em>.
+      <b>Safari genügt nicht.</b> Ist keiner da, bricht Schritt 5 mit einer
+      Meldung über einen fehlenden Browser ab — dann Chrome installieren und
+      den Schritt wiederholen.
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <h2>Teil B · Die App für den Rahmen vorbereiten</h2>
+
+  <div class="schritt">
+    <span class="nr">5</span>
+    <h3>Den nativen Ordner erzeugen lassen</h3>
+    <pre><code>npm run nativ</code></pre>
+    <p>Das legt <code>nativ/mandala/</code> an und stellt alles hinein, was
+      gebraucht wird: die App selbst, das Symbol ohne Alphakanal (mit
+      Alphakanal würde Apple es ablehnen), die Konfiguration — und eine
+      <code>LIESMICH.md</code>, in der die folgenden Schritte noch einmal
+      stehen.</p>
+    <p>Für die zweite App hieße es <code>npm run nativ:blatt</code>. Fangen
+      Sie mit einer an.</p>
+    <p class="note"><strong>Was dabei <em>nicht</em> passiert:</strong> Der
+      Code wird nicht umgeschrieben. Xcode übersetzt kein JavaScript — die
+      Dateien ziehen um, mehr nicht. Die einzige Änderung: Die Registrierung
+      des Service Workers fällt weg, weil im Bundle ohnehin alles auf dem
+      Gerät liegt.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">6</span>
+    <h3>Die vier Befehle von Capacitor</h3>
+    <pre><code>cd nativ/mandala
+npm install
+npx cap add ios
+npx cap sync
+npx cap open ios</code></pre>
+    <p>Beim ersten <code>npx</code> fragt es, ob ein Paket geladen werden
+      darf — mit <b>y</b> bestätigen. Nach dem letzten Befehl geht Xcode von
+      selbst auf. <b>Ab hier wird nicht mehr getippt, nur noch geklickt.</b></p>
+  </div>
+
+  <!-- ============================================================= -->
+  <h2>Teil C · In Xcode</h2>
+
+  <div class="schritt">
+    <span class="nr">7</span>
+    <h3>Sich als Entwickler eintragen</h3>
+    <p>Links im Baum steht ganz oben <b>App</b> mit einem blauen Symbol —
+      darauf klicken. Oben erscheinen Reiter; <b>Signing &amp;
+      Capabilities</b> wählen.</p>
+    <ul>
+      <li><b>Automatically manage signing</b> anhaken.</li>
+      <li>Bei <b>Team</b> Ihre Apple-ID wählen. Steht dort keine, führt
+        <em>Add an Account…</em> zur Anmeldung — die gewöhnliche Apple-ID
+        genügt, kein bezahltes Konto.</li>
+    </ul>
+    <p>Erscheint danach ein roter Fehler zur <em>Bundle Identifier</em>:
+      Hängen Sie an die Kennung etwas Eigenes an, etwa Ihren Nachnamen. Sie
+      muss weltweit einmalig sein, und diese Fassung ist nur zum
+      Ausprobieren.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">8</span>
+    <h3>Das iPad anschließen und starten</h3>
+    <ul>
+      <li>iPad per Kabel anstecken, entsperren, „Diesem Computer vertrauen?“
+        bestätigen.</li>
+      <li>Oben in der Mitte von Xcode steht das Ziel — dort statt eines
+        Simulators <b>Ihr iPad</b> auswählen.</li>
+      <li>Links oben auf das <b>▶︎</b> drücken.</li>
+    </ul>
+    <p>Beim ersten Mal dauert es. Xcode fragt womöglich nach Ihrem
+      Anmeldekennwort, um auf den Schlüsselbund zuzugreifen — <em>Immer
+      erlauben</em>.</p>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">9</span>
+    <h3>Auf dem iPad Vertrauen aussprechen</h3>
+    <p>Beim ersten Start meldet das iPad, dass es dem Entwickler nicht traut.
+      Das ist normal. Auf dem iPad:</p>
+    <p><b>Einstellungen → Allgemein → VPN &amp; Geräteverwaltung</b> → Ihre
+      Apple-ID antippen → <b>Vertrauen</b>.</p>
+    <p>Danach die App auf dem Homescreen starten.</p>
+  </div>
+
+  <!-- ============================================================= -->
+  <h2>Teil D · Der Befundbogen</h2>
+
+  <p>Das ist der Zweck des ganzen Durchgangs. Bitte wirklich aufschreiben,
+     nicht nur ansehen — beim nächsten Mal erinnert sich niemand mehr.</p>
+
+  <table class="bogen">
+    <tr>
+      <th>Flugmodus</th>
+      <td>Alles abschalten, App <em>wirklich</em> beenden (App-Umschalter,
+        hochwischen), neu starten. Läuft sie vollständig? Fehlt irgendwo
+        etwas? <b>Das ist der wichtigste Punkt</b> — er ist das stärkste
+        Argument gegenüber Apples Richtlinie 4.2.</td>
+    </tr>
+    <tr>
+      <th>Apple Pencil</th>
+      <td>Wie fühlt sich das Zeichnen an? Kommt der Strich verzögert? Setzt
+        die Spitze sauber auf?</td>
+    </tr>
+    <tr>
+      <th>Teilen</th>
+      <td>Ein Werk sichern. Sollte gehen — die App benutzt das Teilen-Blatt,
+        nicht den Download-Weg.</td>
+    </tr>
+    <tr>
+      <th>Druckbogen</th>
+      <td><b>Der wird vermutlich nicht gehen.</b> Die App öffnet dafür ein
+        zweites Fenster, und das liefert im nativen Rahmen nichts zurück.
+        Bitte trotzdem ausprobieren und notieren, <em>was genau</em>
+        passiert — nichts, ein leeres Fenster, ein Absturz?</td>
+    </tr>
+    <tr>
+      <th>Die Galerie ist leer</th>
+      <td>Das ist richtig so und kein Fehler: Für iOS ist das eine andere App
+        als das Symbol vom Homescreen, mit eigenem Speicher.</td>
+    </tr>
+    <tr>
+      <th>Drehen</th>
+      <td>Quer- und Hochformat, beides einmal durchspielen.</td>
+    </tr>
+  </table>
+
+  <!-- ============================================================= -->
+  <h2>Wenn etwas schiefgeht</h2>
+
+  <h3>„command not found: npm“</h3>
+  <p>Node fehlt oder das Terminal kennt es noch nicht. Von
+    <code>nodejs.org</code> die LTS-Fassung installieren, Terminal schließen
+    und neu öffnen.</p>
+
+  <h3>Der Symbol-Schritt bricht ab</h3>
+  <p>Kein Chrome auf dem Mac. Siehe den gelben Kasten bei Schritt 4.</p>
+
+  <h3>„Signing for App requires a development team“</h3>
+  <p>Schritt 7 ist noch nicht erledigt: <em>Automatically manage signing</em>
+    anhaken und ein Team wählen.</p>
+
+  <h3>„Unable to install“ oder das iPad taucht nicht auf</h3>
+  <p>iPad entsperren, Kabel prüfen, „Diesem Computer vertrauen?“ bestätigt?
+    Manchmal hilft, Xcode einmal zu beenden und neu zu starten.</p>
+
+  <h3>Die App startet und bleibt weiß</h3>
+  <p>Dann ist beim Umziehen der Dateien etwas nicht mitgekommen. Bitte in
+    Xcode unten die Konsole ansehen und die erste rote Zeile notieren — mit
+    der lässt sich das finden.</p>
+
+  <h3>Nach sieben Tagen startet sie nicht mehr</h3>
+  <p>Das ist so vorgesehen und kein Fehler. Mit einer gewöhnlichen Apple-ID
+    läuft eine selbst aufgespielte App sieben Tage. Einfach in Xcode noch
+    einmal auf <b>▶︎</b> drücken.</p>
+
+  <!-- ============================================================= -->
+  <h2>Was danach kommt</h2>
+
+  <p>Erst wenn dieser Durchgang getragen hat, lohnt das Developer Program.
+     Was dann folgt — Verträge, Bundle-ID, Bildschirmfotos, die Erklärungen
+     in App Store Connect — steht in
+     <a href="veroeffentlichen.html">Bis in den Store</a>. Was noch
+     unentschieden ist, im <a href="offen.html">Register</a>.</p>
+
+  <p><b>Und die unbequeme Frage bleibt:</b> Richtlinie 4.2 lehnt Anwendungen
+     ab, die nichts weiter tun, als eine Website anzuzeigen. Dieser Durchgang
+     beantwortet sie nicht — er liefert nur die Messwerte, mit denen sie sich
+     beantworten lässt. Mehr dazu in der
+     <a href="store.html#huerde">Attrappe</a>, Abschnitt 4.</p>
+
+  <footer>
+    Geschrieben für den ersten Durchgang, nicht für die Einreichung. Wer
+    unterwegs auf etwas stößt, das hier fehlt: Es gehört hierher.
+  </footer>
+
+</main>
+</body>
+</html>

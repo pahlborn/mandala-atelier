@@ -3,8 +3,14 @@
 /* ============================================================================
    Bereitet eine App für den nativen Rahmen vor.
 
-     node tools/gen-nativ.js            → Mandala Atelier
-     node tools/gen-nativ.js blatt      → Mandala – Das ruhige Blatt
+     npm run nativ                      → Mandala Atelier
+     npm run nativ:blatt                → Mandala – Das ruhige Blatt
+
+   VORAUSSETZUNG: Ein Chrome oder Chromium auf dem Rechner. Das Symbol in
+   1024 x 1024 wird in einem echten Browser gezeichnet (launch() aus
+   ./browser). Safari genuegt NICHT — er laesst sich nicht fernsteuern.
+   Fehlt der Browser, bricht dieser Schritt ab, und zwar erst nachdem die
+   Dateien schon umgezogen sind.
 
    Das Ergebnis liegt in nativ/<app>/ und ist alles, was Capacitor braucht:
    ein Ordner www mit genau den Dateien dieser App, die Konfiguration, das
@@ -213,6 +219,8 @@ function anleitung() {
 '`www/app.js` entfernt. Im Bundle liegt ohnehin alles auf dem Gerät.\n\n' +
 '## Am Mac, der Reihe nach\n\n' +
 'Vorausgesetzt: Xcode ist installiert, und Node ist da (`node --version`).\n' +
+'Die Schritt-fuer-Schritt-Fassung mit Bildern und Fehlerfaellen steht in\n' +
+'docs/xcode.html im Repository.\n\n' +
 'Ein Developer-Programm brauchst du für diesen Teil **nicht**.\n\n' +
 '```\ncd nativ/' + WAHL + '\nnpm install\nnpx cap add ios\nnpx cap sync\nnpx cap open ios\n```\n\n' +
 'Danach ist Xcode offen. Dort:\n\n' +

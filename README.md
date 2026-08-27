@@ -126,6 +126,7 @@ Dateien unverändert ausliefert.
     docs/informativa-*.html Malstudio auf Italienisch
     docs/datenschutz.css    gemeinsames Aussehen aller sechs
     docs/offen.html         Register der offenen Punkte
+    docs/xcode.html         Erster nativer Durchgang, Schritt für Schritt
     docs/store/             Bildschirmfotos dafür (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
