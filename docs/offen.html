@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Was noch offen ist</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Register der offenen Punkte über alle drei Apps – was es ist, was es blockiert, woher es kommt.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Das Register der offenen Punkte.
+
+  ACHTUNG, damit das hier nicht schiefgeht: Dies ist KEINE zweite Liste
+  neben docs/veroeffentlichen.html. Die hat den vollständigen Ablauf bis zur
+  Einreichung mit rund fünfzig Punkten, und zwei Listen derselben Sache
+  laufen garantiert auseinander.
+
+  Hier steht nur, was dort NICHT hingehört oder dort noch fehlt:
+    - Punkte, die quer zu allem liegen (ein Name, eine Adresse)
+    - was aus der Pruefliste kam und entschieden werden muss
+    - Aufraeumarbeiten im Repository, die nichts mit dem Store zu tun haben
+    - Zeiger auf die Listen, die es schon gibt
+
+  Wer einen Punkt erledigt, streicht ihn HIER und dort, wo er sonst noch
+  steht. Ein erledigter Punkt, der stehen bleibt, ist schlimmer als einer,
+  der fehlt: Er kostet beim naechsten Mal die Zeit, ihn nachzupruefen.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  a { color: inherit; }
+  code {
+    font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--card); padding: 1px 5px; border-radius: 4px;
+  }
+
+  .punkt {
+    background: var(--card); border-radius: 14px;
+    padding: 15px 19px; margin-bottom: 12px;
+    border-left: 3px solid var(--edge);
+  }
+  .punkt.jetzt { border-left-color: var(--stop); }
+  .punkt.bald  { border-left-color: var(--offen); }
+  .punkt.klein { border-left-color: var(--quiet); }
+  .punkt.fertig{ border-left-color: var(--tut); }
+
+  .punkt h3 { font-size: 16.5px; margin: 0 0 .45rem; font-weight: 600; }
+  .punkt p { font-size: 15.5px; margin: 0 0 .6rem; }
+  .punkt p:last-child { margin-bottom: 0; }
+  .punkt .woher {
+    font-size: 13px; color: var(--quiet);
+    margin-top: .6rem; padding-top: .6rem;
+    border-top: 1px solid var(--edge);
+  }
+  .punkt .woher b { color: var(--ink); font-weight: 600; }
+  .punkt.fertig h3 { color: var(--quiet); }
+  .punkt.fertig h3::before { content: '✓ '; color: var(--tut); }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.4rem 0;
+  }
+  .note strong { color: var(--ink); }
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Was noch offen ist</h1>
+  <p class="lede">Ein Register über alle drei Apps: was es ist, was es
+     blockiert, und woher der Punkt kommt. Nach und nach abzuarbeiten.</p>
+
+  <p class="note"><strong>Dies ist keine zweite Liste.</strong>
+     <a href="veroeffentlichen.html">Bis in den Store</a> hat den
+     vollständigen Ablauf bis zur Einreichung, rund fünfzig Punkte, und
+     bleibt dafür maßgeblich. Hier steht nur, was dort nicht hingehört oder
+     dort noch fehlte — und ganz unten die Zeiger auf alles Übrige. Zwei
+     Listen derselben Sache laufen auseinander; deshalb wird hier nichts
+     wiederholt.</p>
+
+  <!-- ======================================================= -->
+  <h2>Zuerst — es hängt am meisten daran</h2>
+
+  <div class="punkt jetzt">
+    <h3>Unter welchem Namen wird verkauft?</h3>
+    <p>Diese eine Entscheidung füllt <b>sechs gelb hinterlegte Lücken auf
+       einmal</b>: In allen sechs Datenschutzerklärungen — drei deutsche,
+       drei englische — steht der Anbieter als Leerstelle. Ohne ihn ist eine
+       Datenschutzerklärung keine.</p>
+    <p>Sie hängt außerdem an einer anderen: Wer als Person ins Apple
+       Developer Program eintritt, steht mit seinem Namen im Store; wer als
+       Firma eintritt, braucht eine.</p>
+    <p class="woher"><b>Blockiert:</b> die sechs Datenschutzseiten, das
+       Copyright-Feld, die Anbieterzeile im Store ·
+       <b>Woher:</b> beim Schreiben der Erklärungen aufgefallen</p>
+  </div>
+
+  <div class="punkt jetzt">
+    <h3>Die Support-Adresse</h3>
+    <p>Pflichtfeld je App, so wie die Datenschutzerklärung — eine Stelle,
+       an die sich jemand wenden kann, der die App gekauft hat und ein
+       Problem damit hat. Es genügt <b>eine E-Mail-Adresse</b> oder eine
+       schlichte Seite; für alle drei Apps darf es dieselbe sein.</p>
+    <p>Eine Seite hätte den Vorzug, dass sie neben den anderen hier liegen
+       kann und keine private Adresse offenlegt — im Store ist sie
+       öffentlich sichtbar.</p>
+    <p class="woher"><b>Blockiert:</b> die Einreichung, alle drei Apps ·
+       <b>Steht auch in:</b> <a href="veroeffentlichen.html">Bis in den
+       Store</a>, Abschnitt A</p>
+  </div>
+
+  <div class="punkt jetzt">
+    <h3>Die zuständige Aufsichtsbehörde</h3>
+    <p>Ergibt sich aus dem Sitz des Anbieters und wird mit ihm zusammen
+       festgelegt. Steht in allen sechs Datenschutzerklärungen als zweite
+       gelbe Lücke.</p>
+    <p class="woher"><b>Hängt an:</b> dem Anbieternamen ·
+       <b>Woher:</b> <code>veroeffentlichen.html</code> nannte das Feld,
+       es fehlte in der ersten Fassung der Erklärungen</p>
+  </div>
+
+  <!-- ======================================================= -->
+  <h2>Zu entscheiden</h2>
+
+  <div class="punkt bald">
+    <h3>Altersfreigabe: 4+ oder 9+?</h3>
+    <p>Die von außen gereichte Prüfliste empfiehlt <em>9+ / Health or
+       Wellness Topics</em>. Genau dieses Ankreuzen ist aber einer der beiden
+       Auslöser für die Medizinprodukt-Erklärung, die dieselbe Liste eine
+       Zeile darüber vermeiden will. <b>Beides geht nicht.</b></p>
+    <p>Die Empfehlung hier: <b>4+ mit „keine“</b>. Für ein Zeichenwerkzeug
+       ist das die zutreffendere Angabe, und Richtlinie 2.3.1 verlangt
+       zutreffende Angaben. Eine vorsichtshalber höhere Einstufung ist keine
+       harmlose Vorsichtsmaßnahme.</p>
+    <p class="woher"><b>Ausführlich:</b>
+       <a href="pruefliste.html">Acht Zeilen, nachgesehen</a>, Zeile 8</p>
+  </div>
+
+  <div class="punkt bald">
+    <h3>Kinder-Kategorie fürs Malstudio — näher dran, nicht erledigt</h3>
+    <p>Sie verlangt: keine Analyse durch Dritte, keine Werbung, und jeder Weg
+       nach draußen hinter einer Elternschranke. Die ersten beiden erfüllt
+       die App seit je.</p>
+    <p><b>Der dritte ist besser geworden, aber nicht erfüllt.</b> Seit
+       Fassung 7-52 sind Wikipedia und der Kartenlink ab Werk geschlossen,
+       und die Freigabe liegt hinter der Rechenaufgabe. Apple verlangt
+       allerdings <em>„a designated area behind a parental gate“</em> — die
+       Links selbst hinter der Schranke, nicht einen Schalter, der sie danach
+       im Kinderbereich sichtbar macht. Gebaut ist der Schalter. Für eine
+       gewöhnliche Veröffentlichung mit 4+ reicht das weit; für die
+       Kinder-Kategorie ist es die riskantere Auslegung.</p>
+    <p>Dazu die Übergangsausnahme: Wer vor 7-52 schon einen Fundort
+       hinterlegt hatte, dem bleibt der Kartenknopf offen.</p>
+    <p class="woher"><b>Ausführlich:</b>
+       <a href="veroeffentlichen.html">Bis in den Store</a>, die vier
+       Einträge zu 1.3 — dort steht der Wortlaut der Regel und warum der
+       Schalter die schwächere Lesart ist ·
+       <b>Zu bedenken:</b> 1.3 ist eine Tür, die nur in eine Richtung geht</p>
+  </div>
+
+  <div class="punkt bald">
+    <h3>Das Schlüsselwort „Meditation“</h3>
+    <p>Keine Gesundheitsaussage, aber der Faden, an dem ein Prüfer zieht,
+       wenn er die Ateliers in Richtung Wellness liest — und damit die
+       Verbindung zur Altersfreigabe-Frage oben. Wer sparsam sein will, ist
+       beim Schlüsselwort besser bedient als beim Weltnamen <em>Zen &amp;
+       Achtsamkeit</em>.</p>
+    <p class="woher"><b>Ausführlich:</b>
+       <a href="pruefliste.html">Acht Zeilen, nachgesehen</a>, letzter
+       Abschnitt · <b>Nur eine Anmerkung</b>, keine Empfehlung zu ändern</p>
+  </div>
+
+  <div class="punkt bald">
+    <h3>„Zen“ und die Rücksprache in der Familie</h3>
+    <p>Die Hausregel sagt: keine religiösen Symbole ohne ausdrückliche
+       Rücksprache — übernommen wird die Ordnung eines Vorbilds, nicht seine
+       Bedeutung. Für die Motivwelt <em>Zen &amp; Achtsamkeit</em> steht
+       diese Rücksprache noch aus.</p>
+    <p class="woher"><b>Steht in:</b>
+       <a href="architektur.md"><code>architektur.md</code></a> §5 und in
+       <code>CLAUDE.md</code> · <b>seit Längerem offen</b></p>
+  </div>
+
+  <!-- ======================================================= -->
+  <h2>Übersetzen</h2>
+
+  <div class="punkt bald">
+    <h3>Datenschutzerklärung des Malstudios auf Italienisch</h3>
+    <p>Die App spricht drei Sprachen, und die Insel liegt in Italien. Wird
+       das Malstudio im italienischen Store gelistet, gehört die Erklärung
+       auch auf Italienisch dazu — nicht weil Apple die Übersetzung erzwingt,
+       sondern weil eine Datenschutzerklärung für den verständlich sein muss,
+       um dessen Daten es geht.</p>
+    <p><b>Nur das Malstudio.</b> Die beiden Mandala-Apps sprechen Deutsch
+       und Englisch; für sie stellt sich die Frage nicht.</p>
+    <p class="woher"><b>Woher:</b> Rückfrage in der Sitzung vom 27. August ·
+       <b>Verwandt:</b> „Italienisch: die App kann es, der Store weiß es
+       nicht“ in <a href="veroeffentlichen.html">Bis in den Store</a></p>
+  </div>
+
+  <!-- ======================================================= -->
+  <h2>Im Repository aufräumen</h2>
+
+  <div class="punkt klein">
+    <h3>Fassungsnummer und Cache-Name stimmen nicht überein</h3>
+    <p><code>npm run test:nebeneinander</code> meldet es: <b>Atelier 2.25
+       bei <code>v1-27</code></b>, <b>Blatt 3.17 bei <code>v1-20</code></b>.
+       Nach der Absprache ist die Fassungsnummer dieselbe wie im
+       Cache-Namen; es müsste also 2.27 und 3.20 heißen.</p>
+    <p>Nicht nebenbei zu erledigen: Die Nummer hochzusetzen ist eine
+       Veröffentlichung mit Einfrieren und Regal, in der festgelegten
+       Reihenfolge.</p>
+    <p class="woher"><b>Woher:</b> Testlauf vom 27. August ·
+       <b>Bestand schon vorher</b> — die Werte stehen wortgleich in
+       <code>main</code></p>
+  </div>
+
+  <div class="punkt klein">
+    <h3>Die Malstudio-Seiten liegen im falschen Repository</h3>
+    <p>Die beiden Datenschutzerklärungen des Malstudios stehen hier, weil
+       hier die übrigen Store-Papiere liegen und GitHub Pages sie von hier
+       ausliefert. Die App selbst liegt in <code>pahlborn/malstudio</code>.
+       Das ist heute bequem und später womöglich verwirrend — wandern sie
+       um, muss die Adresse in App Store Connect mitwandern.</p>
+    <p class="woher"><b>Woher:</b> beim Anlegen der Seiten bewusst so
+       entschieden · <b>Keine Eile</b>, aber es sollte einmal entschieden
+       werden</p>
+  </div>
+
+  <div class="punkt klein">
+    <h3>Ein Wegwerf-Zweig steht noch im Malstudio</h3>
+    <p><code>claude/wegwerf-schreibtest</code> in
+       <code>pahlborn/malstudio</code> — aus einem Schreibtest entstanden,
+       zeigt auf einen alten Stand von <code>main</code> und richtet nichts
+       an. Löschen ließ er sich aus der Sitzung heraus nicht; in der
+       Zweigliste des Repos geht es mit einem Antippen. Dort stehen auch
+       <code>claude/kannst-du-damit-anfangen-usk51c</code> und
+       <code>claude/malstudio-zugriff-tfn7l7</code> herum.</p>
+    <p class="woher"><b>Woher:</b> Sitzung vom 27. August ·
+       <b>Reine Kosmetik</b></p>
+  </div>
+
+  <div class="punkt klein">
+    <h3><code>foto-fundort-beispiel.jpg</code> fehlt im Malstudio</h3>
+    <p>Das Beispielfoto für den Fundort. Die App kommt ohne aus — die
+       Bildspalte bleibt dann leer, und die Datei steht bewusst nicht im
+       Pflichtvorrat des Service Workers, weil <code>addAll()</code> sonst
+       daran abbräche und den Offline-Betrieb mitrisse. Liegt sie eines
+       Tages im Hauptverzeichnis, ist sie sofort da.</p>
+    <p class="woher"><b>Woher:</b> Übergabe der v7-52-Patches ·
+       <b>Schadet nichts</b>, solange sie fehlt</p>
+  </div>
+
+  <div class="punkt klein">
+    <h3><code>PrivacyInfo.xcprivacy</code> in der Anleitung nachtragen</h3>
+    <p>Capacitor 6 bringt sein Privacy Manifest selbst mit, aber die von
+       <code>tools/gen-nativ.js</code> erzeugte <code>LIESMICH.md</code>
+       erwähnt es mit keinem Wort. Wer die Anleitung abarbeitet, prüft es
+       nicht. Keine falsche Angabe, eine fehlende.</p>
+    <p class="woher"><b>Ausführlich:</b>
+       <a href="pruefliste.html">Acht Zeilen, nachgesehen</a>, Zeile 7</p>
+  </div>
+
+  <!-- ======================================================= -->
+  <h2>Was schon woanders steht</h2>
+
+  <p>Damit hier nichts doppelt geführt wird — diese Listen bleiben für ihren
+     Bereich maßgeblich:</p>
+
+  <div class="punkt klein">
+    <h3><a href="veroeffentlichen.html">Bis in den Store</a></h3>
+    <p>Der vollständige Ablauf bis zur Einreichung: Developer Program,
+       Xcode, Verträge, Bildschirmfotos, der native Rahmen und Richtlinie
+       4.2, die Erklärungen in App Store Connect, das Regelwerk Punkt für
+       Punkt. <b>Rund fünfzig Punkte</b> — dort nachsehen, nicht hier.</p>
+  </div>
+
+  <div class="punkt klein">
+    <h3><a href="store-texte.md"><code>store-texte.md</code></a></h3>
+    <p>Je App ein Abschnitt „Noch offen“: Apple-Pencil-Neigung, das Symbol
+       ohne Alphakanal, die Kids-Corner-Frage, Bildschirmfotos mit gefüllter
+       Galerie.</p>
+  </div>
+
+  <div class="punkt klein">
+    <h3><a href="pruefliste.html">Acht Zeilen, nachgesehen</a></h3>
+    <p>Die von außen gereichte Prüfliste zum App-Store-Risiko, Zeile für
+       Zeile gegen den Quelltext gehalten.</p>
+  </div>
+
+  <!-- ======================================================= -->
+  <h2>Zuletzt geschlossen</h2>
+
+  <p>Damit man sieht, dass sich etwas bewegt — und damit niemand einen
+     erledigten Punkt noch einmal aufmacht:</p>
+
+  <div class="punkt fertig">
+    <h3>Datenschutzerklärungen, deutsch und englisch</h3>
+    <p>Je App eine, in beiden Sprachen, am Quelltext geschrieben. Offen
+       bleibt darin nur der Anbieter (siehe ganz oben).</p>
+    <p class="woher"><b>27. August 2026</b> · zuvor führte
+       <code>veroeffentlichen.html</code> sie fälschlich als erledigt,
+       obwohl es sie in keinem Zweig gab</p>
+  </div>
+
+  <div class="punkt fertig">
+    <h3>Wikipedia und Karten hinter die Elternschranke</h3>
+    <p>Beide ab Werk geschlossen, Freigabe im Elternbereich hinter der
+       Rechenaufgabe. Für eine Veröffentlichung mit 4+ ist die Frage damit
+       erledigt; für die Kinder-Kategorie nicht ganz — siehe oben.</p>
+    <p class="woher"><b>Malstudio v7-52</b>, 27. August 2026</p>
+  </div>
+
+  <div class="punkt fertig">
+    <h3>Sechs Fundstücke für die Schatzsuche</h3>
+    <p>Eines je Bucht, als letzter Schritt. Sie stehen nicht in der
+       Motivliste — die hat unverändert 29 Kacheln.</p>
+    <p class="woher"><b>Malstudio v7-52</b>, 27. August 2026</p>
+  </div>
+
+  <footer>
+    Wer einen Punkt erledigt, streicht ihn hier <em>und</em> dort, wo er
+    sonst noch steht. Ein erledigter Punkt, der stehen bleibt, kostet beim
+    nächsten Mal die Zeit, ihn nachzuprüfen — und genau das ist mit den drei
+    Einträgen zur Elternschranke passiert.
+  </footer>
+
+</main>
+</body>
+</html>

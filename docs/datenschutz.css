@@ -35,7 +35,21 @@ body {
 main { max-width: 760px; margin: 0 auto; }
 
 h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
-.app { font-size: 15px; color: var(--quiet); margin: 0 0 1.6rem; }
+.app { font-size: 15px; color: var(--quiet); margin: 0 0 1.2rem; }
+
+/* Sprachwahl. Sie steht oben, weil ein Prüfer bei Apple die englische
+   Fassung sucht und sie nicht am Fuß der Seite finden soll. */
+.sprachen {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin: 0 0 1.8rem; font-size: 13.5px;
+}
+.sprachen a, .sprachen span {
+  padding: 3px 11px; border-radius: 20px;
+  border: 1px solid var(--edge); text-decoration: none;
+  color: var(--quiet);
+}
+.sprachen span { background: var(--card); color: var(--ink); font-weight: 600; }
+.sprachen a:hover { color: var(--ink); }
 h2 {
   font-size: 13px; margin: 2.4rem 0 .8rem; font-weight: 600;
   text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);

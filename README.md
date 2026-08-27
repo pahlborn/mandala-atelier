@@ -122,7 +122,9 @@ Dateien unverändert ausliefert.
     docs/store.html         Attrappe: die drei Apps als Store-Seiten
     docs/pruefliste.html    Acht Zeilen App-Store-Risiko, nachgesehen
     docs/datenschutz-*.html Datenschutzerklärung, je App eine
-    docs/datenschutz.css    gemeinsames Aussehen der drei Erklärungen
+    docs/privacy-*.html     dieselben auf Englisch
+    docs/datenschutz.css    gemeinsames Aussehen aller sechs
+    docs/offen.html         Register der offenen Punkte
     docs/store/             Bildschirmfotos dafür (erzeugt)
     atelier3/               Zweite App „Blatt“ – eigenes README dort
     beide.html              Einstiegsseite: beide Apps auf den Homescreen
