@@ -123,6 +123,7 @@ Dateien unverändert ausliefert.
     docs/pruefliste.html    Acht Zeilen App-Store-Risiko, nachgesehen
     docs/datenschutz-*.html Datenschutzerklärung, je App eine
     docs/privacy-*.html     dieselben auf Englisch
+    docs/informativa-*.html Malstudio auf Italienisch
     docs/datenschutz.css    gemeinsames Aussehen aller sechs
     docs/offen.html         Register der offenen Punkte
     docs/store/             Bildschirmfotos dafür (erzeugt)

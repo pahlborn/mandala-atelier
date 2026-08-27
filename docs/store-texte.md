@@ -51,6 +51,8 @@ in das Feld gehören sie ohne, das spart je Begriff ein Zeichen.
 | **Sprachen** | Deutsch, Englisch |
 | **Geräte** | iPad und iPhone, Quer- und Hochformat, Apple Pencil |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
+| **Datenschutzerklärung** | `https://pahlborn.github.io/mandala-atelier/docs/datenschutz-atelier.html`<br><sub>englisch: `privacy-atelier.html`</sub> |
+| **Support-Adresse** | **fehlt** – Pflichtfeld je App, darf für alle drei dieselbe sein |
 
 ## Beschreibung
 
@@ -150,6 +152,8 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 | **Sprachen** | Deutsch, Englisch |
 | **Geräte** | iPad und iPhone, Quer- und Hochformat |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
+| **Datenschutzerklärung** | `https://pahlborn.github.io/mandala-atelier/docs/datenschutz-blatt.html`<br><sub>englisch: `privacy-blatt.html`</sub> |
+| **Support-Adresse** | **fehlt** – Pflichtfeld je App, darf für alle drei dieselbe sein |
 
 ## Beschreibung
 
@@ -237,6 +241,8 @@ Mach aus einem leeren Bogen deinen eigenen Raum.
 | **Sprachen** | Deutsch, Englisch, Italienisch |
 | **Geräte** | iPad zuerst, iPhone möglich; Quer- und Hochformat |
 | **Copyright** | © 2026 Name des Anbieters – noch festzulegen |
+| **Datenschutzerklärung** | `https://pahlborn.github.io/mandala-atelier/docs/datenschutz-malstudio.html`<br><sub>englisch: `privacy-malstudio.html` · italienisch: `informativa-malstudio.html`</sub> |
+| **Support-Adresse** | **fehlt** – Pflichtfeld je App, darf für alle drei dieselbe sein |
 
 ## Beschreibung
 
