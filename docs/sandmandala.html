@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Motivwelt Sandmandala — Übersicht zum Entscheiden</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Architektonische Bausteine tibetischer Sandmandalas als Kandidaten für eine neue Motivwelt. Noch nicht gebaut — eine Übersicht zum Auswählen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Übersichtsseite zum Entscheiden, NICHT zum Anschauen einer fertigen Welt.
+  Nichts hier ist in app.js codiert.
+
+  Wie bei sriyantra.html: ein Sandmandala ist kein offenes Formenvokabular,
+  sondern die Darstellung des Palastes EINER bestimmten Gottheit (etwa
+  Kalachakra, mit ueber 700 namentlichen Gottheiten), unter Ritualautoritaet
+  errichtet und wieder zerstoert (Rubin Museum of Art; Namgyal Monastery
+  Institute of Buddhist Studies).
+
+  Deshalb hier keine acht freien Motive, sondern die architektonischen
+  BAUSTEINE, die praktisch jedes Palast-Mandala teilt - Torring, Ringfolge,
+  Lotoskranz, Flammenkranz -, unabhaengig von einer bestimmten Gottheit.
+  Bewusst NICHT verwendet: der Name einer bestimmten Gottheit oder eines
+  bestimmten Mandalas (Kalachakra o.ae.), die Farbzuordnung der vier
+  Himmelsrichtungen zu Gottheiten, jede figuerliche Ikonografie im Palast-
+  inneren. Uebernommen wird der Grundriss, nicht die Bewohner.
+
+  Wie bei Sri Yantra: Diese Welt wurde nach ausfuehrlicher Darstellung der
+  religioesen Tiefe zugesagt. Ob das die von CLAUDE.md verlangte
+  "ausdrueckliche Ruecksprache in der Familie" war oder nur die
+  Einschaetzung einer Person, ist von hier aus nicht zu wissen - deshalb
+  wird es nicht behauptet.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.2rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand b { display: block; margin-bottom: .3rem; }
+
+  .frei {
+    background: rgba(47, 107, 69, .09);
+    border: 1px solid rgba(47, 107, 69, .3);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 14.5px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .frei { background: rgba(111, 191, 142, .1); border-color: rgba(111, 191, 142, .3); }
+  }
+  .frei b { display: block; margin-bottom: .3rem; }
+
+  .kandidat {
+    background: var(--card); border-radius: 14px;
+    padding: 15px 19px; margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 14px;
+    align-items: baseline;
+  }
+  .kandidat h3 { grid-column: 1; font-size: 16px; margin: 0; font-weight: 600; }
+  .kandidat .achsen {
+    grid-column: 2; font-size: 12.5px; color: var(--quiet);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .kandidat p { grid-column: 1 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; }
+
+  .tiefe {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: 2px 12px;
+    margin-bottom: .9rem;
+  }
+  .tiefe b { grid-column: 1 / -1; font-size: 15.5px; }
+  .tiefe span.buchstabe { font-size: 13px; color: var(--quiet); font-weight: 700; }
+  .tiefe p { grid-column: 2; font-size: 14.5px; color: var(--quiet); margin: 0 0 .8rem; }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Motivwelt „Palast-Mandala“</h1>
+  <p class="lede">Vier architektonische Bausteine, die praktisch jedes
+     tibetische Sandmandala teilt — zum Auswählen, nichts davon ist gebaut.</p>
+
+  <div class="frei">
+    <b>Zugesagt, mit einer offenen Frage.</b> Diese Welt wurde nach
+    ausführlicher Darstellung ihrer religiösen Tiefe zugesagt. Die Regel in
+    <code>CLAUDE.md</code> verlangt <em>„ausdrückliche Rücksprache in der
+    Familie“</em> — ob dieses Gespräch das war oder die Einschätzung einer
+    Person, weiß diese Seite nicht und behauptet es nicht.
+  </div>
+
+  <h2>Woher, und warum „Palast“ statt eines Namens</h2>
+
+  <p>Ein Sandmandala (<em>dul-tson-kyil-khor</em>) ist keine freie
+     Dekoration, sondern die dreidimensionale Darstellung des
+     Götterpalastes einer bestimmten Tantra-Gottheit — etwa Kalachakra, mit
+     über 700 namentlichen Gottheiten —, unter Ritualautorität errichtet
+     und rituell wieder zerstört. Jede Farbe, jedes architektonische
+     Element hat festgelegte Bedeutung.
+     (<a href="https://rubinmuseum.org/projecthimalayanart/essays/the-kalachakra-mandala-in-the-potala-palace/">Rubin
+     Museum of Art</a>,
+     <a href="https://namgyal.org/pages/sand-mandala">Namgyal Monastery
+     Institute of Buddhist Studies</a>)</p>
+
+  <p><b>Was diese Seite deshalb bewusst nicht tut:</b> den Namen einer
+     bestimmten Gottheit oder eines bestimmten Mandalas (Kalachakra oder
+     ein anderes) verwenden, die Farbzuordnung der vier Himmelsrichtungen
+     zu Gottheiten übernehmen, irgendeine figürliche Ikonografie im
+     Palastinneren zeigen. Übernommen wird der <b>Grundriss</b>, nicht die
+     Bewohner — dieselbe Regel wie bei den Anlagen, die Festungsgrundrisse
+     ohne ihre historischen Bewohner übernehmen.</p>
+
+  <h2>Vier Bausteine</h2>
+
+  <div class="kandidat">
+    <h3>Torring</h3><span class="achsen">im Original 4 T-förmige Tore, im Werkzeug 8 oder 12 Achsen</span>
+    <p>Der äußere Quadratring mit vier T-förmigen Toren an den
+       Himmelsrichtungen — die Palastmauer selbst.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Flammenkranz</h3><span class="achsen">16 oder 24 Achsen</span>
+    <p>Der äußerste Ring aus stilisierten Flammenzungen, der praktisch
+       jedes Sandmandala nach außen abschließt.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Vajra-Kranz</h3><span class="achsen">8 oder 12 Achsen</span>
+    <p>Ein Ring aus stilisierten Doppel-Blitzbündeln (Vajra) — eine
+       wiederkehrende Randform, für sich genommen ein geometrisches
+       Ornament ohne figürliche Deutung.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Lotoskranz</h3><span class="achsen">8 oder 16 Achsen</span>
+    <p>Der innere Ring aus Lotosblütenblättern, der den zentralen Bereich
+       umschließt — dieselbe Grundform wie in vielen anderen Traditionen,
+       hier ohne Bezug zu einer bestimmten Gottheit im Zentrum.</p>
+  </div>
+
+  <h2>Und die eigentliche Frage: wie wörtlich?</h2>
+
+  <div class="tiefe">
+    <b><span class="buchstabe">A ·</span> Alle vier Bausteine, als konzentrische Ringe zusammen</b>
+    <p>Nahe an der äußeren Erscheinung eines Sandmandalas — Torring,
+       Flammen, Vajra, Lotos ineinander. Kein Zentrum, kein Palastinneres,
+       kein Name.</p>
+
+    <b><span class="buchstabe">B ·</span> Torring und Flammenkranz allein, als „Palast-Umriss“</b>
+    <p>Nur die äußeren zwei Ringe — am weitesten von jeder religiösen
+       Lesart entfernt, weil kein Lotos und kein Vajra (beides mit eigener
+       buddhistischer Bedeutung) vorkommt.</p>
+
+    <b><span class="buchstabe">C ·</span> Die vier Bausteine einzeln, als vier separate Motive</b>
+    <p>Torring, Flammenkranz, Vajra-Kranz und Lotoskranz als vier eigene
+       Vorlagen in der Motivliste — nie als das eine zusammengesetzte
+       Bild, das ein Sandmandala ergäbe.</p>
+  </div>
+
+  <div class="stand">
+    <b>Stand: Vorschlag, nicht Vorlage.</b>
+    Die vier Bausteine und die drei Tiefen sind Vorschläge — nichts davon
+    ist in <code>app.js</code>. Gebaut wird erst, was hier ausgewählt
+    wird: welche Bausteine, und welche der drei Tiefen.
+  </div>
+
+  <footer>
+    Alle sechs Übersichten: <a href="neue-welten.html">Sechs neue
+    Motivwelten</a>.
+  </footer>
+
+</main>
+</body>
+</html>

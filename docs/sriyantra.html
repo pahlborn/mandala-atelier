@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Motivwelt Sri Yantra — Übersicht zum Entscheiden</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Bausteine der Sri-Yantra-Geometrie als Kandidaten für eine neue Motivwelt. Noch nicht gebaut — eine Übersicht zum Auswählen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Übersichtsseite zum Entscheiden, NICHT zum Anschauen einer fertigen Welt.
+  Nichts hier ist in app.js codiert.
+
+  Warum diese Seite anders aufgebaut ist als mehndi.html: Mehndi ist eine
+  offene Formensprache mit vielen unabhaengigen Motiven. Ein Sri Yantra ist
+  EIN bestimmtes Diagramm - neun ineinander verschraenkte Dreiecke, zwei
+  Lotoskraenze, ein Torring, ein Mittelpunkt -, das im tantrischen
+  Hinduismus einer bestimmten Goettin (Lalita Tripura Sundari/Shakti)
+  zugeordnet ist (Britannica, "Yantra"; Wikipedia mit Quellenapparat).
+
+  Deshalb hier keine acht freien Motive, sondern die vier BAUSTEINE, aus
+  denen das Diagramm gewoehnlich besteht - einzeln oder zusammen waehlbar.
+  Was bewusst NICHT verwendet wird: der Name "Sri Yantra" oder "Yantra" im
+  UI, die Zuordnung zu einer Goettin, die traditionelle Bindu-Deutung
+  (Mittelpunkt als Vereinigungspunkt von Shiva und Shakti). Uebernommen
+  wird die Geometrie, nicht die Bedeutung - dieselbe Regel wie bei den
+  Anlagen (architektur.md).
+
+  Wichtige Einschraenkung, ehrlich stehen gelassen: In der Sitzung vom
+  27./28. August 2026 wurde diese Welt nach ausfuehrlicher Darstellung der
+  religioesen Tiefe zugesagt. CLAUDE.md verlangt "ausdrueckliche Ruecksprache
+  in der Familie" - ob dieses Gespraech das schon war oder nur die
+  Einschaetzung einer Person, kann diese Seite nicht wissen und behauptet
+  es deshalb auch nicht. Das steht unten so da, nicht beschoenigt.
+
+  Diese Seite ist trotzdem noch keine Bauanleitung - sie legt die Bausteine
+  offen, damit die TIEFE der Annaeherung eine eigene Entscheidung bleibt,
+  keine Nebenwirkung.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.2rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand b { display: block; margin-bottom: .3rem; }
+
+  .frei {
+    background: rgba(47, 107, 69, .09);
+    border: 1px solid rgba(47, 107, 69, .3);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 14.5px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .frei { background: rgba(111, 191, 142, .1); border-color: rgba(111, 191, 142, .3); }
+  }
+
+  .kandidat {
+    background: var(--card); border-radius: 14px;
+    padding: 15px 19px; margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 14px;
+    align-items: baseline;
+  }
+  .kandidat h3 { grid-column: 1; font-size: 16px; margin: 0; font-weight: 600; }
+  .kandidat .achsen {
+    grid-column: 2; font-size: 12.5px; color: var(--quiet);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .kandidat p { grid-column: 1 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; }
+
+  .tiefe {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: 2px 12px;
+    margin-bottom: .9rem;
+  }
+  .tiefe b { grid-column: 1 / -1; font-size: 15.5px; }
+  .tiefe span.buchstabe {
+    font-size: 13px; color: var(--quiet); font-weight: 700;
+  }
+  .tiefe p { grid-column: 2; font-size: 14.5px; color: var(--quiet); margin: 0 0 .8rem; }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Motivwelt „Sri-Yantra-Geometrie“</h1>
+  <p class="lede">Vier Bausteine eines tantrischen Andachtsdiagramms,
+     zum Auswählen — nichts davon ist gebaut.</p>
+
+  <div class="frei">
+    <b>Zugesagt, mit einer offenen Frage.</b> Diese Welt wurde nach
+    ausführlicher Darstellung ihrer religiösen Tiefe zugesagt. Die Regel in
+    <code>CLAUDE.md</code> verlangt <em>„ausdrückliche Rücksprache in der
+    Familie“</em> — ob dieses Gespräch das war oder die Einschätzung einer
+    Person, weiß diese Seite nicht und behauptet es nicht. Diese Seite ist
+    ohnehin keine Bauanleitung: Sie legt die Bausteine offen, damit die
+    <em>Tiefe der Annäherung</em> — wörtlich oder abstrahiert — eine eigene,
+    bewusste Entscheidung bleibt.
+  </div>
+
+  <h2>Woher</h2>
+
+  <p>Ein Sri Yantra ist im tantrischen Hinduismus kein freies Ornament,
+     sondern ein Andachtsdiagramm der Göttin Lalita Tripura Sundari/Shakti,
+     Zentrum der Shri-Vidya-Verehrung — mit expliziter tantrisch-sexueller
+     Symbolik (die aufwärts weisenden Dreiecke stehen für Shiva, die
+     abwärts weisenden für Shakti; ihre Verschränkung für die Vereinigung
+     beider).
+     (<a href="https://www.britannica.com/topic/yantra">Encyclopaedia
+     Britannica, „Yantra“</a>)</p>
+
+  <p><b>Was diese Seite deshalb bewusst nicht tut:</b> den Namen
+     „Sri Yantra“ im späteren Motivnamen verwenden, eine Gottheit zuordnen,
+     die Bindu-Deutung (den Mittelpunkt als Vereinigungspunkt) übernehmen.
+     Übernommen wird die Geometrie — neun verschränkte Dreiecke, zwei
+     Lotoskränze, ein Torring —, nicht ihre Bedeutung.</p>
+
+  <h2>Vier Bausteine</h2>
+
+  <div class="kandidat">
+    <h3>Dreieckskern</h3><span class="achsen">9-fache Überlagerung, im Werkzeug am ehesten 12 Achsen</span>
+    <p>Die neun ineinander verschränkten Dreiecke, die 43 kleinere Felder
+       bilden — das eigentliche Herzstück der Geometrie.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Innerer Lotoskranz</h3><span class="achsen">8 Achsen</span>
+    <p>Der innere Ring aus acht Blütenblättern, der den Dreieckskern
+       umschließt.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Äußerer Lotoskranz</h3><span class="achsen">16 Achsen</span>
+    <p>Der äußere Ring aus sechzehn Blütenblättern, weiter draußen als der
+       innere.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Torring</h3><span class="achsen">meist quadratisch, im Werkzeug am ehesten 8 oder 12 Achsen</span>
+    <p>Der äußere Rahmen mit vier T-förmigen Toren (Bhupura) — im Original
+       ein Quadrat um den Kreis, im Werkzeug nur angenähert.</p>
+  </div>
+
+  <h2>Und die eigentliche Frage: wie wörtlich?</h2>
+
+  <div class="tiefe">
+    <b><span class="buchstabe">A ·</span> Alle vier Bausteine, vollständig</b>
+    <p>Nahe am Original — Dreieckskern, beide Lotoskränze, Torring
+       zusammen. Wer die Geometrie kennt, erkennt sie wieder.</p>
+
+    <b><span class="buchstabe">B ·</span> Nur der Dreieckskern, als eigenständiges Motiv</b>
+    <p>Eine „Sternrosette“ aus verschränkten Dreiecken, ohne die
+       umgebenden Ringe — abstrakter, für sich genommen nicht mehr
+       eindeutig als das eine bestimmte Diagramm erkennbar.</p>
+
+    <b><span class="buchstabe">C ·</span> Die Bausteine einzeln, als vier separate Motive</b>
+    <p>Dreieckskern, innerer Kranz, äußerer Kranz und Torring als vier
+       eigene Vorlagen in der Motivliste — nie als das eine
+       zusammengesetzte Bild, das sie ergäben.</p>
+  </div>
+
+  <div class="stand">
+    <b>Stand: Vorschlag, nicht Vorlage.</b>
+    Die vier Bausteine und die drei Tiefen sind Vorschläge — nichts davon
+    ist in <code>app.js</code>. Gebaut wird erst, was hier ausgewählt
+    wird: welche Bausteine, und welche der drei Tiefen.
+  </div>
+
+  <footer>
+    Alle sechs Übersichten: <a href="neue-welten.html">Sechs neue
+    Motivwelten</a>.
+  </footer>
+
+</main>
+</body>
+</html>

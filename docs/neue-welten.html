@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Sechs neue Motivwelten — zum Entscheiden</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Übersicht über sechs vorgeschlagene neue Motivwelten. Nichts davon ist gebaut — hier wird ausgewählt, nicht schon gezeigt.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Sammel-Einstieg zu den sechs Uebersichtsseiten. Keine eigene Seite mit
+  eigenem Inhalt - nur der kuerzeste Weg zu allen sechs, damit man nicht
+  sechs Adressen einzeln braucht.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .4rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.8rem; }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand b { display: block; margin-bottom: .3rem; }
+
+  .welt {
+    display: block; text-decoration: none;
+    background: var(--card); border-radius: 14px;
+    padding: 17px 20px; margin-bottom: 12px;
+  }
+  .welt h2 { font-size: 18px; margin: 0 0 .3rem; font-weight: 600; }
+  .welt p { font-size: 15px; color: var(--quiet); margin: 0; }
+  .welt .zahl { font-size: 12.5px; color: var(--quiet); }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Sechs neue Motivwelten</h1>
+  <p class="lede">Kandidaten zum Auswählen, keine fertigen Welten. Jede
+     Seite legt offen, woher die Formen kommen, was bewusst nicht
+     übernommen wird, und was noch zu entscheiden ist.</p>
+
+  <div class="stand">
+    <b>Stand: Vorschlag.</b> Nichts davon steht in der App. Erst wenn hier
+    ausgewählt ist, wird etwas gebaut — und dann eine Fassung, ein Befund,
+    wie es die Absprache im Repository verlangt.
+  </div>
+
+  <a class="welt" href="mehndi.html">
+    <h2>Mehndi</h2>
+    <p>Paisley, Ranken, Lotos, Netzfüllung — Ornamentik ohne
+       Gottheitenbezug. <span class="zahl">Acht Kandidaten</span></p>
+  </a>
+
+  <a class="welt" href="chakren.html">
+    <h2>Chakren</h2>
+    <p>Die westliche Sieben-Chakra-Popform, ehrlich so benannt — keine
+       Sanskrit-Silben, keine Gottheiten. <span class="zahl">Sieben
+       Kandidaten, drei mit offener Achsenfrage</span></p>
+  </a>
+
+  <a class="welt" href="sriyantra.html">
+    <h2>Sri-Yantra-Geometrie</h2>
+    <p>Vier architektonische Bausteine eines tantrischen Andachtsdiagramms
+       — Geometrie ohne Bindu-Deutung. <span class="zahl">Vier Bausteine,
+       drei Tiefen zur Wahl</span></p>
+  </a>
+
+  <a class="welt" href="sandmandala.html">
+    <h2>Palast-Mandala</h2>
+    <p>Torring, Flammen, Vajra, Lotos — der Grundriss eines Sandmandalas,
+       ohne Gottheit und ohne Namen. <span class="zahl">Vier Bausteine,
+       drei Tiefen zur Wahl</span></p>
+  </a>
+
+  <a class="welt" href="bauhaus.html">
+    <h2>Bauhaus</h2>
+    <p>Kreise, Grundformen, Weberosetten — säkulare Designpädagogik nach
+       Kandinsky und Itten. <span class="zahl">Sieben Kandidaten</span></p>
+  </a>
+
+  <a class="welt" href="origami.html">
+    <h2>Origami</h2>
+    <p>Faltsterne, Twist-Muster, Flasher-Faltungen — mathematisch-
+       handwerkliche Tradition. <span class="zahl">Sieben Kandidaten</span></p>
+  </a>
+
+  <footer>
+    Zurück zur <a href="../beide.html">Einstiegsseite</a>. Das Register der
+    offenen Punkte: <a href="offen.html">Was noch offen ist</a>.
+  </footer>
+
+</main>
+</body>
+</html>

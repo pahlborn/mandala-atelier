@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Motivwelt Chakren — Übersicht zum Entscheiden</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Kandidaten für eine neue Motivwelt aus dem westlichen Sieben-Chakra-Bild. Noch nicht gebaut — eine Übersicht zum Auswählen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Übersichtsseite zum Entscheiden, NICHT zum Anschauen einer fertigen Welt.
+  Nichts hier ist in app.js codiert.
+
+  Wichtiger als bei Mehndi: Die Ehrlichkeitsauflage aus dem Gespraech, das
+  zu dieser Seite gefuehrt hat. Das Sieben-Chakra-Bild mit festen Farben
+  und Blattzahlen ist selbst schon eine westliche Erfindung - zusammen-
+  gestellt von Theosophen (Blavatsky, v.a. Leadbeaters "The Chakras", 1927)
+  zwischen 1880 und 1927, nicht aus den Sanskrit-Originaltexten. Die echte
+  religioese Wurzel liegt im Sat-Cakra-Nirupana (tantrische Texte, 8.-16.
+  Jh.), aber DIESE Seite baut nicht darauf auf, sondern auf der laengst
+  verbreiteten Popform - und sagt das auch so.
+
+  Deshalb bewusst NICHT verwendet: Sanskrit-Bija-Mantra-Silben, Gottheiten-
+  Ikonografie, Yantra-Diagramme. Nur abstrakte Lotos-Rosetten mit Farbe -
+  das ist die Ebene, auf der die westliche Popform selbst schon steht.
+
+  Technischer Vorbehalt, ehrlich stehen gelassen: Die App kennt 6/8/10/12/
+  16/24 Achsen (store-texte.md). Die traditionellen Blattzahlen 4 (Wurzel)
+  und 2 (Drittes Auge) passen auf keine davon; 1000 (Scheitel) erst recht
+  nicht. Das ist hier vermerkt, nicht geloest - die Loesung ist eine
+  Bauentscheidung, keine Auswahlentscheidung.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand b { display: block; margin-bottom: .3rem; }
+
+  .warn {
+    background: rgba(154, 59, 47, .09);
+    border: 1px solid rgba(154, 59, 47, .3);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .warn { background: rgba(224, 133, 115, .1); border-color: rgba(224, 133, 115, .3); }
+  }
+  .warn b { display: block; margin-bottom: .3rem; }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.2rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  .kandidat {
+    background: var(--card); border-radius: 14px;
+    padding: 15px 19px; margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 14px;
+    align-items: baseline;
+  }
+  .kandidat h3 { grid-column: 1; font-size: 16px; margin: 0; font-weight: 600; }
+  .kandidat .achsen {
+    grid-column: 2; font-size: 12.5px; color: var(--quiet);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .kandidat .achsen.luecke { color: var(--stop); font-weight: 600; }
+  .kandidat p { grid-column: 1 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Motivwelt „Chakren“</h1>
+  <p class="lede">Sieben Kandidaten, einer je Chakra der westlichen
+     Popform — zum Auswählen, keiner davon ist gebaut.</p>
+
+  <div class="stand">
+    <b>Stand: Vorschlag, nicht Vorlage.</b>
+    Sieben Namen mit Note und vorgeschlagener Achsenzahl — genau das, was
+    später in <code>app.js</code> stehen würde. Gebaut wird erst, was hier
+    ausgewählt wird.
+  </div>
+
+  <h2>Woher, und was diese Seite bewusst tut</h2>
+
+  <p>Das Chakra-System hat eine echte religiöse Wurzel in tantrischen
+     Texten (8.–16. Jh., kanonisiert im <em>Sat-Cakra-Nirupana</em>). Aber
+     die Sieben-Chakra-Farb- und Blattzahlwelt, die heute überall bekannt
+     ist, wurde erst 1880–1927 von westlichen Theosophen zusammengestellt —
+     vor allem C. W. Leadbeaters <em>The Chakras</em> (1927) — und findet
+     sich so nicht in den Originaltexten.</p>
+
+  <p><b>Diese Seite baut ausdrücklich auf der westlichen Popform auf, nicht
+     auf tantrischer Authentizität.</b> Das war die Bedingung, unter der
+     Chakren als vertretbar galten: ehrlich benannt, nicht als Anspruch auf
+     etwas, das sie nicht ist.</p>
+
+  <p>Deshalb bewusst <b>nicht</b> verwendet: Sanskrit-Bija-Mantra-Silben,
+     Gottheiten-Ikonografie, Yantra-Diagramme. Nur abstrakte
+     Lotos-Rosetten mit Farbe — mehr ist die westliche Popform selbst auch
+     nicht.</p>
+
+  <div class="warn">
+    <b>Ein technischer Vorbehalt, offen stehen gelassen.</b>
+    Die App kennt 6, 8, 10, 12, 16 oder 24 Achsen. Die traditionellen
+    Blattzahlen der Wurzel-Chakra (4) und des Dritten Auges (2) passen auf
+    keine davon; die „tausend Blütenblätter“ des Scheitel-Chakra erst
+    recht nicht. Unten rot markiert. Das ist eine Bauentscheidung für
+    später, keine, die hier zu treffen ist.
+  </div>
+
+  <h2>Sieben Kandidaten</h2>
+
+  <div class="kandidat">
+    <h3>Wurzel — Muladhara</h3><span class="achsen luecke">4 Blätter, keine Achsenzahl passt</span>
+    <p>Rot. Die traditionelle Zählung nennt vier Blütenblätter — am Boden
+       des Systems, am wenigsten kompatibel mit dem Werkzeug.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Sakral — Svadhisthana</h3><span class="achsen">6 Achsen</span>
+    <p>Orange. Sechs Blütenblätter — trifft die kleinste Achsenzahl der
+       App genau.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Solarplexus — Manipura</h3><span class="achsen">10 Achsen</span>
+    <p>Gelb. Zehn Blütenblätter, passt direkt.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Herz — Anahata</h3><span class="achsen">12 Achsen</span>
+    <p>Grün. Zwölf Blütenblätter, passt direkt — vermutlich das
+       bekannteste der sieben Bilder.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Kehle — Vishuddha</h3><span class="achsen">16 Achsen</span>
+    <p>Hellblau. Sechzehn Blütenblätter, passt direkt.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Drittes Auge — Ajna</h3><span class="achsen luecke">2 Blätter, keine Achsenzahl passt</span>
+    <p>Indigo. Traditionell nur zwei Blütenblätter, links und rechts — das
+       Gegenteil von radialer Vielzahl.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Scheitel — Sahasrara</h3><span class="achsen luecke">„tausend“ Blätter, keine Achsenzahl passt</span>
+    <p>Violett/Weiß. Traditionell „tausendblättrig“ — am ehesten mit der
+       dichtesten verfügbaren Teilung (24) als bewusste Annäherung zu
+       lösen, nicht als wörtliche Zahl.</p>
+  </div>
+
+  <h2>Zum Wählen</h2>
+
+  <p>Sieben Kandidaten für eine Welt, die üblicherweise 4 bis 8 Motive
+     trägt — die Zahl ergibt sich hier von selbst aus den sieben Chakren.
+     Offen ist: Kommen alle sieben, oder nur die vier, die technisch sauber
+     passen (Sakral, Solarplexus, Herz, Kehle)? Und wie sollen Wurzel,
+     Drittes Auge und Scheitel gelöst werden, falls sie bleiben?</p>
+
+  <footer>
+    Alle sechs Übersichten: <a href="neue-welten.html">Sechs neue
+    Motivwelten</a>.
+  </footer>
+
+</main>
+</body>
+</html>

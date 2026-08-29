@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Motivwelt Mehndi — Übersicht zum Entscheiden</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Kandidaten für eine neue Motivwelt aus der Mehndi-Formensprache. Noch nicht gebaut — eine Übersicht zum Auswählen.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Übersichtsseite zum Entscheiden, NICHT zum Anschauen einer fertigen Welt.
+  Nichts hier ist in app.js codiert. Die Kandidaten sind Vorschläge in Worten
+  (Name, Note, Achsenzahl) - genau die Felder, die ein MOTIFS-Eintrag später
+  braucht -, damit eine Auswahl getroffen werden kann, BEVOR irgendetwas
+  gezeichnet wird.
+
+  Herkunft der Kandidaten: dokumentierte Mehndi-Formenvokabular (Paisley/
+  Kairi, Bel-Ranken, Jaali-Netz, Mor-Feder, Patti-Blätter, Chand-Bögen,
+  Bindi-Punkte) - siehe Quellen unten. Bewusst ausgelassen: figürliche
+  Motive (Dulha-Dulhan, Brautpaar) und alles mit Gottheitenbezug, der in
+  aufwendiger Brautmehndi vorkommen kann. Das hier ist die dekorative
+  Formensprache, nicht das Ritual.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 {
+    font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--quiet);
+  }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand b { display: block; margin-bottom: .3rem; }
+
+  .note {
+    font-size: 14.5px; color: var(--quiet);
+    border-left: 2px solid var(--edge); padding-left: 14px; margin: 1.2rem 0;
+  }
+  .note strong { color: var(--ink); }
+
+  .kandidat {
+    background: var(--card); border-radius: 14px;
+    padding: 15px 19px; margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 14px;
+    align-items: baseline;
+  }
+  .kandidat h3 { grid-column: 1; font-size: 16px; margin: 0; font-weight: 600; }
+  .kandidat .achsen {
+    grid-column: 2; font-size: 12.5px; color: var(--quiet);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .kandidat p { grid-column: 1 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; }
+
+  ul.quellen { font-size: 13.5px; color: var(--quiet); padding-left: 1.2rem; }
+  li { margin-bottom: .3rem; }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Motivwelt „Mehndi“</h1>
+  <p class="lede">Acht Kandidaten aus der Mehndi-Formensprache, zum Auswählen —
+     keiner davon ist gebaut.</p>
+
+  <div class="stand">
+    <b>Stand: Vorschlag, nicht Vorlage.</b>
+    Nichts auf dieser Seite ist in der App. Es sind acht Namen mit einer
+    Note und einer vorgeschlagenen Achsenzahl — genau das, was später in
+    <code>app.js</code> stehen würde. Gebaut wird erst, was hier ausgewählt
+    wird.
+  </div>
+
+  <h2>Woher</h2>
+
+  <p>Mehndi/Henna ist auspiziöse Hochzeits- und Festkörperkunst, ohne feste
+     Zuordnung zu einer Gottheit — anders als Sri Yantra oder das
+     Sandmandala hat das Ornament selbst keine sakrale Bedeutung, nur der
+     Anlass, zu dem es aufgetragen wird.
+     (<a href="https://www.learnreligions.com/mehendi-or-henna-dye-1770473">learnreligions.com</a>,
+     <a href="https://www.culturalindia.net/">culturalindia.net</a>)</p>
+
+  <p><b>Übernommen wird die Formensprache, nicht das Ritual</b> — dieselbe
+     Regel wie bei „Zen &amp; Achtsamkeit“. Bewusst ausgelassen sind
+     figürliche Motive (Brautpaar) und alles mit Gottheitenbezug, das in
+     kunstvoller Brautmehndi vorkommen kann.</p>
+
+  <h2>Acht Kandidaten</h2>
+
+  <div class="kandidat">
+    <h3>Paisley-Kranz</h3><span class="achsen">8 oder 12 Achsen</span>
+    <p>Die tropfenförmige Mango-Form (Kairi) — das bekannteste Mehndi-Element
+       überhaupt —, im Kreis wiederholt.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Rankenkreis</h3><span class="achsen">10 oder 16 Achsen</span>
+    <p>Feine Kletterranken (Bel) mit kleinen Blättern, die sich von der
+       Mitte nach außen winden.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Lotusrosette</h3><span class="achsen">8 oder 12 Achsen</span>
+    <p>Dichte, mehrlagige Blütenform — eines der häufigsten Zentralmotive
+       in Mehndi-Handflächen.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Netzfüllung</h3><span class="achsen">12 oder 16 Achsen</span>
+    <p>Das feine Jaali-Gitterwerk, mit dem Mehndi-Künstlerinnen Flächen aus
+       vielen kleinen Rauten füllen.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Federkranz</h3><span class="achsen">8 Achsen</span>
+    <p>Stilisierte Pfauenfeder-Augen (Mor), kreisförmig angeordnet.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Blätterband</h3><span class="achsen">16 Achsen</span>
+    <p>Schmale, spitz zulaufende Blätter (Patti), die einen Ring aus Zacken
+       bilden.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Mondbogen</h3><span class="achsen">10 Achsen</span>
+    <p>Überlappende Bogenreihen (Chand) — aufgehende Halbmonde, ein
+       klassischer Randabschluss in Mehndi.</p>
+  </div>
+  <div class="kandidat">
+    <h3>Punktkranz</h3><span class="achsen">12 oder 24 Achsen</span>
+    <p>Feine Punktreihen (Bindi), wie Mehndi sie zum Auflockern zwischen
+       den Linien setzt — ein sehr ruhiges Motiv mit viel Weißraum.</p>
+  </div>
+
+  <h2>Zum Wählen</h2>
+
+  <p>Acht Kandidaten für eine Welt, die üblicherweise 4 bis 8 Motive trägt.
+     Passen alle acht, oder sollen es weniger werden? Die Achsenzahlen sind
+     Vorschläge — was am Ende gezeichnet wird, richtet sich danach, welche
+     Kandidaten bleiben.</p>
+
+  <footer>
+    Alle sechs Übersichten: <a href="neue-welten.html">Sechs neue
+    Motivwelten</a>.
+  </footer>
+
+</main>
+</body>
+</html>
