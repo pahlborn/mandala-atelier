@@ -109,6 +109,7 @@ async function main() {
       if (typeof MOTIFS !== 'undefined') {
         MOTIFS.forEach(function (m) {
           raus.push(m.name, m.note);
+          if (m.mythos) raus.push(m.mythos);
           if (m.task) raus.push(m.task);
           if (m.zones) m.zones.forEach(function (z) { raus.push(z.name); });
         });

@@ -246,71 +246,131 @@ var Sprache = (function () {
        genauso nüchtern bleiben und nichts versprechen. */
     'Sternkranz':                 'Star Wreath',
     'Zwölf Spitzen, ruhiger Grundriss': 'Twelve points, a quiet plan',
+    'Zwölf Spitzen im Kreis — als würde ein einzelner Stern sich selbst vervielfachen, bis er den ganzen Rand erreicht.':
+      'Twelve points in a circle — as if a single star multiplied itself until it reached the whole rim.',
     'Rautenkranz':                'Diamond Wreath',
     'Rauten in drei Größen':      'Diamonds in three sizes',
+    'Rauten in drei Größen, ineinandergestaffelt — wie ferne Kirchenfenster, die sich zu einem einzigen Muster ordnen.':
+      'Diamonds in three sizes, nested together — like distant church windows falling into a single pattern.',
     'Sternmandala fein':          'Fine Star Mandala',
     'Sechzehn Achsen, viele kleine Felder': 'Sixteen axes, many small fields',
+    'Sechzehn Achsen, unzählige kleine Felder — je genauer man hinsieht, desto mehr öffnet sich.':
+      'Sixteen axes, countless small fields — the closer you look, the more opens up.',
     'Achteckstern':               'Octagon Star',
     'Acht Achsen, klare Kanten':  'Eight axes, clean edges',
+    'Acht Spitzen, scharf und gleichmäßig — die Form, die entsteht, wenn zwei Quadrate sich umeinander drehen.':
+      'Eight sharp, even points — the shape that appears when two squares turn around each other.',
     'Gitterrose':                 'Lattice Rose',
     'Verschränkte Rauten, dichtes Netz': 'Interlocking diamonds, a dense net',
+    'Ein Gitterwerk, das sich zur Rose rundet — Ordnung, die von selbst zu blühen beginnt.':
+      'A lattice that curves into a rose — order that begins to bloom on its own.',
 
     'Blüte':                      'Blossom',
     'Acht große Blätter, viel Fläche': 'Eight large petals, plenty of surface',
+    'Blütenblatt um Blütenblatt, wie sie sich in einem einzigen warmen Moment öffnen.':
+      'Petal after petal, as if opening in one single warm moment.',
     'Blätterkranz':               'Leaf Wreath',
     'Blätter mit Mittelrippe, versetzt': 'Leaves with a midrib, offset',
+    'Ein Kranz aus Blättern, so dicht wie ein Wald im Hochsommer.':
+      'A wreath of leaves, as dense as a forest at the height of summer.',
     'Muschelspirale':             'Shell Spiral',
     'Sechs Arme, weite Bögen':    'Six arms, wide arcs',
+    'Eine Spirale, wie sie das Meer in jede Muschel schreibt, bevor sie an den Strand gespült wird.':
+      'A spiral, the kind the sea writes into every shell before it washes ashore.',
     'Farnkreis':                  'Fern Circle',
     'Wedel mit feinen Fiedern':   'Fronds with fine pinnae',
+    'Wedel, die sich entrollen wie ein Farn im ersten Frühlingslicht.':
+      'Fronds unfurling like a fern in the first light of spring.',
     'Samenkranz':                 'Seed Wreath',
     'Sechzehn Samen, feine Teilung': 'Sixteen seeds, fine division',
+    'Unzählige kleine Samen, dicht an dicht — ein ganzer Sommer, der auf den nächsten wartet.':
+      'Countless small seeds, packed close — a whole summer waiting for the next.',
 
     'Wellenkreis':                'Wave Circle',
     'Fünf Wellenringe, gleichmäßiger Takt': 'Five wave rings, an even beat',
+    'Wellen, die sich immer wieder überlagern, ohne sich je ganz zu wiederholen.':
+      'Waves that keep overlapping without ever quite repeating themselves.',
     'Tropfenkranz':               'Drop Wreath',
     'Tropfen in zwei Lagen, versetzt': 'Drops in two layers, offset',
+    'Tropfen, aufgereiht wie der Klang von Wasser, das ganz langsam fällt.':
+      'Drops lined up like the sound of water falling very slowly.',
     'Ruhefeld':                   'Field of Quiet',
     'Wenige große Flächen, viel Raum': 'Few large areas, much room',
+    'Ein weites, stilles Feld — Platz genug, dass der Blick zur Ruhe kommt, bevor er weiterwandert.':
+      'A wide, quiet field — room enough for the eye to settle before it moves on.',
     'Atemringe':                  'Breathing Rings',
     'Ruhiger Takt, gleichmäßige Weite': 'A quiet beat, even spacing',
+    'Ringe, die sich weiten und wieder schließen — wie Atem, der kommt und geht, ohne dass man ihn zählen müsste.':
+      'Rings that widen and close again — like breath coming and going, with no need to count it.',
     'Steingarten':                'Stone Garden',
     'Wenige Formen, geharkte Bahnen': 'Few forms, raked lanes',
+    'Wenige Formen, weit auseinandergesetzt — wie Steine, die in Sand geharkt wurden, nicht wie sie zufällig liegen.':
+      'A few forms, set far apart — like stones raked into sand, not left where they happened to fall.',
 
     'Winter':                     'Winter',
     'Schneekristall mit Seitenästen': 'A snow crystal with side branches',
+    'Kahle, klare Linien — die Ruhe, die jedem neuen Anfang vorausgeht.':
+      'Bare, clear lines — the stillness that comes before every new beginning.',
     'Frühling':                   'Spring',
     'Knospen in drei Lagen':      'Buds in three layers',
+    'Erste zarte Formen, die sich gerade erst trauen, sich zu öffnen.':
+      'The first tender shapes, only just daring to open.',
     'Sommer':                     'Summer',
     'Strahlenkranz um eine offene Mitte': 'A ring of rays round an open centre',
+    'Volle, satte Formen — die Jahreszeit, in der alles zugleich blüht.':
+      'Full, rich shapes — the season when everything blooms at once.',
     'Herbst':                     'Autumn',
     'Geneigte Blätter, Eicheln als Punkte': 'Tilted leaves, acorns as dots',
+    'Formen, die sich langsam neigen, bevor sie zu Boden sinken — der ruhigste aller Übergänge.':
+      'Shapes leaning slowly before they sink to the ground — the quietest of all transitions.',
 
     'Anlage':                     'Grounds',
     'Vier Tore, drei Bereiche':   'Four gates, three precincts',
+    'Ein Grundriss, wie ihn alte Gärten tragen — eine Ordnung, in die man gedanklich hineingehen kann.':
+      'A ground plan of the kind old gardens carry — an order you can walk into in your mind.',
     'Ringanlage':                 'Ring Grounds',
     'Vier Tore, vier Ringbänder': 'Four gates, four ring bands',
+    'Ring um Ring um einen stillen Mittelpunkt — wie eine Stadt, die sich um ihr eigenes Zentrum legt.':
+      'Ring after ring around a quiet centre — like a city laid out around its own middle.',
     'Gartenanlage':               'Garden Grounds',
     'Vier Wasserläufe, sechsunddreißig Beete':
       'Four watercourses, thirty-six beds',
+    'Beete und Wasserläufe, symmetrisch angelegt — ein Garten, durch den man mit den Augen spazieren geht.':
+      'Beds and watercourses, laid out symmetrically — a garden you stroll through with your eyes.',
     'Sternanlage':                'Star Grounds',
     'Acht Bastionen, eine Piazza': 'Eight bastions, one piazza',
+    'Ein Grundriss, der von oben wie ein Stern aussieht — Verteidigung, die zur Form wurde.':
+      'A ground plan that looks like a star from above — defence turned into shape.',
     'Rasteranlage':               'Grid Grounds',
     'Neun mal neun Felder, kein Kranz': 'Nine by nine fields, no wreath',
+    'Ein Raster aus geraden Wegen — die stille Ordnung, die jede große Anlage im Kern trägt.':
+      'A grid of straight paths — the quiet order at the heart of every great estate.',
     'Stufenanlage':               'Stepped Grounds',
     'Außen eckig, innen rund':    'Angular without, round within',
+    'Stufe um Stufe, die sich nach innen wandelt — wie ein Bauwerk, das man erst umrunden muss, um es ganz zu verstehen.':
+      'Step after step turning inward — like a building you have to walk around before you understand it whole.',
     'Torstadt':                   'Gate City',
     'Zwölf Tore, sechs Mauern':   'Twelve gates, six walls',
+    'Tore an allen Seiten — eine Stadt, die von jeder Richtung aus betreten werden kann.':
+      'Gates on every side — a city that can be entered from any direction.',
     'Kuppelanlage':               'Dome Grounds',
     'Ein Gewölbe von unten, 132 Kassetten': 'A vault from below, 132 coffers',
+    'Eine Wölbung, die sich Kassette für Kassette dem Licht entgegenhebt.':
+      'A vault rising toward the light, coffer by coffer.',
 
     'Erste Formen':               'First Shapes',
     'Kindergarten – sehr große Felder': 'Nursery — very large fields',
+    'Die einfachsten Formen zuerst — jede große Vorlage hier hat mit genau solchen angefangen.':
+      'The simplest shapes first — every elaborate template here began with just these.',
     'Mustertanz':                 'Pattern Dance',
     'Grundschule – Bänder im Wechsel': 'Primary school — bands in turn',
+    'Formen, die sich abwechseln, als würden sie im Kreis tanzen.':
+      'Shapes taking turns, as if dancing in a circle.',
     'Formenreigen':               'Round of Shapes',
     'Kindergarten – runde und eckige Felder':
       'Nursery — round and angular fields',
+    'Ein ganzer Reigen kleiner Formen — jede für sich einfach, gemeinsam ein Fest.':
+      'A whole round of small shapes — simple alone, a celebration together.',
     'Zähl bis 6':                 'Count to 6',
     'Punkte zählen, nach Anzahl färben': 'Count the dots, colour by number',
     'Zähl bis 10':                'Count to 10',
