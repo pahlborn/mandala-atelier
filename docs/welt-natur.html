@@ -2,20 +2,20 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>Motivwelt Natur — bereits im Atelier</title>
+<title>Motivfamilie Natur — bereits im Atelier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Fünf Vorlagen, bereits im Mandala Atelier — Formen aus der Pflanzenwelt.">
+<meta name="description" content="Fünf Motive, bereits im Mandala Atelier.">
 <meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="../beide-icon-192.png">
 
 <!--
-  Diese Seite zeigt Vorlagen, die es bereits im Mandala Atelier gibt - anders
-  als mehndi.html, chakren.html usw., die Vorschläge zeigen. Gleiche
-  Struktur wie die sechs Vorschlagsseiten (Titel, Einleitung, Karten je
-  Vorlage), aber mit echten Bildern statt nachgebauter SVGs und ohne
-  "Zum Wählen" - hier ist nichts mehr zu entscheiden, es ist schon gebaut.
-  Name, Achsenzahl, Sachnotiz und Beschreibung stammen wörtlich aus app.js.
+  Struktur identisch zu den sechs Vorschlagsseiten (mehndi.html usw.) und
+  untereinander: Titel, Einleitung, Familien-Status (Atelier/Blatt), Woher,
+  Karte je Motiv mit Bild, Achsenzahl, Sachnotiz, Beschreibung und den drei
+  Kennzeichen Atelier/Blatt-umgesetzt/Blatt-sinnvoll. Name, Achsenzahl,
+  Sachnotiz und Beschreibung stammen wörtlich aus app.js. Die Blatt-
+  sinnvoll-Einschätzung ist meine Meinung, kein Beschluss - überschreibbar.
 -->
 
 <style>
@@ -52,7 +52,7 @@
   .fertig {
     background: rgba(47, 107, 69, .09);
     border: 1px solid rgba(47, 107, 69, .3);
-    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.8rem;
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.2rem;
     font-size: 15px;
   }
   @media (prefers-color-scheme: dark) {
@@ -60,26 +60,42 @@
   }
   .fertig b { display: block; margin-bottom: .3rem; }
 
-  .vorlage {
+  .familienstatus {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 1.8rem;
+  }
+  .familienstatus .tag {
+    font-size: 13px; padding: 5px 12px; border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+
+  .motiv {
     background: var(--card); border-radius: 14px;
     padding: 15px 19px; margin-bottom: 10px;
     display: grid; grid-template-columns: 74px 1fr auto; gap: 4px 14px;
     align-items: center;
   }
-  .vorlage .vorschau {
+  .motiv .vorschau {
     grid-row: 1 / span 2; grid-column: 1;
     width: 74px; height: 74px; border-radius: 8px; overflow: hidden;
   }
-  .vorlage .vorschau img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .vorlage h3 { grid-column: 2; font-size: 16px; margin: 0; font-weight: 600; align-self: end; }
-  .vorlage .achsen {
+  .motiv .vorschau img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .motiv h3 { grid-column: 2; font-size: 16px; margin: 0; font-weight: 600; align-self: end; }
+  .motiv .achsen {
     grid-column: 3; font-size: 12.5px; color: var(--quiet);
     white-space: nowrap; font-variant-numeric: tabular-nums; align-self: end;
   }
-  .vorlage p { grid-column: 2 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; align-self: start; }
-  .vorlage p.mythos { font-style: italic; opacity: .85; }
-  .vorlage p.vorbild { font-size: 13px; margin-top: .3rem; }
-  .vorlage p.vorbild b { color: var(--ink); font-weight: 600; }
+  .motiv p { grid-column: 2 / -1; font-size: 15px; color: var(--quiet); margin: .2rem 0 0; align-self: start; }
+  .motiv p.mythos { font-style: italic; opacity: .85; }
+  .motiv p.vorbild { font-size: 13px; margin-top: .3rem; }
+  .motiv p.vorbild b { color: var(--ink); font-weight: 600; }
+  .status { grid-column: 2 / -1; display: flex; gap: 6px; flex-wrap: wrap; margin-top: .5rem; }
+  .status .tag {
+    font-size: 11px; padding: 2px 9px; border-radius: 999px;
+    border: 1px solid currentColor; white-space: nowrap;
+  }
+  .tag.ja { color: var(--tut); }
+  .tag.teilweise { color: var(--offen); }
+  .tag.nein { color: var(--stop); }
 
   footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
            border-top: 1px solid var(--edge); padding-top: 1.2rem; }
@@ -88,54 +104,83 @@
 <body>
 <main>
 
-  <h1>Motivwelt „Natur“</h1>
-  <p class="lede">Fünf Vorlagen, bereits im Mandala Atelier — Formen aus der Pflanzenwelt.</p>
+  <h1>Motivfamilie „Natur“</h1>
+  <p class="lede">Fünf Motive, bereits im Mandala Atelier.</p>
 
   <div class="fertig">
     <b>Bereits im Atelier — keine Vorschau, sondern die App selbst.</b>
     Name, Achsenzahl, Sachnotiz und Beschreibung stehen unverändert so in
-    <code>app.js</code>; die Bilder sind von der App selbst gerendert. Hier
-    ist nichts mehr zu entscheiden — zum Ausprobieren direkt ins
-    <a href="../index.html">Mandala Atelier</a>.
+    <code>app.js</code>; die Bilder sind von der App selbst gerendert.
+    Zum Ausprobieren direkt ins <a href="../index.html">Mandala Atelier</a>.
+  </div>
+
+  <div class="familienstatus">
+    <span class="tag ja">Mandala Atelier: umgesetzt</span>
+    <span class="tag nein">Blatt: nicht umgesetzt</span>
   </div>
 
   <h2>Woher</h2>
 
-  <p>Blüten, Blätter, Muscheln, Farne, Samen — dieselbe radiale Symmetrie wie alle anderen Vorlagen, aber mit weicheren, organischeren Linien als bei den geometrisch-klassischen Formen.</p>
+  <p>Blüten, Blätter, Muscheln, Farne, Samen — dieselbe radiale Symmetrie wie alle anderen Motive, aber mit weicheren, organischeren Linien als bei den geometrisch-klassischen Formen.</p>
 
-  <h2>Fünf Vorlagen</h2>
+  <h2>Fünf Motive</h2>
 
-  <div class="vorlage">
+  <div class="motiv">
     <span class="vorschau"><img src="katalog/bluete.webp" alt="Blüte" loading="lazy"></span><h3>Blüte</h3><span class="achsen">8 Achsen</span>
     <p>Acht große Blätter, viel Fläche</p>
     <p class="mythos">Blütenblatt um Blütenblatt, wie sie sich in einem einzigen warmen Moment öffnen.</p>
+    <div class="status">
+      <span class="tag ja">Atelier: ja</span>
+      <span class="tag nein">Blatt umgesetzt: nein</span>
+      <span class="tag ja">Blatt sinnvoll: ja</span>
+    </div>
   </div>
-  <div class="vorlage">
+  <div class="motiv">
     <span class="vorschau"><img src="katalog/blaetterkranz.webp" alt="Blätterkranz" loading="lazy"></span><h3>Blätterkranz</h3><span class="achsen">12 Achsen</span>
     <p>Blätter mit Mittelrippe, versetzt</p>
     <p class="mythos">Ein Kranz aus Blättern, so dicht wie ein Wald im Hochsommer.</p>
+    <div class="status">
+      <span class="tag ja">Atelier: ja</span>
+      <span class="tag nein">Blatt umgesetzt: nein</span>
+      <span class="tag ja">Blatt sinnvoll: ja</span>
+    </div>
   </div>
-  <div class="vorlage">
+  <div class="motiv">
     <span class="vorschau"><img src="katalog/muschelspirale.webp" alt="Muschelspirale" loading="lazy"></span><h3>Muschelspirale</h3><span class="achsen">6 Achsen</span>
     <p>Sechs Arme, weite Bögen</p>
     <p class="mythos">Eine Spirale, wie sie das Meer in jede Muschel schreibt, bevor sie an den Strand gespült wird.</p>
+    <div class="status">
+      <span class="tag ja">Atelier: ja</span>
+      <span class="tag nein">Blatt umgesetzt: nein</span>
+      <span class="tag nein">Blatt sinnvoll: nein</span>
+    </div>
   </div>
-  <div class="vorlage">
+  <div class="motiv">
     <span class="vorschau"><img src="katalog/farnkreis.webp" alt="Farnkreis" loading="lazy"></span><h3>Farnkreis</h3><span class="achsen">10 Achsen</span>
     <p>Wedel mit feinen Fiedern</p>
     <p class="mythos">Wedel, die sich entrollen wie ein Farn im ersten Frühlingslicht.</p>
+    <div class="status">
+      <span class="tag ja">Atelier: ja</span>
+      <span class="tag nein">Blatt umgesetzt: nein</span>
+      <span class="tag teilweise">Blatt sinnvoll: teilweise</span>
+    </div>
   </div>
-  <div class="vorlage">
+  <div class="motiv">
     <span class="vorschau"><img src="katalog/samenkranz.webp" alt="Samenkranz" loading="lazy"></span><h3>Samenkranz</h3><span class="achsen">16 Achsen</span>
     <p>Sechzehn Samen, feine Teilung</p>
     <p class="mythos">Unzählige kleine Samen, dicht an dicht — ein ganzer Sommer, der auf den nächsten wartet.</p>
+    <div class="status">
+      <span class="tag ja">Atelier: ja</span>
+      <span class="tag nein">Blatt umgesetzt: nein</span>
+      <span class="tag ja">Blatt sinnvoll: ja</span>
+    </div>
   </div>
 
 
   <footer>
-    Alle Vorlagen auf einen Blick: <a href="katalog.html">Katalog</a>.
-    Neue Motivwelten zum Auswählen: <a href="neue-welten.html">Sechs neue
-    Motivwelten</a>. Zurück zur <a href="../beide.html">Einstiegsseite</a>.
+    Alle Motive auf einen Blick: <a href="katalog.html">Katalog</a>.
+    Neue Motivfamilien zur Wahl: <a href="neue-welten.html">sechs Vorschläge</a>.
+    Zurück zur <a href="../beide.html">Einstiegsseite</a>.
   </footer>
 
 </main>

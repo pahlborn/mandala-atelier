@@ -40,6 +40,7 @@
     --ink:   #2f2a22;
     --quiet: #6d6355;
     --edge:  rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -49,6 +50,7 @@
       --ink:   #e8e2d6;
       --quiet: #9a9287;
       --edge:  rgba(0, 0, 0, 0.5);
+      --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573;
     }
   }
 
@@ -160,6 +162,16 @@
     margin: -0.3rem 0 0.9rem; font-size: 14.5px; color: var(--quiet);
   }
   .probe.klein span { font-size: 13.5px; }
+
+  .proben.familien .probe { display: flex; flex-direction: column; gap: 2px; }
+  .status { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .status .tag {
+    font-size: 11px; padding: 2px 9px; border-radius: 999px;
+    border: 1px solid currentColor; white-space: nowrap;
+  }
+  .tag.ja { color: var(--tut); }
+  .tag.teilweise { color: var(--offen); }
+  .tag.nein { color: var(--stop); }
 
   table.werte {
     width: 100%;
@@ -354,76 +366,135 @@
       </a>
     </div>
 
-    <h2>Bereits umgesetzte Motivwelten – Mandala Atelier</h2>
-    <div class="proben">
+    <h2>Motivfamilien</h2>
+    <p class="lede-klein">Zwölf Familien, gleich aufgebaut: je Motiv, ob es im
+       Mandala Atelier steht, ob es in Blatt umgesetzt ist, und ob es für
+       Blatt sinnvoll wäre. Sechs sind bereits gebaut, sechs sind Vorschläge
+       — beides zeigen die Kennzeichen unten, nicht der Name der Karte.</p>
+    <div class="proben familien">
       <a class="probe" href="./docs/welt-geo.html">
         <strong>Geometrisch-klassisch</strong>
-        <span>Fünf Vorlagen: Sternkranz, Rautenkranz, Sternmandala fein,
+        <span>Fünf Motive: Sternkranz, Rautenkranz, Sternmandala fein,
               Achteckstern, Gitterrose.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag ja">Blatt sinnvoll: durchweg</span>
+        </span>
       </a>
       <a class="probe" href="./docs/welt-natur.html">
         <strong>Natur</strong>
-        <span>Fünf Vorlagen: Blüte, Blätterkranz, Muschelspirale, Farnkreis,
+        <span>Fünf Motive: Blüte, Blätterkranz, Muschelspirale, Farnkreis,
               Samenkranz.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag teilweise">Blatt sinnvoll: gemischt</span>
+        </span>
       </a>
       <a class="probe" href="./docs/welt-zen.html">
         <strong>Zen &amp; Achtsamkeit</strong>
-        <span>Fünf Vorlagen: Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
+        <span>Fünf Motive: Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
               Steingarten.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag ja">Blatt sinnvoll: überwiegend</span>
+        </span>
       </a>
       <a class="probe" href="./docs/welt-jahr.html">
         <strong>Jahreszeiten</strong>
-        <span>Vier Vorlagen: Winter, Frühling, Sommer, Herbst.</span>
+        <span>Vier Motive: Winter, Frühling, Sommer, Herbst.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag ja">Blatt sinnvoll: überwiegend</span>
+        </span>
       </a>
       <a class="probe" href="./docs/welt-anlage.html">
         <strong>Anlagen</strong>
-        <span>Acht Vorlagen, jede nach einem echten Grundriss – von der
+        <span>Acht Motive, jedes nach einem echten Grundriss – von der
               Gartenanlage bis zur Kuppelanlage.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag ja">Blatt: ja</span>
+          <span class="tag ja">Blatt sinnvoll: bereits umgesetzt</span>
+        </span>
       </a>
       <a class="probe" href="./docs/welt-kids.html">
         <strong>Kids-Corner</strong>
-        <span>Sieben Vorlagen für Kinder – von ersten Formen bis zum
+        <span>Sieben Motive für Kinder – von ersten Formen bis zum
               Rechenmandala.</span>
+        <span class="status">
+          <span class="tag ja">Atelier: ja</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag nein">Blatt sinnvoll: eher nicht</span>
+        </span>
       </a>
-    </div>
-
-    <h2>Neue Motivwelten – Vorschlag, nichts gebaut</h2>
-    <p class="lede-klein">Für das Mandala Atelier stehen sechs neue
-       Motivwelten zur Wahl, jede mit Kandidaten, Quellen und der Frage, was
-       davon bleibt. Gesammelt unter <a href="./docs/neue-welten.html">Sechs
-       neue Motivwelten</a>.</p>
-    <div class="proben">
       <a class="probe" href="./docs/mehndi.html">
         <strong>Mehndi</strong>
-        <span>13 Kandidaten aus der Mehndi-Formensprache – Paisley, Ranken,
+        <span>13 Motive aus der Mehndi-Formensprache – Paisley, Ranken,
               Lotos, Netzfüllung.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag ja">Blatt sinnvoll: überwiegend</span>
+        </span>
       </a>
       <a class="probe" href="./docs/chakren.html">
         <strong>Chakren</strong>
-        <span>14 Kandidaten, zwei Dichten je Chakra der westlichen
-              Popform.</span>
+        <span>14 Motive, zwei Dichten je Chakra der westlichen Popform.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag ja">Blatt sinnvoll: überwiegend</span>
+        </span>
       </a>
       <a class="probe" href="./docs/sriyantra.html">
         <strong>Sri-Yantra-Geometrie</strong>
-        <span>12 Kandidaten, vier architektonische Bausteine mal drei
+        <span>12 Motive, vier architektonische Bausteine mal drei
               Dichten.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag teilweise">Blatt sinnvoll: gemischt</span>
+        </span>
       </a>
       <a class="probe" href="./docs/sandmandala.html">
         <strong>Palast-Mandala</strong>
-        <span>12 Kandidaten, derselbe Aufbau – Torring, Flammen, Vajra,
+        <span>12 Motive, derselbe Aufbau – Torring, Flammen, Vajra,
               Lotos.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag teilweise">Blatt sinnvoll: gemischt</span>
+        </span>
       </a>
       <a class="probe" href="./docs/bauhaus.html">
         <strong>Bauhaus</strong>
-        <span>13 Kandidaten nach Kandinsky und Itten – säkulare
+        <span>13 Motive nach Kandinsky und Itten – säkulare
               Designpädagogik.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag teilweise">Blatt sinnvoll: gemischt</span>
+        </span>
       </a>
       <a class="probe" href="./docs/origami.html">
         <strong>Origami</strong>
-        <span>13 Kandidaten aus Faltmustern, mathematisch-handwerkliche
+        <span>13 Motive aus Faltmustern, mathematisch-handwerkliche
               Tradition.</span>
+        <span class="status">
+          <span class="tag nein">Atelier: nein</span>
+          <span class="tag nein">Blatt: nein</span>
+          <span class="tag teilweise">Blatt sinnvoll: gemischt</span>
+        </span>
       </a>
     </div>
+    <p class="lede-klein">Sechs davon sind Vorschläge, noch nichts ist
+       gebaut — Einzelheiten je Motiv auf den jeweiligen Seiten. Gesammelt
+       unter <a href="./docs/neue-welten.html">Sechs neue Motivfamilien</a>.
+       „Blatt sinnvoll“ ist meine Einschätzung, kein Beschluss.</p>
 
     <h2>Für den App Store</h2>
     <div class="proben">
