@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marktvergleich — wo stehen wir</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --room:#efe9dd; --card:#f8f4ea; --ink:#2f2a22; --quiet:#6d6355;
+  --edge:rgba(60,48,32,0.16); --mark:#8a5a3c;
+  --tut:#2f6b45; --offen:#a9700a; --stop:#9a3b2f;
+  --akzent:#3b5a8a;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --room:#16151a; --card:#201f25; --ink:#e8e2d6; --quiet:#9a9287;
+          --edge:rgba(0,0,0,0.5); --mark:#d0a184;
+          --tut:#6fbf8e; --offen:#e0a93c; --stop:#e08573;
+          --akzent:#7aaae0; }
+}
+html { -webkit-text-size-adjust:100%; }
+body {
+  margin:0; background:var(--room); color:var(--ink);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  padding: clamp(24px,6vw,64px) clamp(18px,5vw,40px)
+           calc(clamp(24px,6vw,64px) + env(safe-area-inset-bottom));
+}
+main { max-width:52rem; margin:0 auto; }
+h1 { margin:0 0 .15em; font-family:ui-serif,'Iowan Old Style',Georgia,serif;
+     font-weight:500; font-size:clamp(28px,6vw,40px); letter-spacing:-.01em; }
+.lede { margin:0 0 2.4rem; color:var(--quiet); max-width:44rem; }
+h2 { margin:2.8rem 0 .8rem; font-size:14px; font-weight:600; letter-spacing:.08em;
+     text-transform:uppercase; color:var(--quiet);
+     border-top:1px solid var(--edge); padding-top:1.2rem; }
+h3 { margin:1.6rem 0 .3rem; font-size:17px; font-weight:600;
+     font-family:ui-serif,'Iowan Old Style',Georgia,serif; }
+p { margin:0 0 1rem; }
+ul, ol { margin:0 0 1rem; padding-left:1.2rem; }
+li { margin-bottom:.35rem; }
+
+/* Karten für Wettbewerber */
+.karte {
+  background:var(--card); border-radius:16px; padding:18px 20px;
+  margin:0 0 14px;
+  box-shadow:0 1px 2px var(--edge), 0 10px 28px -16px var(--edge);
+}
+.karte h3 { margin-top:0; }
+.karte p:last-child { margin-bottom:0; }
+.meta { font-size:13px; color:var(--quiet); margin:.15rem 0 .7rem; }
+.meta b { color:var(--ink); }
+
+/* Tabelle */
+.wrap { overflow-x:auto; margin:0 0 1.4rem; }
+table { border-collapse:collapse; font-size:14.5px; min-width:32rem; width:100%; }
+th, td { text-align:left; padding:7px 14px 7px 0; border-bottom:1px solid var(--edge);
+         vertical-align:top; }
+th { font-weight:600; font-size:13px; letter-spacing:.03em; color:var(--quiet); }
+td:first-child { font-weight:500; white-space:nowrap; }
+
+/* Tag-Chips */
+.chips { display:flex; gap:6px; flex-wrap:wrap; margin:.5rem 0 0; }
+.chip {
+  font-size:11.5px; padding:2px 9px; border-radius:999px;
+  border:1px solid currentColor; white-space:nowrap;
+}
+.chip.gruen { color:var(--tut); }
+.chip.gelb  { color:var(--offen); }
+.chip.rot   { color:var(--stop); }
+.chip.blau  { color:var(--akzent); }
+
+/* Motivwelten-Tabelle IAP */
+.iap-grid {
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:0;
+  border-radius:14px; overflow:hidden;
+  border:1px solid var(--edge);
+  margin:0 0 1.4rem;
+  font-size:14.5px;
+}
+.iap-grid .kopf {
+  display:contents;
+}
+.iap-grid .kopf span {
+  background:var(--card);
+  padding:8px 14px;
+  font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--quiet); border-bottom:1px solid var(--edge);
+}
+.iap-grid .zeile {
+  display:contents;
+}
+.iap-grid .zeile span {
+  padding:8px 14px;
+  border-bottom:1px solid var(--edge);
+  background:var(--room);
+}
+.iap-grid .zeile:last-child span { border-bottom:none; }
+.iap-grid .zeile span.haupt { font-weight:500; }
+.iap-grid .zeile span.mitte { color:var(--quiet); font-size:13.5px; text-align:center; }
+.iap-grid .zeile span.klein { color:var(--quiet); font-size:13px; }
+
+/* Hinweisbox */
+.hinweis {
+  margin:1.6rem 0; padding:16px 18px; border-radius:14px;
+  border:1px solid var(--edge); font-size:15px;
+}
+.hinweis strong { color:var(--mark); }
+
+/* Unsere Apps hervorgehoben */
+.unsere {
+  background:var(--card); border-radius:16px; padding:20px 22px;
+  margin:0 0 14px;
+  box-shadow:0 1px 2px var(--edge), 0 10px 28px -16px var(--edge);
+  border-left:3px solid var(--tut);
+}
+.unsere h3 { margin-top:0; }
+.unsere p:last-child { margin-bottom:0; }
+
+footer { margin-top:3rem; padding-top:1.2rem; border-top:1px solid var(--edge);
+         font-size:13.5px; color:var(--quiet); }
+footer a { color:inherit; }
+a { color:inherit; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Marktvergleich</h1>
+<p class="lede">Wo stehen Mandala Atelier und Blatt im Vergleich zu den
+   führenden Ausmalen-Apps? Interner Überblick — kein Werbematerial.
+   Preise und Bewertungen aus dem Stand der Recherche (Sommer 2025),
+   können sich geändert haben.</p>
+
+
+<!-- ======================================================
+     DIE VIER GROSSEN
+====================================================== -->
+<h2>Die vier großen Wettbewerber</h2>
+
+<div class="karte">
+  <h3>Pigment — Coloring Book for Adults</h3>
+  <p class="meta"><b>Entwickler:</b> Pixite LLC &nbsp;·&nbsp;
+     <b>Plattform:</b> iOS, Android &nbsp;·&nbsp;
+     <b>Modell:</b> Freemium + Abo + IAP-Pakete &nbsp;·&nbsp;
+     <b>Bewertung:</b> 4,7 ★ (sehr viele Bewertungen)</p>
+  <p>Pixite ist der Qualitätsführer im Segment. Pigment bietet eine
+     umfangreiche Bibliothek von Kunstwerken professioneller Illustratoren,
+     Ebenenunterstützung, echte Pinsel (Aquarell, Bleistift, Marker),
+     Verlaufstools und anpassbare Paletten. Die App wirbt mit einem
+     „realistischen" Malmodus, der die Oberfläche des Papiers spürbar macht.</p>
+  <p>Preisgestaltung: Basis kostenlos mit wenigen freien Bildern, dann
+     ~€3,99/Monat oder ~€19,99/Jahr — plus Einzelkauf-Packs (€2,99–€4,99)
+     für Spezialkollektionen. Die Kombination aus Abo und IAP funktioniert
+     für Pigment, weil ständig neue Kunstwerke hinzukommen.</p>
+  <div class="chips">
+    <span class="chip gruen">Kuratierte Künstler-Bibliothek</span>
+    <span class="chip gruen">Professionelle Pinselwerkzeuge</span>
+    <span class="chip gelb">Abo-Pflicht für Vollfunktion</span>
+    <span class="chip rot">Konto erforderlich</span>
+    <span class="chip rot">Nur vorgegebene Bilder</span>
+  </div>
+</div>
+
+<div class="karte">
+  <h3>Lake — Coloring Book &amp; Journal</h3>
+  <p class="meta"><b>Entwickler:</b> Giraffe Social Media Ltd &nbsp;·&nbsp;
+     <b>Plattform:</b> iOS, Android &nbsp;·&nbsp;
+     <b>Modell:</b> Abo (kein dauerhafter Kauf) &nbsp;·&nbsp;
+     <b>Bewertung:</b> 4,8 ★ (sehr hoch bei gleichzeitig vielen Bewertungen)</p>
+  <p>Lake positioniert sich bewusst im Achsamkeits- und Wellness-Segment.
+     Das UI ist minimalistisch, warme Erdtöne, kein Lärm. Die App hat
+     Eingang in Therapie- und Stressreduktionskontexte gefunden.
+     Besonderheit: Ein integriertes Tagebuch, in dem man neben dem
+     Ausmalen notiert, wie es einem geht.</p>
+  <p>Lake hat kein Freemium-Modell — es gibt keine dauerhaft kostenlosen
+     Bilder, nur eine kostenlose Testphase. Preis: ~€4,99/Monat oder
+     ~€29,99/Jahr. Das funktioniert, weil Lake wöchentlich neue Bilder
+     hinzufügt und sich als Community versteht.</p>
+  <div class="chips">
+    <span class="chip gruen">Höchste Nutzerzufriedenheit im Segment</span>
+    <span class="chip gruen">Wellness-Positionierung überzeugt</span>
+    <span class="chip gelb">Rein abo-basiert, kein Einmalkauf</span>
+    <span class="chip rot">Konto erforderlich</span>
+    <span class="chip rot">Nur vorgegebene Bilder</span>
+  </div>
+</div>
+
+<div class="karte">
+  <h3>Happy Color — Color by Number</h3>
+  <p class="meta"><b>Entwickler:</b> X-Flow &nbsp;·&nbsp;
+     <b>Plattform:</b> iOS, Android &nbsp;·&nbsp;
+     <b>Modell:</b> Gratis + Werbung + Abo &nbsp;·&nbsp;
+     <b>Downloads:</b> 100+ Millionen &nbsp;·&nbsp;
+     <b>Bewertung:</b> 4,7 ★</p>
+  <p>Happy Color ist die meistgeladene App dieser Kategorie — aber die
+     am stärksten gamifizierte. Grundprinzip: nummerierte Felder, jede
+     Fläche hat eine Zahl, man tippt das Farbfeld und trifft es entweder
+     oder nicht. Das ist kein Malen mehr, sondern ein Puzzle. Täglich
+     neue Bilder, Streaks, Belohnungen, Ranglisten. Die Mechanik ist
+     näher an einem Casual-Handyspiel als an kreativem Gestalten.</p>
+  <p>Preis: Gratis mit vielen Werbeanzeigen, oder ~€7,99/Monat ohne Werbung
+     und mit Premium-Inhalten. Das hohe Volumen kommt nicht aus Qualität,
+     sondern aus dem kostenlosen Einstieg.</p>
+  <div class="chips">
+    <span class="chip gruen">Riesige Reichweite</span>
+    <span class="chip gelb">Gamifiziert, nicht kreativ</span>
+    <span class="chip rot">Viel Werbung im Free-Tier</span>
+    <span class="chip rot">Anderes Segment als unsere Apps</span>
+  </div>
+</div>
+
+<div class="karte">
+  <h3>Recolor — Adult Coloring Book</h3>
+  <p class="meta"><b>Entwickler:</b> Sumoing Ltd &nbsp;·&nbsp;
+     <b>Plattform:</b> iOS, Android &nbsp;·&nbsp;
+     <b>Modell:</b> Freemium + Abo + IAP &nbsp;·&nbsp;
+     <b>Bewertung:</b> 4,5 ★</p>
+  <p>Recolor hat eine große Bibliothek und viele Werkzeuge (Bleistift, Pinsel,
+     Airbrush), aber das UI wirkt weniger durchdacht als Pigment oder Lake.
+     Stärke: umfangreiche kostenlose Auswahl. Schwäche: die Grenze zwischen
+     kostenlos und Premium ist weniger klar kommuniziert, was zu gemischten
+     Bewertungen führt.</p>
+  <p>~€5,99/Monat oder ~€35,99/Jahr, plus IAP für einzelne Pakete.
+     Schwächstes Preis-Leistungs-Gefühl im Vergleich zu Pigment und Lake.</p>
+  <div class="chips">
+    <span class="chip gruen">Große kostenlose Auswahl</span>
+    <span class="chip gelb">UI weniger poliert</span>
+    <span class="chip rot">Unübersichtliche Kaufbarrieren</span>
+  </div>
+</div>
+
+
+<!-- ======================================================
+     GEMEINSAMER NENNER DER WETTBEWERBER
+====================================================== -->
+<h2>Was alle vier gemeinsam haben</h2>
+
+<p>So unterschiedlich sie sich positionieren — Pigment als Profi-Tool,
+   Lake als Wellness-Begleiter, Happy Color als Casualspiel, Recolor als
+   Mittelweg —, ihnen liegt dasselbe Geschäftsmodell zugrunde:</p>
+<ul>
+  <li><b>Inhalte-Abonnement.</b> Das eigentliche Produkt ist nicht die
+      App, sondern der Strom neuer Bilder. Die App wäre ohne regelmäßigen
+      Nachschub wertlos. Deshalb funktioniert das Abo: Es kauft nicht
+      Funktionen, sondern laufenden Zugang zu frisch geliefertem Inhalt.</li>
+  <li><b>Passiver Konsum.</b> Die Nutzerin wählt ein Bild aus, das jemand
+      anderes gezeichnet hat, und füllt es mit Farbe aus. Kreativität liegt
+      in der Farbwahl; das eigentliche Motiv kommt von außen.</li>
+  <li><b>Konto und Tracking.</b> Alle vier verlangen ein Konto (oder
+      empfehlen es dringend), damit der Fortschritt gespeichert und
+      Kaufhistorie nachgehalten werden kann. Daten verlassen das Gerät.</li>
+  <li><b>Internetpflicht für neue Inhalte.</b> Wer kein Netz hat, bekommt
+      keine neuen Bilder. Der Offline-Modus ist ein Notbehelf, keine
+      Designabsicht.</li>
+</ul>
+
+
+<!-- ======================================================
+     UNSERE APPS
+====================================================== -->
+<h2>Mandala Atelier &amp; Blatt — eine andere Kategorie</h2>
+
+<div class="unsere">
+  <h3>Mandala Atelier</h3>
+  <p>Mandala Atelier ist kein Ausmalen-Buch. Es ist ein <b>generatives
+     Zeichenwerkzeug</b>: das Motiv entsteht erst durch den Strich der
+     Nutzerin — symmetrisch, algorithmisch, regelgeleitet. Es gibt keine
+     vorgefertigten Bilder zum Einfärben. Stattdessen entstehen auf jedem
+     Gerät, mit jedem Strich, Bilder, die so vorher nicht existiert haben.</p>
+  <p>Das stellt die App in eine Reihe mit Instruments-Apps (GarageBand,
+     Procreate), nicht mit Content-Abos (Spotify, Pigment). Man kauft ein
+     Werkzeug, keinen Zugang zu einem Katalog.</p>
+  <div class="chips">
+    <span class="chip gruen">Generativ — kein Bild existiert vorher</span>
+    <span class="chip gruen">Kein Konto, kein Tracking</span>
+    <span class="chip gruen">Vollständig offline</span>
+    <span class="chip gruen">34 Vorlagen, mathematisch genormt</span>
+    <span class="chip blau">Kategorie: Instrument, nicht Inhalte</span>
+  </div>
+</div>
+
+<div class="unsere">
+  <h3>Blatt — Das ruhige Blatt</h3>
+  <p>Blatt geht noch einen Schritt weiter: Es gibt keine Werkzeugleiste, keine
+     Farbpalette zur bewussten Auswahl, kein «Motiv wählen»-Screen. Die Hand
+     streicht über das Gerät, und das Mandala kommt hervor — wie ein Relief,
+     das langsam sichtbar wird. Farbe ergibt sich aus der Bewegungsrichtung
+     und -geschwindigkeit.</p>
+  <p>Das ist meditative Erfahrung, keine produktive Aufgabe. Kein Ergebnis
+     muss gerettet werden, kein Fortschritt geht verloren. Jede Sitzung
+     beginnt frisch.</p>
+  <div class="chips">
+    <span class="chip gruen">Werkzeuglos — keine Entscheidungen nötig</span>
+    <span class="chip gruen">Relief-Metapher: berühren statt auswählen</span>
+    <span class="chip gruen">Kein Konto, kein Tracking</span>
+    <span class="chip gruen">Vollständig offline</span>
+    <span class="chip blau">Kategorie: Erfahrung, nicht Aufgabe</span>
+  </div>
+</div>
+
+
+<!-- ======================================================
+     PHILOSOPHIE
+====================================================== -->
+<h2>Die Philosophie dahinter</h2>
+
+<h3>Konsumieren vs. Gestalten</h3>
+<p>Der tiefste Unterschied liegt nicht in Features, sondern in der
+   Grundfrage: <em>Was tut die Nutzerin?</em></p>
+<p>Bei Pigment, Lake und Co.: Sie wählt ein Bild aus, das jemand
+   anderes gemacht hat, und folgt dessen Konturen. Das ist angenehm —
+   aber die kreative Arbeit hat schon jemand anderes getan. Die Nutzerin
+   verwaltet Farbe; sie gestaltet kein Motiv.</p>
+<p>Bei Mandala Atelier: Sie zieht den ersten Strich ins Leere und
+   erschafft eine Form, die so noch nicht da war. Das Werkzeug hält die
+   Symmetrie, aber die Entscheidung über Bewegung, Druck, Richtung liegt
+   vollständig bei ihr. Kein Bild der App hat je eine Vorlage, der
+   jemand folgt.</p>
+<p>Bei Blatt: Noch radikaler — es gibt keine bewusste Entscheidung
+   einzuholen. Die Hand streicht, das Bild entsteht. Das ist meditative
+   Praxis, nicht kreative Aufgabe.</p>
+
+<h3>Das Instrument-Modell</h3>
+<p>Aus dieser Grundunterscheidung folgt ein anderes Geschäftsmodell.
+   Instrumente — Gitarren, Pianos, Procreate — werden einmal gekauft.
+   Es gibt keine Pflicht zu neuen Inhalten, weil das Instrument selbst
+   die Inhalte ermöglicht. Das Abo-Modell der Wettbewerber passt hier
+   <em>nicht</em>: Was hätte man abonniert, wenn die App nach einem Jahr
+   dieselben Werkzeuge hat wie vorher?</p>
+<p>Was sinnvoll ist: <b>einmaliger Kauf des Instruments</b>, ergänzt um
+   optionale <b>Erweiterungen der Motivbibliothek</b> — genau dann, wenn
+   neue Motivfamilien gebaut werden, die über das Basisset hinausgehen.</p>
+
+<h3>Keine Werbung, keine Konten, kein Tracking</h3>
+<p>Alle drei Wettbewerber erheben Nutzerdaten, mindestens für Kauf-
+   bestätigung und Abo-Verwaltung. Viele kaufen oder integrieren
+   Werbenetzwerke. Das ist keine böse Absicht — es ist das Geschäftsmodell.</p>
+<p>Mandala Atelier und Blatt haben das als Designentscheidung
+   ausgeschlossen. Kein Konto. Kein Netz nötig. Was auf dem Gerät
+   entsteht, bleibt auf dem Gerät. Das ist keine Datenschutz-Compliance,
+   sondern eine Werthaltung — und für einen bestimmten Nutzerkreis
+   (Kinder, Achsamkeitspraxis, tech-skeptische Erwachsene) ein echtes
+   Kaufargument.</p>
+
+
+<!-- ======================================================
+     MOTIVWELTEN: IAP-POTENTIAL
+====================================================== -->
+<h2>Motivwelten: was als Erweiterung taugt</h2>
+
+<p>Derzeit hat Blatt acht Motive der Familie «Anlagen». Die sechs in
+   der App bereits bestehenden Familien von Mandala Atelier sind für
+   Blatt noch nicht umgesetzt. Hinzu kommen sechs neue Familien als
+   Kandidaten. Hier ist die Einschätzung, welche sich als bezahlte
+   Erweiterung eignen — und warum.</p>
+
+<div class="iap-grid">
+  <div class="kopf">
+    <span>Motivfamilie</span>
+    <span>Motive</span>
+    <span>IAP-Eignung für Blatt</span>
+  </div>
+
+  <div class="zeile">
+    <span class="haupt">Geometrisch-klassisch</span>
+    <span class="mitte">5</span>
+    <span class="klein">Stark — klare Formen, sehr kompatibel mit dem Relief</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Zen &amp; Achtsamkeit</span>
+    <span class="mitte">5</span>
+    <span class="klein">Stark — trifft genau das Blatt-Publikum</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Jahreszeiten</span>
+    <span class="mitte">4</span>
+    <span class="klein">Gut — saisonale Attraktivität, klare Formen</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Mehndi</span>
+    <span class="mitte">13</span>
+    <span class="klein">Stark — ornamentale Dichte passt zum Relief-Erleben</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Chakren</span>
+    <span class="mitte">14</span>
+    <span class="klein">Gut — Wellness-Publikum, das Blatt ohnehin anspricht</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Natur</span>
+    <span class="mitte">5</span>
+    <span class="klein">Gemischt — organische Formen, weniger strenge Symmetrie</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Sri-Yantra-Geometrie</span>
+    <span class="mitte">12</span>
+    <span class="klein">Gemischt — komplex, spezifisches Publikum</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Palast-Mandala</span>
+    <span class="mitte">12</span>
+    <span class="klein">Gemischt — kultureller Kontext schwerer vermittelbar</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Bauhaus</span>
+    <span class="mitte">13</span>
+    <span class="klein">Gemischt — Design-affines Publikum, kleinere Nische</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Origami</span>
+    <span class="mitte">13</span>
+    <span class="klein">Gemischt — mathematisch, spezifisches Publikum</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Kids-Corner</span>
+    <span class="mitte">7</span>
+    <span class="klein">Eher nicht — Blatt ist für Erwachsene ausgelegt</span>
+  </div>
+  <div class="zeile">
+    <span class="haupt">Anlagen ✓</span>
+    <span class="mitte">8</span>
+    <span class="klein">Bereits in Blatt umgesetzt — Teil des Basispakets</span>
+  </div>
+</div>
+
+<div class="hinweis">
+  <strong>Lesart:</strong> «Stark» und «Gut» bedeuten, dass die Motive
+  technisch und ästhetisch zur Relief-Mechanik von Blatt passen und dass
+  das Publikum sich überschneidet. «Gemischt» heißt: es ginge, aber der
+  Nutzen ist weniger eindeutig, und der Bauaufwand sollte das
+  rechtfertigen. «Eher nicht» ist keine Ablehnung des Motivs als solchem —
+  nur eine Einschätzung der Passung zu Blatt.
+</div>
+
+<h3>Warum Einzel-IAP statt Abo</h3>
+<p>Das Abo-Modell (wie Pigment, Lake) setzt voraus, dass laufend neuer
+   Inhalt geliefert wird — Inhalt, den die Nutzerin ohne Abo nie gesehen
+   hätte. Bei Mandala Atelier und Blatt ist das anders: Motive werden
+   nicht täglich geliefert, sondern in Familien gebaut — selten, sorgfältig,
+   endlich. Ein Abo auf «neue Motive» würde versprechen, was kaum gehalten
+   werden kann.</p>
+<p>Sinnvoller: <b>einmaliger Freischalt-Kauf je Motivfamilie</b>. Die
+   Nutzerin kauft «Mehndi» oder «Zen» einmal, dauerhaft, ohne Verfallsdatum.
+   Das passt zur Offline-first-Philosophie und zur Erwartung, die an ein
+   Instrument gestellt wird: man kauft neue Saiten, keine Saiten-Flat-Rate.</p>
+
+
+<!-- ======================================================
+     SCHLUSSFOLGERUNGEN
+====================================================== -->
+<h2>Schlussfolgerungen zum Preismodell</h2>
+
+<p>Der Vergleich legt folgendes Modell nahe:</p>
+
+<ul>
+  <li><b>Blatt (App Store):</b> Einmalkauf, z. B. €2,99 oder €3,99.
+      Keine Werbung, kein Abo. Im Lieferumfang: die Anlagen-Familie
+      (8 Motive), alle vier Griff-Fassungen, beide Sprachen.</li>
+  <li><b>Erweiterungen (IAP):</b> Einzelne Motivfamilien, je €1,99.
+      Empfohlen für den Start: Geometrisch-klassisch, Zen &amp; Achtsamkeit,
+      Jahreszeiten — weil sie am nächsten an Blatt's Kern liegen und
+      am wenigsten Erklärung brauchen. Mehndi und Chakren als zweite
+      Welle, wenn die ersten gut angenommen werden.</li>
+  <li><b>Mandala Atelier (PWA/WebApp):</b> Bleibt kostenlos oder bekommt
+      ein ähnliches Modell — die Zeichenfunktionen sind der Kern, nicht
+      die Vorlagenanzahl. IAP für neue Familien ist möglich, aber weniger
+      dringend, da Atelier schon sechs Familien hat.</li>
+</ul>
+
+<div class="hinweis">
+  <strong>Was gegen das Freemium-Modell spricht:</strong> «Freemium» mit
+  einer eingeschränkten kostenlosen Version und Werbung steht quer zur
+  Philosophie der Apps. Die Wettbewerber, die Freemium gut umsetzen
+  (Happy Color), nehmen dafür Werbung und Daten-Tracking in Kauf —
+  beides ist hier ausgeschlossen. Ein App mit einer einzigen verstümmelten
+  Free-Version, die man dann kaufen muss, hinterlässt keinen guten Eindruck.
+  Klarer ist: «Hier ist das Werkzeug. Wenn du mehr Motive willst, gibt es
+  sie.»
+</div>
+
+<p>Die Stärke gegenüber dem Wettbewerb liegt nicht in der Tiefe der
+   Bibliothek — die werden wir nie einholen. Sie liegt in der Einzigartigkeit
+   der Erfahrung: generativ, offline, ohne Konto, ohne Werbung, ohne Abo-Druck.
+   Das ist eine klar abgegrenzte Nische — und eine glaubwürdige.</p>
+
+
+<footer>
+  Zurück zur <a href="../beide.html">Einstiegsseite</a>.
+  Neue Motivfamilien im Detail: <a href="neue-welten.html">Sechs neue Motivwelten</a>.
+  Offene Punkte: <a href="offen.html">Was noch offen ist</a>.
+</footer>
+
+</main>
+</body>
+</html>
