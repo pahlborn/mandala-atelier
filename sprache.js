@@ -240,6 +240,7 @@ var Sprache = (function () {
     'Jahreszeiten':               'Seasons',
     'Anlagen':                    'Grounds',
     'Kids-Corner':                "Kids' Corner",
+    'Filigran':                   'Filigree',
 
     /* --- Motive: Name und Beischrift --------------------------------------
        Die Beischrift zählt auf, was zu sehen ist – sie soll auf Englisch
@@ -379,6 +380,45 @@ var Sprache = (function () {
     'Plus und Minus im Zahlenraum 10': 'Plus and minus up to 10',
     'Rechenmandala ZR 20':        'Sums Mandala to 20',
     'Plus und Minus im Zahlenraum 20': 'Plus and minus up to 20',
+
+    /* --- Filigran ----------------------------------------------------------
+       Zusätzlich, wie der Bereich in app.js. Fehlt hier etwas, erscheint
+       der deutsche Text - kaputt geht nichts. */
+    'Spitzenrad':                  'Lace Wheel',
+    'Vier Bänder mit Sprossen, Klöppelspitze als Rad':
+      'Four banded rings with rungs, bobbin lace read as a wheel',
+    'Spitze entsteht, indem man Fäden umeinanderführt und den Zwischenraum stehen lässt. Sie ist die einzige Handarbeit, deren Ergebnis hauptsächlich aus dem besteht, was nicht getan wurde.':
+      'Lace is made by leading threads around one another and letting the space between them stand. It is the only handicraft whose result consists mainly of what was not done.',
+    'Perlgrat':                    'Beaded Ridge',
+    'Schmale Blätter mit Innenkontur, geteilt durch einen Perlgrat':
+      'Narrow leaves with an inner outline, split by a ridge of beads',
+    'Der Grat ist die Stelle, an der zwei Hälften sich einigen. Man sieht ihn nur, wenn man das Blatt gegen das Licht dreht — und dann sieht man nichts anderes mehr.':
+      'The ridge is where two halves agree. You only see it when you turn the leaf against the light — and then you see nothing else.',
+    'Gitterschale':                'Lattice Bowl',
+    'Zwei Rautengitter, über die Bandgrenze geschoben':
+      'Two diamond lattices, pushed across the band boundary',
+    'Ein Gitter hält nichts fest. Es zeigt nur, dass es eine Ordnung gibt, und lässt alles durch, was hindurch will.':
+      'A lattice holds nothing. It only shows that there is an order, and lets through everything that wants to pass.',
+    'Granulat':                    'Granulation',
+    'Rautennetz in zwei Lagen, vier Perlreihen dazwischen':
+      'A diamond net in two layers, four rows of beads between',
+    'Tausend Kügelchen, jedes einzeln gesetzt, keines wichtiger als das andere. So entsteht Glanz: nicht durch ein großes Licht, sondern dadurch, dass sehr viele sehr kleine Dinge in dieselbe Richtung schauen.':
+      'A thousand tiny spheres, each one set on its own, none more important than the next. That is how lustre comes about: not from one great light, but because very many very small things face the same way.',
+    'Tropfensaum':                 'Teardrop Hem',
+    'Vier Reihen Tropfen mit Innen- und Kernkontur':
+      'Four rows of teardrops with an inner and a core outline',
+    'Ein Tropfen hat keine Kanten, und trotzdem weiß jeder sofort, wo er aufhört. Es gibt Dinge, die brauchen keine Linie, um eine Grenze zu haben.':
+      'A teardrop has no edges, and still everyone knows at once where it stops. Some things need no line in order to have a boundary.',
+    'Kordelstern':                 'Cord Star',
+    'Achtstrahliger Stern aus drei Dreiecken, Zopf um den Kern':
+      'An eight-rayed star from three triangles, a plait around the core',
+    'Ein Stern ist keine Form, sondern eine Behauptung: dass es eine Mitte gibt und dass alles von dort kommt. Wer lange genug ausmalt, glaubt es irgendwann.':
+      'A star is not a shape but a claim: that there is a middle, and that everything comes from there. Colour it in long enough and you start to believe it.',
+    'Rankengeflecht':              'Vine Weave',
+    'Zwei gegenläufige Rankenpaare, drei Blattlagen':
+      'Two counter-running pairs of vines, three layers of leaves',
+    'Eine Ranke sucht nicht das Licht, sie sucht Halt. Dass sie dabei schön wird, ist ein Nebenprodukt — und wahrscheinlich der Grund, warum wir sie nachzeichnen.':
+      'A vine does not seek the light, it seeks a hold. That it becomes beautiful on the way is a by-product — and probably the reason we trace it.',
 
     /* Diese beiden stehen im Quelltext über zwei Zeilen, zusammengefügt
        mit `+`. Der Schlüssel ist deshalb der fertige Satz, nicht die
