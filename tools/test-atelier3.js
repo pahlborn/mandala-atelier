@@ -480,8 +480,15 @@ async function run() {
     });
     return { stabil: stabil, profil: profil, namen: B.KINDS.map(function (k) { return k.name; }) };
   });
-  prüfe('fünf Charaktere', charaktere.namen.length === 5, charaktere.namen.join(' · '));
+  prüfe('sechs Charaktere', charaktere.namen.length === 6, charaktere.namen.join(' · '));
   prüfe('ohne Charakter bleibt der Bauplan der alte', charaktere.stabil);
+  prüfe('Feinwerk ist dichter als Fülle',
+        charaktere.profil.feinwerk.b > charaktere.profil.fuelle.b &&
+        charaktere.profil.feinwerk.n >= charaktere.profil.fuelle.n,
+        'Bänder ' + charaktere.profil.feinwerk.b.toFixed(1) + ' gegen ' +
+        charaktere.profil.fuelle.b.toFixed(1) + ', Achsen ' +
+        charaktere.profil.feinwerk.n.toFixed(1) + ' gegen ' +
+        charaktere.profil.fuelle.n.toFixed(1));
   prüfe('Ruhe ist ruhiger als Fülle',
         charaktere.profil.ruhe.n < charaktere.profil.fuelle.n &&
         charaktere.profil.ruhe.b < charaktere.profil.fuelle.b,
@@ -837,7 +844,7 @@ async function run() {
     };
   });
   prüfe('die Lade zeigt Stimmung, Pigmente und Blätter',
-        ladeAuf.offen && ladeAuf.kategorien === 5 && ladeAuf.welten === 5 && ladeAuf.blaetter === 6,
+        ladeAuf.offen && ladeAuf.kategorien === 6 && ladeAuf.welten === 5 && ladeAuf.blaetter === 6,
         ladeAuf.kategorien + ' Stimmungen, ' + ladeAuf.welten + ' Welten, ' + ladeAuf.blaetter + ' Blätter');
   const fertig = ladeAuf.kontraste.filter(function (c) { return c > 25; }).length;
   prüfe('die Ausschnitte zeigen wirklich etwas',

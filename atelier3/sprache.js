@@ -94,6 +94,7 @@ var Sprache = (function () {
     'Klarheit':                   'Clarity',
     'Fülle':                      'Abundance',
     'Anlage':                     'Grounds',
+    'Feinwerk':                   'Fine Work',
 
     /* --- Pigmentwelten --------------------------------------------------- */
     'Erdpigmente':                'Earth Pigments',
