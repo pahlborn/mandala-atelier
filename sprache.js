@@ -419,6 +419,31 @@ var Sprache = (function () {
       'Two counter-running pairs of vines, three layers of leaves',
     'Eine Ranke sucht nicht das Licht, sie sucht Halt. Dass sie dabei schön wird, ist ein Nebenprodukt — und wahrscheinlich der Grund, warum wir sie nachzeichnen.':
       'A vine does not seek the light, it seeks a hold. That it becomes beautiful on the way is a by-product — and probably the reason we trace it.',
+    'Sprossenband':                'Rung Band',
+    'Fünf Bänder mit Sprossen, jedes mit eigenem Innenmotiv':
+      'Five banded rings with rungs, each with its own inner figure',
+    'Eine Sprosse ist der kürzeste Weg zwischen zwei Ringen und die einzige Stelle, an der man von einem ins andere kommt. Leitern sind älter als Türen.':
+      'A rung is the shortest way between two rings and the only place where you get from one into the other. Ladders are older than doors.',
+    'Tauwerk':                     'Ropework',
+    'Drei Zöpfe auf drei Radien, dazwischen Rauten und Blätter':
+      'Three plaits on three radii, with diamonds and leaves between',
+    'Ein Tau ist stärker als der Draht, aus dem es besteht — nicht, weil mehr Draht darin ist, sondern weil keiner allein zieht.':
+      'A rope is stronger than the wire it is made of — not because there is more wire in it, but because none of it pulls alone.',
+    'Kettenreif':                  'Chain Ring',
+    'Vier Reihen Glieder, jede in die darunterliegende gehängt':
+      'Four rows of links, each hooked into the one below',
+    'Ein Glied für sich ist ein Loch mit einem Rand darum. Erst das nächste macht daraus eine Kette, und keines von beiden weiß, welches das erste war.':
+      'A link on its own is a hole with a rim around it. Only the next one makes it a chain, and neither of them knows which was first.',
+    'Schuppenwerk':                'Scalework',
+    'Fünf Reihen Schuppen, jede über der Naht der darunter':
+      'Five rows of scales, each over the seam of the one below',
+    'Jede Schuppe deckt die Naht der vorigen. So wird aus lauter kleinen Blechen eine Haut, die nichts durchlässt und sich trotzdem bewegt.':
+      'Every scale covers the seam of the last. That is how a great many small plates become a skin that lets nothing through and still moves.',
+    'Zellenwerk':                  'Cloisonné',
+    'Zellenschmelz: vier Bänder gelöteter Zellen mit eigenem Grund':
+      'Cloisonné: four bands of soldered cells, each with its own ground',
+    'Der Goldschmied lötet erst die Wände und füllt dann die Farbe hinein. Er entscheidet die Ordnung, bevor er weiß, welche Farbe er hat — und das ist keine Not, sondern die Kunst.':
+      'The goldsmith solders the walls first and fills in the colour afterwards. He settles the order before he knows what colour he has — and that is not a hardship, it is the craft.',
 
     /* Diese beiden stehen im Quelltext über zwei Zeilen, zusammengefügt
        mit `+`. Der Schlüssel ist deshalb der fertige Satz, nicht die
