@@ -33,8 +33,8 @@ Atelier.
 
 ## 2. Was an einer Anlage anders ist
 
-Die bisherigen 26 Vorlagen sind **Muster**: Ringe, Blätter, Rauten, Speichen um
-eine Mitte. Man ordnet eine Fläche.
+Die 26 Vorlagen, die es vor den Anlagen gab, sind **Muster**: Ringe, Blätter,
+Rauten, Speichen um eine Mitte. Man ordnet eine Fläche.
 
 Eine Anlage ist ein **Grundriss**. Von außen nach innen:
 

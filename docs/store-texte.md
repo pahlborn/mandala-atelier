@@ -70,7 +70,7 @@ Es geht nicht darum, schnell fertig zu werden. Es gibt kein Richtig und kein Fal
 
 **Oder du fängst mit einem leeren Blatt an.** Nur Symmetrie, keine Vorlage – dann stammt jede Form von dir, und das Atelier vervielfacht sie. So entstehen eigene Motive von Grund auf.
 
-Wer lieber färbt als zeichnet, nimmt eine der 34 Vorlagen. Ein Tippen setzt Farbe in ein Feld – und zugleich in alle übrigen Segmente. Die Motive liegen in sechs Welten: Geometrisch-klassisch, Natur, Zen & Achtsamkeit, Jahreszeiten, Anlagen und eine Kids-Corner.
+Wer lieber färbt als zeichnet, nimmt eine der 46 Vorlagen. Ein Tippen setzt Farbe in ein Feld – und zugleich in alle übrigen Segmente. Die Motive liegen in sieben Welten: Geometrisch-klassisch, Natur, Zen & Achtsamkeit, Jahreszeiten, Anlagen, Feinwerk und eine Kids-Corner.
 
 Krumme Kreise sind eine Frage der Sache, nicht des Könnens. Das Werkzeug *Form* setzt deshalb dieselben fünf Bausteine exakt, aus denen auch die Vorlagen bestehen: Ring, Speiche, Blatt, Raute, Band.
 
@@ -88,7 +88,7 @@ Ohne Konto. Ohne Werbung. Ohne Netz. Nichts, was hier entsteht, verlässt dein G
 - Achsenzahl frei wählbar: 6, 8, 10, 12, 16 oder 24
 - Spiegelung zuschaltbar – bis zu 48 Wiederholungen einer Bewegung
 - Füllen wirkt auf alle Achsen zugleich, oder nur auf eine
-- 34 Vorlagen in sechs Welten
+- 46 Vorlagen in sieben Welten
 - Zeichnen mit Finger oder Apple Pencil
 - Stift, Füllen, Formen (Ring, Speiche, Blatt, Raute, Band), Radierer
 - Rückgängig und Wiederherstellen, zwanzig Schritte weit
@@ -125,12 +125,12 @@ Mach aus einer leeren Fläche deinen eigenen Raum.
 
 - Neigung des Apple Pencil – steht als offener Punkt im Konzeptpapier und wäre gegenüber Apples Richtlinie 4.2 ein starkes Argument.
 - App-Symbol in 1024 × 1024 **ohne Alphakanal** – die vorhandenen Icons sind alle RGBA und würden abgelehnt.
-- **Die App spricht Englisch.** Deutsch im deutschsprachigen Raum, sonst Englisch – 34 Motive mit Beischrift, sechs Welten, 31 Bereichsnamen und 50 Pigmente. Offen bleibt der Name unter dem Symbol; der kommt aus dem Bundle.
-- **Die Zahlen sind geradegezogen.** Nachgezählt am laufenden Programm und überall angeglichen: **34 Vorlagen in sechs Welten** (die *Anlagen* fehlten in jeder Aufzählung), **je zehn** statt vierzehn Pigmente, und *Goldgrund* war als fünfte Farbwelt nicht genannt. Im ruhigen Blatt ebenso: zehn statt neun Pigmente, fünf statt vier Blattarten und Pigmentwelten. Richtlinie 2.3.1 verlangt zutreffende Angaben.
+- **Die App spricht Englisch.** Deutsch im deutschsprachigen Raum, sonst Englisch – 46 Motive mit Beischrift, sieben Welten, 31 Bereichsnamen und 50 Pigmente. Offen bleibt der Name unter dem Symbol; der kommt aus dem Bundle.
+- **Die Zahlen sind geradegezogen.** Nachgezählt am laufenden Programm und überall angeglichen: **46 Vorlagen in sieben Welten** (die *Anlagen* fehlten in jeder Aufzählung), **je zehn** statt vierzehn Pigmente, und *Goldgrund* war als fünfte Farbwelt nicht genannt. Im ruhigen Blatt ebenso: zehn statt neun Pigmente, **sechs** Blattarten und fünf Pigmentwelten. Richtlinie 2.3.1 verlangt zutreffende Angaben. Nachgezogen mit jeder Fassung – `npm run zahlen` prüft es.
 **Entschieden – zurückgestellt**
 
 - **Keine Fortsetzen-Funktion.** Ein angefangenes Mandala überlebt den Neustart nicht; die Galerie bewahrt ein fertiges Bild, keinen Arbeitsstand. Das bleibt so – das Atelier hat darin einen anderen Charakter als das zweite, wo das Aufnehmen eines weggelegten Blattes zur Sache gehört. *Der Text verspricht es deshalb nirgends.*
-- **Kids-Corner bleibt Anhängsel.** Sie ist mit 7 von 34 Motiven die zweitgrößte der sechs Welten – nach den Anlagen mit acht – und bringt Zähl- und Rechenmandalas mit, wird aber vorerst nicht beworben – was mit ihr geschehen soll, ist offen. *Wiedervorlage vor dem Einreichen:* Entweder sie wird Teil des Angebots, dann verschiebt sich die Zielgruppe, oder sie verschwindet aus der ausgelieferten Fassung.
+- **Kids-Corner bleibt Anhängsel.** Sie ist mit 7 von 46 Motiven eine der mittleren der sieben Welten – nach Anlagen und Feinwerk mit je acht – und bringt Zähl- und Rechenmandalas mit, wird aber vorerst nicht beworben – was mit ihr geschehen soll, ist offen. *Wiedervorlage vor dem Einreichen:* Entweder sie wird Teil des Angebots, dann verschiebt sich die Zielgruppe, oder sie verschwindet aus der ausgelieferten Fassung.
 
 ---
 

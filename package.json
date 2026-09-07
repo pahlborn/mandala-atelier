@@ -18,7 +18,8 @@
     "nativ:blatt": "node tools/gen-nativ.js blatt",
     "einfrieren": "node tools/einfrieren.js",
     "fassungen": "node tools/gen-fassungen.js",
-    "katalog": "node tools/gen-katalog.js"
+    "katalog": "node tools/gen-katalog.js",
+    "zahlen": "node tools/zahlen.js"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"

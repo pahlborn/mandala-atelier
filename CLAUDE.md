@@ -61,6 +61,14 @@ sich mit dem Finger erledigen lassen.
 - **Keine Gamification** — keine Sterne, keine Pokale, keine Streaks, keine
   Prozentanzeige. Wer hier malt, will abschalten.
 - **Deutsche Oberfläche**, ruhiger Ton, gedeckte Farben.
+- **Zahlen und Angaben werden mit jeder Änderung mitgezogen** — in der App,
+  in den Store-Texten, in den Seiten unter `docs/`. Von Hand geht das schief,
+  sobald es mehr als drei Stellen sind: Als aus 34 Vorlagen 46 wurden, waren
+  es siebzehn. `npm run zahlen` zählt am laufenden Programm nach und hält die
+  Seiten dagegen. Es ist eine **Liste, kein Sprachverstand** — eine neue
+  Behauptung im Text gehört als Zeile dazu. Rückblicke („fünf statt vier
+  Blattarten") bleiben stehen, wie sie sind; der heutige Stand kommt daneben.
+  Richtlinie 2.3.1 verlangt zutreffende Angaben.
 - **Farbwelten und Motive dürfen zwischen den beiden Apps nicht auseinander-
   laufen.** Was das Atelier bekommt, bekommt Blatt auch — in Blatts Grammatik
   übersetzt, nicht kopiert.
@@ -86,7 +94,9 @@ und `npm run test:nebeneinander` prüft, dass beide Stellen übereinstimmen.
 4. `npm run katalog` — nur wenn sich Motive geändert haben; zeichnet
    `docs/katalog.html` mit den Apps selbst neu. `npm test` meldet es, wenn
    eine Vorlage im Katalog fehlt.
-5. Testläufe, dann committen und pushen.
+5. `npm run zahlen` — zählt nach und meldet jede Seite, auf der eine Zahl
+   nicht mehr stimmt.
+6. Testläufe, dann committen und pushen.
 
 Eingefrorene Fassungen bleiben **für immer** erreichbar. Damit ist „zurück auf
 3.7" ein Link statt eines Auftrags. Zwei Dinge daran sind nicht verhandelbar,
@@ -112,6 +122,7 @@ Was sich nicht messen lässt, gehört in einen eigenen Commit.
     npm run test:nebeneinander  beide Apps an einem Origin
     npm run test:druck        die Prüfseite docs/druck.html (Sekunden)
     npm run test:regal        das Fassungsregal unter v/ (Sekunden)
+    npm run zahlen            Zahlen in App und Seiten (Sekunden)
 
 Sie laufen gegen einen echten Browser. Die ersten drei dauern je ein paar
 Minuten und gehören vor jeden Push; die letzten beiden sind in Sekunden durch

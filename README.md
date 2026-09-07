@@ -408,7 +408,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (34 Vorlagen, 6 Welten)
+## Motivkatalog (46 Vorlagen, 7 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose
