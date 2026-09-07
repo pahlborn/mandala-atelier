@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Schlussdurchsicht — welche zwölf tragen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Die zwölf gebauten Feinwerk-Motive nebeneinander, mit gemessenen Zahlen und einem Votum je Motiv. Zum Entscheiden in einem Durchgang.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Entscheidungsseite, kein Schaufenster. Die Bilder sind der Katalogrender in
+  620 px - also die App selbst, nicht eine Vorschau. Die Zahlen sind an
+  derselben Zeichnung gemessen: Wandschwelle alpha > 60 wie in app.js,
+  Flaechenzaehlung wie das Fuellwerkzeug, "ausmalbar" ab 80 Bildpunkten.
+
+  Das Votum ist meine Einschaetzung, kein Beschluss. Es steht bei jedem
+  Motiv dabei, damit man widersprechen kann, ohne suchen zu muessen.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 { font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+       text-transform: uppercase; letter-spacing: .06em; color: var(--quiet); }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+  code { font-size: .93em; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.4rem; font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand > b:first-of-type { display: block; margin-bottom: .3rem; }
+
+  .bilanz { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 1.8rem; }
+  .bilanz span { font-size: 13px; padding: 5px 12px; border-radius: 999px;
+                 border: 1px solid currentColor; }
+
+  .motiv {
+    background: var(--card); border-radius: 16px; overflow: hidden;
+    margin-bottom: 14px; display: grid; gap: 0 22px;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    align-items: start; padding: 18px 22px 20px;
+  }
+  .motiv img { width: 100%; height: auto; border-radius: 10px; display: block; }
+  .motiv h3 { font-size: 19px; margin: 0 0 .35rem; font-weight: 600;
+              display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .votum { font-size: 12px; font-weight: 600; padding: 2px 10px;
+           border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .votum.ja { color: var(--tut); }
+  .votum.teilweise { color: var(--offen); }
+  .votum.nein { color: var(--stop); }
+  .zahlen { font-size: 13.5px; color: var(--quiet); margin: 0 0 .7rem;
+            font-variant-numeric: tabular-nums; }
+  .motiv p { font-size: 15px; color: var(--quiet); }
+  .motiv p b { color: var(--ink); font-weight: 600; }
+  .motiv.streichen { box-shadow: inset 3px 0 0 var(--stop); }
+  .motiv.anmerkung { box-shadow: inset 3px 0 0 var(--offen); }
+  .motiv.behalten { box-shadow: inset 3px 0 0 var(--tut); }
+
+  @media (max-width: 620px) {
+    .motiv { grid-template-columns: 1fr; gap: 14px; }
+  }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Schlussdurchsicht</h1>
+  <p class="lede">Die zwölf gebauten Motive nebeneinander, absteigend nach
+     meinem Votum. Zum Entscheiden in einem Durchgang.</p>
+
+  <div class="stand">
+    <b>Das Votum ist meine Einschätzung, kein Beschluss.</b>
+    Die Bilder sind der Katalogrender in 620 Punkten — also die App selbst,
+    keine Vorschau. Die Zahlen sind an derselben Zeichnung gemessen: dieselbe
+    Wandschwelle wie <code>app.js</code>, dieselbe Flächenzählung wie das
+    Füllwerkzeug, <b>ausmalbar</b> heißt ab 80 Bildpunkten Fläche — etwa neun
+    mal neun, die Untergrenze dessen, was ein Finger trifft und was Farbe
+    zeigt. Nichts ist entfernt; sagen Sie, was fallen soll.
+  </div>
+
+  <div class="bilanz">
+    <span class="votum ja">6 behalten</span>
+    <span class="votum teilweise">4 behalten, mit Anmerkung</span>
+    <span class="votum nein">2 würde ich streichen</span>
+  </div>
+
+  <h2>Die zwölf</h2>
+
+  <article class="motiv behalten">
+    <img src="durchsicht/zellenwerk.webp" alt="Zellenwerk" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Zellenwerk <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">12 Achsen · <b>361</b> ausmalbare Felder von 542 ·
+         Median 355 px² · größtes Feld 0,5 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Das beste der fünf neuen. Es ist unverwechselbar — niemand hält Zellenschmelz für irgendetwas anderes —, die Zellen sind großzügig (Median 355), und das größte Einzelfeld ist mit 0,5 % das kleinste aller zwölf. Nichts daran wackelt.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/tauwerk.webp" alt="Tauwerk" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Tauwerk <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">8 Achsen · <b>409</b> ausmalbare Felder von 603 ·
+         Median 426 px² · größtes Feld 0,6 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Drei Zöpfe, sofort als Tauwerk lesbar, Median 426. Von den acht Achsen lebt es: große Felder, ruhiges Ausmalen, und trotzdem 409 ausmalbare. Das Gegenstück zu den sechzehnachsigen — jede Familie braucht so eines.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/spitzenrad.webp" alt="Spitzenrad" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Spitzenrad <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">16 Achsen · <b>449</b> ausmalbare Felder von 679 ·
+         Median 267 px² · größtes Feld 0,6 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Vier Bänder, klar getrennt, nichts überlagert sich. Median 267 bei 449 ausmalbaren Feldern und das zweitkleinste größte Feld. Bei sechzehn Achsen sind die 449 rund 28 Entscheidungen — dicht, aber nicht mühsam.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/perlgrat.webp" alt="Perlgrat" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Perlgrat <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">16 Achsen · <b>389</b> ausmalbare Felder von 513 ·
+         Median 448 px² · größtes Feld 1,5 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Die großzügigsten Felder der ganzen Familie (Median 448) und trotzdem 389 ausmalbare. Wer die Dichte scheut, fängt hier an. Der Perlgrat liest sich als Grat, nicht als Zufall.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/tropfensaum.webp" alt="Tropfensaum" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Tropfensaum <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">12 Achsen · <b>487</b> ausmalbare Felder von 1046 ·
+         Median 72 px² · größtes Feld 1,4 %<br>
+         steht in <b>Natur</b></p>
+      <p>Vier Reihen genesteter Tropfen, 487 ausmalbare — die zweithöchste Zahl. Die doppelte Innenkontur trägt hier sichtbar: Jeder Tropfen hat einen Kern, und der bekommt seine eigene Farbe.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/kordelstern.webp" alt="Kordelstern" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Kordelstern <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">8 Achsen · <b>505</b> ausmalbare Felder von 991 ·
+         Median 98 px² · größtes Feld 1,1 %<br>
+         steht in <b>Geometrisch-klassisch</b></p>
+      <p>Die höchste Zahl ausmalbarer Felder von allen (505) und das grafischste Bild der zwölf. <b>Anmerkung:</b> Die Strahlen sind sehr fein, der Median liegt deshalb bei 98. Wer die Nadeln einzeln färben will, braucht den Zoom — im Atelier reicht er bis 4.</p>
+    </div>
+  </article>
+  <article class="motiv anmerkung">
+    <img src="durchsicht/granulat.webp" alt="Granulat" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Granulat <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
+      <p class="zahlen">12 Achsen · <b>481</b> ausmalbare Felder von 742 ·
+         Median 158 px² · größtes Feld 1,6 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Perlen und Rauten, 481 ausmalbare — inhaltlich richtig für die Familie. <b>Was mir nicht gefällt:</b> Die beiden inneren Perlreihen bei r≈96 und r≈164 stehen zu dicht beieinander und verklumpen zu einem Ring. Das ist eine halbe Stunde Nacharbeit, kein Grund zum Streichen — ich würde die innere Reihe herausnehmen.</p>
+    </div>
+  </article>
+  <article class="motiv anmerkung">
+    <img src="durchsicht/sprossenband.webp" alt="Sprossenband" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Sprossenband <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
+      <p class="zahlen">14 Achsen · <b>432</b> ausmalbare Felder von 614 ·
+         Median 523 px² · größtes Feld 0,9 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Fünf Bänder mit Sprossen, Median 523 — die zweitgroßzügigsten Felder. <b>Was mir nicht gefällt:</b> Die Nabe. Die Sprossen des innersten Bandes laufen von r=46 aus, und 42 Linien treffen sich auf engstem Raum zu einem struppigen Büschel. Das innerste Band sollte weiter außen anfangen.</p>
+    </div>
+  </article>
+  <article class="motiv anmerkung">
+    <img src="durchsicht/gitterschale.webp" alt="Gitterschale" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Gitterschale <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
+      <p class="zahlen">12 Achsen · <b>333</b> ausmalbare Felder von 636 ·
+         Median 91 px² · größtes Feld 2,5 %<br>
+         steht in <b>Geometrisch-klassisch</b></p>
+      <p>Das Sterngitter ist stark und gehört nach Geometrisch-klassisch. <b>Zwei Zahlen mahnen:</b> 333 ausmalbare Felder — die wenigsten der zwölf — und mit 2,5 % das zweitgrößte Einzelfeld. Es ist also weniger dicht, als es aussieht. Behalten, aber es ist nicht das, wofür die Familie steht.</p>
+    </div>
+  </article>
+  <article class="motiv anmerkung">
+    <img src="durchsicht/rankengeflecht.webp" alt="Rankengeflecht" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Rankengeflecht <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
+      <p class="zahlen">8 Achsen · <b>409</b> ausmalbare Felder von 751 ·
+         Median 110 px² · größtes Feld 3,1 %<br>
+         steht in <b>Natur</b></p>
+      <p>Organisch, hübsch, und in Natur richtig aufgehoben. <b>Was mahnt:</b> Mit 3,1 % hat es das größte Einzelfeld aller zwölf — die Grenze des Prüflaufs liegt bei 4. Die Ranken lassen zwischen den Blattlagen große Flächen stehen. Das ist kein Fehler, aber es ist das am wenigsten dichte der Familie.</p>
+    </div>
+  </article>
+  <article class="motiv streichen">
+    <img src="durchsicht/schuppenwerk.webp" alt="Schuppenwerk" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Schuppenwerk <span class="votum nein">ich würde streichen</span></h3>
+      <p class="zahlen">16 Achsen · <b>417</b> ausmalbare Felder von 887 ·
+         Median 65 px² · größtes Feld 0,9 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Es sollte nach Dachziegeln aussehen. Es sieht nach Spirograph aus. Die Schuppenbögen kreuzen einander so flach, dass daraus keine Reihen werden, sondern ein Netz — und derselbe flache Winkel erzeugt die Splitter: <b>Median 65, der niedrigste der zwölf.</b> Der Kunstgriff „Schuppe" ist damit nicht eingelöst. Ich würde es herausnehmen und, wenn Sie mögen, mit echter Überdeckung neu zeichnen.</p>
+    </div>
+  </article>
+  <article class="motiv streichen">
+    <img src="durchsicht/kettenreif.webp" alt="Kettenreif" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Kettenreif <span class="votum nein">ich würde streichen</span></h3>
+      <p class="zahlen">10 Achsen · <b>332</b> ausmalbare Felder von 536 ·
+         Median 199 px² · größtes Feld 1,1 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Das schwächste der zwölf, und ich habe es zweimal überarbeitet. <b>332 ausmalbare Felder — die wenigsten</b>, und wichtiger: Es liest sich nicht als Kette. Die Glieder überlappen zwar, aber ohne Über-und-Unter wirken sie wie hingeworfene Blasen, nicht wie eingehängte Ringe. Eine echte Verschränkung bräuchte Auslöschung — dieselbe Technik, die den Motiven bisher fehlt. Bis dahin: streichen.</p>
+    </div>
+  </article>
+
+  <h2>Wenn Sie meinem Votum folgen</h2>
+
+  <p>Dann fallen <b>Schuppenwerk</b> und <b>Kettenreif</b>, und Feinwerk steht
+     bei <b>sechs</b> Motiven — so groß wie „Zen &amp; Achtsamkeit“, größer als
+     „Jahreszeiten“. Geometrisch-klassisch und Natur bleiben bei sieben. Das
+     ist eine tragfähige Familie, und keines der sechs ist nur dabei, um die
+     Zahl zu halten.</p>
+
+  <p>Die zwei Anmerkungen zu <b>Granulat</b> und <b>Sprossenband</b> sind
+     Nacharbeit, kein Streichgrund: eine Perlreihe heraus, ein Band weiter
+     außen anfangen lassen. Beides ist in einer Fassung erledigt und messbar.</p>
+
+  <p><b>Ein Wort zu den beiden, die ich streichen würde.</b> Sie sind nicht
+     misslungen, sie lösen ihren eigenen Anspruch nicht ein: Eine Schuppe
+     muss die darunterliegende <i>decken</i>, ein Kettenglied muss <i>durch</i>
+     das nächste gehen. Beides braucht Auslöschung — eine Linie, die eine
+     andere unterbricht. Die haben die Motive bisher nicht, und sie wäre der
+     nächste der drei Bausteine. Bis dahin behaupten die zwei etwas, das man
+     ihnen nicht ansieht.</p>
+
+  <footer>
+    Die ganze Familie mit Herkunft und Beschreibung:
+    <a href="feinwerk.html">Motivfamilie Feinwerk</a>.
+    Zum Ausprobieren ins <a href="../index.html">Mandala Atelier</a>.
+    Zurück zur <a href="../beide.html">Einstiegsseite</a>.
+  </footer>
+
+</main>
+</body>
+</html>
