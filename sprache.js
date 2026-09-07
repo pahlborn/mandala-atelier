@@ -240,7 +240,7 @@ var Sprache = (function () {
     'Jahreszeiten':               'Seasons',
     'Anlagen':                    'Grounds',
     'Kids-Corner':                "Kids' Corner",
-    'Filigran':                   'Filigree',
+    'Feinwerk':                   'Fine Work',
 
     /* --- Motive: Name und Beischrift --------------------------------------
        Die Beischrift zählt auf, was zu sehen ist – sie soll auf Englisch
@@ -381,7 +381,7 @@ var Sprache = (function () {
     'Rechenmandala ZR 20':        'Sums Mandala to 20',
     'Plus und Minus im Zahlenraum 20': 'Plus and minus up to 20',
 
-    /* --- Filigran ----------------------------------------------------------
+    /* --- Feinwerk ----------------------------------------------------------
        Zusätzlich, wie der Bereich in app.js. Fehlt hier etwas, erscheint
        der deutsche Text - kaputt geht nichts. */
     'Spitzenrad':                  'Lace Wheel',
