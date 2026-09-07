@@ -1,0 +1,626 @@
+/* ============================================================================
+   Atelier 3.0 – „Blatt“
+
+   Die Oberfläche soll nicht gefallen, sondern verschwinden. Es gibt genau
+   drei sichtbare Dinge: das Blatt, die Pigmente und ein sehr stilles Zeichen.
+
+   Keine Schriftdatei. Diese App sagt so wenig, dass Systemschriften genügen –
+   das spart 400 kB und macht die Zusicherung „lädt nichts nach“ trivial wahr.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Muss ganz oben stehen und muss !important sein: Weiter unten bekommen
+   Fach und Stapel ein display: flex, und eine Klassenregel schlägt das
+   display: none, das der Browser dem hidden-Attribut mitgibt. Ohne diese
+   Zeile liegt der Stapel unsichtbar über dem ganzen Blatt und fängt jede
+   Berührung ab. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  /* Der Raum folgt dem Blatt, nicht der Uhr: Ein Nachtblatt liegt auch am
+     Morgen noch auf einem nächtlichen Tisch. */
+  --room:   #e6dfd1;
+  --room-0: rgba(230, 223, 209, 0);   /* derselbe Ton, nur durchsichtig */
+  --edge:   rgba(60, 48, 32, 0.16);
+  --quiet:  rgba(52, 42, 30, 0.42);
+  --plain:  rgba(38, 30, 20, 0.78);
+  --panel:  #f3ece0;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--room);
+  color: var(--plain);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 700ms ease, background-color 600ms ease;
+}
+
+body.is-ready { opacity: 1; }
+
+body[data-sheet='nacht'] {
+  --room:   #121114;
+  --room-0: rgba(18, 17, 20, 0);
+  --edge:   rgba(0, 0, 0, 0.5);
+  --quiet:  rgba(228, 220, 206, 0.34);
+  --plain:  rgba(232, 226, 214, 0.82);
+  --panel:  #1d1c20;
+}
+
+/* ---------------------------------------------------------------------------
+   Das Blatt
+   ------------------------------------------------------------------------- */
+
+.room {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Ein Blatt liegt nicht bündig an der Tischkante. Der Innenraum hier ist
+     zugleich die einzige Quelle für die Blattgröße – fitSheet() misst ihn
+     aus, statt die Zahlen zu wiederholen. */
+  padding:
+    calc(env(safe-area-inset-top) + 22px)
+    calc(env(safe-area-inset-right) + 22px)
+    calc(env(safe-area-inset-bottom) + 104px)
+    calc(env(safe-area-inset-left) + 22px);
+}
+
+.sheet-wrap { position: relative; }
+
+#sheet {
+  display: block;
+  touch-action: none;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px var(--edge),
+    0 12px 36px -12px var(--edge);
+  transition: opacity 260ms ease;
+
+  /* Die zweite Hand verschiebt und vergrößert allein diese Ebene. Das Layout
+     bleibt davon unberührt – deshalb bleiben Pigmente und Zeichen dort, wo
+     sie liegen, während das Blatt darunter wandert. */
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+body.is-turning #sheet { opacity: 0; }
+
+/* Der einzige Satz, den diese App je sagt. */
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0 1em;
+  font-family: ui-serif, 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  font-size: clamp(15px, 2.4vmin, 21px);
+  letter-spacing: 0.01em;
+  color: var(--quiet);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+
+.hint.is-on { opacity: 1; }
+
+/* ---------------------------------------------------------------------------
+   Die Pigmente – Stifte, die auf dem Tisch liegen, keine Bedienelemente
+   ------------------------------------------------------------------------- */
+
+.strip {
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 0 64px;
+  transition: opacity 1400ms ease, transform 1400ms ease;
+}
+
+/* Die Tischkante.
+
+   Bei voller Ansicht endet das Blatt oberhalb der Pigmente, und alles ist
+   klar: Stifte auf dem Tisch, Blatt daneben. Holt man das Blatt aber heran,
+   wächst es unter den Stiften hindurch – und dann sieht es aus, als wäre
+   die Palette in die Zeichnung geraten.
+
+   Deshalb liegt unter den Pigmenten ein Streifen Tisch, der nach oben hin
+   ausläuft. Er hat exakt die Farbe des Raums, ist auf dem Tisch also nicht
+   zu sehen; sichtbar wird er nur dort, wo das Blatt darunter liegt. Kein
+   Schalter, kein Zustand, nichts, was mit dem Maßstab umgeschaltet werden
+   müsste – es stimmt in jeder Lage von selbst. */
+.strip::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: -58px;
+  bottom: calc(-1 * (env(safe-area-inset-bottom) + 24px));
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--room-0) 0%, var(--room) 62%);
+}
+
+.pigment {
+  appearance: none;
+  width: 26px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  cursor: pointer;
+  /* Matt, nicht glänzend. Ein Glanzlicht macht aus einem Pigmentstift
+     sofort ein Bonbon, und Bonbons passen nicht auf diesen Tisch. */
+  background:
+    linear-gradient(102deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.02) 42%,
+      rgba(0, 0, 0, 0.13) 100%),
+    var(--pigment);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.18);
+  transition: transform 260ms cubic-bezier(.2,.7,.3,1), box-shadow 260ms ease;
+}
+
+.pigment[aria-pressed='true'] {
+  transform: translateY(-13px);
+  box-shadow:
+    0 6px 12px -4px rgba(0, 0, 0, 0.34),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.pigment:focus-visible {
+  outline: 2px solid var(--plain);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+   Das stille Zeichen und sein Fach
+   ------------------------------------------------------------------------- */
+
+.mark {
+  position: fixed;
+  z-index: 2;
+  right: calc(env(safe-area-inset-right) + 14px);
+  bottom: calc(env(safe-area-inset-bottom) + 32px);
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 1400ms ease;
+}
+
+/* Still, aber auffindbar. Ganz unsichtbar wäre eine geheime Geste, und
+   Geheimnisse sind gegenüber Erreichbarkeit unfair. */
+.mark::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--quiet);
+  opacity: 0.85;
+}
+
+.mark:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+.tray {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 14px);
+  bottom: calc(env(safe-area-inset-bottom) + 76px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 10px;
+  min-width: 172px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 10px 34px -10px rgba(0, 0, 0, 0.36), 0 1px 2px var(--edge);
+}
+
+.tray button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--plain);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.tray button:hover { background: rgba(128, 128, 128, 0.12); }
+.tray button:focus-visible { outline: 2px solid var(--plain); outline-offset: -2px; }
+
+.tray-note {
+  margin: 4px 12px 6px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--quiet);
+}
+
+/* Die Fassungsnummer.
+
+   Sie stand zuerst im Fach, hinter einem Tipp – und war damit genau dann
+   nicht da, wenn man sie braucht: beim Öffnen. Jetzt steht sie in der linken
+   unteren Ecke, gegenüber dem stillen Zeichen, und ist beim ersten Blick
+   lesbar, ohne sich in den Vordergrund zu drängen.
+
+   `pointer-events: none` ist keine Feinheit: Die ganze Fläche dieser App ist
+   Zeichenfläche. Ein Textabsatz, der Berührungen annimmt, verschluckte dort
+   Striche. */
+.fassung {
+  position: fixed;
+  z-index: 2;
+  left: calc(env(safe-area-inset-left) + 16px);
+  bottom: calc(env(safe-area-inset-bottom) + 38px);
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--quiet);
+  opacity: 0.45;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Die Blattlade
+
+   Eine Schublade mit Papier, kein Einstellungsfenster: oben die Pigmente,
+   die auf dem Tisch liegen sollen, darunter die Blätter zur Auswahl.
+   ------------------------------------------------------------------------- */
+
+.lade {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  /* „safe“ ist hier kein Zierrat: Ein zentrierter Inhalt, der höher ist als
+     das Fenster, wird oben abgeschnitten und lässt sich dorthin auch nicht
+     scrollen. Mit „safe center“ rückt er an den Anfang, sobald es eng wird.
+     Die einfache Fassung steht davor, für Browser, die „safe“ nicht kennen. */
+  align-items: center;
+  align-items: safe center;
+  overflow-y: auto;
+  padding: calc(env(safe-area-inset-top) + 24px) 24px
+           calc(env(safe-area-inset-bottom) + 24px);
+  background: var(--room);
+}
+
+/* Auf niedrigen Fenstern rücken die Reihen zusammen, statt dass die Lade
+   zum Scrollen zwingt. */
+@media (max-height: 720px) {
+  .lade-inner { gap: 16px; }
+  .lade-sheets { gap: 10px; }
+}
+
+.lade-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  max-width: 860px;
+  width: 100%;
+}
+
+/* Die Stimmung zuerst, und die trägt einen Namen. Über ein Wort
+   entscheidet man in einem Atemzug; sechs Bilder zu vergleichen ist eine
+   Aufgabe. */
+.lade-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lade-kind {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--quiet);
+  font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  font-size: clamp(17px, 2.6vmin, 22px);
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 220ms ease, background-color 220ms ease;
+}
+
+.lade-kind:hover { background: rgba(128, 128, 128, 0.08); }
+
+.lade-kind[aria-pressed='true'] {
+  color: var(--plain);
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.lade-kind:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+/* Dann das Papier. Zwei kleine Blätter, jedes in seinem eigenen Ton, mit
+   drei Pigmenten darauf – man wählt nicht „hell“ oder „dunkel“, sondern
+   sieht, wie die Farbe darauf liegen wird. Klein gehalten und ohne
+   Überschrift: Es ist eine Nebensache neben der Stimmung, aber eine, die
+   man haben will, ohne am Gerät etwas umzustellen. */
+.lade-papers {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.lade-paper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 76px;
+  padding: 11px 0 9px;
+  border: 1px solid rgba(128, 128, 128, 0.28);
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.lade-paper .paper-dots { display: flex; gap: 4px; }
+
+.lade-paper .paper-dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+/* Die Beschriftung steht auf dem Papier und muss deshalb auf beiden Tönen
+   lesbar sein – hell auf dunkel, dunkel auf hell. Sie folgt nicht dem
+   Thema der App, sondern dem Papier, das sie zeigt. */
+.lade-paper .paper-word {
+  font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.lade-paper[data-paper='tag']   .paper-word { color: #5c574d; }
+.lade-paper[data-paper='nacht'] .paper-word { color: #b3aca1; }
+
+.lade-paper:hover { transform: translateY(-1px); }
+
+.lade-paper[aria-pressed='true'] {
+  border-color: var(--plain);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.lade-paper:focus-visible { outline: 2px solid var(--plain); outline-offset: 3px; }
+
+/* Danach die Farbwelten als das, was sie sind: Pigmente. Ohne Namen –
+   über eine Beschriftung müsste man erst nachdenken, über Farbe nicht. */
+.lade-worlds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lade-world {
+  display: flex;
+  gap: 3px;
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.lade-world span {
+  width: 13px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.lade-world:hover { background: rgba(128, 128, 128, 0.08); }
+
+.lade-world[aria-pressed='true'] {
+  border-color: var(--quiet);
+  background: rgba(128, 128, 128, 0.10);
+}
+
+.lade-world:focus-visible { outline: 2px solid var(--plain); outline-offset: 2px; }
+
+/* Die Blätter selbst. */
+.lade-sheets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 620px;
+}
+
+@media (min-width: 640px) {
+  .lade-sheets { grid-template-columns: repeat(3, 1fr); }
+}
+
+.lade-sheet {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  box-shadow: 0 1px 2px var(--edge), 0 8px 22px -12px var(--edge);
+  transition: transform 240ms cubic-bezier(.2,.7,.3,1), box-shadow 240ms ease;
+}
+
+.lade-sheet canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+
+.lade-sheet:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 4px var(--edge), 0 14px 30px -12px var(--edge);
+}
+
+.lade-sheet:focus-visible { outline: 2px solid var(--plain); outline-offset: 4px; }
+
+.lade-bar {
+  display: flex;
+  gap: 6px;
+}
+
+.lade-bar button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--plain);
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.lade-bar button:hover { background: rgba(128, 128, 128, 0.12); }
+.lade-bar button:focus-visible { outline: 2px solid var(--plain); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lade-sheet, .lade-world, .lade-kind, .lade-paper {
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Der Stapel
+   ------------------------------------------------------------------------- */
+
+.stack {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: calc(env(safe-area-inset-top) + 22px) 22px
+           calc(env(safe-area-inset-bottom) + 22px);
+  background: var(--room);
+}
+
+.stack-figure {
+  margin: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stack-figure img {
+  max-width: min(100%, 74vh);
+  max-height: 100%;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px var(--edge), 0 12px 36px -12px var(--edge);
+}
+
+.stack-empty {
+  margin: 0;
+  color: var(--quiet);
+  font-family: ui-serif, 'Iowan Old Style', Georgia, serif;
+  font-size: 17px;
+}
+
+.stack-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stack-bar button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--plain);
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.stack-bar button:hover:not(:disabled) { background: rgba(128, 128, 128, 0.12); }
+.stack-bar button:focus-visible { outline: 2px solid var(--plain); outline-offset: -2px; }
+.stack-bar button:disabled { opacity: 0.28; cursor: default; }
+
+#stack-prev, #stack-next { font-size: 22px; line-height: 1; padding: 8px 14px; }
+
+/* Aufnehmen ist der gewöhnliche Weg, Verwerfen der seltene. Das darf man
+   sehen, ohne dass es laut wird. */
+#stack-take { font-weight: 600; }
+
+#stack-remove { color: var(--quiet); }
+#stack-remove.is-armed { color: #a4423a; font-weight: 600; }
+body[data-sheet='nacht'] #stack-remove.is-armed { color: #e08b7a; }
+
+/* ---------------------------------------------------------------------------
+   Die Stille
+
+   Nach vierzig Sekunden ohne Berührung tritt die Bedienung ab. Kein Knopf,
+   keine Meldung – nur das Blatt, allein.
+   ------------------------------------------------------------------------- */
+
+body.is-still .strip {
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+}
+
+body.is-still .mark {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Wer keine Bewegung möchte, bekommt keine.
+   ------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  body, #sheet, .hint, .strip, .pigment, .mark {
+    transition-duration: 1ms !important;
+  }
+}
