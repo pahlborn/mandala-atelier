@@ -394,16 +394,6 @@ var Sprache = (function () {
       'Narrow leaves with an inner outline, split by a ridge of beads',
     'Der Grat ist die Stelle, an der zwei Hälften sich einigen. Man sieht ihn nur, wenn man das Blatt gegen das Licht dreht — und dann sieht man nichts anderes mehr.':
       'The ridge is where two halves agree. You only see it when you turn the leaf against the light — and then you see nothing else.',
-    'Gitterschale':                'Lattice Bowl',
-    'Zwei Rautengitter, über die Bandgrenze geschoben':
-      'Two diamond lattices, pushed across the band boundary',
-    'Ein Gitter hält nichts fest. Es zeigt nur, dass es eine Ordnung gibt, und lässt alles durch, was hindurch will.':
-      'A lattice holds nothing. It only shows that there is an order, and lets through everything that wants to pass.',
-    'Granulat':                    'Granulation',
-    'Rautennetz in zwei Lagen, vier Perlreihen dazwischen':
-      'A diamond net in two layers, four rows of beads between',
-    'Tausend Kügelchen, jedes einzeln gesetzt, keines wichtiger als das andere. So entsteht Glanz: nicht durch ein großes Licht, sondern dadurch, dass sehr viele sehr kleine Dinge in dieselbe Richtung schauen.':
-      'A thousand tiny spheres, each one set on its own, none more important than the next. That is how lustre comes about: not from one great light, but because very many very small things face the same way.',
     'Tropfensaum':                 'Teardrop Hem',
     'Vier Reihen Tropfen mit Innen- und Kernkontur':
       'Four rows of teardrops with an inner and a core outline',
@@ -414,11 +404,6 @@ var Sprache = (function () {
       'An eight-rayed star from three triangles, a plait around the core',
     'Ein Stern ist keine Form, sondern eine Behauptung: dass es eine Mitte gibt und dass alles von dort kommt. Wer lange genug ausmalt, glaubt es irgendwann.':
       'A star is not a shape but a claim: that there is a middle, and that everything comes from there. Colour it in long enough and you start to believe it.',
-    'Rankengeflecht':              'Vine Weave',
-    'Zwei gegenläufige Rankenpaare, drei Blattlagen':
-      'Two counter-running pairs of vines, three layers of leaves',
-    'Eine Ranke sucht nicht das Licht, sie sucht Halt. Dass sie dabei schön wird, ist ein Nebenprodukt — und wahrscheinlich der Grund, warum wir sie nachzeichnen.':
-      'A vine does not seek the light, it seeks a hold. That it becomes beautiful on the way is a by-product — and probably the reason we trace it.',
     'Sprossenband':                'Rung Band',
     'Fünf Bänder mit Sprossen, jedes mit eigenem Innenmotiv':
       'Five banded rings with rungs, each with its own inner figure',
@@ -429,21 +414,31 @@ var Sprache = (function () {
       'Three plaits on three radii, with diamonds and leaves between',
     'Ein Tau ist stärker als der Draht, aus dem es besteht — nicht, weil mehr Draht darin ist, sondern weil keiner allein zieht.':
       'A rope is stronger than the wire it is made of — not because there is more wire in it, but because none of it pulls alone.',
-    'Kettenreif':                  'Chain Ring',
-    'Vier Reihen Glieder, jede in die darunterliegende gehängt':
-      'Four rows of links, each hooked into the one below',
-    'Ein Glied für sich ist ein Loch mit einem Rand darum. Erst das nächste macht daraus eine Kette, und keines von beiden weiß, welches das erste war.':
-      'A link on its own is a hole with a rim around it. Only the next one makes it a chain, and neither of them knows which was first.',
-    'Schuppenwerk':                'Scalework',
-    'Fünf Reihen Schuppen, jede über der Naht der darunter':
-      'Five rows of scales, each over the seam of the one below',
-    'Jede Schuppe deckt die Naht der vorigen. So wird aus lauter kleinen Blechen eine Haut, die nichts durchlässt und sich trotzdem bewegt.':
-      'Every scale covers the seam of the last. That is how a great many small plates become a skin that lets nothing through and still moves.',
     'Zellenwerk':                  'Cloisonné',
     'Zellenschmelz: vier Bänder gelöteter Zellen mit eigenem Grund':
       'Cloisonné: four bands of soldered cells, each with its own ground',
     'Der Goldschmied lötet erst die Wände und füllt dann die Farbe hinein. Er entscheidet die Ordnung, bevor er weiß, welche Farbe er hat — und das ist keine Not, sondern die Kunst.':
       'The goldsmith solders the walls first and fills in the colour afterwards. He settles the order before he knows what colour he has — and that is not a hardship, it is the craft.',
+    'Flechtband':                  'Plaited Band',
+    'Zwei Wellen, die einander abwechselnd über- und unterqueren':
+      'Two waves that cross over and under each other in turn',
+    'An jeder Kreuzung entscheidet sich, wer oben liegt — und weil es sich zwanzigmal entscheidet, liegt am Ende keiner oben. Das ist die ganze Kunst des Flechtens und vermutlich auch die des Zusammenlebens.':
+      'At every crossing it is decided who lies on top — and because it is decided twenty times, in the end nobody does. That is the whole art of plaiting, and probably of living together too.',
+    'Kettenglied':                 'Chain Link',
+    'Zehn Glieder, jedes zweite über seinen Nachbarn gelegt':
+      'Ten links, every other one laid over its neighbour',
+    'Ein Glied für sich ist ein Loch mit einem Rand darum. Erst das nächste macht daraus eine Kette — und keines von beiden weiß, welches das erste war.':
+      'A link on its own is a hole with a rim around it. Only the next one makes it a chain — and neither of them knows which was first.',
+    'Schneckenwerk':               'Scrollwork',
+    'Paarweise gegenläufige Schnecken, die Signatur der Filigranarbeit':
+      'Paired counter-running scrolls, the signature of filigree',
+    'Der Draht wird nicht gebogen, bis er eine Form hat — er wird gewickelt, bis er nicht mehr weiterkann. Was dabei entsteht, hat niemand entworfen, und trotzdem sieht es aus wie eine Absicht.':
+      'The wire is not bent until it has a shape — it is wound until it can go no further. What comes of it nobody designed, and still it looks like an intention.',
+    'Nadelkrone':                  'Needle Crown',
+    'Sechzehn lange Nadeln mit Innenkontur, im Außenband Blätter mit Kern':
+      'Sixteen long needles with an inner outline, leaves with a core in the outer band',
+    'Eine Krone aus Nadeln setzt man niemandem auf. Man stellt sie hin und geht darum herum, und das genügt.':
+      'A crown of needles is not put on anyone. You set it down and walk around it, and that is enough.',
 
     /* Diese beiden stehen im Quelltext über zwei Zeilen, zusammengefügt
        mit `+`. Der Schlüssel ist deshalb der fertige Satz, nicht die
