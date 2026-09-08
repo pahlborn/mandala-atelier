@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Schlussdurchsicht — welche zwölf tragen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Die zwölf gebauten Feinwerk-Motive nebeneinander, mit gemessenen Zahlen und einem Votum je Motiv. Zum Entscheiden in einem Durchgang.">
+<meta name="description" content="Die elf gebauten Motive nebeneinander, mit gemessenen Zahlen und einem Votum je Motiv. Vier davon sind neu. Zum Entscheiden in einem Durchgang.">
 <meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="../beide-icon-192.png">
@@ -84,6 +84,9 @@
   .motiv.streichen { box-shadow: inset 3px 0 0 var(--stop); }
   .motiv.anmerkung { box-shadow: inset 3px 0 0 var(--offen); }
   .motiv.behalten { box-shadow: inset 3px 0 0 var(--tut); }
+  .neu { font-size: 11px; font-weight: 600; letter-spacing: .06em;
+         text-transform: uppercase; color: var(--room); background: var(--ink);
+         padding: 2px 8px; border-radius: 999px; }
 
   @media (max-width: 620px) {
     .motiv { grid-template-columns: 1fr; gap: 14px; }
@@ -97,26 +100,77 @@
 <main>
 
   <h1>Schlussdurchsicht</h1>
-  <p class="lede">Die zwölf gebauten Motive nebeneinander, absteigend nach
-     meinem Votum. Zum Entscheiden in einem Durchgang.</p>
+  <p class="lede">Die elf gebauten Motive nebeneinander — vier davon neu.
+     Zum Entscheiden in einem Durchgang.</p>
 
   <div class="stand">
-    <b>Das Votum ist meine Einschätzung, kein Beschluss.</b>
-    Die Bilder sind der Katalogrender in 620 Punkten — also die App selbst,
-    keine Vorschau. Die Zahlen sind an derselben Zeichnung gemessen: dieselbe
-    Wandschwelle wie <code>app.js</code>, dieselbe Flächenzählung wie das
-    Füllwerkzeug, <b>ausmalbar</b> heißt ab 80 Bildpunkten Fläche — etwa neun
-    mal neun, die Untergrenze dessen, was ein Finger trifft und was Farbe
-    zeigt. Nichts ist entfernt; sagen Sie, was fallen soll.
+    <b>Der zweite Durchgang.</b>
+    Fünf sind gestrichen: Schuppenwerk, Kettenreif, Granulat, Rankengeflecht
+    und Gitterschale. Vier neue stehen dafür da. Das Votum ist meine
+    Einschätzung, kein Beschluss. Die Bilder sind der Katalogrender in 620
+    Punkten — also die App selbst, keine Vorschau; die Zahlen sind an
+    derselben Zeichnung gemessen, <b>ausmalbar</b> heißt ab 80 Bildpunkten
+    Fläche.
   </div>
 
   <div class="bilanz">
-    <span class="votum ja">6 behalten</span>
-    <span class="votum teilweise">4 behalten, mit Anmerkung</span>
-    <span class="votum nein">2 würde ich streichen</span>
+    <span class="votum ja">9 behalten</span>
+    <span class="votum teilweise">2 behalten, mit Anmerkung</span>
+    <span class="votum nein">0 streichen</span>
   </div>
 
-  <h2>Die zwölf</h2>
+  <h2>Die vier neuen</h2>
+
+  <p>Zwei davon gibt es nur, weil ein Baustein dazugekommen ist: die
+     <b>Auslöschung</b> — eine Linie, die eine andere unterbricht. Genau
+     daran waren Schuppenwerk und Kettenreif gescheitert. Technisch ist es
+     <code>destination-out</code>: Der Alphawert wird auf null gesetzt, nicht
+     überdeckt. Deshalb verschwindet die untenliegende Linie, und die Stelle
+     bleibt trotzdem ausmalbar — ein hell übermaltes Band wäre eine Wand
+     geblieben.</p>
+
+  <article class="motiv behalten">
+    <img src="durchsicht/flechtband.webp" alt="Flechtband" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Flechtband <span class="neu">neu</span><span class="votum ja">behalten</span></h3>
+      <p class="zahlen">10 Achsen · <b>337</b> ausmalbare Felder von 627 ·
+         Median 103 px² · größtes Feld 1,9 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Das erste Motiv der App, in dem ein Strang wirklich <b>unter</b> einem anderen hindurchgeht. Genau daran waren Schuppenwerk und Kettenreif gescheitert — hier ist der fehlende Baustein gebaut: eine Linie, die eine andere unterbricht. 337 ausmalbare Felder, größtes 1,9 %.</p>
+    </div>
+  </article>
+  <article class="motiv anmerkung">
+    <img src="durchsicht/kettenglied.webp" alt="Kettenglied" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Kettenglied <span class="neu">neu</span><span class="votum teilweise">behalten, mit Anmerkung</span></h3>
+      <p class="zahlen">10 Achsen · <b>251</b> ausmalbare Felder von 396 ·
+         Median 156 px² · größtes Feld 2,4 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Die Wiedervorlage von Kettenreif, diesmal mit echter Verschränkung: Jedes zweite Glied liegt sichtbar über seinem Nachbarn. Jetzt liest es sich als Kette. <b>Was mahnt:</b> Mit 251 ausmalbaren Feldern hat es die wenigsten der elf — die Glieder sind groß, und viel Fläche geht an ihre Ringkörper.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/schneckenwerk.webp" alt="Schneckenwerk" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Schneckenwerk <span class="neu">neu</span><span class="votum ja">behalten</span></h3>
+      <p class="zahlen">8 Achsen · <b>321</b> ausmalbare Felder von 503 ·
+         Median 163 px² · größtes Feld 1,6 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>Die Signatur der Filigranarbeit, und der Familie fehlte sie: der gewickelte Draht. Paarweise gegenläufige Schnecken in drei Bändern, dazu die Schneckenaugen als Perlen. 321 ausmalbare, Median 163, größtes Feld 1,6 %.</p>
+    </div>
+  </article>
+  <article class="motiv behalten">
+    <img src="durchsicht/nadelkrone.webp" alt="Nadelkrone" loading="lazy" width="620" height="620">
+    <div class="dazu">
+      <h3>Nadelkrone <span class="neu">neu</span><span class="votum ja">behalten</span></h3>
+      <p class="zahlen">16 Achsen · <b>402</b> ausmalbare Felder von 740 ·
+         Median 93 px² · größtes Feld 0,6 %<br>
+         steht in <b>Feinwerk</b></p>
+      <p>402 ausmalbare Felder und mit 0,6 % ein sehr kleines größtes — technisch das sauberste der vier neuen. <b>Anmerkung:</b> Die Nadeln sind sehr fein, daher der Median von 93. Es ist das dichteste der vier, ohne dabei splittrig zu werden.</p>
+    </div>
+  </article>
+
+  <h2>Die sieben, die bleiben</h2>
 
   <article class="motiv behalten">
     <img src="durchsicht/zellenwerk.webp" alt="Zellenwerk" loading="lazy" width="620" height="620">
@@ -125,7 +179,7 @@
       <p class="zahlen">12 Achsen · <b>361</b> ausmalbare Felder von 542 ·
          Median 355 px² · größtes Feld 0,5 %<br>
          steht in <b>Feinwerk</b></p>
-      <p>Das beste der fünf neuen. Es ist unverwechselbar — niemand hält Zellenschmelz für irgendetwas anderes —, die Zellen sind großzügig (Median 355), und das größte Einzelfeld ist mit 0,5 % das kleinste aller zwölf. Nichts daran wackelt.</p>
+      <p>Unverwechselbar — niemand hält Zellenschmelz für etwas anderes —, großzügige Zellen (Median 355) und mit 0,5 % das kleinste größte Feld aller elf. Nichts daran wackelt.</p>
     </div>
   </article>
   <article class="motiv behalten">
@@ -135,7 +189,7 @@
       <p class="zahlen">8 Achsen · <b>409</b> ausmalbare Felder von 603 ·
          Median 426 px² · größtes Feld 0,6 %<br>
          steht in <b>Feinwerk</b></p>
-      <p>Drei Zöpfe, sofort als Tauwerk lesbar, Median 426. Von den acht Achsen lebt es: große Felder, ruhiges Ausmalen, und trotzdem 409 ausmalbare. Das Gegenstück zu den sechzehnachsigen — jede Familie braucht so eines.</p>
+      <p>Drei Zöpfe, sofort lesbar, Median 426. Von den acht Achsen lebt es: große Felder, ruhiges Ausmalen, trotzdem 409 ausmalbare. Das Gegenstück zu den sechzehnachsigen.</p>
     </div>
   </article>
   <article class="motiv behalten">
@@ -145,7 +199,7 @@
       <p class="zahlen">16 Achsen · <b>449</b> ausmalbare Felder von 679 ·
          Median 267 px² · größtes Feld 0,6 %<br>
          steht in <b>Feinwerk</b></p>
-      <p>Vier Bänder, klar getrennt, nichts überlagert sich. Median 267 bei 449 ausmalbaren Feldern und das zweitkleinste größte Feld. Bei sechzehn Achsen sind die 449 rund 28 Entscheidungen — dicht, aber nicht mühsam.</p>
+      <p>Vier Bänder, klar getrennt, nichts überlagert sich. 449 ausmalbare bei Median 267 — bei sechzehn Achsen sind das rund 28 Entscheidungen. Dicht, aber nicht mühsam.</p>
     </div>
   </article>
   <article class="motiv behalten">
@@ -155,37 +209,7 @@
       <p class="zahlen">16 Achsen · <b>389</b> ausmalbare Felder von 513 ·
          Median 448 px² · größtes Feld 1,5 %<br>
          steht in <b>Feinwerk</b></p>
-      <p>Die großzügigsten Felder der ganzen Familie (Median 448) und trotzdem 389 ausmalbare. Wer die Dichte scheut, fängt hier an. Der Perlgrat liest sich als Grat, nicht als Zufall.</p>
-    </div>
-  </article>
-  <article class="motiv behalten">
-    <img src="durchsicht/tropfensaum.webp" alt="Tropfensaum" loading="lazy" width="620" height="620">
-    <div class="dazu">
-      <h3>Tropfensaum <span class="votum ja">behalten</span></h3>
-      <p class="zahlen">12 Achsen · <b>487</b> ausmalbare Felder von 1046 ·
-         Median 72 px² · größtes Feld 1,4 %<br>
-         steht in <b>Natur</b></p>
-      <p>Vier Reihen genesteter Tropfen, 487 ausmalbare — die zweithöchste Zahl. Die doppelte Innenkontur trägt hier sichtbar: Jeder Tropfen hat einen Kern, und der bekommt seine eigene Farbe.</p>
-    </div>
-  </article>
-  <article class="motiv behalten">
-    <img src="durchsicht/kordelstern.webp" alt="Kordelstern" loading="lazy" width="620" height="620">
-    <div class="dazu">
-      <h3>Kordelstern <span class="votum ja">behalten</span></h3>
-      <p class="zahlen">8 Achsen · <b>505</b> ausmalbare Felder von 991 ·
-         Median 98 px² · größtes Feld 1,1 %<br>
-         steht in <b>Geometrisch-klassisch</b></p>
-      <p>Die höchste Zahl ausmalbarer Felder von allen (505) und das grafischste Bild der zwölf. <b>Anmerkung:</b> Die Strahlen sind sehr fein, der Median liegt deshalb bei 98. Wer die Nadeln einzeln färben will, braucht den Zoom — im Atelier reicht er bis 4.</p>
-    </div>
-  </article>
-  <article class="motiv anmerkung">
-    <img src="durchsicht/granulat.webp" alt="Granulat" loading="lazy" width="620" height="620">
-    <div class="dazu">
-      <h3>Granulat <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
-      <p class="zahlen">12 Achsen · <b>481</b> ausmalbare Felder von 742 ·
-         Median 158 px² · größtes Feld 1,6 %<br>
-         steht in <b>Feinwerk</b></p>
-      <p>Perlen und Rauten, 481 ausmalbare — inhaltlich richtig für die Familie. <b>Was mir nicht gefällt:</b> Die beiden inneren Perlreihen bei r≈96 und r≈164 stehen zu dicht beieinander und verklumpen zu einem Ring. Das ist eine halbe Stunde Nacharbeit, kein Grund zum Streichen — ich würde die innere Reihe herausnehmen.</p>
+      <p>Die großzügigsten Felder der Familie (Median 448) und trotzdem 389 ausmalbare. Wer die Dichte scheut, fängt hier an.</p>
     </div>
   </article>
   <article class="motiv anmerkung">
@@ -195,75 +219,49 @@
       <p class="zahlen">14 Achsen · <b>432</b> ausmalbare Felder von 614 ·
          Median 523 px² · größtes Feld 0,9 %<br>
          steht in <b>Feinwerk</b></p>
-      <p>Fünf Bänder mit Sprossen, Median 523 — die zweitgroßzügigsten Felder. <b>Was mir nicht gefällt:</b> Die Nabe. Die Sprossen des innersten Bandes laufen von r=46 aus, und 42 Linien treffen sich auf engstem Raum zu einem struppigen Büschel. Das innerste Band sollte weiter außen anfangen.</p>
+      <p>Fünf Bänder mit Sprossen, Median 523 — die zweitgroßzügigsten Felder. <b>Was mir weiter nicht gefällt:</b> die Nabe. Die Sprossen des innersten Bandes laufen ab r=46, und 42 Linien treffen sich auf engstem Raum zu einem struppigen Büschel. Das innerste Band sollte weiter außen anfangen — eine Zeile, wenn Sie mögen.</p>
     </div>
   </article>
-  <article class="motiv anmerkung">
-    <img src="durchsicht/gitterschale.webp" alt="Gitterschale" loading="lazy" width="620" height="620">
+  <article class="motiv behalten">
+    <img src="durchsicht/kordelstern.webp" alt="Kordelstern" loading="lazy" width="620" height="620">
     <div class="dazu">
-      <h3>Gitterschale <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
-      <p class="zahlen">12 Achsen · <b>333</b> ausmalbare Felder von 636 ·
-         Median 91 px² · größtes Feld 2,5 %<br>
+      <h3>Kordelstern <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">8 Achsen · <b>505</b> ausmalbare Felder von 991 ·
+         Median 98 px² · größtes Feld 1,1 %<br>
          steht in <b>Geometrisch-klassisch</b></p>
-      <p>Das Sterngitter ist stark und gehört nach Geometrisch-klassisch. <b>Zwei Zahlen mahnen:</b> 333 ausmalbare Felder — die wenigsten der zwölf — und mit 2,5 % das zweitgrößte Einzelfeld. Es ist also weniger dicht, als es aussieht. Behalten, aber es ist nicht das, wofür die Familie steht.</p>
+      <p>Die höchste Zahl ausmalbarer Felder von allen (505) und das grafischste Bild. <b>Anmerkung:</b> Die Strahlen sind sehr fein, der Median liegt bei 98. Wer die Nadeln einzeln färben will, braucht den Zoom.</p>
     </div>
   </article>
-  <article class="motiv anmerkung">
-    <img src="durchsicht/rankengeflecht.webp" alt="Rankengeflecht" loading="lazy" width="620" height="620">
+  <article class="motiv behalten">
+    <img src="durchsicht/tropfensaum.webp" alt="Tropfensaum" loading="lazy" width="620" height="620">
     <div class="dazu">
-      <h3>Rankengeflecht <span class="votum teilweise">behalten, mit Anmerkung</span></h3>
-      <p class="zahlen">8 Achsen · <b>409</b> ausmalbare Felder von 751 ·
-         Median 110 px² · größtes Feld 3,1 %<br>
+      <h3>Tropfensaum <span class="votum ja">behalten</span></h3>
+      <p class="zahlen">12 Achsen · <b>487</b> ausmalbare Felder von 1046 ·
+         Median 72 px² · größtes Feld 1,4 %<br>
          steht in <b>Natur</b></p>
-      <p>Organisch, hübsch, und in Natur richtig aufgehoben. <b>Was mahnt:</b> Mit 3,1 % hat es das größte Einzelfeld aller zwölf — die Grenze des Prüflaufs liegt bei 4. Die Ranken lassen zwischen den Blattlagen große Flächen stehen. Das ist kein Fehler, aber es ist das am wenigsten dichte der Familie.</p>
-    </div>
-  </article>
-  <article class="motiv streichen">
-    <img src="durchsicht/schuppenwerk.webp" alt="Schuppenwerk" loading="lazy" width="620" height="620">
-    <div class="dazu">
-      <h3>Schuppenwerk <span class="votum nein">ich würde streichen</span></h3>
-      <p class="zahlen">16 Achsen · <b>417</b> ausmalbare Felder von 887 ·
-         Median 65 px² · größtes Feld 0,9 %<br>
-         steht in <b>Feinwerk</b></p>
-      <p>Es sollte nach Dachziegeln aussehen. Es sieht nach Spirograph aus. Die Schuppenbögen kreuzen einander so flach, dass daraus keine Reihen werden, sondern ein Netz — und derselbe flache Winkel erzeugt die Splitter: <b>Median 65, der niedrigste der zwölf.</b> Der Kunstgriff „Schuppe" ist damit nicht eingelöst. Ich würde es herausnehmen und, wenn Sie mögen, mit echter Überdeckung neu zeichnen.</p>
-    </div>
-  </article>
-  <article class="motiv streichen">
-    <img src="durchsicht/kettenreif.webp" alt="Kettenreif" loading="lazy" width="620" height="620">
-    <div class="dazu">
-      <h3>Kettenreif <span class="votum nein">ich würde streichen</span></h3>
-      <p class="zahlen">10 Achsen · <b>332</b> ausmalbare Felder von 536 ·
-         Median 199 px² · größtes Feld 1,1 %<br>
-         steht in <b>Feinwerk</b></p>
-      <p>Das schwächste der zwölf, und ich habe es zweimal überarbeitet. <b>332 ausmalbare Felder — die wenigsten</b>, und wichtiger: Es liest sich nicht als Kette. Die Glieder überlappen zwar, aber ohne Über-und-Unter wirken sie wie hingeworfene Blasen, nicht wie eingehängte Ringe. Eine echte Verschränkung bräuchte Auslöschung — dieselbe Technik, die den Motiven bisher fehlt. Bis dahin: streichen.</p>
+      <p>Vier Reihen genesteter Tropfen, 487 ausmalbare — die zweithöchste Zahl. Die doppelte Innenkontur trägt hier sichtbar: Jeder Tropfen hat einen Kern.</p>
     </div>
   </article>
 
-  <h2>Wenn Sie meinem Votum folgen</h2>
+  <h2>Wo Feinwerk damit steht</h2>
 
-  <p>Dann fallen <b>Schuppenwerk</b> und <b>Kettenreif</b>, und Feinwerk steht
-     bei <b>sechs</b> Motiven — so groß wie „Zen &amp; Achtsamkeit“, größer als
-     „Jahreszeiten“. Geometrisch-klassisch und Natur bleiben bei sieben. Das
-     ist eine tragfähige Familie, und keines der sechs ist nur dabei, um die
-     Zahl zu halten.</p>
+  <p>Neun Motive in Feinwerk, dazu Kordelstern in Geometrisch-klassisch und
+     Tropfensaum in Natur. Damit ist Feinwerk die größte Familie der App —
+     vor Anlagen mit acht. Die Kunstgriffe: Zellen, Zopf, Bänder, Blätter,
+     Sprossen, Nadeln, Schnecken, Flechte, Kette. Keiner doppelt.</p>
 
-  <p>Die zwei Anmerkungen zu <b>Granulat</b> und <b>Sprossenband</b> sind
-     Nacharbeit, kein Streichgrund: eine Perlreihe heraus, ein Band weiter
-     außen anfangen lassen. Beides ist in einer Fassung erledigt und messbar.</p>
-
-  <p><b>Ein Wort zu den beiden, die ich streichen würde.</b> Sie sind nicht
-     misslungen, sie lösen ihren eigenen Anspruch nicht ein: Eine Schuppe
-     muss die darunterliegende <i>decken</i>, ein Kettenglied muss <i>durch</i>
-     das nächste gehen. Beides braucht Auslöschung — eine Linie, die eine
-     andere unterbricht. Die haben die Motive bisher nicht, und sie wäre der
-     nächste der drei Bausteine. Bis dahin behaupten die zwei etwas, das man
-     ihnen nicht ansieht.</p>
+  <p><b>Ich habe diesmal nichts zum Streichen.</b> Das ist keine Nachsicht,
+     sondern die Folge des ersten Durchgangs: Was nicht trug, ist weg, und
+     die vier neuen sind gegen dieselben Grenzen geprüft — größtes Feld
+     zwischen 0,5 und 2,4 Prozent, die Grenze des Prüflaufs liegt bei 4.
+     Die zwei Anmerkungen sind Nacharbeit, kein Streichgrund.</p>
 
   <footer>
     Die ganze Familie mit Herkunft und Beschreibung:
     <a href="feinwerk.html">Motivfamilie Feinwerk</a>.
-    Zum Ausprobieren ins <a href="../index.html">Mandala Atelier</a>.
-    Zurück zur <a href="../beide.html">Einstiegsseite</a>.
+    Dasselbe für Blatt: <a href="durchsicht-blatt.html">Die sechs
+    Stimmungen</a>. Zum Ausprobieren ins
+    <a href="../index.html">Mandala Atelier</a>.
   </footer>
 
 </main>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Blatt: die sechs Stimmungen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Die sechs Stimmungen von Blatt, je vier Würfe nebeneinander, mit gemessenen Zahlen und einem Votum. Zum Entscheiden in einem Durchgang.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Entscheidungsseite, kein Schaufenster. Die Bilder sind der Katalogrender in
+  620 px - also die App selbst, nicht eine Vorschau. Die Zahlen sind an
+  derselben Zeichnung gemessen: Wandschwelle alpha > 60 wie in app.js,
+  Flaechenzaehlung wie das Fuellwerkzeug, "ausmalbar" ab 80 Bildpunkten.
+
+  Das Votum ist meine Einschaetzung, kein Beschluss. Es steht bei jedem
+  Motiv dabei, damit man widersprechen kann, ohne suchen zu muessen.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 960px; margin: 0 auto; }
+  .stimmung { background: var(--card); border-radius: 16px; padding: 18px 22px 20px;
+              margin-bottom: 14px; }
+  .stimmung.behalten { box-shadow: inset 3px 0 0 var(--tut); }
+  .stimmung.anmerkung { box-shadow: inset 3px 0 0 var(--offen); }
+  .stimmung h3 { font-size: 19px; margin: 0 0 .35rem; font-weight: 600;
+                 display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .stimmung p { font-size: 15px; color: var(--quiet); }
+  .stimmung p b { color: var(--ink); font-weight: 600; }
+  .reihe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: .8rem 0 1rem; }
+  .reihe img { width: 100%; height: auto; border-radius: 8px; display: block; background: #f4efe4; }
+  @media (max-width: 620px) { .reihe { grid-template-columns: repeat(2, 1fr); } }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 { font-size: 13px; margin: 2.6rem 0 .9rem; font-weight: 600;
+       text-transform: uppercase; letter-spacing: .06em; color: var(--quiet); }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+  code { font-size: .93em; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.4rem; font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand > b:first-of-type { display: block; margin-bottom: .3rem; }
+
+  .bilanz { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 1.8rem; }
+  .bilanz span { font-size: 13px; padding: 5px 12px; border-radius: 999px;
+                 border: 1px solid currentColor; }
+
+  .motiv {
+    background: var(--card); border-radius: 16px; overflow: hidden;
+    margin-bottom: 14px; display: grid; gap: 0 22px;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    align-items: start; padding: 18px 22px 20px;
+  }
+  .motiv img { width: 100%; height: auto; border-radius: 10px; display: block; }
+  .motiv h3 { font-size: 19px; margin: 0 0 .35rem; font-weight: 600;
+              display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .votum { font-size: 12px; font-weight: 600; padding: 2px 10px;
+           border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .votum.ja { color: var(--tut); }
+  .votum.teilweise { color: var(--offen); }
+  .votum.nein { color: var(--stop); }
+  .zahlen { font-size: 13.5px; color: var(--quiet); margin: 0 0 .7rem;
+            font-variant-numeric: tabular-nums; }
+  .motiv p { font-size: 15px; color: var(--quiet); }
+  .motiv p b { color: var(--ink); font-weight: 600; }
+  .motiv.streichen { box-shadow: inset 3px 0 0 var(--stop); }
+  .motiv.anmerkung { box-shadow: inset 3px 0 0 var(--offen); }
+  .motiv.behalten { box-shadow: inset 3px 0 0 var(--tut); }
+  .neu { font-size: 11px; font-weight: 600; letter-spacing: .06em;
+         text-transform: uppercase; color: var(--room); background: var(--ink);
+         padding: 2px 8px; border-radius: 999px; }
+
+  @media (max-width: 620px) {
+    .motiv { grid-template-columns: 1fr; gap: 14px; }
+  }
+
+  footer { margin-top: 2.6rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Blatt: die sechs Stimmungen</h1>
+  <p class="lede">Dasselbe für Blatt — nur ist die Einheit hier keine Vorlage,
+     sondern eine Stimmung. Je vier Würfe nebeneinander.</p>
+
+  <div class="stand">
+    <b>Warum das anders aussieht als beim Atelier.</b>
+    Blatt hat keinen Katalog. Es würfelt aus dem Vorrat der gewählten
+    Stimmung, und zwei Blätter derselben Stimmung sind nie gleich — zu
+    entscheiden ist deshalb nicht ein Bild, sondern ein Vorrat. Die vier
+    Würfe je Zeile sind dieselben Seeds bei allen sechs (7, 1234, 88117,
+    42424), damit die Zeilen vergleichbar sind.
+    <br><br>
+    <b>Das Relief ist hier aufgedreht.</b> Auf dem Papier ist es fast
+    unsichtbar, bis man darüberreibt — das ist der ganze Reiz von Blatt.
+    Zum Beurteilen wäre ein leeres Blatt aber nutzlos, deshalb sind die
+    Höhen gestreckt (gemessen liegen sie je Wurf in einem engen Band, hier
+    auf den vollen Umfang gezogen). So sieht man, was man freilegen würde.
+  </div>
+
+  <div class="bilanz">
+    <span class="votum ja">5 bleiben</span>
+    <span class="votum teilweise">1 bleibt, mit Anmerkung</span>
+  </div>
+
+  <h2>Die sechs</h2>
+
+  <article class="stimmung anmerkung">
+    <h3>Feinwerk <span class="neu">neu</span><span class="votum teilweise">bleibt, mit Anmerkung</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 14/14/20/16 · Bänder 8/8/10/10</p>
+    <div class="reihe"><img src="durchsicht-blatt/feinwerk-0.webp" alt="Feinwerk, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/feinwerk-1.webp" alt="Feinwerk, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/feinwerk-2.webp" alt="Feinwerk, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/feinwerk-3.webp" alt="Feinwerk, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Vorrat: 14 bis 20 Achsen, sechs bis acht Bänder, Striche von 0,0040 bis 0,0056 — enger und feiner als alle anderen. Gemessen über sechzig Würfe: <b>17,1 Achsen und 9,2 Bänder gegen 16,1 und 7,6 bei „Fülle"</b>, dem bisher dichtesten. Der Unterschied ist da und sichtbar.<br><br><b>Was mahnt:</b> Das vierte Beispiel oben. Manche Würfe kommen bandlastig heraus — viele Ringe, wenig Ornament darin. Der Vorrat gewichtet Perlen und Strahlen hoch, aber wenn der Wurf mehrfach „plain" zieht, bleibt ein Reifenstapel übrig. Das ließe sich beheben, indem „plain" aus dem schmalen Vorrat fliegt.</p>
+  </article>
+  <article class="stimmung behalten">
+    <h3>Fülle <span class="votum ja">bleibt</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 14/14/18/16 · Bänder 7/7/8/8</p>
+    <div class="reihe"><img src="durchsicht-blatt/fuelle-0.webp" alt="Fülle, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/fuelle-1.webp" alt="Fülle, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/fuelle-2.webp" alt="Fülle, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/fuelle-3.webp" alt="Fülle, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Der bisher dichteste Kranz: Blüten und Gitter breit, Perlen und Strahlen schmal. Bleibt unverändert — Feinwerk tritt daneben, nicht an seine Stelle.</p>
+  </article>
+  <article class="stimmung behalten">
+    <h3>Klarheit <span class="votum ja">bleibt</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 12/12/18/12 · Bänder 6/6/7/7</p>
+    <div class="reihe"><img src="durchsicht-blatt/klarheit-0.webp" alt="Klarheit, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/klarheit-1.webp" alt="Klarheit, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/klarheit-2.webp" alt="Klarheit, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/klarheit-3.webp" alt="Klarheit, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Gitter und Strahlen, hohe Achsenzahlen, sehr klare Netze. Von allen sechs das geometrischste.</p>
+  </article>
+  <article class="stimmung behalten">
+    <h3>Blüte <span class="votum ja">bleibt</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 8/8/14/10 · Bänder 6/6/7/7</p>
+    <div class="reihe"><img src="durchsicht-blatt/bluete-0.webp" alt="Blüte, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/bluete-1.webp" alt="Blüte, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/bluete-2.webp" alt="Blüte, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/bluete-3.webp" alt="Blüte, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Blütenblätter und Bogenränder, mittlere Dichte. Der freundlichste der sechs.</p>
+  </article>
+  <article class="stimmung behalten">
+    <h3>Ruhe <span class="votum ja">bleibt</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 6/6/12/8 · Bänder 5/5/6/6</p>
+    <div class="reihe"><img src="durchsicht-blatt/ruhe-0.webp" alt="Ruhe, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/ruhe-1.webp" alt="Ruhe, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/ruhe-2.webp" alt="Ruhe, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/ruhe-3.webp" alt="Ruhe, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Wenige Achsen, wenige Bänder, viel leere Fläche — mit Absicht. Das zweite Beispiel oben ist fast leer, und das ist kein Fehler: Wer „Ruhe" wählt, will genau das.</p>
+  </article>
+  <article class="stimmung behalten">
+    <h3>Anlage <span class="votum ja">bleibt</span></h3>
+    <p class="zahlen">vier Würfe · Achsen 4/4/4/4 · Bänder 19/7/7/14</p>
+    <div class="reihe"><img src="durchsicht-blatt/anlage-0.webp" alt="Anlage, Wurf 1" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/anlage-1.webp" alt="Anlage, Wurf 2" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/anlage-2.webp" alt="Anlage, Wurf 3" loading="lazy" width="420" height="420"><img src="durchsicht-blatt/anlage-3.webp" alt="Anlage, Wurf 4" loading="lazy" width="420" height="420"></div>
+    <p>Fällt aus der Reihe, und zwar gewollt: kein Kranz aus Bändern, sondern ein Grundriss. Zieht je Blatt eine von acht Grammatiken — dieselben acht, die im Atelier unter „Anlagen" zur Wahl stehen.</p>
+  </article>
+
+  <h2>Was hier zu entscheiden wäre</h2>
+
+  <p>Die fünf alten stehen nicht zur Wahl — sie sind seit Fassung 3.13
+     unverändert, und gesicherte Blätter hängen an ihnen. Zur Entscheidung
+     steht allein <b>Feinwerk</b>, und dort auch nur eine Frage: ob
+     „plain" aus dem schmalen Vorrat fliegt. Dann kann kein Wurf mehr als
+     Reifenstapel herauskommen; dafür wird die Stimmung ein Stück
+     gleichförmiger.</p>
+
+  <p><b>Was hier bewusst nicht steht:</b> Zopf, Kette und Zelle. Im Atelier
+     tragen sie seit Fassung 2.34 drei Motive, in Blatt wären sie neue
+     Bandarten. Sicher sind sie — solange nur diese Stimmung sie zieht,
+     verschiebt sich kein Wurf der anderen fünf. Sie gehören aber in einen
+     eigenen Schritt mit eigenem Messwert.</p>
+
+  <footer>
+    Dasselbe für das Atelier: <a href="durchsicht.html">Schlussdurchsicht</a>.
+    Die Motivfamilie mit Herkunft: <a href="feinwerk.html">Feinwerk</a>.
+    Zum Ausprobieren ins <a href="../atelier3/index.html">ruhige Blatt</a>.
+  </footer>
+
+</main>
+</body>
+</html>
