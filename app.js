@@ -322,7 +322,7 @@ const state = {
   fillAll:    true,   // ein Tipp färbt alle gleichwertigen Felder
   graded:     true,   // bei Anlagen: die Achsenzahl folgt dem Bereich
   strokeSym:  null,   // Symmetrie des laufenden Zuges, am Aufsetzpunkt bestimmt
-  tool:       'pen',
+  tool:       'fill',      // Füllen ist der Regelfall, nicht das Zeichnen
   shape:      'ring',   // Grundform des Form-Werkzeugs
   shapeFrom:  null,     // Anfasspunkt, solange gezogen wird
   palette:    'erde',
@@ -4066,7 +4066,8 @@ function bindEvents() {
     if (event.key === '-') { zoomBy(1 / 1.25); return; }
     if (event.key === '0') { resetZoom(); return; }
 
-    const keys = { '1': 'pen', '2': 'fill', '3': 'shape', '4': 'eraser' };
+    /* Die Ziffern folgen der Reihenfolge auf dem Bildschirm. */
+    const keys = { '1': 'fill', '2': 'pen', '3': 'shape', '4': 'eraser' };
     if (keys[event.key]) { state.tool = keys[event.key]; syncUI(); return; }
     if (event.key === 'm') toggleDrawer('library');
     if (event.key === 'w') toggleDrawer('controls');

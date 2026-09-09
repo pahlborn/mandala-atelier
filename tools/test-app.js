@@ -329,11 +329,30 @@ async function run() {
 
   /* Zeichnen über echte Zeigerereignisse – prüft nebenbei die Umrechnung
      von Bildschirm- in Blattkoordinaten. */
+  /* Was beim Öffnen bereitliegt. Wer ein Motiv wählt, will färben - nicht
+     zeichnen. Deshalb ist Füllen vorbelegt und steht links außen. */
+  const start = await page.evaluate(function () {
+    return {
+      werkzeug: window.MandalaAtelier.state.tool,
+      reihe: Array.prototype.map.call(
+        document.querySelectorAll('.quick-tools .tool'),
+        function (b) { return b.dataset.tool; })
+    };
+  });
+  const startOk = start.werkzeug === 'fill' && start.reihe[0] === 'fill';
+  console.log('\nWas beim Öffnen bereitliegt');
+  console.log('  Werkzeug: ' + start.werkzeug + (start.werkzeug === 'fill' ? '' : '  ← erwartet: fill'));
+  console.log('  Reihenfolge: ' + start.reihe.join(' · ') +
+    (start.reihe[0] === 'fill' ? '' : '  ← Füllen gehört nach links außen'));
+
   console.log('\nZeichnen mit dem Zeiger');
   await page.evaluate(function () {
     window.MandalaAtelier.loadMotif('');
     window.MandalaAtelier.state.axes = 8;
     window.MandalaAtelier.state.mirror = false;
+    /* Ausdrücklich den Stift nehmen: Vorbelegt ist seit 2.35 das Füllen,
+       und hier soll das Zeichnen geprüft werden, nicht die Vorbelegung. */
+    window.MandalaAtelier.state.tool = 'pen';
   });
 
   const rect = await page.evaluate(function () {
@@ -1205,6 +1224,7 @@ async function run() {
   if (!galleryOk) broken.push('Galerie');
   if (!atelierOk) broken.push('Atelier');
   if (!zoomOk) broken.push('Vergrößern');
+  if (!startOk) broken.push('Vorbelegung');
   broken.push.apply(broken, taskProblems);
   if (!shapeOk) broken.push('Grundformen');
   if (!typeOk) broken.push('Schriften');
