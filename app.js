@@ -2100,6 +2100,134 @@ MOTIFS.push(
 
 /* ===== FEINWERK – ENDE ==================================================== */
 
+/* ===== NEUN DREIECKE – ANFANG ===============================================
+
+   Wieder ein zusätzlicher Block, wieder umkehrbar: Alles zwischen diesem
+   Zeichen und „NEUN DREIECKE – ENDE“ hängt sich mit push an WORLDS und
+   MOTIFS an. Schneidet man es heraus, steht die App wie vorher da.
+
+   Woher die Zahlen kommen. Der Kern ist die Dreiecksfigur des Sri Yantra,
+   und sie ist nicht frei gezeichnet: Vier aufwärts und fünf abwärts
+   weisende Dreiecke müssen sich so durchdringen, dass sich jeweils DREI
+   Linien in EINEM Punkt treffen. Das ist die eigentliche Schwierigkeit der
+   Figur; mit Zirkel und Lineal ist sie nicht lösbar. Bolton und Macleod
+   haben 1977 gezeigt, dass die Bedingungen die Figur bis auf wenige freie
+   Größen festlegen, Kulaichev hat die Beziehungen ausgerechnet, und Huet
+   hat 2002 ein Verfahren dafür veröffentlicht.
+
+   Die Tafel unten ist eine solche gelöste Fassung, nachgemessen statt
+   geglaubt: 27 Dreiertreffpunkte, größte Streuung 0,13 von 100 — auf
+   diesem Blatt ein halber Bildpunkt. Die Ecken der beiden größten
+   Dreiecke liegen auf dem Kreis, wie es die Konstruktion verlangt.
+
+   Was NICHT übernommen wird: der Name im Motivnamen, die Zuordnung zu
+   einer Gottheit, die Deutung des Mittelpunkts. Übernommen ist die
+   Ordnung, nicht die Bedeutung — dieselbe Regel wie bei den Anlagen,
+   docs/architektur.md §5.
+   ========================================================================= */
+
+/* Neun Dreiecke, je: linke Ecke x, y der Grundlinie, y der Spitze auf der
+   Mittelachse, rechte Ecke x. Feld 300 breit, Mitte (150,150), Kreis 100.
+   y wächst nach unten, wie auf der Leinwand auch. */
+const NEUN = [
+  [ 53.66, 123.21, 250.00, 246.34],
+  [ 52.98, 174.25,  50.00, 247.02],
+  [ 98.72, 220.04, 123.21, 201.28],
+  [ 78.26, 197.92,  78.10, 221.74],
+  [ 90.49,  78.10, 160.66, 209.51],
+  [ 80.98, 103.12, 220.04, 219.02],
+  [114.95, 160.66, 103.12, 185.05],
+  [116.35, 134.31, 197.92, 183.65],
+  [124.61, 144.80, 174.25, 175.39]
+];
+
+/* Die Tafel auf einen Kern vom Radius r umrechnen. Ein einziger Faktor —
+   die Figur verträgt keine Verzerrung, sonst gehen die Treffpunkte
+   auseinander. */
+function neunDreiecke(pen, r, lineWidth) {
+  const ctx = pen.ctx;
+  const m = r / 100;
+  ctx.lineWidth = lineWidth || 2;
+  ctx.lineJoin = 'round';
+  NEUN.forEach(function (t) {
+    tracePath(ctx, [
+      [CX + (t[0] - 150) * m, CY + (t[1] - 150) * m],
+      [CX + (t[3] - 150) * m, CY + (t[1] - 150) * m],
+      [CX,                    CY + (t[2] - 150) * m]
+    ], true);
+  });
+}
+
+/* Ein Lotosblatt, und zwar ein richtiges. petalPoints() läuft an beiden
+   Enden spitz zu — das ergibt eine Linse, kein Blütenblatt. Ein Lotosblatt
+   sitzt mit voller Breite auf dem inneren Ring, bauscht sich und läuft
+   allein nach außen spitz zu. Zwei quadratische Bögen, einer je Flanke;
+   der Bauch ist der einzige Regler. */
+function lotosBlattPoints(rInner, rOuter, halbBasis, bauch, steps) {
+  steps = steps || 20;
+  const spitze = pol(rOuter, UP);
+  const rMitte = rInner + (rOuter - rInner) * 0.52;
+  const pts = [];
+  [-1, 1].forEach(function (seite, k) {
+    const fuss = pol(rInner, UP + seite * halbBasis);
+    const griff = pol(rMitte, UP + seite * halbBasis * bauch);
+    for (let i = 0; i <= steps; i++) {
+      /* Bei der zweiten Flanke rückwärts, damit der Umriss durchläuft. */
+      const t = k === 0 ? i / steps : 1 - i / steps;
+      const u = 1 - t;
+      pts.push([u * u * fuss[0] + 2 * u * t * griff[0] + t * t * spitze[0],
+                u * u * fuss[1] + 2 * u * t * griff[1] + t * t * spitze[1]]);
+    }
+  });
+  return pts;
+}
+
+/* Ein Kranz daraus. Die Blätter stehen auf der Lücke zwischen zwei Achsen,
+   damit die Spitze des einen nicht auf der Naht des anderen sitzt.
+
+   Zwei Zutaten sind ausprobiert und wieder verworfen worden, beide im Bild
+   sofort zu sehen: eine zweite, kleinere Blattlinie im Blatt — sie ließ die
+   Blätter wie ineinandergesteckte Schilde aussehen statt wie Blüten — und
+   ein Kelchblatt in der Lücke, das den Kranz stachelig machte. Geblieben
+   ist ein pralles Blatt und sonst nichts. */
+function lotosKranz(pen, rInner, rOuter, lineWidth) {
+  /* Offen gezeichnet, nicht geschlossen, und die Spitze reicht ein paar
+     Punkte ÜBER den äußeren Ring hinaus. Beides ist nötig, sonst hängen
+     die Lücken zwischen den Blättern zu einem einzigen Ringfeld zusammen —
+     derselbe Fehler wie damals beim Flechtband. Der Fuß liegt auf dem
+     inneren Ring, die Spitze schneidet den äußeren: So schließt jedes
+     Blatt und jede Lücke für sich. */
+  drawPolyline(pen, halb(pen, lotosBlattPoints(
+    rInner, rOuter + 3, pen.step * 0.46, 1.25)), lineWidth);
+}
+
+WORLDS.push({ id: 'yantra', title: 'Yantra-Geometrie' });
+
+MOTIFS.push(
+  {
+    id: 'neundreiecke', world: 'yantra', axes: 1, frame: false,
+    name: 'Neun Dreiecke',
+    note: 'Vier aufwärts, fünf abwärts, ein Lotoskranz',
+    mythos: 'Vier Dreiecke weisen nach oben, fünf nach unten, und sie durchdringen einander so genau, dass sich je drei Linien in einem Punkt treffen. Wer eine Figur sucht, die man nicht erfinden, sondern nur ausrechnen kann — das hier ist eine.',
+    zones: [
+      { r: 280,   axes: 1,  name: 'Dreieckskern' },
+      { r: 374,   axes: 16, name: 'Lotoskranz' },
+      { r: R_OUT, axes: 32, name: 'Saum' }
+    ],
+    build: function (p) {
+      const sech = makePen(p.ctx, 16);
+      neunDreiecke(p, 280, 1.8);
+      drawRing(p, 280, 2.2);
+      lotosKranz(sech, 280, 374, 1.7);
+      drawRing(p, 374, 2.2);
+      drawSprossen(makePen(p.ctx, 32), 374, R_OUT, 0, 1, 1.4);
+      drawRing(p, R_OUT, 2.6);
+    }
+  }
+);
+
+/* ===== NEUN DREIECKE – ENDE =============================================== */
+
 /* Welten, Motive und die Bereiche der Anlagen – dieselbe Bewegung wie oben
    bei den Pigmenten. Die Bereichsnamen stehen unter dem Blatt, sobald die
    Symmetrie den Bereichen folgt; auch sie werden gelesen. */
