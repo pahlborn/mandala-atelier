@@ -43,6 +43,9 @@ const ZUSICHERUNGEN = [
   { was: 'Welten im Atelier',   muster: /([a-zäöü]+) (?:Motivwelten|Motivfamilien)\b/g,
                                 soll: z => z.welten, wort: true },
   { was: 'Bereichsnamen',       muster: /(\d+) Bereichsnamen/g,               soll: z => z.bereiche },
+  /* Die Überschrift des Motivkatalogs im README nennt beide Zahlen in einem
+     Atemzug. Die Vorlagen fing das Muster oben schon; die Welten nicht. */
+  { was: 'Welten im Atelier',   muster: /Vorlagen, (\d+) Welten/g,            soll: z => z.welten },
   /* Wie groß Feinwerk ist, stand an zwei Stellen verschieden da: „Acht" in
      beide.html, „Neun" in docs/feinwerk.html. Deshalb hier eine Zeile. */
   { was: 'Motive in Feinwerk',  muster: /([A-Za-zäöü]+) stehen in Feinwerk/g, soll: z => z.feinwerk, wort: true },

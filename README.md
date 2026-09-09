@@ -408,11 +408,12 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (45 Vorlagen, 7 Welten)
+## Motivkatalog (46 Vorlagen, 8 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
-  Achteckstern, Gitterrose
-- **Natur:** Blüte, Blätterkranz, Muschelspirale, Farnkreis, Samenkranz
+  Achteckstern, Gitterrose, Kordelstern
+- **Natur:** Blüte, Blätterkranz, Muschelspirale, Farnkreis, Samenkranz,
+  Tropfensaum
 - **Zen & Achtsamkeit:** Wellenkreis, Tropfenkranz, Ruhefeld, Atemringe,
   Steingarten
 - **Jahreszeiten:** Winter, Frühling, Sommer, Herbst
@@ -421,6 +422,9 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 - **Kids-Corner:** Erste Formen (Kindergarten), Formenreigen (Kindergarten),
   Mustertanz (Grundschule), Zähl bis 6, Zähl bis 10, Rechenmandala ZR 10,
   Rechenmandala ZR 20
+- **Feinwerk:** Spitzenrad, Perlgrat, Sprossenband, Tauwerk, Zellenwerk,
+  Flechtband, Kettenglied, Schneckenwerk, Nadelkrone
+- **Yantra-Geometrie:** Neun Dreiecke
 
 **Regel für neue Motive:** Genug Ringe, damit der Hintergrund in Felder
 zerfällt. Ein Feld, das von der Nabe bis zum Rand reicht, wirkt beim
