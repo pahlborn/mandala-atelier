@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Neun Dreiecke — zurück zu den Vorbildern</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Die Dreiecksfigur des Sri Yantra, nachgerechnet statt nachempfunden: 27 Dreiertreffpunkte, größte Abweichung ein halber Bildpunkt. Das erste Motiv der Welt Yantra-Geometrie.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Diese Seite gehört zu Fassung 2.36. Die Bilder sind der Katalogrender in
+  620 Punkten, also die App selbst; die Zahlen sind an derselben Zeichnung
+  gemessen: Wand ab alpha > 60, Flaechen wie das Fuellwerkzeug sie sieht,
+  "ausmalbar" ab 80 Bildpunkten. Nachzurechnen mit tools/beruehrung.js
+  bzw. den Zahlen im Kopf von app.js.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 { font-size: 13px; margin: 2.8rem 0 .9rem; font-weight: 600;
+       text-transform: uppercase; letter-spacing: .06em; color: var(--quiet); }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+  code { font-size: .93em; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.4rem; font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand > b:first-of-type { display: block; margin-bottom: .3rem; }
+
+  .hero { background: var(--card); border-radius: 16px; padding: 16px; margin: 0 0 1.6rem; }
+  .hero img { display: block; width: 100%; max-width: 560px; height: auto;
+              margin: 0 auto; border-radius: 10px; }
+  .hero p { font-size: 14px; color: var(--quiet); margin: .8rem 0 0; text-align: center; }
+
+  .zwei { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin-bottom: 1.4rem; }
+  @media (max-width: 640px) { .zwei { grid-template-columns: 1fr; } }
+  .stueck { background: var(--card); border-radius: 16px; padding: 14px 16px 16px; }
+  .stueck img { width: 100%; height: auto; display: block; border-radius: 10px; }
+  .stueck h3 { font-size: 17px; margin: .7rem 0 .2rem; font-weight: 600; }
+  .stueck p { font-size: 14.5px; color: var(--quiet); margin: .4rem 0 0; }
+  .zahlen { font-size: 13px; color: var(--quiet); margin: 0;
+            font-variant-numeric: tabular-nums; }
+  .zahlen b { color: var(--ink); font-weight: 600; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px;
+          font-variant-numeric: tabular-nums; margin: 0 0 1rem; }
+  th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--edge); }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+       color: var(--quiet); font-weight: 600; }
+  .quelle { font-size: 14.5px; color: var(--quiet); }
+  .quelle li { margin-bottom: .5rem; }
+  .gut { box-shadow: inset 3px 0 0 var(--tut); }
+  .warn { box-shadow: inset 3px 0 0 var(--offen); }
+
+  footer { margin-top: 2.8rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Neun Dreiecke</h1>
+  <p class="lede">Das erste Motiv einer neuen Welt — und das erste, das nicht
+     ich entworfen habe, sondern eine Überlieferung.</p>
+
+  <div class="stand">
+    <b>Zurück zu den Vorbildern.</b>
+    Die Kritik war: „Wir hatten zu Anfang tolle esoterische und literarisch
+    wertvoll hinterlegte Ordnungen … bei den letzten bist du nicht
+    konzentriert und verschwendest deine Gedanken in Algorithmen, die keine
+    Kunst ergeben." Das trifft zu, und es lässt sich am Repository ablesen:
+    <b>Sechs recherchierte Motivfamilien liegen seit Monaten unter
+    <a href="neue-welten.html">Neue Motivfamilien</a> und sind nie gebaut
+    worden.</b> Gebaut wurde stattdessen Feinwerk — die eine Familie, bei
+    der es nie um Herkunft ging, sondern nur um Dichte. Das hier ist der
+    erste Schritt zurück.
+  </div>
+
+  <div class="hero">
+    <img src="yantra/motiv.png" alt="Mandala aus neun verschränkten Dreiecken, umgeben von einem Lotoskranz und einem Perlsaum" width="620" height="620">
+    <p>„Neun Dreiecke“, gezeichnet von der App selbst. 144 Felder, jedes
+       einzelne ausmalbar.</p>
+  </div>
+
+  <h2>Die Figur, und warum sie schwer ist</h2>
+
+  <p>Vier Dreiecke weisen nach oben, fünf nach unten. Sie durchdringen
+     einander — so weit ist das leicht. Die Bedingung, die diese Figur zu
+     einem der berühmteren Konstruktionsprobleme macht, ist eine andere:
+     <b>Es müssen sich jeweils drei Linien in einem Punkt treffen</b>, nicht
+     zwei und eine knapp daneben. Mit Zirkel und Lineal ist das nicht
+     lösbar; die Bedingungen bilden ein Gleichungssystem.</p>
+
+  <p>Genau daran ist auch zu erkennen, ob eine Zeichnung stimmt oder nur so
+     aussieht. In den meisten frei nachgezeichneten Fassungen tut sie es
+     nicht. Deshalb ist die Tafel im Kopf des Blocks eine <b>gelöste</b>
+     Fassung, und deshalb steht hier eine Messung statt einer Behauptung:</p>
+
+  <div class="zwei">
+    <div class="stueck gut">
+      <img src="yantra/kern.png" alt="Die neun Dreiecke allein, in ihrem Kreis" width="620" height="620">
+      <h3>Der nackte Kern</h3>
+      <p class="zahlen"><b>27</b> Dreiertreffpunkte · größte Streuung
+        <b>0,13</b> von 100 · auf diesem Blatt ein halber Bildpunkt</p>
+      <p>Die Ecken der beiden größten Dreiecke liegen auf dem Kreis — das
+         ist Bolton und Macleods zweite Bedingung, und sie stimmt auf drei
+         Nachkommastellen. Die Spitzen der übrigen Dreiecke liegen auf den
+         Grundlinien anderer; auch das ist keine Näherung, sondern exakt.</p>
+    </div>
+    <div class="stueck">
+      <img src="yantra/spitzenrad.png" alt="Spitzenrad, ein Motiv aus der Familie Feinwerk" width="620" height="620">
+      <h3>Zum Vergleich: Spitzenrad</h3>
+      <p class="zahlen">679 Felder · <b>449 ausmalbar</b> · Median 267 ·
+        größtes Feld 0,6 %</p>
+      <p>Das dichteste der elf Feinwerk-Motive. Es hat dreimal so viele
+         Felder — und jede seiner Linien war eine Entscheidung von mir.
+         Genau das ist der Unterschied, um den es geht.</p>
+    </div>
+  </div>
+
+  <h2>Was gemessen ist</h2>
+
+  <table>
+    <thead><tr><th>Motiv</th><th>Felder</th><th>ausmalbar</th>
+      <th>Median</th><th>größtes&nbsp;Feld</th></tr></thead>
+    <tbody>
+      <tr><td>Neun Dreiecke</td><td>144</td><td>144</td><td>2485</td><td>3,63 %</td></tr>
+      <tr><td>Spitzenrad (Feinwerk)</td><td>679</td><td>449</td><td>267</td><td>0,6 %</td></tr>
+      <tr><td>Kettenglied (Feinwerk)</td><td>396</td><td>251</td><td>156</td><td>2,4 %</td></tr>
+    </tbody>
+  </table>
+
+  <p>Die Zeile, auf die es ankommt, ist die dritte: <b>144 Felder, 144
+     ausmalbar.</b> Nicht ein einziger Splitter. Zum Vergleich lagen die
+     Mediane der elf Feinwerk-Motive zwischen 72 und 523 Bildpunkten — hier
+     sind es 2485, das Feld ist im Schnitt also fünf- bis dreißigmal so
+     groß. Weniger Felder, aber jedes eines, in das ein Stift passt.</p>
+
+  <p>Das größte Feld nimmt 3,63 % der Scheibe ein; erlaubt sind 4 %. Es sind
+     die vier Zwickel zwischen der Dreiecksfigur und ihrem Kreis. Sie liegen
+     innerhalb der Grenze, aber knapp — das ist die Stelle, an der ich
+     nachbessern würde, wenn diese Welt weitergeht.</p>
+
+  <h2>Was übernommen ist und was nicht</h2>
+
+  <p>Die Vorlage ist das <b>Sri Yantra</b>, im tantrischen Hinduismus ein
+     Andachtsdiagramm, kein freies Ornament. Übernommen ist die
+     <b>Ordnung</b>: neun verschränkte Dreiecke, ein Lotoskranz, die
+     Bewegung von außen nach innen. Nicht übernommen sind der Name im
+     Motivnamen, die Zuordnung zu einer Gottheit und die Deutung des
+     Mittelpunkts. Das ist dieselbe Regel wie bei den Anlagen, nachzulesen
+     in <a href="architektur.md">architektur.md §5</a>.</p>
+
+  <p>Zwei Bausteine der Vorlage fehlen, und zwar mit Grund:</p>
+
+  <ul class="quelle">
+    <li><b>Der achtblättrige Lotoskranz.</b> Er passt in den Ring zwischen
+      Kern und äußerem Kranz nur als gedrungene Form — die Blätter würden
+      breiter als hoch. Ein Ring statt zwei, dafür ein Kern, der zwei
+      Drittel des Radius einnimmt.</li>
+    <li><b>Der Torring mit den vier Toren.</b> Den gibt es in dieser App
+      schon: Er ist die Grundlage der acht <i>Anlagen</i>. Ein zweites Mal
+      wäre eine Dopplung, und Dopplungen waren ausdrücklich nicht
+      erwünscht.</li>
+  </ul>
+
+  <h2>Woher die Zahlen stammen</h2>
+
+  <ul class="quelle">
+    <li><b>Bolton &amp; Macleod, „The Geometry of the Śrī-Yantra“</b>,
+      Religion 7 (1977) — die Arbeit, die zeigt, dass die
+      Berührungsbedingungen die Figur bis auf wenige freie Größen
+      festlegen, und dass die Ecken der größten Dreiecke auf dem Kreis
+      liegen müssen.</li>
+    <li><b>A. V. Kulaichev</b> hat die Beziehungen ausgerechnet und
+      gezeigt, dass keine Zirkel-und-Lineal-Konstruktion existiert.</li>
+    <li><b>Gérard Huet, „Cartesian Śrī Yantra“</b>, Theoretical Computer
+      Science (2002) — ein ausdrückliches Verfahren; es gibt eine kleine
+      Schar gültiger Figuren, nicht eine einzige.</li>
+  </ul>
+
+  <h2>Was als Nächstes ansteht</h2>
+
+  <p>Nach der Absprache im Repository dürfen die beiden Apps nicht
+     auseinanderlaufen: <b>Was das Atelier bekommt, bekommt Blatt auch</b> —
+     in Blatts Grammatik übersetzt, nicht kopiert. Das ist der nächste
+     Schritt und ein eigener, denn Blatt würfelt seine Blätter, und eine
+     Figur, die nur in einer einzigen gelösten Fassung existiert, ist das
+     Gegenteil davon. Der Weg dahin führt über Huets Schar: nicht eine
+     Figur, sondern die Familie gültiger Figuren, aus der sich würfeln
+     lässt.</p>
+
+  <p>Und dann liegen noch fünf recherchierte Familien da: Mehndi, Chakren,
+     Palast-Mandala, Bauhaus, Origami. Diese hier war die erste.</p>
+
+  <footer>
+    <p>Fassung 2.36. Die Bilder sind der Katalogrender in 620 Punkten, also
+      die App selbst.
+      <a href="../beide.html">Zurück zur Übersicht</a> ·
+      <a href="neue-welten.html">Die recherchierten Familien</a> ·
+      <a href="durchsicht.html">Die elf Feinwerk-Motive</a></p>
+  </footer>
+
+</main>
+</body>
+</html>
