@@ -3918,8 +3918,9 @@ function bindEvents() {
 
     const motifButton = target.closest('.motif');
     if (motifButton) {
+      /* Offen lassen. Wer ein Motiv sucht, probiert mehrere - und die
+         Werkzeugschublade schließt sich beim Werkzeugwechsel auch nicht. */
       loadMotif(motifButton.dataset.motif);
-      setDrawer('library', false);
       return;
     }
 
