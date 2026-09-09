@@ -55,7 +55,11 @@ sich mit dem Finger erledigen lassen.
      Danach: **zweimal** öffnen — einmal holt, einmal zeigt.
 - **Keine religiösen Symbole ohne ausdrückliche Rücksprache in der Familie.**
   Übernommen wird die Ordnung eines Vorbilds, nicht seine Bedeutung. Siehe
-  [`docs/architektur.md`](docs/architektur.md) §5 — die Rücksprache steht aus.
+  [`docs/architektur.md`](docs/architektur.md) §5. **Die Rücksprache ist
+  geführt** (September 2026, wörtlich: „Das hat sich erledigt. Wir bauen, was
+  wir wollen."). Die zweite Hälfte der Regel bleibt trotzdem stehen und ist
+  die eigentliche: Ordnung ja, Bedeutung nein — kein Gottheitenbezug, keine
+  Mantras, keine Deutung, und der Name des Vorbilds nicht im Motivnamen.
 - **Alles offline.** Zur Laufzeit wird nichts von außen geholt; Schriften
   stecken als Daten-URI in `fonts.css`. Der Testlauf prüft das.
 - **Keine Gamification** — keine Sterne, keine Pokale, keine Streaks, keine

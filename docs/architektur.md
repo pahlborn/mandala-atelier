@@ -115,11 +115,17 @@ Schutzringe. Im Original sind das Flammen- und Leichenacker-Kränze; ihr Aussehe
 zu kopieren, führte geradewegs ins Okkult-Esoterische, das diese App nicht will.
 Der Schutzbereich ist hier gemauertes Ringwerk, mehr nicht.
 
-> **Offen und vor dem Ausliefern zu klären:** Das README des Ateliers verlangt
-> Rücksprache mit der Familie, bevor religiös aufgeladene Zeichen aufgenommen
-> werden. Ein Grundriss tibetischer Herkunft ist näher an dieser Grenze als
-> alles im bisherigen Katalog, auch ohne ein einziges religiöses Zeichen. Diese
-> Rücksprache steht aus.
+> **Geklärt, September 2026.** Das README des Ateliers verlangte Rücksprache
+> mit der Familie, bevor religiös aufgeladene Zeichen aufgenommen werden. Ein
+> Grundriss tibetischer Herkunft ist näher an dieser Grenze als alles im
+> bisherigen Katalog, auch ohne ein einziges religiöses Zeichen. Die
+> Rücksprache ist geführt; die Antwort war: „Das hat sich erledigt. Wir bauen,
+> was wir wollen."
+>
+> Damit fällt die Sperre, nicht die Regel. Was bleibt, ist die Fassung dieses
+> Abschnitts: übernommen wird die Ordnung, nicht die Bedeutung. Erstes Motiv
+> nach dieser Klärung ist „Neun Dreiecke" (Fassung 2.36), siehe
+> [`yantra.html`](yantra.html).
 
 ---
 
@@ -370,5 +376,4 @@ Apps teilen.
   vergrößert, sondern aufdeckt. Das kostet Auflösung (§1) und ist deshalb Kür,
   nicht Voraussetzung. Architektur will große, unterscheidbare Flächen, kein
   Mikrodetail.
-- **Die Rücksprache aus §5.**
 - **Test am echten iPad**, wie beim ganzen übrigen Atelier.
