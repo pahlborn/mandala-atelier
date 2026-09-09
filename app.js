@@ -3494,12 +3494,26 @@ function printSheet() {
 
   const person = currentPerson().name;
   const title = state.motif ? state.motif.name : T('Freies Blatt');
-  const frame = window.open('', '_blank');
-  if (!frame) {
-    say(T('Der Browser hat das Druckfenster blockiert.'));
-    return;
-  }
-  frame.document.write(
+
+  /* Gedruckt wird über einen versteckten Rahmen im eigenen Dokument.
+
+     Vorher stand hier window.open('', '_blank'), und genau daran scheiterte
+     der Druckbogen auf dem iPad: In einer zum Homescreen gelegten App gibt
+     es kein zweites Fenster. Der Aufruf liefert null - dann kam nur die
+     Meldung - oder einen Tab, in den sich nichts schreiben lässt. Ein
+     iframe im eigenen Dokument braucht keine Erlaubnis und funktioniert
+     in Safari, in der installierten App und am Rechner gleich. */
+  const alt = document.getElementById('druckrahmen');
+  if (alt) alt.remove();
+  const frame = document.createElement('iframe');
+  frame.id = 'druckrahmen';
+  frame.setAttribute('aria-hidden', 'true');
+  frame.style.cssText =
+    'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;';
+  document.body.appendChild(frame);
+  const blatt = frame.contentWindow.document;
+  blatt.open();
+  blatt.write(
     '<!doctype html><html lang="de"><head><meta charset="utf-8">' +
     '<title>' + title + '</title><style>' +
     '@page { size: A4 portrait; margin: 14mm; }' +
@@ -3518,9 +3532,27 @@ function printSheet() {
     '<p>Mandala Atelier</p>' +
     '</body></html>'
   );
-  frame.document.close();
-  frame.focus();
-  setTimeout(function () { frame.print(); }, 400);
+  blatt.close();
+
+  /* Erst drucken, wenn das Bild wirklich steht. Die alte Fassung wartete
+     400 Millisekunden auf gut Glück; bei einem großen Motiv war der
+     Bogen dann leer. */
+  function los() {
+    try {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    } catch (err) {
+      say(T('Der Druck ließ sich nicht öffnen.'));
+    }
+    setTimeout(function () { if (frame.parentNode) frame.remove(); }, 2000);
+  }
+  const bild = blatt.querySelector('img');
+  if (bild && !bild.complete) {
+    bild.addEventListener('load', los);
+    bild.addEventListener('error', los);
+  } else {
+    setTimeout(los, 60);
+  }
 }
 
 function escapeText(text) {
