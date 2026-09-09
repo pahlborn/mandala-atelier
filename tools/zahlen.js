@@ -43,6 +43,10 @@ const ZUSICHERUNGEN = [
   { was: 'Welten im Atelier',   muster: /([a-zäöü]+) (?:Motivwelten|Motivfamilien)\b/g,
                                 soll: z => z.welten, wort: true },
   { was: 'Bereichsnamen',       muster: /(\d+) Bereichsnamen/g,               soll: z => z.bereiche },
+  /* Wie groß Feinwerk ist, stand an zwei Stellen verschieden da: „Acht" in
+     beide.html, „Neun" in docs/feinwerk.html. Deshalb hier eine Zeile. */
+  { was: 'Motive in Feinwerk',  muster: /([A-Za-zäöü]+) stehen in Feinwerk/g, soll: z => z.feinwerk, wort: true },
+  { was: 'Motive in Feinwerk',  muster: /Atelier: (\d+) hier/g,               soll: z => z.feinwerk },
   /* Beide Apps haben fünf Pigmentwelten zu je zehn - die Zahl gilt für
      jede von beiden, deshalb genügt ein Satz. */
   { was: 'Pigmente',            muster: /(\d+) Pigmente/g,                    soll: z => z.pigmente },
@@ -87,6 +91,7 @@ async function zaehle() {
       welten: A.WORLDS.length,
       jeWelt: A.WORLDS.map(w => w.title + ' ' + A.MOTIFS.filter(m => m.world === w.id).length),
       bereiche: new Set(namen).size,
+      feinwerk: A.MOTIFS.filter(m => m.world === 'feinwerk').length,
       farbwelten: fertige.length,
       pigmente: fertige.reduce((s, w) => s + w.colors.length, 0),
       fassung: A.FASSUNG
@@ -119,6 +124,7 @@ function pad(text, breite) {
   console.log('    ' + z.motive + ' Motive in ' + z.welten + ' Welten');
   z.jeWelt.forEach(w => console.log('      ' + w));
   console.log('    ' + z.bereiche + ' verschiedene Bereichsnamen der Anlagen');
+  console.log('    ' + z.feinwerk + ' Motive in der Familie Feinwerk');
   console.log('    ' + z.farbwelten + ' Farbwelten, zusammen ' + z.pigmente + ' Pigmente');
   console.log('  Mandala – Das ruhige Blatt ' + z.blattFassung);
   console.log('    ' + z.stimmungen + ' Stimmungen: ' + z.stimmungsnamen.join(', '));
