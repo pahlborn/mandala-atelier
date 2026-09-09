@@ -1072,7 +1072,11 @@ async function run() {
   console.log('\nKatalog: ' + (fehlend.length
     ? 'FEHLT für ' + fehlend.join(', ') + ' — bitte `npm run katalog`'
     : 'alle ' + ids.length + ' Vorlagen abgebildet'));
-  if (fehlend.length) broken.push('Katalog unvollständig');
+  /* Nicht gleich broken.push: Die Liste wird erst weiter unten angelegt.
+     Vorher stand hier genau das, und der Lauf brach mit "Cannot access
+     'broken' before initialization" ab - ausgerechnet in dem einen Fall,
+     für den die Zeile gedacht war. */
+  const katalogFehlt = fehlend.length > 0;
 
   /* ---- Farbabstände in den Welten --------------------------------------
      Zwei Töne, die man beim Malen nicht auseinanderhalten kann, sind kein
@@ -1225,6 +1229,7 @@ async function run() {
   if (!atelierOk) broken.push('Atelier');
   if (!zoomOk) broken.push('Vergrößern');
   if (!startOk) broken.push('Vorbelegung');
+  if (katalogFehlt) broken.push('Katalog unvollständig');
   broken.push.apply(broken, taskProblems);
   if (!shapeOk) broken.push('Grundformen');
   if (!typeOk) broken.push('Schriften');
