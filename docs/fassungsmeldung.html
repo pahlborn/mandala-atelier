@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Fassungsmeldung — der Plan für alle drei Apps</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Wie die Apps künftig melden, dass es eine neue Fassung gibt. Die Offline-Regel wird dafür geändert — eng, nachprüfbar, und mit einer Sonderregel fürs Regal.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  VORSCHLAG. Nichts davon ist gebaut. Diese Seite ist der Plan, nicht der
+  Stand. Sie gilt fuer drei Apps in zwei Repositories: Mandala Atelier und
+  Blatt (mandala-atelier) sowie Malstudio (malstudio).
+-->
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{--room:#efe9dd;--card:#f8f4ea;--ink:#2f2a22;--quiet:#6d6355;
+        --edge:rgba(60,48,32,.16);--tut:#2f6b45;--offen:#a9700a;--stop:#9a3b2f}
+  @media (prefers-color-scheme:dark){
+    :root{--room:#16151a;--card:#201f25;--ink:#e8e2d6;--quiet:#9a9287;
+          --edge:rgba(0,0,0,.5);--tut:#6fbf8e;--offen:#e0a93c;--stop:#e08573}}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;padding:clamp(20px,5vw,48px) clamp(16px,4vw,36px)
+       calc(clamp(20px,5vw,48px) + env(safe-area-inset-bottom));
+       background:var(--room);color:var(--ink);
+       font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  main{max-width:900px;margin:0 auto}
+  h1{font-size:clamp(24px,5vw,32px);margin:0 0 .3rem;font-weight:600}
+  .lede{color:var(--quiet);margin:0 0 1.6rem}
+  h2{font-size:13px;margin:2.8rem 0 .9rem;font-weight:600;text-transform:uppercase;
+     letter-spacing:.06em;color:var(--quiet)}
+  h3{font-size:18px;margin:1.6rem 0 .4rem;font-weight:600}
+  p{margin:0 0 1rem}
+  a{color:inherit}
+  code{font-size:.92em;background:rgba(60,48,32,.07);padding:1px 5px;border-radius:4px}
+  @media (prefers-color-scheme:dark){code{background:rgba(255,255,255,.07)}}
+  pre{background:var(--card);border:1px solid var(--edge);border-radius:12px;
+      padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.5;margin:0 0 1.2rem}
+  pre code{background:none;padding:0}
+  ul,ol{margin:0 0 1rem;padding-left:1.35rem}
+  li{margin-bottom:.45rem}
+
+  .kasten{background:var(--card);border:1px solid var(--edge);border-radius:14px;
+          padding:16px 20px;margin:0 0 1.4rem}
+  .kasten>b:first-child{display:block;margin-bottom:.35rem}
+  .warn{background:rgba(169,112,10,.12);border-color:rgba(169,112,10,.35)}
+  @media (prefers-color-scheme:dark){.warn{background:rgba(224,169,60,.12);border-color:rgba(224,169,60,.3)}}
+  .stopp{background:rgba(154,59,47,.1);border-color:rgba(154,59,47,.32)}
+  @media (prefers-color-scheme:dark){.stopp{background:rgba(224,133,115,.1);border-color:rgba(224,133,115,.28)}}
+
+  .gegen{display:grid;gap:14px;grid-template-columns:1fr 1fr;margin:0 0 1.4rem}
+  @media (max-width:640px){.gegen{grid-template-columns:1fr}}
+  .gegen>div{background:var(--card);border-radius:14px;padding:14px 18px}
+  .gegen h4{margin:0 0 .5rem;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+            color:var(--quiet);font-weight:600}
+  .alt{box-shadow:inset 3px 0 0 var(--stop)}
+  .neu{box-shadow:inset 3px 0 0 var(--tut)}
+
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:0 0 1.2rem}
+  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--edge);vertical-align:top}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--quiet);font-weight:600}
+  td.ja{color:var(--tut);font-weight:600}
+  td.nein{color:var(--stop);font-weight:600}
+
+  .phase{background:var(--card);border-radius:14px;padding:16px 20px;margin:0 0 12px;
+         box-shadow:inset 3px 0 0 var(--quiet)}
+  .phase h3{margin:0 0 .3rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .nr{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+      color:var(--room);background:var(--ink);padding:2px 9px;border-radius:999px}
+  .phase p{font-size:15px;margin:0 0 .6rem}
+  .mess{font-size:14px;color:var(--quiet);border-top:1px solid var(--edge);padding-top:.6rem;margin:0}
+  .mess b{color:var(--ink)}
+  .phase.jetzt{box-shadow:inset 3px 0 0 var(--tut)}
+  .phase.spaeter{opacity:.86}
+
+  footer{margin-top:2.8rem;font-size:13.5px;color:var(--quiet);border-top:1px solid var(--edge);padding-top:1.2rem}
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Fassungsmeldung</h1>
+  <p class="lede">Wie die Apps künftig melden, dass es eine neue Fassung gibt —
+     und warum dafür die Offline-Regel geändert wird. Ein Plan für drei Apps,
+     nichts davon ist gebaut.</p>
+
+  <div class="kasten warn">
+    <b>Stand: Vorschlag.</b>
+    Diese Seite ist der Plan, nicht der Stand. Sie betrifft <b>Mandala
+    Atelier</b>, <b>Blatt</b> und <b>Malstudio</b>. Die Regeländerung in
+    Abschnitt 1 ist die Voraussetzung für alles Übrige; ohne sie bricht
+    schon der Testlauf.
+  </div>
+
+  <h2>1 · Die Regel, die sich ändert</h2>
+
+  <p>Heute steht in beiden <code>CLAUDE.md</code> sinngemäß dasselbe, und es
+     ist nicht bloß ein Satz: Der Testlauf zählt jeden Abruf mit und schlägt
+     bei jedem an, der nicht <code>file:</code> oder <code>data:</code> ist
+     (<code>tools/test-app.js</code>, Zeile 48–51). Die Regel ist also in
+     Code gegossen, nicht nur aufgeschrieben. Genau so soll sie bleiben —
+     nur mit einer benannten Ausnahme statt einer Null.</p>
+
+  <div class="gegen">
+    <div class="alt">
+      <h4>Bisher</h4>
+      <p><b>Alles offline.</b> Zur Laufzeit wird nichts von außen geholt;
+         Schriften stecken als Daten-URI in <code>fonts.css</code>. Der
+         Testlauf prüft das.</p>
+    </div>
+    <div class="neu">
+      <h4>Vorschlag</h4>
+      <p><b>Alles offline bis auf eines.</b> Zur Laufzeit wird genau eine
+         Sache von außen geholt: die eigene Fassungsnummer, von derselben
+         Adresse, von der die App stammt. <b>Gesendet wird nichts</b> — keine
+         Namen, keine Bilder, keine Kennung, keine Cookies. Der Testlauf
+         zählt weiter mit und lässt genau diesen einen Abruf durch; jeder
+         weitere ist ein Befund.</p>
+    </div>
+  </div>
+
+  <p><b>Warum das gerechtfertigt ist.</b> Der Anlass ist kein Wunsch, sondern
+     ein Messwert, der schon in <code>CLAUDE.md</code> steht: Ein Gerät, auf
+     dem die App eingerichtet ist, fragt <code>sw.js</code> über fünf
+     Öffnungen <b>null Mal</b> ab. Eine neue Fassung erreicht ein iPad damit
+     im Zweifel nie. Der heutige Ausweg ist eine Anweisung an einen Menschen
+     — App wirklich beenden, hochwischen, zweimal öffnen —, und der taugt
+     nicht für Kinder und nicht für andere Familien.</p>
+
+  <h2>2 · Was hinausgeht und was nicht</h2>
+
+  <p>Das ist die ehrliche Abrechnung. Sie gehört in die Datenschutzseiten
+     aller drei Apps, wenn das hier gebaut wird.</p>
+
+  <table>
+    <thead><tr><th>Was</th><th>Geht hinaus?</th><th>Anmerkung</th></tr></thead>
+    <tbody>
+      <tr><td>IP-Adresse des Geräts</td><td class="nein">ja</td>
+          <td>Unvermeidlich bei jedem Abruf. Landet im Protokoll des Hosters
+              (GitHub Pages bzw. Netlify), nicht bei uns.</td></tr>
+      <tr><td>Zeitpunkt des Starts</td><td class="nein">ja</td>
+          <td>Indirekt: Wer abruft, hat die App geöffnet. Durch die Sperre
+              (höchstens einmal je sechs Stunden) grob, nicht genau.</td></tr>
+      <tr><td>Name des Kindes</td><td class="ja">nein</td><td>Verlässt das Gerät nie.</td></tr>
+      <tr><td>Gemalte Bilder</td><td class="ja">nein</td><td>Verlassen das Gerät nie.</td></tr>
+      <tr><td>Profile, Sticker, Fortschritt</td><td class="ja">nein</td><td>Verlassen das Gerät nie.</td></tr>
+      <tr><td>Fundort der Schatzsuche</td><td class="ja">nein</td><td>Bleibt lokal; die Karten-Verbindung bleibt wie sie ist.</td></tr>
+      <tr><td>Eine Kennung des Geräts</td><td class="ja">nein</td>
+          <td>Wird nicht erzeugt und nicht mitgeschickt. Kein Cookie, keine
+              Kennung im Adresszusatz außer einem Zeitstempel gegen den Cache.</td></tr>
+      <tr><td>Welche Fassung läuft</td><td class="ja">nein</td>
+          <td>Der Vergleich geschieht <b>im Gerät</b>. Der Server erfährt
+              nicht, welche Fassung fragt — er liefert nur eine Datei aus.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="kasten stopp">
+    <b>Was ausdrücklich nicht kommt.</b>
+    Keine Analytics, keine Zählung von Anwendern, keine Fehlermeldungen nach
+    Hause, kein „Wie gefällt dir die App", kein Zwang. Die Fassungsmeldung
+    ist ein Abruf, kein Kanal. Wer sie zu einem Kanal ausbaut, bricht die
+    Regel erneut — dann bitte wieder mit Rücksprache.
+  </div>
+
+  <h2>3 · Der Mechanismus</h2>
+
+  <p>Eine Datei je App, an fester Adresse, erzeugt vom selben Werkzeug, das
+     die Fassungsnummer erhöht. Kein Server, keine Schnittstelle, kein
+     Dienst — GitHub Pages und Netlify liefern eine Datei aus, mehr braucht
+     es nicht.</p>
+
+  <pre><code>fassung.json
+{
+  "fassung": "2.37",
+  "seit":    "2026-10-04",
+  "was":     "Neun Dreiecke, eine neue Motivfamilie",
+  "art":     "normal"
+}</code></pre>
+
+  <p>Der Ablauf in der App, in dieser Reihenfolge:</p>
+
+  <ol>
+    <li>Beim Start nachsehen, wann zuletzt gefragt wurde. Ist das weniger als
+      sechs Stunden her: nichts tun, gar nichts.</li>
+    <li>Sonst <code>fassung.json</code> holen, mit
+      <code>cache: 'no-store'</code> und einem Zeitstempel im Adresszusatz —
+      sonst liefert der HTTP-Vorrat zehn Minuten lang die alte Datei zurück,
+      derselbe Fallstrick wie beim Service Worker.</li>
+    <li>Scheitert der Abruf — kein Netz, Flugzeug, Strand —: <b>stillschweigend
+      nichts tun.</b> Keine Meldung, kein Symbol, kein Hinweis. Ein Kind darf
+      nie merken, dass etwas nicht ging.</li>
+    <li>Ist die gemeldete Nummer neuer als die eigene: ein ruhiges Band
+      einblenden. „Fassung 2.37 ist da — Neun Dreiecke. <b>Jetzt laden</b>".
+      Wegtippbar, und bis zur nächsten neuen Nummer nicht wieder zu sehen.</li>
+    <li>Erst auf Tippen: den eigenen Vorrat leeren, den Worker auffrischen,
+      neu laden.</li>
+  </ol>
+
+  <h3>Vier Grundsätze</h3>
+
+  <ul>
+    <li><b>Nie automatisch.</b> Die App aktualisiert sich nicht von selbst.
+      Es braucht immer einen Fingertipp. Das ist nicht nur Höflichkeit — es
+      ist die Bedingung dafür, dass ein Vergleich vorher/nachher überhaupt
+      möglich bleibt (Abschnitt 4).</li>
+    <li><b>Nie blockierend.</b> Kein Vollbild, kein „Du musst erst
+      aktualisieren". Das Kind malt weiter. Was Google Play <i>immediate
+      update</i> nennt, kommt hier nicht vor.</li>
+    <li><b>Nie laut.</b> Ein schmales Band im Hausstil, kein Ausrufezeichen,
+      keine Zahl am Symbol, kein Ton. Keine Gamification, auch nicht hier.</li>
+    <li><b>Abschaltbar für Werkzeuge.</b> Zehn Werkzeuge treiben die Apps im
+      Browser — Katalog, Zahlen, sämtliche Testläufe. Ein Band würde in jedes
+      Bild geraten. Also <code>?fassung=aus</code>, und die Werkzeuge hängen
+      es an.</li>
+  </ul>
+
+  <h3>Beim Leeren des Vorrats: nur den eigenen</h3>
+
+  <div class="kasten stopp">
+    <b>Der Fehler, der hier lauert, ist schon zweimal gefunden worden.</b>
+    Malstudios <code>sw.js</code> löscht in seinem <code>activate</code>
+    <b>jeden</b> fremden Vorrat (<code>keys.filter(k =&gt; k !== CACHE)</code>).
+    Wer den Knopf „Jetzt laden" genauso baut, löscht beim Auffrischen einer
+    App den Offline-Vorrat der anderen — Atelier und Blatt liegen unter
+    derselben Adresse. Der Knopf muss <b>nach Vorsilbe</b> löschen
+    (<code>mandala-atelier-</code>, <code>atelier3-</code>,
+    <code>malstudio-</code>) und nichts sonst. Das gehört in den Testlauf.
+  </div>
+
+  <h2>4 · Der Sonderfall: vorher und nachher vergleichen</h2>
+
+  <p>Das Regal unter <code>v/</code> gibt es, damit sich zwei Fassungen
+     nebeneinander ansehen lassen. Die Fassungsmeldung stört das an drei
+     Stellen, und zwei davon sind gefährlich, nicht bloß lästig.</p>
+
+  <h3>Drei Probleme</h3>
+
+  <ol>
+    <li><b>Eine Regalfassung würde nörgeln.</b> <code>v/2.30/</code> ist mit
+      Absicht alt. Ein Band „Fassung 2.37 ist da" ist dort sinnlos und
+      verwirrend.</li>
+    <li><b>Eine Regalfassung würde fremden Vorrat löschen.</b> Tippt jemand
+      dort auf „Jetzt laden", leert der Knopf den Vorrat der laufenden App —
+      dieselbe Adresse, dieselben Vorratsnamen. Das ist dieselbe Klasse von
+      Schaden wie der Service Worker im Regal.</li>
+    <li><b>Ein laufender Vergleich würde verrutschen.</b> Wer 2.30 gegen 2.36
+      hält und die laufende App springt dabei auf 2.37, vergleicht am Ende
+      etwas anderes als gedacht.</li>
+  </ol>
+
+  <h3>Drei Regeln</h3>
+
+  <ul>
+    <li><b>Das Einfrieren schneidet die Fassungsmeldung heraus.</b> Sie wird
+      die <b>dritte</b> unverhandelbare Sache am Regal, neben „kein Service
+      Worker" und „eigener Speicher". <code>tools/einfrieren.js</code>
+      bekommt einen dritten Handgriff, <code>test:regal</code> einen
+      fünften Haken — und beide werden wie die anderen durch Sabotage
+      nachgewiesen.</li>
+    <li><b>Verglichen wird Regal gegen Regal, nicht Regal gegen laufend.</b>
+      Zwei feste Stände, keiner davon beweglich. Das ist ohnehin die
+      sauberere Methode und war schon vor diesem Plan richtig.</li>
+    <li><b>Nie automatisch</b> aus Abschnitt 3 ist zugleich die Versicherung:
+      Selbst wenn die laufende App im Vergleich steckt, springt sie nicht von
+      allein. Ohne Fingertipp passiert nichts.</li>
+  </ul>
+
+  <div class="kasten">
+    <b>Dazu, optional:</b> eine Seite <code>docs/gegenueber.html</code>, die
+    zwei Regalfassungen nebeneinander stellt — zwei Auswahllisten, zwei
+    Rahmen, dasselbe Motiv in beiden. Weil jede Regalfassung ihren eigenen
+    gestempelten Speicher hat, stören sie einander dabei nicht. Nützlich,
+    aber nicht Voraussetzung; deshalb steht es am Ende des Fahrplans.
+  </div>
+
+  <h2>5 · Ein Grundgerüst für alle drei</h2>
+
+  <p>Die Meldung soll in jeder App gleich funktionieren, sonst driftet sie
+     auseinander wie damals die Zahlen. Drei Repositories, kein Bauschritt,
+     keine Pakete — also derselbe Weg wie bei <code>npm run zahlen</code>:</p>
+
+  <ul>
+    <li>Eine Datei <code>fassung.js</code>, rund sechzig Zeilen, ohne
+      Abhängigkeiten, in jeder App dieselbe.</li>
+    <li>Ein Werkzeug kopiert sie aus der einen maßgeblichen Fassung in die
+      anderen Apps.</li>
+    <li>Ein Prüflauf vergleicht die Kopien Byte für Byte mit dem Original.
+      Ohne Paketverwaltung ist das die einzige Art, drei Kopien am
+      Auseinanderlaufen zu hindern.</li>
+  </ul>
+
+  <p>Nebenbei fällt dabei etwas auf, das ohnehin aufgeräumt gehört: Die drei
+     Apps zählen in drei Formaten — <code>2.36</code>, <code>3.22</code>,
+     <code>v7-52</code>. Die Meldung muss vergleichen können, also braucht
+     es eine Vergleichsregel, die alle drei verträgt. Umbenennen wäre
+     falsch: Die Nummern stehen in den Vorratsnamen, in den Regalfächern und
+     in eingefrorenen Seiten. Die Regel richtet sich also nach den Nummern,
+     nicht umgekehrt.</p>
+
+  <h2>6 · Wenn es doch in die Stores geht</h2>
+
+  <p>Dann gilt für dieselbe Datei ein anderer Knopf, sonst nichts:</p>
+
+  <ul>
+    <li><b>Android.</b> Google Play hat eine richtige Schnittstelle dafür,
+      <i>In-App Updates</i>, mit Priorität 0–5 und
+      <code>clientVersionStalenessDays</code>. Dann braucht es
+      <code>fassung.json</code> dort gar nicht mehr — die Plattform macht es
+      besser. Nur die sanfte Form (<i>flexible</i>), nie die erzwungene.</li>
+    <li><b>Apple.</b> Es ist nicht erlaubt, eine App-Store-App aus sich
+      selbst heraus zu aktualisieren, und es gibt keine Schnittstelle. Also
+      dieselbe Prüfung wie im Web, aber der Knopf führt in den App Store
+      statt neu zu laden.</li>
+  </ul>
+
+  <h2>7 · Der Fahrplan</h2>
+
+  <p>Nach der Hausregel: eine Änderung je Fassung, mit Messwert. Die
+     Reihenfolge ist nicht beliebig — Phase 4 muss stehen, bevor die erste
+     Fassung mit Meldung eingefroren wird.</p>
+
+  <div class="phase">
+    <h3><span class="nr">Phase 0</span> Entscheidungen</h3>
+    <p>Die Regeländerung wörtlich in beide <code>CLAUDE.md</code>, die
+      Abrechnung aus Abschnitt 2 in die drei Datenschutzseiten. Kein Code.
+      Dazu die feste Adresse für Malstudio klären — heute steht dort
+      „GitHub Pages <i>oder</i> Netlify Drop", und die Meldung braucht eine
+      Adresse, die sich nicht ändert.</p>
+    <p class="mess"><b>Messwert:</b> keiner. Das ist eine Absprache, kein Bau.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="nr">Phase 1</span> Die Fassungsdatei</h3>
+    <p><code>fassung.json</code> wird in jedem Repository erzeugt, aus den
+      Nummern, die ohnehin schon dastehen. Noch ruft sie niemand ab. Risiko
+      null.</p>
+    <p class="mess"><b>Messwert:</b> Die Datei stimmt mit
+      <code>sw.js</code> und der Fassungskonstante überein; die Werkzeuge
+      brechen ab, wenn nicht.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="nr">Phase 2</span> Der Testlauf lernt die Ausnahme</h3>
+    <p>Aus „null Abrufe nach außen" wird „genau dieser eine, und nichts
+      sonst". Die Regel bleibt scharf, sie bekommt nur eine benannte Lücke.</p>
+    <p class="mess"><b>Messwert:</b> durch Sabotage nachgewiesen — ein
+      zweiter Abruf, egal wohin, muss den Lauf rot machen. Wie beim Regal:
+      Ein Prüflauf, der nie anschlägt, ist wertlos.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="nr">Phase 3</span> Das Modul, in einer App</h3>
+    <p><code>fassung.js</code> entsteht und wandert zuerst in <b>Blatt</b> —
+      die kleinste der drei, und die, an der am wenigsten hängt.</p>
+    <p class="mess"><b>Messwert:</b> Mit vorgetäuschter neuerer Nummer
+      erscheint das Band; ohne Netz passiert nichts und es erscheint kein
+      Fehler; nach dem Tippen trägt der Browser den neuen Vorratsnamen und
+      den alten nicht mehr. Und: die Vorräte der beiden anderen Apps sind
+      danach unverändert da.</p>
+  </div>
+
+  <div class="phase jetzt">
+    <h3><span class="nr">Phase 4</span> Das Regal absichern</h3>
+    <p>Das Einfrieren schneidet die Meldung heraus,
+      <code>test:regal</code> bekommt den fünften Haken. <b>Gehört in
+      dieselbe Fassung wie Phase 3</b> — es darf keine eingefrorene Fassung
+      geben, die den Abruf noch trägt.</p>
+    <p class="mess"><b>Messwert:</b> durch Sabotage — eine Regalfassung mit
+      wieder eingesetzter Meldung muss den Lauf rot machen.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="nr">Phase 5</span> Die beiden anderen Apps</h3>
+    <p>Atelier, dann Malstudio. Je eine eigene Fassung, je ein eigener
+      Messwert. Dazu der Byte-Vergleich der drei Kopien aus Abschnitt 5.</p>
+    <p class="mess"><b>Messwert:</b> Die drei <code>fassung.js</code> sind
+      identisch; in jeder App erscheint das Band bei vorgetäuschter Nummer
+      und sonst nie.</p>
+  </div>
+
+  <div class="phase spaeter">
+    <h3><span class="nr">Phase 6</span> Gegenüberstellung</h3>
+    <p>Die Seite aus Abschnitt 4: zwei Regalfassungen nebeneinander. Nützlich
+      fürs Vergleichen, aber keine Voraussetzung.</p>
+    <p class="mess"><b>Messwert:</b> Beide Rahmen laufen, jeder mit seinem
+      eigenen gestempelten Speicher, und keiner schreibt in den anderen.</p>
+  </div>
+
+  <div class="phase spaeter">
+    <h3><span class="nr">Phase 7</span> Store-Varianten</h3>
+    <p>Erst, wenn eine der Apps wirklich in einen Store geht. Vorher ist es
+      Arbeit auf Vorrat.</p>
+    <p class="mess"><b>Messwert:</b> steht dann an.</p>
+  </div>
+
+  <h2>8 · Was ich von Ihnen brauche</h2>
+
+  <ol>
+    <li><b>Ist der Tausch aus Abschnitt 2 in Ordnung?</b> Die Apps rufen
+      künftig höchstens alle sechs Stunden zu Hause an. Nichts wird
+      gesendet, aber die IP-Adresse und der ungefähre Zeitpunkt stehen im
+      Protokoll des Hosters. Bei einer Kinder-App ohne Konten ist das die
+      einzige Stelle, an der überhaupt etwas nach außen geht.</li>
+    <li><b>Eine feste Adresse für Malstudio.</b> GitHub Pages oder Netlify —
+      aber eine, und dauerhaft.</li>
+    <li><b>Band oder Zahnrad?</b> Mein Vorschlag ist das ruhige Band mit
+      einem Tipp. Die Alternative wäre, gar nichts einzublenden und den
+      Hinweis nur im Zahnrad zu zeigen — noch leiser, aber dann sieht ihn
+      praktisch niemand.</li>
+  </ol>
+
+  <footer>
+    <p>Vorschlag, nicht Fassung. Nichts hiervon ist gebaut.
+      <a href="../beide.html">Zurück zur Übersicht</a> ·
+      <a href="offen.html">Offene Punkte</a> ·
+      <a href="fassungen.html">Das Regal</a></p>
+  </footer>
+
+</main>
+</body>
+</html>
