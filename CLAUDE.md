@@ -60,8 +60,18 @@ sich mit dem Finger erledigen lassen.
   wir wollen."). Die zweite Hälfte der Regel bleibt trotzdem stehen und ist
   die eigentliche: Ordnung ja, Bedeutung nein — kein Gottheitenbezug, keine
   Mantras, keine Deutung, und der Name des Vorbilds nicht im Motivnamen.
-- **Alles offline.** Zur Laufzeit wird nichts von außen geholt; Schriften
-  stecken als Daten-URI in `fonts.css`. Der Testlauf prüft das.
+- **Alles offline — und ab Werk bleibt es dabei.** Zur Laufzeit wird nichts
+  von außen geholt; Schriften stecken als Daten-URI in `fonts.css`. Der
+  Testlauf prüft das.
+  **Eine einzige Ausnahme, und sie ist abgeschaltet, bis der Anwender sie
+  selbst einschaltet:** die Fassungsmeldung (Blatt ab 3.23, Schalter im
+  Fach). Sie holt `fassung.json` von derselben Adresse, von der die App
+  stammt, und **sendet nichts** — keine Kennung, keinen Namen, kein Blatt,
+  kein Cookie; verglichen wird im Gerät. `npm run test:fassung` misst nach,
+  dass ohne Zutun des Anwenders kein Abruf hinausgeht. Wer daraus mehr macht
+  — Zählung, Analytics, Fehlermeldungen nach Hause —, bricht die Regel neu
+  und braucht wieder Rücksprache. Der Plan dazu:
+  [`docs/fassungsmeldung.html`](docs/fassungsmeldung.html).
 - **Keine Gamification** — keine Sterne, keine Pokale, keine Streaks, keine
   Prozentanzeige. Wer hier malt, will abschalten.
 - **Deutsche Oberfläche**, ruhiger Ton, gedeckte Farben.
@@ -101,6 +111,10 @@ und `npm run test:nebeneinander` prüft, dass beide Stellen übereinstimmen.
 5. `npm run zahlen` — zählt nach und meldet jede Seite, auf der eine Zahl
    nicht mehr stimmt.
 6. Testläufe, dann committen und pushen.
+7. **Danach** `npm run fassung-datei` und ein zweiter kleiner Commit. Der
+   Satz in `fassung.json` kommt aus dem Commit, der die Nummer eingeführt
+   hat — den gibt es vor Schritt 6 noch nicht. Zwei Commits sind hier
+   richtig, nicht unordentlich.
 
 Eingefrorene Fassungen bleiben **für immer** erreichbar. Damit ist „zurück auf
 3.7" ein Link statt eines Auftrags. Zwei Dinge daran sind nicht verhandelbar,
@@ -110,6 +124,10 @@ sonst richtet das Regal Schaden an:
   bzw. `mandala-atelier-` anfängt — also den Offline-Vorrat der laufenden App.
 - **Eigener Speicher.** Sonst überschriebe eine alte Fassung das laufende
   Blatt und schöbe ihm einen fremden Grundriss unter.
+- **Keine Fassungsmeldung.** Eine Regalfassung ist mit Absicht alt und darf
+  nicht nach neueren sehen. Vor allem aber räumt ihr Knopf „Jetzt laden" den
+  Vorrat — aus dem Regal heraus träfe das den Vorrat der **laufenden** App,
+  dieselbe Adresse, dieselben Vorratsnamen.
 
 `tools/einfrieren.js` erledigt beides; `npm run test:regal` prüft es im echten
 Browser.
@@ -127,6 +145,7 @@ Was sich nicht messen lässt, gehört in einen eigenen Commit.
     npm run test:druck        die Prüfseite docs/druck.html (Sekunden)
     npm run test:regal        das Fassungsregal unter v/ (Sekunden)
     npm run zahlen            Zahlen in App und Seiten (Sekunden)
+    npm run test:fassung      die Fassungsmeldung (Sekunden)
 
 Sie laufen gegen einen echten Browser. Die ersten drei dauern je ein paar
 Minuten und gehören vor jeden Push; die letzten beiden sind in Sekunden durch

@@ -10,7 +10,7 @@
     "test:nebeneinander": "node tools/test-nebeneinander.js",
     "test:druck": "node tools/test-druck.js",
     "test:regal": "node tools/test-regal.js",
-    "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js && node tools/test-druck.js && node tools/test-regal.js",
+    "test:alle": "node tools/test-app.js && node tools/test-atelier3.js && node tools/test-nebeneinander.js && node tools/test-druck.js && node tools/test-regal.js && node tools/test-fassungsmeldung.js",
     "icons": "node tools/gen-icons.js",
     "icons:atelier3": "node tools/gen-atelier3-icons.js",
     "mac": "node tools/mac-pruefen.js",
@@ -19,7 +19,9 @@
     "einfrieren": "node tools/einfrieren.js",
     "fassungen": "node tools/gen-fassungen.js",
     "katalog": "node tools/gen-katalog.js",
-    "zahlen": "node tools/zahlen.js"
+    "zahlen": "node tools/zahlen.js",
+    "fassung-datei": "node tools/fassung-datei.js",
+    "test:fassung": "node tools/test-fassungsmeldung.js"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0"

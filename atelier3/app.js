@@ -50,7 +50,7 @@
    Sie steht sichtbar im Fach, und das ist kein Schmuck: Als es darum ging,
    ein Bildschirmfoto einzuordnen, mussten Pigmentstifte gezählt werden, weil
    nirgends stand, welche Fassung läuft. */
-const FASSUNG = '3.22';
+const FASSUNG = '3.23';
 
 const SIZE   = 1280;                 // innere Kantenlänge des Blattes
 const HALF   = SIZE / 2;
@@ -3580,6 +3580,7 @@ function cacheUi() {
   ui.trayNew     = document.getElementById('tray-new');
   ui.trayStack   = document.getElementById('tray-stack');
   ui.traySound   = document.getElementById('tray-sound');
+  ui.trayFassung = document.getElementById('tray-fassung');
   ui.trayLang    = document.getElementById('tray-lang');
   ui.trayNote    = document.getElementById('tray-note');
   ui.fassung     = document.getElementById('fassung');
@@ -3647,6 +3648,14 @@ function bindUi() {
     try { localStorage.setItem('atelier3-ton', Klang.muted ? 'aus' : 'an'); } catch (err) {}
     syncSoundLabel();
   });
+  /* Der Schalter für die Fassungsmeldung. Ab Werk aus; wer ihn anschaltet,
+     hat es selbst entschieden, und wer ihn wieder ausschaltet, bei dem geht
+     ab sofort wieder nichts hinaus. */
+  ui.trayFassung.addEventListener('click', function () {
+    FASSUNGSMELDUNG.schalten(!FASSUNGSMELDUNG.erlaubt());
+    syncSoundLabel();
+  });
+
 
   /* Der Knopf trägt immer den Namen der *anderen* Sprache – so muss niemand
      raten, was ein Druck bewirkt. */
@@ -3705,6 +3714,10 @@ function showHint(text, hold) {
 
 function syncSoundLabel() {
   ui.traySound.textContent = Klang.muted ? T('Ton an') : T('Ton aus');
+  if (ui.trayFassung) {
+    ui.trayFassung.textContent = FASSUNGSMELDUNG.erlaubt()
+      ? T('Nach Fassungen sehen: an') : T('Nach Fassungen sehen: aus');
+  }
 }
 
 async function start() {
@@ -3733,6 +3746,11 @@ async function start() {
      welcher Griff. Ohne Abweichung steht nur die Nummer da. */
   ui.fassung.textContent = T('Blatt') + ' ' + FASSUNG +
     (griff === GRIFF_VOREINSTELLUNG ? '' : ' · ' + griff);
+
+  /* Nachsehen, ob es eine neuere Fassung gibt - nur wenn der Anwender es
+     im Fach erlaubt hat, höchstens alle sechs Stunden, und ohne dass der
+     Aufbau darauf wartet. */
+  setTimeout(function () { FASSUNGSMELDUNG.sehen(false); }, 1200);
 
   /* Ein begonnenes Blatt liegt da, wo man es verlassen hat. */
   let resumed = null;
@@ -3793,7 +3811,131 @@ async function start() {
 
 /* Für den Testlauf in tools/test-atelier3.js. Die App selbst benutzt nichts
    davon – es ist ein Fenster, kein Bedienelement. */
+/* ===== FASSUNGSMELDUNG – ANFANG =============================================
+
+   Umkehrbarer Zusatz: Alles zwischen diesem Zeichen und „FASSUNGSMELDUNG –
+   ENDE" lässt sich in einem Stück herausschneiden, dann ist die App wieder
+   so offline wie zuvor.
+
+   WOZU. Nachgemessen und in CLAUDE.md festgehalten: Ein Gerät, auf dem die
+   App eingerichtet ist, fragt sw.js über fünf Öffnungen NULL MAL ab. Eine
+   neue Fassung erreicht ein iPad damit im Zweifel nie. Der bisherige Ausweg
+   war eine Anweisung an einen Menschen — App beenden, hochwischen, zweimal
+   öffnen — und der taugt nicht.
+
+   WAS HINAUSGEHT. Ein Abruf einer einzigen Datei, fassung.json, von
+   derselben Adresse, von der die App stammt. GESENDET WIRD NICHTS: keine
+   Kennung, kein Name, kein Blatt, kein Cookie. Verglichen wird IM GERÄT —
+   der Server erfährt nicht einmal, welche Fassung fragt. Was er sieht, ist
+   was jeder Server sieht: eine IP-Adresse und eine Uhrzeit.
+
+   UND: AB WERK AUS. Der Anwender entscheidet selbst, im Fach. Wer den
+   Schalter nicht anfasst, bei dem geht nie etwas hinaus. Das ist der Grund,
+   warum die Hausregel dafür geändert werden konnte, ohne sie aufzugeben.
+
+   ZWEI FALLSTRICKE, beide nachgesehen:
+
+   1. Der Worker legt JEDE Antwort in den Vorrat (sw.js, store()) und liefert
+      beim nächsten Mal zuerst die alte Fassung. Die Meldung hinkte damit um
+      einen Durchgang hinterher. Deshalb trägt jeder Abruf einen eindeutigen
+      Zusatz in der Adresse — dann ist es immer ein Fehlschlag im Vorrat und
+      es wird wirklich geholt. Die angesammelten Einträge räumt der Worker
+      bei der nächsten Fassung ohnehin weg.
+
+   2. Zehn Werkzeuge treiben diese App im Browser — Katalog, Zahlen, sämtliche
+      Testläufe. Ein Band geriete in jedes Bild. Deshalb schaltet
+      ?fassung=aus alles ab, und die Werkzeuge hängen es an.
+   ========================================================================== */
+
+const FASSUNGSMELDUNG = (function () {
+  const SCHALTER = 'atelier3-fassungsmeldung';
+  const ZULETZT  = 'atelier3-fassung-geprueft';
+  const PAUSE    = 6 * 60 * 60 * 1000;          // höchstens alle sechs Stunden
+  const VORSILBE = 'atelier3-';                 // nur der eigene Vorrat!
+
+  function erlaubt() {
+    try { return localStorage.getItem(SCHALTER) === 'an'; } catch (e) { return false; }
+  }
+  function schalten(an) {
+    try { localStorage.setItem(SCHALTER, an ? 'an' : 'aus'); } catch (e) {}
+    if (an) sehen(true);
+  }
+  function abgeschaltet() {
+    try { return new URLSearchParams(location.search).get('fassung') === 'aus'; }
+    catch (e) { return false; }
+  }
+
+  /* Fassungsnummern dieses Hauses sind „3.22" — zwei Zahlen, nicht mehr.
+     Verglichen wird zahlenweise, damit 3.9 kleiner ist als 3.10. */
+  function neuerAls(dort, hier) {
+    const a = String(dort).split('.').map(Number);
+    const b = String(hier).split('.').map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const x = a[i] || 0, y = b[i] || 0;
+      if (x !== y) return x > y;
+    }
+    return false;
+  }
+
+  function band(neu, was) {
+    if (document.getElementById('fassungsband')) return;
+    const d = document.createElement('div');
+    d.id = 'fassungsband';
+    d.className = 'fassungsband';
+    const text = document.createElement('span');
+    text.textContent = T('Fassung') + ' ' + neu + (was ? ' · ' + was : '');
+    const laden = document.createElement('button');
+    laden.type = 'button';
+    laden.textContent = T('Jetzt laden');
+    laden.addEventListener('click', holen);
+    const weg = document.createElement('button');
+    weg.type = 'button';
+    weg.className = 'fassungsband-weg';
+    weg.setAttribute('aria-label', T('Später'));
+    weg.textContent = '×';
+    weg.addEventListener('click', function () { d.remove(); });
+    d.appendChild(text); d.appendChild(laden); d.appendChild(weg);
+    document.body.appendChild(d);
+  }
+
+  /* Der Knopf. Er räumt NUR den eigenen Vorrat — „atelier3-". Räumte er
+     alles, nähme er dem Atelier unter derselben Adresse seinen mit; genau
+     dieser Fehler steckt bis heute in malstudio/sw.js. */
+  function holen() {
+    const fertig = function () { location.reload(); };
+    if (!window.caches || !caches.keys) return fertig();
+    caches.keys()
+      .then(function (namen) {
+        return Promise.all(namen
+          .filter(function (n) { return n.indexOf(VORSILBE) === 0; })
+          .map(function (n) { return caches.delete(n); }));
+      })
+      .then(fertig, fertig);
+  }
+
+  function sehen(sofort) {
+    if (abgeschaltet() || !erlaubt()) return;
+    if (!sofort) {
+      let zuletzt = 0;
+      try { zuletzt = Number(localStorage.getItem(ZULETZT)) || 0; } catch (e) {}
+      if (Date.now() - zuletzt < PAUSE) return;
+    }
+    try { localStorage.setItem(ZULETZT, String(Date.now())); } catch (e) {}
+    fetch('fassung.json?z=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (j && j.fassung && neuerAls(j.fassung, FASSUNG)) band(j.fassung, j.was);
+      })
+      .catch(function () { /* kein Netz: stillschweigend nichts. */ });
+  }
+
+  return { sehen: sehen, erlaubt: erlaubt, schalten: schalten, neuerAls: neuerAls };
+})();
+
+/* ===== FASSUNGSMELDUNG – ENDE ============================================= */
+
 window.Blatt = {
+  FASSUNGSMELDUNG: FASSUNGSMELDUNG,
   FASSUNG: FASSUNG,
   SIZE: SIZE, R_DISC: R_DISC, VIEW_MAX: VIEW_MAX,
   sheet: sheet, hand: hand, view: view,

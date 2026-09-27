@@ -624,3 +624,54 @@ body.is-still .mark {
     transition-duration: 1ms !important;
   }
 }
+
+
+/* ===== FASSUNGSMELDUNG – ANFANG ============================================
+   Ein schmales Band unten. Kein Ausrufezeichen, keine Zahl am Symbol, kein
+   Ton - es soll die Arbeit nicht unterbrechen, sondern nur dastehen.
+   ========================================================================= */
+.fassungsband {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 520px);
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
+  background: var(--tray-bg, rgba(44, 40, 34, .92));
+  color: var(--tray-ink, #efe9dd);
+  font: 13px/1.4 inherit;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .22);
+}
+.fassungsband span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fassungsband button {
+  flex: none;
+  border: 1px solid currentColor;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 3px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fassungsband .fassungsband-weg {
+  border: 0;
+  padding: 3px 6px;
+  font-size: 16px;
+  opacity: .7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fassungsband { animation: fassungsband-auf .5s ease both; }
+  @keyframes fassungsband-auf {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  }
+}
+/* ===== FASSUNGSMELDUNG – ENDE ============================================= */

@@ -2,9 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>Fassungsmeldung — der Plan für alle drei Apps</title>
+<title>Fassungsmeldung — gebaut in Blatt 3.23</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Wie die Apps künftig melden, dass es eine neue Fassung gibt. Die Offline-Regel wird dafür geändert — eng, nachprüfbar, und mit einer Sonderregel fürs Regal.">
+<meta name="description" content="Wie die Apps melden, dass es eine neue Fassung gibt. Ab Werk aus — der Anwender entscheidet selbst im Fach. Gebaut und gemessen in Blatt 3.23.">
 <meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="../beide-icon-192.png">
@@ -88,12 +88,15 @@
      und warum dafür die Offline-Regel geändert wird. Ein Plan für drei Apps,
      nichts davon ist gebaut.</p>
 
-  <div class="kasten warn">
-    <b>Stand: Vorschlag.</b>
-    Diese Seite ist der Plan, nicht der Stand. Sie betrifft <b>Mandala
-    Atelier</b>, <b>Blatt</b> und <b>Malstudio</b>. Die Regeländerung in
-    Abschnitt 1 ist die Voraussetzung für alles Übrige; ohne sie bricht
-    schon der Testlauf.
+  <div class="kasten" style="background:rgba(47,107,69,.1);border-color:rgba(47,107,69,.32)">
+    <b>Stand: in Blatt gebaut, ab Fassung 3.23.</b>
+    Der Plan gilt weiter für alle drei Apps — Blatt ist die erste, Atelier und
+    Malstudio folgen. <b>Und er hat sich an einer Stelle geändert, zum
+    Besseren:</b> Die Meldung ist <b>ab Werk aus</b>. Der Anwender schaltet
+    sie im Fach selbst an und jederzeit wieder ab. Damit war keine
+    Grundsatzänderung der Offline-Regel nötig — wer den Schalter nicht
+    anfasst, bei dem geht nie etwas hinaus, und für ihn gilt die alte Regel
+    unverändert weiter.
   </div>
 
   <h2>1 · Die Regel, die sich ändert</h2>
@@ -113,14 +116,29 @@
          Testlauf prüft das.</p>
     </div>
     <div class="neu">
-      <h4>Vorschlag</h4>
-      <p><b>Alles offline bis auf eines.</b> Zur Laufzeit wird genau eine
-         Sache von außen geholt: die eigene Fassungsnummer, von derselben
-         Adresse, von der die App stammt. <b>Gesendet wird nichts</b> — keine
-         Namen, keine Bilder, keine Kennung, keine Cookies. Der Testlauf
-         zählt weiter mit und lässt genau diesen einen Abruf durch; jeder
-         weitere ist ein Befund.</p>
+      <h4>Jetzt</h4>
+      <p><b>Alles offline — und ab Werk bleibt es dabei.</b> Wer im Fach
+         „Nach Fassungen sehen" anschaltet, bei dem wird genau eine Sache
+         geholt: die eigene Fassungsnummer, von derselben Adresse, von der
+         die App stammt. <b>Gesendet wird nichts</b> — keine Namen, keine
+         Bilder, keine Kennung, keine Cookies. Wer ihn nicht anfasst,
+         bei dem geht nie etwas hinaus.</p>
     </div>
+  </div>
+
+  <div class="kasten">
+    <b>Warum der Schalter die Sache löst.</b>
+    Der erste Entwurf dieser Seite wollte die Hausregel ändern. Das war
+    unnötig scharf. Mit einem Schalter, der ab Werk aus ist, wird aus der
+    Regeländerung eine <b>Erlaubnis, die der Anwender selbst erteilt</b> —
+    und jederzeit zurücknimmt. Bei einer Kinder-App ist das auch die
+    sauberste Grundlage, die es gibt.
+    <br><br>
+    Der Haken daran, ehrlich: Was ab Werk aus ist, schaltet fast niemand an.
+    Der Mechanismus wäre dann gebaut und erreichte kaum jemanden — also genau
+    das Problem, das er lösen soll. Die Gegenmaßnahme wäre, <b>einmalig beim
+    ersten Start zu fragen</b>, statt den Schalter still im Fach liegen zu
+    lassen. Das ist noch nicht gebaut und noch nicht entschieden.
   </div>
 
   <p><b>Warum das gerechtfertigt ist.</b> Der Anlass ist kein Wunsch, sondern
@@ -324,58 +342,73 @@
      Reihenfolge ist nicht beliebig — Phase 4 muss stehen, bevor die erste
      Fassung mit Meldung eingefroren wird.</p>
 
-  <div class="phase">
-    <h3><span class="nr">Phase 0</span> Entscheidungen</h3>
+  <div class="phase gut">
+    <h3><span class="nr">Phase 0</span> Entscheidungen <span class="jetztmark">erledigt</span></h3>
     <p>Die Regeländerung wörtlich in beide <code>CLAUDE.md</code>, die
       Abrechnung aus Abschnitt 2 in die drei Datenschutzseiten. Kein Code.
       Dazu die feste Adresse für Malstudio klären — heute steht dort
       „GitHub Pages <i>oder</i> Netlify Drop", und die Meldung braucht eine
       Adresse, die sich nicht ändert.</p>
-    <p class="mess"><b>Messwert:</b> keiner. Das ist eine Absprache, kein Bau.</p>
+    <p class="mess"><b>Entschieden:</b> Schalter im Fach, ab Werk aus. Damit
+      war keine Grundsatzänderung nötig. Offen bleibt die feste Adresse für
+      Malstudio — dort steht heute „GitHub Pages <i>oder</i> Netlify Drop".</p>
   </div>
 
-  <div class="phase">
-    <h3><span class="nr">Phase 1</span> Die Fassungsdatei</h3>
+  <div class="phase gut">
+    <h3><span class="nr">Phase 1</span> Die Fassungsdatei <span class="jetztmark">gebaut</span></h3>
     <p><code>fassung.json</code> wird in jedem Repository erzeugt, aus den
       Nummern, die ohnehin schon dastehen. Noch ruft sie niemand ab. Risiko
       null.</p>
-    <p class="mess"><b>Messwert:</b> Die Datei stimmt mit
-      <code>sw.js</code> und der Fassungskonstante überein; die Werkzeuge
-      brechen ab, wenn nicht.</p>
+    <p class="mess"><b>Gebaut:</b> <code>npm run fassung-datei</code> schreibt
+      <code>fassung.json</code> für beide Apps. Drei Angaben, sonst nichts;
+      der Satz dazu kommt aus dem Commit, der die Nummer eingeführt hat — von
+      Hand gepflegt veraltete er beim zweiten Mal. Der Lauf bricht ab, wenn
+      <code>sw.js</code> und <code>app.js</code> verschiedene Nummern tragen.</p>
   </div>
 
-  <div class="phase">
-    <h3><span class="nr">Phase 2</span> Der Testlauf lernt die Ausnahme</h3>
+  <div class="phase gut">
+    <h3><span class="nr">Phase 2</span> Ein eigener Prüflauf <span class="jetztmark">gebaut</span></h3>
     <p>Aus „null Abrufe nach außen" wird „genau dieser eine, und nichts
       sonst". Die Regel bleibt scharf, sie bekommt nur eine benannte Lücke.</p>
-    <p class="mess"><b>Messwert:</b> durch Sabotage nachgewiesen — ein
-      zweiter Abruf, egal wohin, muss den Lauf rot machen. Wie beim Regal:
-      Ein Prüflauf, der nie anschlägt, ist wertlos.</p>
+    <p class="mess"><b>Gebaut:</b> <code>npm run test:fassung</code>, sieben
+      Haken im echten Browser über HTTP. Der erste ist der, an dem alles
+      hängt: <b>ab Werk geht kein Abruf hinaus.</b> Dazu: angeschaltet genau
+      ein Abruf und keiner sonst, Band nur bei neuerer Nummer, kein Band bei
+      gleicher, bei Fehlschlag nichts und keine Meldung, und
+      <code>?fassung=aus</code> schaltet alles ab.</p>
   </div>
 
-  <div class="phase">
-    <h3><span class="nr">Phase 3</span> Das Modul, in einer App</h3>
+  <div class="phase gut">
+    <h3><span class="nr">Phase 3</span> Das Modul, in Blatt <span class="jetztmark">gebaut</span></h3>
     <p><code>fassung.js</code> entsteht und wandert zuerst in <b>Blatt</b> —
       die kleinste der drei, und die, an der am wenigsten hängt.</p>
-    <p class="mess"><b>Messwert:</b> Mit vorgetäuschter neuerer Nummer
-      erscheint das Band; ohne Netz passiert nichts und es erscheint kein
-      Fehler; nach dem Tippen trägt der Browser den neuen Vorratsnamen und
-      den alten nicht mehr. Und: die Vorräte der beiden anderen Apps sind
-      danach unverändert da.</p>
+    <p class="mess"><b>Gebaut, Blatt 3.23.</b> Eingezäunter Block in
+      <code>app.js</code>, Schalter im Fach, schmales Band unten. Der Knopf
+      „Jetzt laden" räumt <b>nur den eigenen Vorrat</b> (Vorsilbe
+      <code>atelier3-</code>) — räumte er alles, nähme er dem Atelier unter
+      derselben Adresse seinen mit. Genau dieser Fehler steckt bis heute in
+      <code>malstudio/sw.js</code>.</p>
   </div>
 
-  <div class="phase jetzt">
-    <h3><span class="nr">Phase 4</span> Das Regal absichern</h3>
+  <div class="phase gut">
+    <h3><span class="nr">Phase 4</span> Das Regal absichern <span class="jetztmark">gebaut</span></h3>
     <p>Das Einfrieren schneidet die Meldung heraus,
       <code>test:regal</code> bekommt den fünften Haken. <b>Gehört in
       dieselbe Fassung wie Phase 3</b> — es darf keine eingefrorene Fassung
       geben, die den Abruf noch trägt.</p>
-    <p class="mess"><b>Messwert:</b> durch Sabotage — eine Regalfassung mit
-      wieder eingesetzter Meldung muss den Lauf rot machen.</p>
+    <p class="mess"><b>Gebaut und gemessen:</b> Das Einfrieren legt die
+      Meldung still, der siebte Haken prüft es an der neuesten Regalfassung —
+      kein Abruf, kein Band, <code>erlaubt()</code> falsch. <b>Dabei ein
+      Fund:</b> Der Haken schlug zuerst an, weil <code>window.Blatt</code> in
+      der Regalfassung gar nicht entstand. Grund war nicht die Meldung,
+      sondern dass <code>sprache.js</code> beim Einfrieren nie mitgenommen
+      wurde. <b>Vierzehn eingefrorene Fassungen waren dadurch kaputt</b> —
+      Regalband da, Startlauf abgebrochen mit „T is not defined". Alle
+      repariert.</p>
   </div>
 
-  <div class="phase">
-    <h3><span class="nr">Phase 5</span> Die beiden anderen Apps</h3>
+  <div class="phase jetzt">
+    <h3><span class="nr">Phase 5</span> Die beiden anderen Apps <span class="jetztmark">als Nächstes</span></h3>
     <p>Atelier, dann Malstudio. Je eine eigene Fassung, je ein eigener
       Messwert. Dazu der Byte-Vergleich der drei Kopien aus Abschnitt 5.</p>
     <p class="mess"><b>Messwert:</b> Die drei <code>fassung.js</code> sind
