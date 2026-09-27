@@ -57,9 +57,20 @@ const REGAL = path.join(ROOT, 'v');
 
    Damit wiegt eine Fassung rund 150 kB statt 720. */
 const TEILE = {
-  atelier: ['index.html', 'style.css', 'app.js'],
-  blatt:   ['atelier3/index.html', 'atelier3/style.css', 'atelier3/app.js']
+  atelier: ['index.html', 'style.css', 'app.js', 'sprache.js'],
+  blatt:   ['atelier3/index.html', 'atelier3/style.css', 'atelier3/app.js',
+            'atelier3/sprache.js']
 };
+
+/* sprache.js fehlte hier, und zwar seit es sie gibt. Vierzehn eingefrorene
+   Fassungen waren dadurch KAPUTT: Die Seite lud, das Regalband stand da, und
+   dann brach der Startlauf mit „T is not defined" ab - der Übersetzer war
+   nicht mitgekommen. Aufgefallen ist es erst, als ein neuer Prüflauf zum
+   ersten Mal in einer Regalfassung nach window.Blatt sah.
+
+   Sie gehört mitgenommen, nicht nach oben umgebogen: Die Texte gehören zur
+   Fassung. Eine alte Fassung mit den Texten von heute wäre nicht die alte
+   Fassung. */
 
 /* Schriften und Symbole liegen oben, nicht im Regalfach. */
 function biegeVerweise(html, app) {
@@ -131,6 +142,40 @@ const STILLGELEGT =
   '  navigator.serviceWorker.register = function () { return new Promise(function () {}); };\n' +
   '}\n\n';
 
+/* Die Fassungsmeldung wird im Regal stillgelegt - die DRITTE unverhandelbare
+   Sache, neben „kein Service Worker" und „eigener Speicher".
+
+   Zwei Gruende, beide ernst:
+   1. Eine Regalfassung ist mit Absicht alt. Ein Band „Fassung 2.40 ist da"
+      waere dort sinnlos und verwirrend.
+   2. Schlimmer: Der Knopf „Jetzt laden" raeumt den Vorrat. Aus einer
+      Regalfassung heraus traefe das den Vorrat der LAUFENDEN App - dieselbe
+      Adresse, dieselben Vorratsnamen. Derselbe Schaden wie beim Worker.
+
+   Stillgelegt wird an der Schnittstelle, nicht durch Herausschneiden: Der
+   Block heisst in jeder Fassung gleich, seine Innereien nicht. */
+const MELDUNG_AUS =
+  '/* Im Regal ohne Fassungsmeldung - siehe tools/einfrieren.js. Eine alte\n' +
+  '   Fassung darf weder nach neueren sehen noch den Vorrat raeumen: Das\n' +
+  '   traefe den Vorrat der laufenden App. */\n' +
+  'if (typeof FASSUNGSMELDUNG !== \'undefined\' && FASSUNGSMELDUNG) {\n' +
+  '  FASSUNGSMELDUNG.sehen    = function () {};\n' +
+  '  FASSUNGSMELDUNG.schalten = function () {};\n' +
+  '  FASSUNGSMELDUNG.erlaubt  = function () { return false; };\n' +
+  '}\n\n';
+
+function legeMeldungStill(text) {
+  if (text.indexOf('FASSUNGSMELDUNG') < 0) return text;   // Fassung ohne Meldung
+  const m = text.match(/\n\/\* ===== FASSUNGSMELDUNG – ENDE [^\n]*\n/);
+  if (!m) {
+    throw new Error('app.js: Ende der Fassungsmeldung nicht gefunden. Wurde der ' +
+                    'Block umbenannt? Ohne Stilllegung raeumt eine Regalfassung ' +
+                    'den Vorrat der laufenden App.');
+  }
+  const i = text.indexOf(m[0]) + m[0].length;
+  return text.slice(0, i) + '\n' + MELDUNG_AUS + text.slice(i);
+}
+
 function entferneWorker(text) {
   /* Hinter ein etwaiges 'use strict', damit das seine Wirkung behält. */
   const m = text.match(/^\s*['"]use strict['"];\s*\n/);
@@ -178,6 +223,7 @@ function einfrieren(commit) {
         let t = String(roh);
         t = stempleSpeicher(t, app, nummer);
         t = entferneWorker(t);
+        t = legeMeldungStill(t);
         fs.writeFileSync(aus, t);
       } else if (/\.html$/.test(flach)) {
         fs.writeFileSync(aus, stempleBanner(biegeVerweise(String(roh), app), nummer, app));

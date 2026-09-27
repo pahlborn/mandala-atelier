@@ -1,0 +1,701 @@
+'use strict';
+
+/* ============================================================================
+   Sprache – Deutsch im deutschsprachigen Raum, sonst Englisch.
+
+   Der deutsche Text ist der Schlüssel:
+
+     T('Leeres Blatt')  →  'Leeres Blatt'  auf Deutsch
+                        →  'Blank sheet'   auf Englisch
+
+   Warum keine Kennungen wie `blatt.leer`: Weil dann im Quelltext nirgends
+   mehr stünde, was auf dem Knopf steht. Man müsste bei jeder Zeile
+   nachschlagen. So bleibt das Deutsche dort, wo es hingehört, und diese Datei
+   ist ein Wörterbuch – kein zweiter Satz Namen für dieselben Dinge.
+
+   Fehlt ein Eintrag, erscheint der deutsche Text. Sichtbar unfertig ist
+   besser als leer oder abgestürzt.
+
+   ---------------------------------------------------------------------------
+   Der eine Fall, in dem ein Wort nicht genügt
+
+   „Blatt" heißt in dieser App zweierlei: die Grundform neben Ring, Speiche,
+   Raute und Band – das ist ein `leaf` – und der Bogen, auf dem gezeichnet
+   wird – das ist ein `sheet`. Ein Wörterbuch mit dem deutschen Wort als
+   Schlüssel kann das nicht auseinanderhalten.
+
+   Deshalb gibt es einen zweiten Schlüssel, den Sinn:
+
+     im Wörterbuch     'Blatt @form': 'Leaf'
+     im HTML           <button data-sinn="form">Blatt</button>
+     im Quelltext      T('Blatt', 'form')
+
+   Ohne Sinn gilt der schlichte Eintrag. `tools/test-sprache.js` sucht nach
+   weiteren solchen Fällen und meldet sie, bevor sie jemandem auffallen.
+
+   ---------------------------------------------------------------------------
+   Welche Sprache gilt, entscheidet sich in dieser Reihenfolge:
+
+     1. ?sprache=de  oder  ?sprache=en   in der Adresse
+     2. was zuletzt von Hand gewählt wurde
+     3. die Sprache des Geräts – „de…" heißt Deutsch, alles andere Englisch
+   ========================================================================== */
+
+var Sprache = (function () {
+
+  var EN = {
+
+    /* --- Kopfzeile und Grundbedienung ------------------------------------ */
+    'Mandala Atelier':            'Mandala Atelier',
+    'Zeichne ein Segment – der Rest entsteht von selbst.':
+      'Draw one segment — the rest comes about by itself.',
+    'Motive':                     'Motifs',
+    'Werkzeuge':                  'Tools',
+    'Galerie':                    'Gallery',
+    'Vollbild':                   'Full screen',
+    'Vollbild beenden':           'Leave full screen',
+    'Hell':                       'Light',
+    'Dunkel':                     'Dark',
+    'Sprache':                    'Language',
+
+    /* --- Werkzeuge -------------------------------------------------------- */
+    'Werkzeug':                   'Tool',
+    'Stift':                      'Pen',
+    'Füllen':                     'Fill',
+    'Form':                       'Shape',
+    'Radierer':                   'Eraser',
+    'Strichstärke':               'Stroke width',
+
+    /* --- Grundformen ------------------------------------------------------
+       Hier steht der Sinn dabei: `Blatt` ist an dieser Stelle ein Blatt am
+       Zweig, nicht ein Blatt Papier. */
+    'Ring':                       'Ring',
+    'Speiche':                    'Spoke',
+    'Blatt @form':                'Leaf',
+    'Raute':                      'Diamond',
+    'Band':                       'Band',
+    'gesetzt.':                   'placed.',
+
+    /* --- Farbe ------------------------------------------------------------ */
+    'Farbwelt':                   'Colour world',
+    'Pigment':                    'Pigment',
+    'Gewähltes Pigment mischen':  'Mix the chosen pigment',
+    'Farblegende':                'Colour key',
+    'Farblegende – Ergebnis':     'Colour key — result',
+    'Farblegende – Anzahl':       'Colour key — count',
+    'Eigen ':                     'Own ',
+
+    /* --- Symmetrie -------------------------------------------------------- */
+    'Symmetrie':                  'Symmetry',
+    'Spiegelung':                 'Mirroring',
+    'Hilfsraster':                'Guide grid',
+    'Füllen wirkt auf alle Achsen': 'Fill acts on all axes',
+    'Symmetrie folgt den Bereichen': 'Symmetry follows the precincts',
+    'Achsenzahl':                 'Number of axes',
+
+    /* --- Das Blatt selbst -------------------------------------------------
+       Ohne Sinn: der Bogen, auf dem gezeichnet wird. */
+    'Blatt':                      'Sheet',
+    'Leeres Blatt':               'Blank sheet',
+    'Freies Blatt':               'Free sheet',
+    'Nur Symmetrie, keine Vorlage': 'Symmetry only, no template',
+    'Zurücksetzen':               'Start over',
+    'In die Galerie legen':       'Lay it in the gallery',
+    'Als Bild speichern':         'Save as a picture',
+    'Druckbogen (A4)':            'Print sheet (A4)',
+    'Wähle ein Motiv oder beginne auf dem leeren Blatt.':
+      'Choose a motif, or begin on the blank sheet.',
+
+    /* --- Ganze Absätze ----------------------------------------------------
+       Die Träger stehen im HTML mit `data-satz`. Schlüssel ist der innere
+       HTML-Text, auf einzelne Leerzeichen zusammengezogen – deshalb steht
+       hier auch das <b> mit drin. */
+    '34 Vorlagen in 6 Welten. Ein Motiv setzt die Achsenzahl passend – du kannst sie danach jederzeit ändern.':
+      '34 templates in 6 worlds. A motif sets the number of axes to suit it — you can change that afterwards at any time.',
+
+    'Mit „Form“ entstehen die Grundformen exakt: Ring, Speiche, Blatt, Raute und Band – dieselben Bausteine, aus denen auch die Vorlagen gemacht sind. Ziehen setzt die Länge, seitlich ziehen die Breite.':
+      'With “Shape” the basic forms come out exact: ring, spoke, leaf, diamond and band — the same building blocks the templates are made of. Dragging sets the length, dragging sideways the width.',
+
+    'Noch nichts abgelegt. Leg ein fertiges Bild über „In die Galerie legen“ hierher.':
+      'Nothing laid down yet. Put a finished picture here with “Lay it in the gallery”.',
+
+    'Werke liegen nur auf diesem Gerät. Eine Sicherung ist zugleich der Weg auf ein zweites Gerät – sie enthält alle Personen, deren Werke und die eigene Farbwelt.':
+      'Pieces stay on this device only. A backup is also the way onto a second device — it holds every person, their pieces and the colour world you mixed yourself.',
+
+    '<b>Sicherung speichern</b> packt alles in eine Datei und öffnet das Teilen-Blatt. Dort <b>„In Dateien sichern“</b> wählen – etwa in iCloud Drive, dann liegt sie auch auf dem zweiten Gerät bereit. <b>Sicherung einlesen</b> holt sie von dort zurück; vorhandene Werke bleiben dabei stehen, es kommt nur dazu, was noch fehlt.':
+      '<b>Save a backup</b> packs everything into one file and opens the share sheet. Choose <b>“Save to Files”</b> there — in iCloud Drive, say, and it is ready on the second device too. <b>Read a backup</b> fetches it back; pieces already here stay as they are, only what is missing is added.',
+
+    /* --- Galerie ---------------------------------------------------------- */
+    'Galerie von':                'Gallery of',
+    'Galerie von ':               'Gallery of ',
+    'Titel':                      'Title',
+    'Aus der Galerie nehmen':     'Take out of the gallery',
+    'Schließen':                  'Close',
+    'Name':                       'Name',
+    '＋ Neue Person':             '＋ New person',
+    'Ohne Namen ':                'Unnamed ',
+    'Sicherung speichern':        'Save a backup',
+    'Sicherung einlesen':         'Read a backup',
+    'Die Sicherung':              'The backup',
+    'Das Bild':                   'The picture',
+
+    /* --- Was die App sagt --------------------------------------------------
+       Kurze Rückmeldungen. Sie stehen dort, wo sonst der Hinweis steht, und
+       verschwinden von selbst. */
+    'In die Galerie gelegt.':     'Laid in the gallery.',
+    'In die Galerie gelegt – bleibt aber nur, solange die Seite offen ist.':
+      'Laid in the gallery — but only while this page stays open.',
+    'Das Werk ließ sich nicht ablegen – der Speicher des Geräts ist voll.':
+      'The piece could not be laid down — the device is out of storage.',
+    'Die Datei ließ sich nicht lesen.': 'The file could not be read.',
+    'Das ist keine Sicherung des Mandala Ateliers.':
+      'That is not a Mandala Atelier backup.',
+    /* Die Zahl in der Galerie: „3 Werke". Sie stand nur da, wenn schon etwas
+       darin lag - deshalb ist sie dem ersten Durchgang ueber die fertige
+       Seite entgangen. tools/pruef-uebersetzt.js hat sie gefunden. */
+    ' Werk':                      ' piece',
+    ' Werke':                     ' pieces',
+    ' Werk eingelesen.':          ' piece read in.',
+    ' Werke eingelesen.':         ' pieces read in.',
+    'Alles aus der Sicherung war schon vorhanden.':
+      'Everything in the backup was already here.',
+    ' liegt bei den Downloads.':  ' is in your downloads.',
+    'Der Browser hat das Druckfenster blockiert.':
+      'The browser blocked the print window.',
+    'Druckbogen erstellen.\n\n':  'Make a print sheet.\n\n',
+    'OK: mit den gesetzten Farben\n': 'OK: with the colours as set\n',
+    'Abbrechen: nur die Linien zum Ausmalen':
+      'Cancel: the lines alone, to colour in',
+
+    /* --- Der Hinweis unter dem Blatt --------------------------------------
+       Er wird aus Teilen zusammengesetzt; deshalb stehen die Teile hier
+       einzeln, jeweils mit ihrem führenden Trennzeichen. */
+    'Leeres Blatt · zeichne ein Segment, der Rest entsteht von selbst':
+      'Blank sheet · draw one segment, the rest comes about by itself',
+    ' · die Symmetrie folgt dem Bereich, in dem die Hand aufsetzt':
+      ' · the symmetry follows the precinct the hand starts in',
+    ' · ein Tipp färbt alle gleichwertigen Felder':
+      ' · one tap colours every field of equal value',
+    ' · ein Tipp färbt nur das angetippte Feld':
+      ' · one tap colours only the field tapped',
+    'Ein Tipp färbt alle gleichwertigen Felder zugleich.':
+      'One tap colours every field of equal value at once.',
+    'Ein Tipp färbt nur das angetippte Feld.':
+      'One tap colours only the field tapped.',
+    'Bei Zähl- und Rechenmandalas wird immer einzeln gefüllt – sonst bekämen ':
+      'Counting and sums mandalas always fill one field at a time — otherwise ',
+    'Felder mit verschiedenen Ergebnissen dieselbe Farbe.':
+      'fields with different results would get the same colour.',
+    'Aus: überall dieselbe Achsenzahl, wie bei den anderen Vorlagen.':
+      'Off: the same number of axes everywhere, as in the other templates.',
+    '-fach':                      '-fold',
+    'frei':                       'free',
+
+    /* --- Zähl- und Rechenmandalas ----------------------------------------- */
+    'Ergebnis ':                  'Result ',
+    ' Punkt':                     ' dot',
+    ' Punkte':                    ' dots',
+
+    /* --- Was nur die Vorlesestimme hört ----------------------------------- */
+    'Mandala – hier zeichnen und füllen': 'Mandala — draw and fill here',
+    'Zeichenfläche':              'Drawing area',
+    'Zeichenfläche vergrößern':   'Enlarge the drawing area',
+    'Motivwelten':                'Motif worlds',
+    'Motive schließen':           'Close motifs',
+    'Werkzeuge schließen':        'Close tools',
+    'Galerie schließen':          'Close the gallery',
+    'Werkzeug wählen':            'Choose a tool',
+    'Grundform':                  'Basic shape',
+    'Farbwelt wählen':            'Choose a colour world',
+    'Pigment wählen':             'Choose a pigment',
+    'Person wählen':              'Choose a person',
+    'Person umbenennen':          'Rename this person',
+    'Werk ansehen':               'Look at this piece',
+    'Rückgängig':                 'Undo',
+    'Wiederherstellen':           'Redo',
+    'Schritte':                   'Steps',
+    'Vergrößern':                 'Zoom in',
+    'Verkleinern':                'Zoom out',
+    'Vergrößerung zurücksetzen':  'Reset the zoom',
+    'Leiste einklappen':          'Fold the bar away',
+    'Leiste ausklappen':          'Unfold the bar',
+    'Sprache wählen':             'Choose a language',
+
+    /* --- Tastenkürzel in den Kurzhinweisen -------------------------------- */
+    'Stift (1)':                  'Pen (1)',
+    'Füllen (2)':                 'Fill (2)',
+    'Form (3)':                   'Shape (3)',
+    'Radierer (4)':               'Eraser (4)',
+    'Auf Anfang zurück (0)':      'Back to the start (0)',
+    'Vergrößern (+)':             'Zoom in (+)',
+    'Verkleinern (−)':            'Zoom out (−)',
+    'Hell / Dunkel umschalten':   'Switch light / dark',
+    'Rückgängig (Cmd/Strg+Z)':    'Undo (Cmd/Ctrl+Z)',
+    'Wiederherstellen (Cmd/Strg+Umschalt+Z)': 'Redo (Cmd/Ctrl+Shift+Z)',
+
+    /* --- Motivwelten ------------------------------------------------------ */
+    'Geometrisch-klassisch':      'Geometric & Classical',
+    'Natur':                      'Nature',
+    'Zen & Achtsamkeit':          'Zen & Mindfulness',
+    'Jahreszeiten':               'Seasons',
+    'Anlagen':                    'Grounds',
+    'Kids-Corner':                "Kids' Corner",
+    'Feinwerk':                   'Fine Work',
+
+    /* --- Motive: Name und Beischrift --------------------------------------
+       Die Beischrift zählt auf, was zu sehen ist – sie soll auf Englisch
+       genauso nüchtern bleiben und nichts versprechen. */
+    'Sternkranz':                 'Star Wreath',
+    'Zwölf Spitzen, ruhiger Grundriss': 'Twelve points, a quiet plan',
+    'Zwölf Spitzen im Kreis — als würde ein einzelner Stern sich selbst vervielfachen, bis er den ganzen Rand erreicht.':
+      'Twelve points in a circle — as if a single star multiplied itself until it reached the whole rim.',
+    'Rautenkranz':                'Diamond Wreath',
+    'Rauten in drei Größen':      'Diamonds in three sizes',
+    'Rauten in drei Größen, ineinandergestaffelt — wie ferne Kirchenfenster, die sich zu einem einzigen Muster ordnen.':
+      'Diamonds in three sizes, nested together — like distant church windows falling into a single pattern.',
+    'Sternmandala fein':          'Fine Star Mandala',
+    'Sechzehn Achsen, viele kleine Felder': 'Sixteen axes, many small fields',
+    'Sechzehn Achsen, unzählige kleine Felder — je genauer man hinsieht, desto mehr öffnet sich.':
+      'Sixteen axes, countless small fields — the closer you look, the more opens up.',
+    'Achteckstern':               'Octagon Star',
+    'Acht Achsen, klare Kanten':  'Eight axes, clean edges',
+    'Acht Spitzen, scharf und gleichmäßig — die Form, die entsteht, wenn zwei Quadrate sich umeinander drehen.':
+      'Eight sharp, even points — the shape that appears when two squares turn around each other.',
+    'Gitterrose':                 'Lattice Rose',
+    'Verschränkte Rauten, dichtes Netz': 'Interlocking diamonds, a dense net',
+    'Ein Gitterwerk, das sich zur Rose rundet — Ordnung, die von selbst zu blühen beginnt.':
+      'A lattice that curves into a rose — order that begins to bloom on its own.',
+
+    'Blüte':                      'Blossom',
+    'Acht große Blätter, viel Fläche': 'Eight large petals, plenty of surface',
+    'Blütenblatt um Blütenblatt, wie sie sich in einem einzigen warmen Moment öffnen.':
+      'Petal after petal, as if opening in one single warm moment.',
+    'Blätterkranz':               'Leaf Wreath',
+    'Blätter mit Mittelrippe, versetzt': 'Leaves with a midrib, offset',
+    'Ein Kranz aus Blättern, so dicht wie ein Wald im Hochsommer.':
+      'A wreath of leaves, as dense as a forest at the height of summer.',
+    'Muschelspirale':             'Shell Spiral',
+    'Sechs Arme, weite Bögen':    'Six arms, wide arcs',
+    'Eine Spirale, wie sie das Meer in jede Muschel schreibt, bevor sie an den Strand gespült wird.':
+      'A spiral, the kind the sea writes into every shell before it washes ashore.',
+    'Farnkreis':                  'Fern Circle',
+    'Wedel mit feinen Fiedern':   'Fronds with fine pinnae',
+    'Wedel, die sich entrollen wie ein Farn im ersten Frühlingslicht.':
+      'Fronds unfurling like a fern in the first light of spring.',
+    'Samenkranz':                 'Seed Wreath',
+    'Sechzehn Samen, feine Teilung': 'Sixteen seeds, fine division',
+    'Unzählige kleine Samen, dicht an dicht — ein ganzer Sommer, der auf den nächsten wartet.':
+      'Countless small seeds, packed close — a whole summer waiting for the next.',
+
+    'Wellenkreis':                'Wave Circle',
+    'Fünf Wellenringe, gleichmäßiger Takt': 'Five wave rings, an even beat',
+    'Wellen, die sich immer wieder überlagern, ohne sich je ganz zu wiederholen.':
+      'Waves that keep overlapping without ever quite repeating themselves.',
+    'Tropfenkranz':               'Drop Wreath',
+    'Tropfen in zwei Lagen, versetzt': 'Drops in two layers, offset',
+    'Tropfen, aufgereiht wie der Klang von Wasser, das ganz langsam fällt.':
+      'Drops lined up like the sound of water falling very slowly.',
+    'Ruhefeld':                   'Field of Quiet',
+    'Wenige große Flächen, viel Raum': 'Few large areas, much room',
+    'Ein weites, stilles Feld — Platz genug, dass der Blick zur Ruhe kommt, bevor er weiterwandert.':
+      'A wide, quiet field — room enough for the eye to settle before it moves on.',
+    'Atemringe':                  'Breathing Rings',
+    'Ruhiger Takt, gleichmäßige Weite': 'A quiet beat, even spacing',
+    'Ringe, die sich weiten und wieder schließen — wie Atem, der kommt und geht, ohne dass man ihn zählen müsste.':
+      'Rings that widen and close again — like breath coming and going, with no need to count it.',
+    'Steingarten':                'Stone Garden',
+    'Wenige Formen, geharkte Bahnen': 'Few forms, raked lanes',
+    'Wenige Formen, weit auseinandergesetzt — wie Steine, die in Sand geharkt wurden, nicht wie sie zufällig liegen.':
+      'A few forms, set far apart — like stones raked into sand, not left where they happened to fall.',
+
+    'Winter':                     'Winter',
+    'Schneekristall mit Seitenästen': 'A snow crystal with side branches',
+    'Kahle, klare Linien — die Ruhe, die jedem neuen Anfang vorausgeht.':
+      'Bare, clear lines — the stillness that comes before every new beginning.',
+    'Frühling':                   'Spring',
+    'Knospen in drei Lagen':      'Buds in three layers',
+    'Erste zarte Formen, die sich gerade erst trauen, sich zu öffnen.':
+      'The first tender shapes, only just daring to open.',
+    'Sommer':                     'Summer',
+    'Strahlenkranz um eine offene Mitte': 'A ring of rays round an open centre',
+    'Volle, satte Formen — die Jahreszeit, in der alles zugleich blüht.':
+      'Full, rich shapes — the season when everything blooms at once.',
+    'Herbst':                     'Autumn',
+    'Geneigte Blätter, Eicheln als Punkte': 'Tilted leaves, acorns as dots',
+    'Formen, die sich langsam neigen, bevor sie zu Boden sinken — der ruhigste aller Übergänge.':
+      'Shapes leaning slowly before they sink to the ground — the quietest of all transitions.',
+
+    'Anlage':                     'Grounds',
+    'Vier Tore, drei Bereiche':   'Four gates, three precincts',
+    'Ein Grundriss, wie ihn alte Gärten tragen — eine Ordnung, in die man gedanklich hineingehen kann.':
+      'A ground plan of the kind old gardens carry — an order you can walk into in your mind.',
+    'Ringanlage':                 'Ring Grounds',
+    'Vier Tore, vier Ringbänder': 'Four gates, four ring bands',
+    'Ring um Ring um einen stillen Mittelpunkt — wie eine Stadt, die sich um ihr eigenes Zentrum legt.':
+      'Ring after ring around a quiet centre — like a city laid out around its own middle.',
+    'Gartenanlage':               'Garden Grounds',
+    'Vier Wasserläufe, sechsunddreißig Beete':
+      'Four watercourses, thirty-six beds',
+    'Beete und Wasserläufe, symmetrisch angelegt — ein Garten, durch den man mit den Augen spazieren geht.':
+      'Beds and watercourses, laid out symmetrically — a garden you stroll through with your eyes.',
+    'Sternanlage':                'Star Grounds',
+    'Acht Bastionen, eine Piazza': 'Eight bastions, one piazza',
+    'Ein Grundriss, der von oben wie ein Stern aussieht — Verteidigung, die zur Form wurde.':
+      'A ground plan that looks like a star from above — defence turned into shape.',
+    'Rasteranlage':               'Grid Grounds',
+    'Neun mal neun Felder, kein Kranz': 'Nine by nine fields, no wreath',
+    'Ein Raster aus geraden Wegen — die stille Ordnung, die jede große Anlage im Kern trägt.':
+      'A grid of straight paths — the quiet order at the heart of every great estate.',
+    'Stufenanlage':               'Stepped Grounds',
+    'Außen eckig, innen rund':    'Angular without, round within',
+    'Stufe um Stufe, die sich nach innen wandelt — wie ein Bauwerk, das man erst umrunden muss, um es ganz zu verstehen.':
+      'Step after step turning inward — like a building you have to walk around before you understand it whole.',
+    'Torstadt':                   'Gate City',
+    'Zwölf Tore, sechs Mauern':   'Twelve gates, six walls',
+    'Tore an allen Seiten — eine Stadt, die von jeder Richtung aus betreten werden kann.':
+      'Gates on every side — a city that can be entered from any direction.',
+    'Kuppelanlage':               'Dome Grounds',
+    'Ein Gewölbe von unten, 132 Kassetten': 'A vault from below, 132 coffers',
+    'Eine Wölbung, die sich Kassette für Kassette dem Licht entgegenhebt.':
+      'A vault rising toward the light, coffer by coffer.',
+
+    'Erste Formen':               'First Shapes',
+    'Kindergarten – sehr große Felder': 'Nursery — very large fields',
+    'Die einfachsten Formen zuerst — jede große Vorlage hier hat mit genau solchen angefangen.':
+      'The simplest shapes first — every elaborate template here began with just these.',
+    'Mustertanz':                 'Pattern Dance',
+    'Grundschule – Bänder im Wechsel': 'Primary school — bands in turn',
+    'Formen, die sich abwechseln, als würden sie im Kreis tanzen.':
+      'Shapes taking turns, as if dancing in a circle.',
+    'Formenreigen':               'Round of Shapes',
+    'Kindergarten – runde und eckige Felder':
+      'Nursery — round and angular fields',
+    'Ein ganzer Reigen kleiner Formen — jede für sich einfach, gemeinsam ein Fest.':
+      'A whole round of small shapes — simple alone, a celebration together.',
+    'Zähl bis 6':                 'Count to 6',
+    'Punkte zählen, nach Anzahl färben': 'Count the dots, colour by number',
+    'Zähl bis 10':                'Count to 10',
+    'Punkte zählen bis zehn':     'Counting dots up to ten',
+    'Rechenmandala ZR 10':        'Sums Mandala to 10',
+    'Plus und Minus im Zahlenraum 10': 'Plus and minus up to 10',
+    'Rechenmandala ZR 20':        'Sums Mandala to 20',
+    'Plus und Minus im Zahlenraum 20': 'Plus and minus up to 20',
+
+    /* --- Feinwerk ----------------------------------------------------------
+       Zusätzlich, wie der Bereich in app.js. Fehlt hier etwas, erscheint
+       der deutsche Text - kaputt geht nichts. */
+    'Spitzenrad':                  'Lace Wheel',
+    'Vier Bänder mit Sprossen, Klöppelspitze als Rad':
+      'Four banded rings with rungs, bobbin lace read as a wheel',
+    'Spitze entsteht, indem man Fäden umeinanderführt und den Zwischenraum stehen lässt. Sie ist die einzige Handarbeit, deren Ergebnis hauptsächlich aus dem besteht, was nicht getan wurde.':
+      'Lace is made by leading threads around one another and letting the space between them stand. It is the only handicraft whose result consists mainly of what was not done.',
+    'Perlgrat':                    'Beaded Ridge',
+    'Schmale Blätter mit Innenkontur, geteilt durch einen Perlgrat':
+      'Narrow leaves with an inner outline, split by a ridge of beads',
+    'Der Grat ist die Stelle, an der zwei Hälften sich einigen. Man sieht ihn nur, wenn man das Blatt gegen das Licht dreht — und dann sieht man nichts anderes mehr.':
+      'The ridge is where two halves agree. You only see it when you turn the leaf against the light — and then you see nothing else.',
+    'Gitterschale':                'Lattice Bowl',
+    'Zwei Rautengitter, über die Bandgrenze geschoben':
+      'Two diamond lattices, pushed across the band boundary',
+    'Ein Gitter hält nichts fest. Es zeigt nur, dass es eine Ordnung gibt, und lässt alles durch, was hindurch will.':
+      'A lattice holds nothing. It only shows that there is an order, and lets through everything that wants to pass.',
+    'Granulat':                    'Granulation',
+    'Rautennetz in zwei Lagen, vier Perlreihen dazwischen':
+      'A diamond net in two layers, four rows of beads between',
+    'Tausend Kügelchen, jedes einzeln gesetzt, keines wichtiger als das andere. So entsteht Glanz: nicht durch ein großes Licht, sondern dadurch, dass sehr viele sehr kleine Dinge in dieselbe Richtung schauen.':
+      'A thousand tiny spheres, each one set on its own, none more important than the next. That is how lustre comes about: not from one great light, but because very many very small things face the same way.',
+    'Tropfensaum':                 'Teardrop Hem',
+    'Vier Reihen Tropfen mit Innen- und Kernkontur':
+      'Four rows of teardrops with an inner and a core outline',
+    'Ein Tropfen hat keine Kanten, und trotzdem weiß jeder sofort, wo er aufhört. Es gibt Dinge, die brauchen keine Linie, um eine Grenze zu haben.':
+      'A teardrop has no edges, and still everyone knows at once where it stops. Some things need no line in order to have a boundary.',
+    'Kordelstern':                 'Cord Star',
+    'Achtstrahliger Stern aus drei Dreiecken, Zopf um den Kern':
+      'An eight-rayed star from three triangles, a plait around the core',
+    'Ein Stern ist keine Form, sondern eine Behauptung: dass es eine Mitte gibt und dass alles von dort kommt. Wer lange genug ausmalt, glaubt es irgendwann.':
+      'A star is not a shape but a claim: that there is a middle, and that everything comes from there. Colour it in long enough and you start to believe it.',
+    'Rankengeflecht':              'Vine Weave',
+    'Zwei gegenläufige Rankenpaare, drei Blattlagen':
+      'Two counter-running pairs of vines, three layers of leaves',
+    'Eine Ranke sucht nicht das Licht, sie sucht Halt. Dass sie dabei schön wird, ist ein Nebenprodukt — und wahrscheinlich der Grund, warum wir sie nachzeichnen.':
+      'A vine does not seek the light, it seeks a hold. That it becomes beautiful on the way is a by-product — and probably the reason we trace it.',
+
+    /* Diese beiden stehen im Quelltext über zwei Zeilen, zusammengefügt
+       mit `+`. Der Schlüssel ist deshalb der fertige Satz, nicht die
+       Hälfte. */
+    'Zähl die Punkte in einem Feld. Unten in der Leiste steht bei jeder Farbe eine Zahl – nimm die Farbe mit deiner Anzahl und tippe ins Feld.':
+      'Count the dots in a field. In the bar below, every colour carries a number — take the colour with your count and tap the field.',
+    'Rechne die Aufgabe in einem Feld aus. Unten in der Leiste steht bei jeder Farbe eine Zahl – nimm die Farbe mit deinem Ergebnis und tippe ins Feld.':
+      'Work out the sum in a field. In the bar below, every colour carries a number — take the colour with your result and tap the field.',
+
+    /* --- Bereiche der Anlagen ---------------------------------------------
+       Sie stehen unter dem Blatt, wenn die Symmetrie den Bereichen folgt.
+       Es sind Bauteile, keine Stimmungen: Wall bleibt `rampart`, nicht
+       `wall` – gemeint ist der Erdwall, nicht die Mauer, die daneben
+       steht. */
+    'Mitte':                      'Centre',
+    'Palast':                     'Palace',
+    'Schutzbereich':              'Precinct',
+    'Speichen':                   'Spokes',
+    'Blätter':                    'Leaves',
+    'Wellen':                     'Waves',
+    'Perlen':                     'Beads',
+    'Becken':                     'Basin',
+    'Garten':                     'Garden',
+    'Mauer':                      'Wall',
+    'Piazza':                     'Piazza',
+    'Innenstadt':                 'Inner city',
+    'Wall':                       'Rampart',
+    'Mittelfeld':                 'Middle field',
+    'Raster':                     'Grid',
+    'Kuppe':                      'Crown',
+    'obere Terrasse':             'upper terrace',
+    'mittlere Terrasse':          'middle terrace',
+    'untere Terrasse':            'lower terrace',
+    'Umgänge':                    'Ambulatories',
+    'Stadt':                      'City',
+    'Vorfeld':                    'Approach',
+    'Auge':                       'Eye',
+    'Augenring':                  'Eye ring',
+    'Laterne':                    'Lantern',
+    'Reihe 12':                   'Row 12',
+    'Reihe 16':                   'Row 16',
+    'Reihe 20':                   'Row 20',
+    'Reihe 24':                   'Row 24',
+    'Reihe 28':                   'Row 28',
+    'Reihe 32':                   'Row 32',
+
+    /* --- Pigmentwelten ----------------------------------------------------- */
+    'Erdpigmente':                'Earth Pigments',
+    'Nordlicht':                  'Northern Light',
+    'Färbergarten':               "Dyer's Garden",
+    'Rauchglas':                  'Smoked Glass',
+    'Goldgrund':                  'Gold Ground',
+
+    /* --- Pigmente ----------------------------------------------------------
+       Wo es das Wort im Englischen wirklich gibt, steht es: Krapp ist
+       `Madder`, Waid ist `Woad`, Cochenille ist `Cochineal`. Das sind
+       Farbstoffnamen, keine Erfindungen.
+
+       Eine Ausnahme: `Kalk` heißt wörtlich `Lime` und liest sich dann zuerst
+       als Frucht. `Limewash` trifft die Farbe und lässt keinen Zweifel. */
+    'Terrakotta':   'Terracotta',
+    'Ocker':        'Ochre',
+    'Petrol':       'Petrol',
+    'Indigo':       'Indigo',
+    'Moos':         'Moss',
+    'Mohn':         'Poppy',
+    'Nebelblau':    'Mist Blue',
+    'Pflaume':      'Plum',
+    'Anthrazit':    'Anthracite',
+    'Elfenbein':    'Ivory',
+
+    'Tanne':        'Fir',
+    'Amethyst':     'Amethyst',
+    'Tiefsee':      'Deep Sea',
+    'Flechte':      'Lichen',
+    'Beere':        'Berry',
+    'Fjord':        'Fjord',
+    'Heidekraut':   'Heather',
+    'Stahl':        'Steel',
+    'Polarnacht':   'Polar Night',
+    'Raureif':      'Hoarfrost',
+
+    'Krapp':        'Madder',
+    'Safran':       'Saffron',
+    'Waid':         'Woad',
+    'Färberginster': "Dyer's Broom",
+    'Cochenille':   'Cochineal',
+    'Malve':        'Mallow',
+    'Katechu':      'Catechu',
+    'Rinde':        'Bark',
+    'Ruß':          'Soot',
+    'Leinen':       'Linen',
+
+    'Taubenblau':   'Dove Blue',
+    'Altrosa':      'Dusty Rose',
+    'Farn':         'Fern',
+    'Kastanie':     'Chestnut',
+    'Schilf':       'Reed',
+    'Zinn':         'Pewter',
+    'Trüffel':      'Truffle',
+    'Nebel':        'Mist',
+    'Basalt':       'Basalt',
+    'Kalk':         'Limewash',
+
+    'Bronze':       'Bronze',
+    'Lichtgold':    'Light Gold',
+    'Nachtblau':    'Night Blue',
+    'Kobalt':       'Cobalt',
+    'Himmel':       'Sky',
+    'Ochsenblut':   'Oxblood',
+    'Purpur':       'Purple',
+    'Grund':        'Ground',
+
+    /* --- Die Beschreibung im Kopf der Seite --------------------------------
+       Sie steht in <meta name="description">; Suchmaschinen und die
+       Vorschau beim Teilen lesen sie. */
+    'Mandalas gestalten und kolorieren – ein Symmetrie-Werkzeug für ruhige Stunden. Offline, ohne Konto, ohne Werbung.':
+      'Design and colour mandalas — an instrument for symmetry, for quiet hours. Offline, no account, no advertising.'
+  };
+
+
+  /* ------------------------------------------------------------------------
+     Welche Sprache gilt
+     ---------------------------------------------------------------------- */
+
+  var SCHLUESSEL = 'mandala-sprache';
+
+  function ausAdresse() {
+    var treffer = /[?&]sprache=(de|en)\b/.exec(location.search);
+    return treffer ? treffer[1] : null;
+  }
+
+  function gemerkt() {
+    try {
+      var wert = localStorage.getItem(SCHLUESSEL);
+      return (wert === 'de' || wert === 'en') ? wert : null;
+    } catch (err) { return null; }
+  }
+
+  /* Der deutschsprachige Raum bekommt Deutsch, alles andere Englisch.
+     `navigator.languages` statt `navigator.language`, weil auf einem iPad mit
+     mehreren eingestellten Sprachen nur die Liste die zweite Wahl kennt. */
+  function vomGeraet() {
+    var liste = navigator.languages || [navigator.language || 'en'];
+    for (var i = 0; i < liste.length; i++) {
+      if (String(liste[i] || '').toLowerCase().indexOf('de') === 0) return 'de';
+    }
+    return 'en';
+  }
+
+  var aktiv = ausAdresse() || gemerkt() || vomGeraet();
+
+  function waehle(sprache) {
+    if (sprache !== 'de' && sprache !== 'en') return;
+    try { localStorage.setItem(SCHLUESSEL, sprache); } catch (err) {}
+    /* Neu laden statt alles zurückbauen: Die Namen stecken nach dem Start in
+       aufgebauten Knöpfen, in gezeichneten Vorschauen und im Blatt selbst.
+       Ein Neustart ist ehrlicher als ein halber Umbau – und dauert keine
+       Sekunde, weil alles lokal liegt. Die Werke bleiben, sie liegen im
+       Speicher des Geräts und nicht in der Seite. */
+    location.replace(location.pathname + '?sprache=' + sprache + location.hash);
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Übersetzen
+     ---------------------------------------------------------------------- */
+
+  function t(text, sinn) {
+    if (aktiv === 'de' || typeof text !== 'string') return text;
+
+    if (sinn) {
+      var mitSinn = EN[text + ' @' + sinn];
+      if (mitSinn !== undefined) return mitSinn;
+    }
+
+    var fertig = EN[text];
+    if (fertig !== undefined) return fertig;
+
+    /* Auch mit Rand: Text aus dem HTML kommt oft mit Zeilenumbruch und
+       Einrückung. Der Rand bleibt stehen, nur der Kern wird getauscht. */
+    var kern = text.trim();
+    if (kern !== text && kern) {
+      if (sinn && EN[kern + ' @' + sinn] !== undefined) {
+        return text.replace(kern, EN[kern + ' @' + sinn]);
+      }
+      if (EN[kern] !== undefined) return text.replace(kern, EN[kern]);
+    }
+    return text;
+  }
+
+  /* Die fertige Seite einmal durchgehen. Textknoten und die vier Attribute,
+     die ein Mensch je zu hören oder zu sehen bekommt.
+
+     `data-sinn` gilt für das Element und alles darin – so genügt eine Marke
+     am umschließenden Kasten, wenn mehrere Knöpfe denselben Sinn teilen. */
+  var ATTRIBUTE = ['aria-label', 'title', 'placeholder', 'alt'];
+
+  /* Ganze Absätze -----------------------------------------------------------
+
+     Ein Fließtext mit <b> darin zerfällt beim Durchgang über die Textknoten
+     in Bruchstücke – „packt alles in eine Datei und öffnet das", dann fett
+     „In Dateien sichern", dann der Rest. Einzeln übersetzt ergibt das keinen
+     Satz, und in einem Wörterbuch stünden Halbsätze.
+
+     Solche Absätze tragen deshalb `data-satz`. Sie werden als Ganzes
+     nachgeschlagen – Schlüssel ist ihr innerer HTML-Text, auf einzelne
+     Leerzeichen zusammengezogen, damit Einrückung und Zeilenumbruch im
+     Quelltext nichts ausmachen. */
+  function glatt(text) {
+    return String(text).replace(/\s+/g, ' ').trim();
+  }
+
+  function absaetze(wurzel) {
+    var offen = wurzel.querySelectorAll('[data-satz]');
+    for (var i = 0; i < offen.length; i++) {
+      var schluessel = glatt(offen[i].innerHTML);
+      var fertig = EN[schluessel];
+      if (fertig !== undefined) offen[i].innerHTML = fertig;
+    }
+  }
+
+  function sinnVon(knoten) {
+    var el = knoten.nodeType === 1 ? knoten : knoten.parentElement;
+    var traeger = el && el.closest ? el.closest('[data-sinn]') : null;
+    return traeger ? traeger.getAttribute('data-sinn') : null;
+  }
+
+  function seite(wurzel) {
+    if (aktiv === 'de') return;
+    wurzel = wurzel || document;
+
+    /* Erst die ganzen Absätze, dann die einzelnen Knoten: Was oben schon
+       vollständig ersetzt wurde, ist danach englisch und wird vom Durchgang
+       über die Textknoten nicht mehr angefasst. */
+    absaetze(wurzel);
+
+    var lauf = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, null);
+    var offen = [];
+    var knoten;
+    while ((knoten = lauf.nextNode())) offen.push(knoten);
+    offen.forEach(function (n) {
+      var neu = t(n.nodeValue, sinnVon(n));
+      if (neu !== n.nodeValue) n.nodeValue = neu;
+    });
+
+    var alle = wurzel.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var sinn = sinnVon(alle[i]);
+      for (var k = 0; k < ATTRIBUTE.length; k++) {
+        var wert = alle[i].getAttribute(ATTRIBUTE[k]);
+        if (!wert) continue;
+        var neu = t(wert, sinn);
+        if (neu !== wert) alle[i].setAttribute(ATTRIBUTE[k], neu);
+      }
+    }
+
+    if (document.documentElement) document.documentElement.lang = 'en';
+    if (document.title) document.title = t(document.title);
+
+    /* Die Beschreibung im Kopf. Sie steht nicht auf der Seite, wird aber
+       gelesen – von Suchmaschinen und von der Vorschau, die beim Teilen
+       eines Links erscheint. */
+    var beschreibung = document.querySelector('meta[name="description"]');
+    if (beschreibung) {
+      beschreibung.setAttribute('content', t(beschreibung.getAttribute('content')));
+    }
+  }
+
+  return {
+    get aktiv() { return aktiv; },
+    t: t,
+    seite: seite,
+    waehle: waehle,
+    woerter: EN
+  };
+})();
+
+/* Kurz, weil es an sehr vielen Stellen steht. */
+function T(text, sinn) { return Sprache.t(text, sinn); }
