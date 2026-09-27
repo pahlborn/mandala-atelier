@@ -53,11 +53,28 @@ function findInPlaywrightCache() {
   return null;
 }
 
+/* playwright-core liegt nicht immer im Projekt - in frischen Umgebungen
+   steht nur ein globales playwright zur Verfügung. Beide Orte werden
+   probiert, bevor der Lauf mit einer Anweisung abbricht, die dort nicht
+   hilft. */
+function ladeChromium() {
+  const orte = ['playwright-core', 'playwright'];
+  for (const wurzel of (require('module').globalPaths || [])) {
+    orte.push(require('path').join(wurzel, 'playwright'));
+    orte.push(require('path').join(wurzel, 'playwright', 'node_modules', 'playwright-core'));
+  }
+  orte.push('/opt/node22/lib/node_modules/playwright/node_modules/playwright-core');
+  orte.push('/opt/node22/lib/node_modules/playwright');
+  for (const ort of orte) {
+    try { const m = require(ort); if (m && m.chromium) return m.chromium; }
+    catch (e) { /* weiter */ }
+  }
+  return null;
+}
+
 async function launch() {
-  let chromium;
-  try {
-    chromium = require('playwright-core').chromium;
-  } catch (err) {
+  const chromium = ladeChromium();
+  if (!chromium) {
     throw new Error('playwright-core fehlt. Bitte zuerst "npm install" ausführen.');
   }
 
