@@ -123,9 +123,12 @@ Der Schutzbereich ist hier gemauertes Ringwerk, mehr nicht.
 > was wir wollen."
 >
 > Damit fällt die Sperre, nicht die Regel. Was bleibt, ist die Fassung dieses
-> Abschnitts: übernommen wird die Ordnung, nicht die Bedeutung. Erstes Motiv
-> nach dieser Klärung ist „Neun Dreiecke" (Fassung 2.36), siehe
-> [`yantra.html`](yantra.html).
+> Abschnitts: übernommen wird die Ordnung, nicht die Bedeutung.
+>
+> Ein erster Versuch danach, „Neun Dreiecke" in Fassung 2.36, ist in 2.37
+> wieder **zurückgenommen** worden — nicht wegen der Herkunft, sondern weil
+> die Zeichnung nichts taugte. Die Klärung bleibt davon unberührt; was daran
+> zu lernen war, steht in [`yantra.html`](yantra.html).
 
 ---
 

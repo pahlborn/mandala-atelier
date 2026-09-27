@@ -408,7 +408,7 @@ jedem Gerät. Wichtig, damit Lehrkräfte ein Blatt ausdrucken und im Unterricht
 verwenden können. Die Werte werden nicht frei gewürfelt, sondern als Liste
 gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
 
-## Motivkatalog (46 Vorlagen, 8 Welten)
+## Motivkatalog (45 Vorlagen, 7 Welten)
 
 - **Geometrisch-klassisch:** Sternkranz, Rautenkranz, Sternmandala fein,
   Achteckstern, Gitterrose, Kordelstern
@@ -424,7 +424,6 @@ gemischt – so kommt jeder Eintrag der Legende garantiert auch im Bild vor.
   Rechenmandala ZR 20
 - **Feinwerk:** Spitzenrad, Perlgrat, Sprossenband, Tauwerk, Zellenwerk,
   Flechtband, Kettenglied, Schneckenwerk, Nadelkrone
-- **Yantra-Geometrie:** Neun Dreiecke
 
 **Regel für neue Motive:** Genug Ringe, damit der Hintergrund in Felder
 zerfällt. Ein Feld, das von der Nabe bis zum Rand reicht, wirkt beim
