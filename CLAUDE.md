@@ -156,3 +156,9 @@ und nur nötig, wenn `docs/druck.html` bzw. das Regal angefasst wurde.
 Entwickelt wird auf `claude/mandala-atelier-architektur-o8hy4b`, gepusht wird
 **auch direkt nach `main`** — das ist ausdrücklich so gewollt, weil GitHub Pages
 nur `main` ausliefert und die Änderung sonst nicht auf dem iPad ankommt.
+
+Wo doch einmal ein Pull Request entsteht, **öffnet und merged Claude ihn
+selbst** — beides, nicht nur das Öffnen. Ausdrücklich so gewünscht (September
+2026). Vor dem Merge gilt trotzdem: Prüfläufe grün, `mergeable_state` sauber,
+keine offenen Anmerkungen. Danach wird der Zweig von `main` neu aufgesetzt;
+ein gemergter Pull Request ist fertig und trägt keine neue Arbeit mehr.
