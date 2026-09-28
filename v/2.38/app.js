@@ -1,5 +1,12 @@
 'use strict';
 
+/* Im Regal ohne Service Worker – siehe tools/einfrieren.js.
+   Eine eingefrorene Fassung darf keinen anmelden: Ihr `activate` löschte
+   den Offline-Vorrat der laufenden App. */
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.register = function () { return new Promise(function () {}); };
+}
+
 /* ============================================================================
    Mandala Atelier – gesamte Logik
 
@@ -234,7 +241,7 @@ const WALL_ALPHA = 60;
    ------------------------------------------------------------------------- */
 
 const Store = {
-  prefix: 'mandala-atelier.',
+  prefix: 'mandala-atelier-regal2-38.',
   get(key, fallback) {
     try {
       const raw = localStorage.getItem(this.prefix + key);
@@ -2747,7 +2754,7 @@ const Gallery = {
       if (!window.indexedDB) return resolve();
       let request;
       try {
-        request = indexedDB.open('mandala-atelier', 1);
+        request = indexedDB.open('mandala-atelier-regal2-38', 1);
       } catch (err) {
         return resolve();
       }
@@ -4385,6 +4392,16 @@ function syncFassungSchalter() {
 }
 
 /* ===== FASSUNGSMELDUNG – ENDE ============================================= */
+
+/* Im Regal ohne Fassungsmeldung - siehe tools/einfrieren.js. Eine alte
+   Fassung darf weder nach neueren sehen noch den Vorrat raeumen: Das
+   traefe den Vorrat der laufenden App. */
+if (typeof FASSUNGSMELDUNG !== 'undefined' && FASSUNGSMELDUNG) {
+  FASSUNGSMELDUNG.sehen    = function () {};
+  FASSUNGSMELDUNG.schalten = function () {};
+  FASSUNGSMELDUNG.erlaubt  = function () { return false; };
+}
+
 
 window.MandalaAtelier = {
   FASSUNGSMELDUNG: FASSUNGSMELDUNG,
