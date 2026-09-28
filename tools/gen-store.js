@@ -162,7 +162,7 @@ function warte(seite, ms) {
 
   /* ---- Blatt ------------------------------------------------------------ */
   const blatt = await ctx.newPage();
-  await blatt.goto('file://' + path.join(ROOT, 'atelier3', 'index.html'));
+  await blatt.goto('file://' + path.join(ROOT, 'atelier3', 'index.html') + '?fassung=aus');
   await blatt.waitForFunction('window.Blatt');
 
   /* Die Hand. Zwei Arten, ein Blatt hervorzuholen:

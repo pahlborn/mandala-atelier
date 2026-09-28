@@ -105,7 +105,7 @@ async function run() {
        eine Ebene darüber. Erst wenn der eigene Worker installiert ist und
        clients.claim() ruft, übernimmt er. Das darf einen Moment dauern;
        gemessen wird, ob es überhaupt passiert. */
-    await page.goto(server.url + '/atelier3/index.html');
+    await page.goto(server.url + '/atelier3/index.html?fassung=aus');
     await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
 
     let wer = '(keiner)';
@@ -136,7 +136,7 @@ async function run() {
        der Testlauf sähe die neue Fassung dann selbst dann nicht, wenn sie
        längst im Vorrat liegt. Auf dem iPad entspricht das dem Unterschied
        zwischen „App wieder hervorholen“ und „App wirklich beenden“. */
-    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html?fassung=aus');
     await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
     const nochAlt = await page.evaluate(function () {
       return window.__frischeFassung === true;
@@ -145,7 +145,7 @@ async function run() {
        wird jetzt nachgeladen. */
     await page.waitForTimeout(1500);
 
-    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html?fassung=aus');
     await page.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
     const jetztNeu = await page.evaluate(function () {
       return window.__frischeFassung === true;
@@ -167,7 +167,7 @@ async function run() {
     });
     prüfe('neue Fassung des Ateliers kommt ohne Versionswechsel an', atelierNeu,
           atelierNeu ? 'beim zweiten Öffnen' : 'sie kam nie an – siehe fetch in sw.js');
-    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html');
+    page = await neuOeffnen(context, page, server.url + '/atelier3/index.html?fassung=aus');
     await page.waitForFunction('window.Blatt');
     prüfe('der Start bleibt sofort und offlinefähig', !nochAlt,
           nochAlt ? 'es wurde aufs Netz gewartet' : 'erst Vorrat, dann auffrischen');
@@ -275,7 +275,7 @@ async function run() {
        Fuß der Galerie – also genau dann nicht da, wenn man sie braucht: beim
        Öffnen. Geprüft wird deshalb, was ohne jede Bedienung sichtbar ist. */
     const sichtbar = {};
-    for (const ort of [['blatt', '/atelier3/index.html'], ['atelier', '/index.html']]) {
+    for (const ort of [['blatt', '/atelier3/index.html?fassung=aus'], ['atelier', '/index.html']]) {
       await page.goto(server.url + ort[1]);
       await page.waitForFunction(ort[0] === 'blatt' ? 'window.Blatt' : 'window.MandalaAtelier');
       await page.waitForTimeout(300);

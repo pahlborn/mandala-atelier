@@ -32,8 +32,12 @@ const { launch } = require('./browser');
    englischen System englisch, und jede Prüfung auf einen deutschen Satz
    schlüge fehl, ohne dass etwas kaputt wäre. Die englische Fassung prüft
    tools/test-sprache.js. */
+/* ?fassung=aus: Sonst stellt die App beim ersten Start ihre Frage nach der
+   Fassungsmeldung, das Band legt sich über die Oberfläche und fängt die
+   Klicks des Prüflaufs ab. Genau daran ist dieser Lauf beim ersten Mal
+   hängengeblieben. */
 const FILE_URL = 'file://' + path.join(__dirname, '..', 'atelier3', 'index.html') +
-                 '?sprache=de';
+                 '?sprache=de&fassung=aus';
 
 const befunde = [];
 function prüfe(name, ok, notiz) {
@@ -1166,7 +1170,7 @@ async function run() {
   let fortsetzen = 'übersprungen';
   try {
     const p2 = await context.newPage();
-    await p2.goto(server.url + '/atelier3/index.html');
+    await p2.goto(server.url + '/atelier3/index.html?fassung=aus');
     await p2.waitForFunction('window.Blatt && window.Blatt.sheet.relief');
     await p2.waitForFunction('window.Blatt.sheet.plan !== null');
 

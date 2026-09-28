@@ -1,5 +1,12 @@
 'use strict';
 
+/* Im Regal ohne Service Worker – siehe tools/einfrieren.js.
+   Eine eingefrorene Fassung darf keinen anmelden: Ihr `activate` löschte
+   den Offline-Vorrat der laufenden App. */
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.register = function () { return new Promise(function () {}); };
+}
+
 /* ============================================================================
    Sprache – Deutsch im deutschsprachigen Raum, sonst Englisch.
 
@@ -231,7 +238,7 @@ var Sprache = (function () {
      Welche Sprache gilt
      ---------------------------------------------------------------------- */
 
-  var SCHLUESSEL = 'atelier3-sprache';
+  var SCHLUESSEL = 'atelier3-regal3-24-sprache';
 
   function ausAdresse() {
     var treffer = /[?&]sprache=(de|en)\b/.exec(location.search);

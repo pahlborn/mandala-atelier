@@ -166,7 +166,7 @@ a { color:inherit; }
 
   /* ---- Die Stimmungen von Blatt, ebenfalls echt gerechnet ---------------- */
   const seite2 = await ctx.newPage();
-  await seite2.goto('file://' + path.join(ROOT, 'atelier3', 'index.html'));
+  await seite2.goto('file://' + path.join(ROOT, 'atelier3', 'index.html') + '?fassung=aus');
   await seite2.waitForFunction('window.Blatt');
 
   const blatt = await seite2.evaluate(function (px) {

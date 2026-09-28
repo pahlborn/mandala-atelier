@@ -101,7 +101,7 @@ async function zaehle() {
     };
   });
 
-  await page.goto('file://' + path.join(WURZEL, 'atelier3', 'index.html') + '?sprache=de');
+  await page.goto('file://' + path.join(WURZEL, 'atelier3', 'index.html') + '?sprache=de&fassung=aus');
   await page.waitForFunction('window.Blatt && window.Blatt.KINDS');
   const b = await page.evaluate(function () {
     const B = window.Blatt;

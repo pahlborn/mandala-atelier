@@ -17,6 +17,14 @@
    5. ?fassung=aus schaltet alles ab — sonst geriete das Band in jedes Bild,
       das die zehn Werkzeuge rendern.
 
+   Dazu die Wege, die seit 3.24 dazugekommen sind:
+
+   6. Beim allerersten Start wird EINMAL gefragt. Danach nie wieder.
+   7. Still gestellt wird beim Fund nur GEMERKT, nicht geladen - niemand
+      verliert sein Blatt mitten in der Arbeit.
+   8. Beim nächsten Start wird das Gemerkte angewendet, und danach sagt ein
+      Toast, dass es geklappt hat.
+
    Jeder Haken ist so gebaut, dass er auch anschlagen KANN; ein Prüflauf, der
    das nicht tut, ist wertlos.
    ========================================================================== */
@@ -90,9 +98,20 @@ function server() {
        App beim Start noch mit Netz, das Band stuende schon da, und der Lauf
        meldete es hinterher als „Band ohne Netz". Erst laden, dann das Netz
        kappen, dann anschalten; schalten() prueft sofort. */
-    if (opt.an && !opt.offline) {
-      await p.goto(basis, { waitUntil: 'load' });
-      await p.evaluate(function () { localStorage.setItem('atelier3-fassungsmeldung', 'an'); });
+    if ((opt.an || opt.vor) && !opt.offline) {
+      /* Der Vorbereitungslauf MUSS abgeschaltet sein. Sonst fährt die App auch
+         dort hoch, ihr start() verbraucht die eben gesetzten Merker - etwa
+         „getan" für den Toast - und der eigentliche Lauf findet nichts mehr
+         vor. Genau daran scheiterte der Toast-Haken zuerst. */
+      await p.goto(basis + '?fassung=aus', { waitUntil: 'load' });
+      await p.evaluate(function (o) {
+        if (o.an) localStorage.setItem('atelier3-fassungsmeldung', 'an');
+        if (o.still) localStorage.setItem('atelier3-fassung-still', 'an');
+        /* „schon gefragt" ist der Regelfall aller älteren Haken - sonst
+           käme statt der Prüfung die Erststart-Frage. */
+        if (o.gefragt !== false) localStorage.setItem('atelier3-fassung-gefragt', '1');
+        Object.keys(o.vor || {}).forEach(function (k) { localStorage.setItem(k, o.vor[k]); });
+      }, { an: opt.an, still: opt.still, gefragt: opt.gefragt, vor: opt.vor });
     }
     await p.goto(basis + (opt.zusatz || ''), { waitUntil: 'load' });
     if (opt.offline) {
@@ -102,22 +121,33 @@ function server() {
       await p.evaluate(function () { window.Blatt.FASSUNGSMELDUNG.schalten(true); });
     }
     await p.waitForTimeout(2600);
-    const band = await p.evaluate(function () {
-      const d = document.getElementById('fassungsband');
-      return d ? d.textContent.replace(/\s+/g, ' ').trim() : null;
-    }).catch(function () { return null; });
+    const sicht = await p.evaluate(function () {
+      const t = function (id) {
+        const d = document.getElementById(id);
+        return d ? d.textContent.replace(/\s+/g, ' ').trim() : null;
+      };
+      return { band: t('fassungsband'), frage: t('fassungsfrage'), toast: t('fassungstoast'),
+               bereit: localStorage.getItem('atelier3-fassung-bereit'),
+               fassung: (window.Blatt && window.Blatt.FASSUNG) || null };
+    }).catch(function () { return {}; });
     await ctx.close();
     return { name: name, abrufe: raus.filter(u => /fassung\.json/.test(u)),
              fremd: raus.filter(u => u.indexOf('FREMD') === 0),
-             band: band, fehler: fehler };
+             band: sicht.band, frage: sicht.frage, toast: sicht.toast,
+             bereit: sicht.bereit, fassung: sicht.fassung, fehler: fehler };
   }
 
-  const hier = JSON.parse(fs.readFileSync(path.join(ROOT, 'atelier3', 'fassung.json'), 'utf8'));
+  /* Die Wahrheit ist, was die App SAGT, nicht was in fassung.json steht.
+     Der erste Entwurf verglich gegen die Datei - und meldete drei Befunde,
+     sobald die Nummer erhöht, die Datei aber noch nicht neu geschrieben war.
+     Ein Prüflauf, der bei einem Versionssprung von selbst rot wird, erzieht
+     nur dazu, ihn zu ignorieren. */
+  gefaelscht = null;
+  let r = await lauf('ab Werk', { an: false, vor: {} });
+  const hier = { fassung: r.fassung };
   console.log('\nFassungsmeldung — Blatt ' + hier.fassung + '\n');
 
   /* 1 — ab Werk still */
-  gefaelscht = null;
-  let r = await lauf('ab Werk', { an: false });
   let ok1 = r.abrufe.length === 0 && r.fremd.length === 0 && !r.band;
   console.log('  ab Werk aus          ' + (ok1 ? 'kein Abruf, kein Band'
     : 'ABRUF TROTZ AUS: ' + r.abrufe.concat(r.fremd).join(', ')));
@@ -157,7 +187,58 @@ function server() {
   console.log('  ?fassung=aus         ' + (ok5 ? 'kein Abruf, kein Band' : 'GREIFT NICHT'));
   if (!ok5) befunde.push('?fassung=aus');
 
-  /* 6 — die Regalfassung. Sie traegt den Block, aber stillgelegt: kein Abruf,
+  /* 6 — die einmalige Frage beim ersten Start. */
+  gefaelscht = null;
+  r = await lauf('erster Start', { an: false, vor: {}, gefragt: false });
+  const ok6 = !!r.frage && r.abrufe.length === 0;
+  console.log('  erster Start         ' + (ok6
+    ? 'fragt einmal, und holt vorher nichts'
+    : (r.frage ? 'FRAGT, ABER HOLT SCHON: ' + r.abrufe.length : 'FRAGT NICHT')));
+  if (!ok6) befunde.push('Erststart-Frage');
+
+  /* 6b — schon gefragt: nie wieder fragen. */
+  r = await lauf('schon gefragt', { an: true });
+  const ok6b = !r.frage;
+  console.log('  schon gefragt        ' + (ok6b ? 'fragt nicht noch einmal' : 'FRAGT WIEDER'));
+  if (!ok6b) befunde.push('fragt wieder');
+
+  /* 7 — still gestellt: merken statt laden. Das ist der Haken, an dem das
+     Blatt eines Kindes hängt: Wird hier geladen, ist die Arbeit weg. */
+  gefaelscht = { fassung: '9.99', seit: '2099-01-01', was: 'Probefassung' };
+  r = await lauf('still', { an: true, still: true });
+  const ok7 = r.bereit === '9.99' && !r.band && r.fassung === hier.fassung;
+  console.log('  still gestellt       ' + (ok7
+    ? 'gemerkt (9.99), kein Band, nicht geladen'
+    : 'gemerkt: ' + r.bereit + ', Band: ' + !!r.band + ', Fassung: ' + r.fassung));
+  if (!ok7) befunde.push('stilles Merken');
+
+  /* 8 — beim nächsten Start anwenden. Vorgemerkt wird eine Nummer, die es
+     WIRKLICH gibt, sonst liefe der Versuch ins Leere. Angewendet heißt hier:
+     Vorrat geräumt und neu geladen; dass die Fassung danach dieselbe ist,
+     liegt daran, dass es keine neuere Datei gibt - der Toast schweigt dann
+     zu Recht. */
+  gefaelscht = null;
+  r = await lauf('anwenden', { an: true, vor: { 'atelier3-fassung-bereit': '9.99' } });
+  const ok8 = r.bereit === null && r.fassung === hier.fassung && !r.band;
+  console.log('  Gemerktes anwenden   ' + (ok8
+    ? 'angewendet und wieder vergessen - kein Kreisen'
+    : 'bereit danach: ' + r.bereit + ', Fassung: ' + r.fassung));
+  if (!ok8) befunde.push('Anwenden');
+
+  /* 8b — der Toast nach gelungenem Update. */
+  r = await lauf('toast', { an: true, vor: { 'atelier3-fassung-getan': '3.0' } });
+  const ok8b = !!r.toast && r.toast.indexOf(hier.fassung) >= 0;
+  console.log('  Toast danach         ' + (ok8b ? 'sagt: „' + r.toast + '"'
+    : (r.toast ? 'TOAST OHNE NUMMER: ' + r.toast : 'KEIN TOAST')));
+  if (!ok8b) befunde.push('Toast');
+
+  /* 8c — und er schweigt, wenn es NICHT geklappt hat. */
+  r = await lauf('toast still', { an: true, vor: { 'atelier3-fassung-getan': '9.99' } });
+  const ok8c = !r.toast;
+  console.log('  Toast bei Fehlschlag ' + (ok8c ? 'schweigt, richtig' : 'MELDET ERFOLG OBWOHL NICHT'));
+  if (!ok8c) befunde.push('Toast bei Fehlschlag');
+
+  /* 9 — die Regalfassung. Sie traegt den Block, aber stillgelegt: kein Abruf,
      kein Band, und vor allem kein Knopf, der den Vorrat der laufenden App
      raeumen koennte. Geprueft wird die NEUESTE eingefrorene Fassung, denn nur
      die hat den Block ueberhaupt. */
