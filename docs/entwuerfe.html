@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Fünf Entwürfe — gemessen am Ausmalen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Fünf Ordnungen aus Mathematik, Natur und Musik, außerhalb der App gebaut und daraufhin gemessen, ob sich jedes Feld auch füllen lässt. Zwei tragen, drei nicht.">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../beide-icon-192.png">
+
+<!--
+  Kein Schaufenster, sondern Versuche zum Ansehen. Nichts davon steht in der
+  App. Gerechnet wird von tools/entwuerfe/ - dieselben Dateien, die auch die
+  Bilder erzeugt haben, damit die Seite nachgerechnet werden kann statt nur
+  geglaubt. Die Zahlen sind an genau diesen Zeichnungen gemessen: Wand ab
+  alpha > 60 wie in app.js, Felder wie das Fuellwerkzeug sie sieht,
+  "ausmalbar" ab 80 Bildpunkten.
+-->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --room: #efe9dd; --card: #f8f4ea; --blatt: #f8f4ea; --ink: #2f2a22;
+    --quiet: #6d6355; --edge: rgba(60, 48, 32, 0.16);
+    --tut: #2f6b45; --offen: #a9700a; --stop: #9a3b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --room: #16151a; --card: #201f25; --blatt: #f1ece1; --ink: #e8e2d6;
+            --quiet: #9a9287; --edge: rgba(0, 0, 0, 0.5);
+            --tut: #6fbf8e; --offen: #e0a93c; --stop: #e08573; }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 48px) clamp(16px, 4vw, 36px)
+             calc(clamp(20px, 5vw, 48px) + env(safe-area-inset-bottom));
+    background: var(--room); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 .3rem; font-weight: 600; }
+  .lede { color: var(--quiet); margin-bottom: 1.6rem; }
+  h2 { font-size: 13px; margin: 2.8rem 0 .9rem; font-weight: 600;
+       text-transform: uppercase; letter-spacing: .06em; color: var(--quiet); }
+  p { margin: 0 0 1rem; }
+  a { color: inherit; }
+
+  .stand {
+    background: rgba(169, 112, 10, .12);
+    border: 1px solid rgba(169, 112, 10, .35);
+    border-radius: 12px; padding: 14px 18px; margin: 0 0 1.4rem; font-size: 15px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .stand { background: rgba(224, 169, 60, .12); border-color: rgba(224, 169, 60, .3); }
+  }
+  .stand > b:first-of-type { display: block; margin-bottom: .3rem; }
+
+  .riss { width: 100%; height: auto; display: block; border-radius: 10px; }
+  .hero { background: var(--card); border-radius: 16px; padding: 16px;
+          margin: 0 0 1.6rem; }
+  .hero .riss { max-width: 620px; margin: 0 auto; }
+  .hero p { font-size: 14px; color: var(--quiet); margin: .8rem 0 0;
+            text-align: center; }
+
+  .reihe { display: grid; gap: 14px; margin-bottom: 1.4rem;
+           grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 700px) { .reihe { grid-template-columns: 1fr; } }
+  .stueck { background: var(--card); border-radius: 16px; padding: 14px 16px 16px; }
+  .stueck h3 { font-size: 17px; margin: .7rem 0 .2rem; font-weight: 600; }
+  .zahlen { font-size: 13px; color: var(--quiet); margin: 0;
+            font-variant-numeric: tabular-nums; }
+  .zahlen b { color: var(--ink); font-weight: 600; }
+  .stueck p.sagt { font-size: 14.5px; color: var(--quiet); margin: .5rem 0 0; }
+
+  .einzeln { background: var(--card); border-radius: 16px; padding: 18px 22px 20px;
+             display: grid; gap: 0 24px; align-items: start;
+             grid-template-columns: minmax(0, 360px) minmax(0, 1fr); margin-bottom: 14px; }
+  @media (max-width: 620px) { .einzeln { grid-template-columns: 1fr; gap: 14px; } }
+  .einzeln h3 { font-size: 19px; margin: 0 0 .35rem; font-weight: 600; }
+  .einzeln p { font-size: 15px; color: var(--quiet); }
+  .einzeln p b { color: var(--ink); font-weight: 600; }
+
+  .warn { box-shadow: inset 3px 0 0 var(--offen); }
+  .gut  { box-shadow: inset 3px 0 0 var(--tut); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px;
+          font-variant-numeric: tabular-nums; margin: 0 0 1.2rem; }
+  th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--edge); }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+       color: var(--quiet); font-weight: 600; }
+  .quelle { font-size: 14.5px; color: var(--quiet); }
+  .quelle li { margin-bottom: .5rem; }
+
+  footer { margin-top: 2.8rem; font-size: 13.5px; color: var(--quiet);
+           border-top: 1px solid var(--edge); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Fünf Entwürfe</h1>
+  <p class="lede">Aus Mathematik, Natur und Musik. Außerhalb der App gebaut und
+     daraufhin gemessen, worauf es beim Ausmalen ankommt: Hat jede Form einen
+     Rand? Nichts davon steht in der App.</p>
+
+  <div class="stand">
+    <b>Die Bedingung, an der alles hängt.</b>
+    Im Mandala wird getippt, und das Füllwerkzeug läuft bis zur nächsten Wand.
+    <b>Jede Form braucht also einen geschlossenen Rand</b> — sonst läuft die
+    Farbe über das halbe Blatt. In Blatt gilt das nicht: dort wird Pigment
+    über ein Relief gerieben, nicht getippt. Was nur für Blatt gedacht ist,
+    wird deshalb gezählt, aber nicht danach beurteilt.
+  </div>
+
+  <h2>Wie gemessen wird</h2>
+  <p>Die App prüft in <code>npm test</code> schon das <em>größte</em> Feld je
+     Motiv. Hier läuft die Gegenprobe: <b>alle</b> zusammenhängenden Gebiete
+     werden gezählt, mit derselben Wandschwelle wie im Füllwerkzeug
+     (<code>alpha&nbsp;&gt;&nbsp;60</code>). Drei Klassen statt zwei:</p>
+  <ul class="quelle">
+    <li><b>Feld</b> — ab 80 Bildpunkten. Das lässt sich mit dem Finger treffen.</li>
+    <li><b>Splitter</b> — 10 bis 80 Bildpunkte. Sichtbar, aber nicht zu treffen.
+        Das ist ein Befund.</li>
+    <li><b>winzig</b> — unter 10 Bildpunkten. Rundungsreste an Berührstellen,
+        auf Papier unsichtbar; die Kantenglättung des Füllwerkzeugs deckt sie zu.</li>
+  </ul>
+  <p>Die Grenzen der App: kein Feld über 4 % der Scheibe, keines breiter als
+     das 1,6-fache seines Segments.</p>
+
+  <table>
+    <thead><tr><th>Entwurf</th><th>für</th><th>Felder</th><th>Splitter</th>
+      <th>winzig</th><th>größtes</th><th>Median px²</th></tr></thead>
+    <tbody>
+    <tr><td>Kreisbrut</td><td>Mandala</td><td>253</td><td>9</td><td>176</td><td>1,2 %</td><td>887</td></tr>\n    <tr><td>Kieselschale</td><td>Mandala</td><td>376</td><td>0</td><td>32</td><td>3,9 %</td><td>347</td></tr>\n    <tr><td>Klangfeld</td><td>beide</td><td>96</td><td>1</td><td>9</td><td>2,9 %</td><td>1106</td></tr>\n    <tr><td>Fächergewölbe</td><td>beide</td><td>149</td><td>0</td><td>54</td><td>1,5 %</td><td>2292</td></tr>\n    <tr><td>Pendelriss</td><td>Blatt</td><td>48</td><td>72</td><td>439</td><td>27,9 %</td><td>767</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Die Entwürfe</h2>
+
+  <div class="einzeln gut">
+    <img class="riss" src="entwurf-kreisbrut.png" alt="Kreisbrut" loading="lazy">
+    <div>
+      <h3>Kreisbrut</h3>
+      <p class="zahlen">Sieben Achsen · 253 Felder · 9 Splitter · größtes 1,2 % · Median 887 px²</p>
+      <p><b>Die Ordnung.</b> Apollonische Kreispackung. Drei sich berührende
+      Kreise legen den vierten fest — das ist Descartes’ Kreissatz, und er ist
+      hier wirklich gerechnet, nicht nachempfunden: Von den beiden
+      Wurzelzweigen wird der genommen, der alle drei Kreise nachweislich
+      berührt. In jede Lücke der größtmögliche nächste, drei Schichten tief,
+      und in jeden Ringkreis noch eine kleine Packung.</p>
+     <p><b>Was er bringt.</b> Die Feldgrößen stufen sich von selbst — große
+      Kreise zum Ausmalen, kleine als Kies. Genau das fehlt dem Katalog: dort
+      ist jedes Feld ungefähr so groß wie sein Nachbar.</p>
+     <p class="quelle"><b>Quelle.</b> Descartes an Elisabeth von der Pfalz
+      (1643); Frederick Soddy, „The Kiss Precise“, <i>Nature</i> 137 (1936).</p>
+      <p><b>Urteil.</b> Der beste der fünf. Ruhig, gestuft, eindeutig füllbar. Den würde ich bauen.</p>
+    </div>
+  </div>
+  <div class="einzeln gut">
+    <img class="riss" src="entwurf-kieselschale.png" alt="Kieselschale" loading="lazy">
+    <div>
+      <h3>Kieselschale</h3>
+      <p class="zahlen">Acht Achsen · 376 Felder · <b>0 Splitter</b> · größtes 3,9 % · Median 347 px²</p>
+      <p><b>Die Ordnung.</b> Ein Gitter aus Poren, wie die Kieselschale eines
+      Radiolars. Die Zellwände sind ein <em>echtes</em> Voronoi-Gitter, über
+      Halbebenen-Schnitt gerechnet und nicht geschätzt; in jeder Zelle eine
+      Pore, deren Ring daneben groß genug bleibt, dass ein Finger ihn trifft.</p>
+     <p><b>Was er bringt.</b> Zwei Feldgrößen je Zelle, und die Stacheln laufen
+      über die Ringgrenzen hinweg — auch das gibt es im Katalog kein
+      einziges Mal.</p>
+     <p class="quelle"><b>Quelle.</b> Ernst Haeckel, <i>Report on the
+      Radiolaria</i> (1887) und <i>Kunstformen der Natur</i> (1899–1904);
+      D’Arcy Thompson, <i>On Growth and Form</i> (1917).</p>
+      <p><b>Urteil.</b> Das Gitter trägt. Die Stacheln nicht — sie lesen sich wie Streichhölzer und müssten anders gezeichnet werden oder ganz weg.</p>
+    </div>
+  </div>
+  <div class="einzeln warn">
+    <img class="riss" src="entwurf-klangfeld.png" alt="Klangfeld" loading="lazy">
+    <div>
+      <h3>Klangfeld</h3>
+      <p class="zahlen">Acht Achsen · 96 Felder · 1 Splitter · größtes 2,9 % · Median 1106 px²</p>
+      <p><b>Die Ordnung.</b> Die Knotenlinien einer schwingenden Membran — die
+      Linien, auf denen sich das Fell nicht bewegt und der Sand liegen bleibt.
+      Zwei Moden übereinandergelegt, wie auf einer angeregten Trommel:
+      <code>J₈</code> mit vier Knotenkreisen und <code>J₂₄</code> mit zweien.</p>
+     <p><b>Was er bringt.</b> Gekrümmte Wände mit wechselnder Krümmung, und
+      Zellen, die nach außen von selbst kleiner werden.</p>
+     <p class="quelle"><b>Quelle.</b> Lord Rayleigh, <i>The Theory of Sound</i>
+      (1877), §200 ff.; die Idee der Knotenfigur von Ernst Chladni,
+      <i>Die Akustik</i> (1802), geordnet von Mary Waller,
+      <i>Chladni Figures: A Study in Symmetry</i> (1961).</p>
+      <p><b>Urteil.</b> Die Zahlen bestehen, das Bild nicht. Die Innenhälfte bleibt leer, und die Zellen schwimmen als einzelne Kleckse in einem großen Feld. Physikalisch wahr, als Zeichnung dünn.</p>
+    </div>
+  </div>
+  <div class="einzeln warn">
+    <img class="riss" src="entwurf-faecher.png" alt="Fächergewölbe" loading="lazy">
+    <div>
+      <h3>Fächergewölbe</h3>
+      <p class="zahlen">Acht Achsen · 149 Felder · <b>0 Splitter</b> · größtes 1,5 % · Median 2292 px²</p>
+      <p><b>Die Ordnung.</b> Ein Fächergewölbe ist kein Polargitter: Jeder Fächer
+      sitzt auf einem Kämpfer, und alles darüber ist ein Kegel um diesen
+      Punkt — die Rippen strahlen vom Kämpfer aus, die Ringe sind Bögen
+      <em>um den Kämpfer</em>, nicht um die Mitte des Blattes.</p>
+     <p><b>Was schiefging.</b> Der erste Anlauf legte die Ringe um die Mitte:
+      eine Dartscheibe mit tadellosen Messwerten. Der zweite setzte die
+      Kämpfer richtig, aber an die Nabe — bei acht Segmenten ist die Lücke
+      dort vierzig Bildpunkte breit, der Fächer zerfiel in Stummel. Der
+      dritte schob die Kämpfer nach außen und sprang auf 31,8 % größtes
+      Feld. Gezeigt wird der zweite.</p>
+     <p class="quelle"><b>Quelle.</b> Robert Hooke (1675, als Anagramm);
+      Gaudís hängende Schnüre; Block/Ochsendorf zur Gewölbestatik.</p>
+      <p><b>Urteil.</b> Fehlgeschlagen. Drei Anläufe, und es bleibt eine Dartscheibe mit einem Stachelstern in der Mitte. Die Messung besteht — das ist gerade die Warnung: gute Zahlen sind kein Bild.</p>
+    </div>
+  </div>
+  <div class="einzeln warn">
+    <img class="riss" src="entwurf-pendelriss.png" alt="Pendelriss" loading="lazy">
+    <div>
+      <h3>Pendelriss</h3>
+      <p class="zahlen">Eine Kurve · 48 Felder · 72 Splitter · größtes 27,9 % — <b>nach der Mandala-Regel durchgefallen</b></p>
+      <p><b>Die Ordnung.</b> Ein Harmonograph: zwei abklingende Pendel. Die
+      Kurve wird von selbst dünner und wandert nach innen — genau die zwei
+      Hebel, die dem Katalog fehlen, und sie kommen aus der Physik statt aus
+      einem Einfall. Gezeichnet als <b>Band mit zwei Rändern</b>, nicht als
+      Tinte: nur so ist das Band selbst ein Feld und die Lücke daneben auch.</p>
+     <p><b>Was schiefging.</b> Sechsfach wiederholt wurde aus einer eleganten
+      Kurve ein Knäuel mit 880 Splittern. Als einzelne Kurve ist es ruhiger,
+      aber viel zu leer.</p>
+     <p class="quelle"><b>Quelle.</b> Charles Benham, <i>Harmonic Vibrations</i>
+      (1909); Anthony Ashton, <i>Harmonograph</i>.</p>
+      <p><b>Urteil.</b> Fürs Mandala unbrauchbar, und für Blatt zu unruhig beziehungsweise zu leer. Der schwellende Strich als Randpaar bleibt trotzdem richtig — nur nicht an diesem Motiv.</p>
+    </div>
+  </div>
+
+  <h2>Zwei Fehler, die unterwegs auffielen</h2>
+  <p><b>Die Nullstellensuche log.</b> Für n&nbsp;≥&nbsp;1 ist
+     <code>J<sub>n</sub>(0)&nbsp;=&nbsp;0</code>, und dicht bei Null liefert die
+     Integration nur Rauschen um 1e-17. Ein Vorzeichenzähler findet dort
+     dutzende „Nullstellen“ und gab <code>j₈,₃&nbsp;=&nbsp;0,0598</code> zurück
+     statt 19,55. Der zweite Term jeder Überlagerung war damit Rauschen:
+     <b>dreißig gemessene Zeilen zeigten in Wahrheit eine einzelne Mode</b> —
+     genau das Polargitter, von dem ich gesagt hatte, es sei nichts Neues.
+     Aufgefallen ist es nur, weil ein Parameter, der etwas ändern musste,
+     nichts änderte.</p>
+  <p><b>Und meine Literaturspalte war erfunden.</b> Beim Nachprüfen habe ich
+     Vergleichswerte aus dem Gedächtnis hingeschrieben; sie waren falsch, und
+     eine Weile sah es so aus, als sei der Code kaputt.
+     <code>J₈(19,5545)&nbsp;=&nbsp;6·10⁻⁶</code> — die gerechnete Stelle
+     stimmt, die erinnerte nicht. Gegen echte Tafelwerte geprüft trifft die
+     Bessel-Funktion auf 1e-8.</p>
+
+  <h2>Was daraus folgt</h2>
+  <p>Zwei von fünf tragen. Drei nicht — und bei zweien davon <em>bestand die
+     Messung</em>. Das ist die eigentliche Lehre dieses Durchgangs: Die Zahlen
+     sagen, ob sich ein Blatt ausmalen lässt. Ob es schön ist, sagen sie
+     nicht.</p>
+
+  <footer>
+    Gerechnet von <code>tools/entwuerfe/</code> — <code>node bauen.js</code>
+    zeichnet, misst und legt die Bilder neu ab. Nichts davon steht in der App;
+    <code>sw.js</code> kennt diese Dateien nicht.
+  </footer>
+
+</main>
+</body>
+</html>

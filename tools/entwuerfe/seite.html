@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Entwürfe</title>
+<style>html,body{margin:0;background:#f6f1e6}canvas{display:block}</style>
+</head><body>
+<canvas id="linien" width="900" height="900"></canvas>
+<script src="grund.js"></script>
+<script src="entwuerfe.js"></script>
+<script>
+/* Kapsel, wie in entwuerfe.js: grund.js hat SIZE, C und R_OUT schon im
+   globalen Bereich deklariert. */
+(function(){
+const LW = 2.2, TINTE = '#3a3228', PAPIER = '#f6f1e6';
+const WALL_ALPHA = 60;              /* wie in app.js */
+const { SIZE, C, R_OUT } = window.Grund;
+
+function zeichne(id){
+  const cv = document.getElementById('linien');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,SIZE,SIZE);
+  ctx.lineWidth = LW; ctx.strokeStyle = TINTE;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const e = window.Entwuerfe.ENTWUERFE.filter(x => x.id === id)[0];
+  const t0 = performance.now();
+  const info = e.fn(ctx, e.opt) || {};
+  info.ms = Math.round(performance.now() - t0);
+  return info;
+}
+
+/* Die Gegenprobe zur App: die zählt das GRÖSSTE Feld, hier zählen wir ALLE.
+   Zusammenhängende Gebiete von Nicht-Wand-Pixeln innerhalb des Rahmens.
+   Wand = alpha > 60, genau wie floodFill es sieht. */
+function messe(){
+  const ctx = document.getElementById('linien').getContext('2d');
+  const d = ctx.getImageData(0,0,SIZE,SIZE).data;
+  const marke = new Int32Array(SIZE*SIZE).fill(-1);
+  const r2 = R_OUT*R_OUT;
+  let scheibe = 0;
+  const drin = new Uint8Array(SIZE*SIZE);
+  for (let y=0;y<SIZE;y++) for (let x=0;x<SIZE;x++){
+    const dx=x-C, dy=y-C;
+    if (dx*dx+dy*dy > r2) continue;
+    scheibe++;
+    if (d[(y*SIZE+x)*4+3] <= WALL_ALPHA) drin[y*SIZE+x] = 1;
+  }
+  const flaechen = [];
+  const stapel = new Int32Array(SIZE*SIZE);
+  for (let start=0; start<SIZE*SIZE; start++){
+    if (!drin[start] || marke[start] >= 0) continue;
+    const nr = flaechen.length;
+    let sp = 0, flaeche = 0;
+    const winkel = new Set();
+    stapel[sp++] = start; marke[start] = nr;
+    while (sp){
+      const p = stapel[--sp];
+      flaeche++;
+      const x = p % SIZE, y = (p - x) / SIZE;
+      const dx = x-C, dy = y-C;
+      winkel.add(Math.round(((Math.atan2(dy,dx)+Math.PI*2)%(Math.PI*2))/(Math.PI/90)));
+      if (x>0      && drin[p-1]    && marke[p-1]<0)    { marke[p-1]=nr;    stapel[sp++]=p-1; }
+      if (x<SIZE-1 && drin[p+1]    && marke[p+1]<0)    { marke[p+1]=nr;    stapel[sp++]=p+1; }
+      if (y>0      && drin[p-SIZE] && marke[p-SIZE]<0) { marke[p-SIZE]=nr; stapel[sp++]=p-SIZE; }
+      if (y<SIZE-1 && drin[p+SIZE] && marke[p+SIZE]<0) { marke[p+SIZE]=nr; stapel[sp++]=p+SIZE; }
+    }
+    flaechen.push({ flaeche: flaeche, grad: winkel.size*2 });
+  }
+  /* Drei Klassen, nicht zwei. Ein Gebiet von wenigen px² ist ein
+     Rundungsrest an einer Berührstelle - auf Papier unsichtbar, und die
+     Kantenglättung des Füllwerkzeugs deckt es mit. Erst ab etwa 10 px² wird
+     daraus sichtbarer Schmutz, den kein Finger trifft. Diese Grenze zu
+     ziehen ist keine Schönfärbung: die mittlere Klasse bleibt Befund. */
+  const echt = flaechen.filter(f => f.flaeche >= 80).sort((a,b)=>b.flaeche-a.flaeche);
+  const splitter = flaechen.filter(f => f.flaeche >= 10 && f.flaeche < 80).length;
+  const winzig = flaechen.filter(f => f.flaeche < 10).length;
+  const med = echt.length ? echt[Math.floor(echt.length/2)].flaeche : 0;
+  return {
+    felder: echt.length,
+    splitter: splitter,
+    winzig: winzig,
+    groesstes: echt.length ? +(echt[0].flaeche / scheibe * 100).toFixed(1) : 0,
+    gradGroesstes: echt.length ? echt[0].grad : 0,
+    median: med,
+    kleinstes: echt.length ? echt[echt.length-1].flaeche : 0
+  };
+}
+
+/* Fürs Bild: Papier darunter, damit es aussieht wie in der App. */
+function aufPapier(){
+  const cv = document.getElementById('linien');
+  const ctx = cv.getContext('2d');
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.fillStyle = PAPIER; ctx.fillRect(0,0,SIZE,SIZE);
+  ctx.restore();
+}
+window.zeichne = zeichne; window.messe = messe; window.aufPapier = aufPapier;
+})();
+</script>
+</body></html>
